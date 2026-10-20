@@ -159,3 +159,38 @@ new MutationObserver(()=>scheduleLinkify()).observe(document.getElementById('pan
  const sync=()=>{const h=fab.hidden;main.style.display=h?'none':'flex';if(h)close();};
  new MutationObserver(sync).observe(fab,{attributes:true,attributeFilter:['hidden']});sync();
 })();
+
+/* Command palette: search or jump anywhere (Ctrl/Cmd+K, "/", or the search icon) */
+(function(){
+ const sw=document.querySelector('.sw');if(!sw||window.__cmdk)return;window.__cmdk=1;
+ const el=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e;};
+ const TABS=[['ov','Overview'],['tr','Tracker'],['al','Orders'],['pay','Payments'],['ad','Address'],['msg','Messages'],['st','Stats'],['pol','Terms & order procedure'],['help','Help']];
+ const openPolicy=n=>{goTab('pol');setTimeout(()=>{const d=[...document.querySelectorAll('#terms details.tsec')].find(x=>{const k=x.querySelector('.tnum');return k&&k.textContent===String(n);});if(d){let p=d.parentElement;while(p&&p.id!=='terms'){if(p.tagName==='DETAILS')p.open=true;p=p.parentElement;}d.open=true;d.scrollIntoView({behavior:'smooth',block:'center'});}},150);};
+ const build=()=>{const items=[];const o=window.dash.data('orders');const rows=o.status==='ok'?o.data:[];
+  const due=rows.filter(r=>paidAmt(r)<Number(r.payout||0));
+  if(due.length)items.push({g:'Actions',t:'Pay now',s:'₹'+fmt(due.reduce((s,r)=>s+Number(r.payout||0)-paidAmt(r),0))+' due · opens GPay',k:'pay gpay due paid payment',go:()=>openPay()});
+  items.push({g:'Actions',t:'Share delivery address',s:'Address tab',k:'address pata deliver',go:()=>goTab('ad')});
+  items.push({g:'Actions',t:'Track latest order',s:'Tracker',k:'track tracking where kahan status',go:()=>goTab('tr')});
+  items.push({g:'Actions',t:'WhatsApp Luxella',s:'+91 87240 79056',k:'whatsapp chat message contact',go:()=>window.open('https://wa.me/918724079056','_blank')});
+  items.push({g:'Actions',t:'Instagram @luxella.in',s:'Opens Instagram',k:'instagram insta social',go:()=>window.open('https://www.instagram.com/luxella.in/','_blank')});
+  items.push({g:'Actions',t:'Email Luxella',s:'luxella.in@gmail.com',k:'email mail gmail',go:()=>{location.href='mailto:luxella.in@gmail.com';}});
+  rows.forEach(r=>{const st=Number(r.stage||1);items.push({g:'Orders',t:r.item,s:(r.order_no||'')+' · '+(STAGES[st-1]||r.status)+(r.eta_date&&st<9?' · ETA '+fd(r.eta_date):''),k:(r.order_no||'')+' '+(r.brand||'')+' '+(r.status||''),go:()=>openDrawer(r)});});
+  TABS.forEach(([id,n])=>items.push({g:'Go to',t:n,s:'Tab',k:'',go:()=>document.getElementById('tab-'+id).click()}));
+  if(typeof polSections==='function')polSections().forEach(s=>{if(s.n==='00')return;items.push({g:'Terms',t:s.title,s:'Section '+s.n+' · '+(s.lead||s.body[0]||'').slice(0,70),k:(s.lead||'')+' '+s.body.join(' '),go:()=>openPolicy(s.n)});});
+  return items;};
+ const score=(it,q)=>{if(!q)return it.g==='Actions'||it.g==='Orders'?1:0;const T=(it.t+' '+it.s).toLowerCase(),K=(it.k||'').toLowerCase();let sc=0;for(const w of q.split(/\s+/)){if(!w)continue;if(it.t.toLowerCase().startsWith(w))sc+=6;else if(T.includes(w))sc+=4;else if(K.includes(w))sc+=1.5;else return 0;}return sc;};
+ let back=null,sel=0,list=[];
+ const close=()=>{if(back){back.remove();back=null;}};
+ const draw=(q)=>{const all=build();list=all.map(it=>({it,sc:score(it,q.trim().toLowerCase())})).filter(x=>x.sc>0).sort((a,b)=>b.sc-a.sc).slice(0,q?9:8).map(x=>x.it);sel=0;const ul=back.querySelector('.cm-list');ul.textContent='';
+  if(!list.length){ul.appendChild(el('div','cm-empty','Nothing matches. Try the chat bubble, or WhatsApp Luxella.'));return;}
+  let lastG='';list.forEach((it,i)=>{if(it.g!==lastG){lastG=it.g;ul.appendChild(el('div','cm-g',it.g));}const r=el('button','cm-i');r.type='button';r.dataset.i=i;r.appendChild(el('span','cm-t',it.t));r.appendChild(el('span','cm-s',it.s));r.addEventListener('click',()=>run(i));r.addEventListener('mousemove',()=>{sel=i;mark();});ul.appendChild(r);});mark();};
+ const mark=()=>{back.querySelectorAll('.cm-i').forEach(b=>b.classList.toggle('on',Number(b.dataset.i)===sel));const a=back.querySelector('.cm-i.on');if(a&&a.scrollIntoView)a.scrollIntoView({block:'nearest'});};
+ const run=i=>{const it=list[i];close();if(it)setTimeout(it.go,60);};
+ const open=()=>{if(back)return;document.querySelectorAll('.lx-sheet-back').forEach(e=>{});back=el('div','cm-back');back.innerHTML='<div class="cm" role="dialog" aria-label="Search"><div class="cm-top"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="m16 16 4.5 4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><input class="cm-in" type="text" placeholder="Search orders, terms, or jump to…" autocomplete="off" spellcheck="false"><kbd>esc</kbd></div><div class="cm-list"></div><div class="cm-foot"><span>↑↓ move</span><span>↵ open</span><span>Ctrl K anywhere</span></div></div>';
+  sw.appendChild(back);const inp=back.querySelector('.cm-in');draw('');inp.focus();inp.addEventListener('input',()=>draw(inp.value));
+  inp.addEventListener('keydown',e=>{if(e.key==='ArrowDown'){e.preventDefault();sel=Math.min(list.length-1,sel+1);mark();}else if(e.key==='ArrowUp'){e.preventDefault();sel=Math.max(0,sel-1);mark();}else if(e.key==='Enter'){e.preventDefault();run(sel);}});
+  back.addEventListener('click',e=>{if(e.target===back)close();});};
+ addEventListener('keydown',e=>{if(e.key==='Escape'){close();return;}if((e.key==='k'||e.key==='K')&&(e.ctrlKey||e.metaKey)){e.preventDefault();back?close():open();return;}if(e.key==='/'&&!/INPUT|TEXTAREA|SELECT/.test((e.target&&e.target.tagName)||'')&&!back){e.preventDefault();open();}});
+ const place=()=>{const top=document.getElementById('top');if(!top||top.querySelector('.srchb'))return;const b=el('button','srchb');b.type='button';b.setAttribute('aria-label','Search');b.title='Search (Ctrl K)';b.innerHTML='<svg viewBox="0 0 24 24" width="14" height="14"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m16 16 4.5 4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span>Search</span>';b.addEventListener('click',open);const who=top.querySelector('.who');top.insertBefore(b,who||null);};
+ place();new MutationObserver(place).observe(document.body,{childList:true,subtree:true});
+})();
