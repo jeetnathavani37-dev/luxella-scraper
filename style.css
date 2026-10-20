@@ -838,8 +838,18 @@ img{max-width:100%}
 .sw .chatfab{position:fixed!important;left:-9999px!important;opacity:0;pointer-events:none}
 .sw .qcm{position:fixed;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(max(16px,env(safe-area-inset-bottom,0px)) + 52px);z-index:32;width:54px;height:54px;padding:0;border-radius:50%!important;display:flex;align-items:center;justify-content:center;background:var(--gold);border:1px solid var(--gold);color:#0A0A0A;box-shadow:0 8px 24px rgba(0,0,0,.45);cursor:pointer;transition:transform .25s ease,background .2s}
 .sw .qcm svg{width:24px;height:24px;display:block;transition:transform .25s ease}
-.sw .qcm.on svg{transform:rotate(135deg)}
-.sw .qcmenu{position:fixed;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(max(16px,env(safe-area-inset-bottom,0px)) + 116px);z-index:32;display:flex;flex-direction:column;align-items:flex-end;gap:10px}
+.sw .qcm{width:58px;height:58px;position:fixed}
+.sw .qcm .qcc{position:relative;width:34px;height:34px;display:block;transition:opacity .2s,transform .25s}
+.sw .qcm .qcc i{position:absolute;width:16px;height:16px;display:block}
+.sw .qcm .qcc i svg{width:16px;height:16px}
+.sw .qcm .qcc .c1{left:9px;top:0}.sw .qcm .qcc .c2{left:0;top:17px}.sw .qcm .qcc .c3{left:18px;top:17px}
+.sw .qcm .qcx{position:absolute;opacity:0;transform:rotate(-90deg);transition:opacity .2s,transform .25s;display:flex}
+.sw .qcm .qcx svg{width:24px;height:24px;transform:rotate(45deg)}
+.sw .qcm.on .qcc{opacity:0;transform:scale(.6)}
+.sw .qcm.on .qcx{opacity:1;transform:none}
+@media (prefers-reduced-motion:no-preference){.sw .qcm:not(.on) .qcc{animation:qcpulse 3.2s ease-in-out infinite}}
+@keyframes qcpulse{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
+.sw .qcmenu{position:fixed;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(max(16px,env(safe-area-inset-bottom,0px)) + 120px);z-index:32;display:flex;flex-direction:column;align-items:flex-end;gap:10px}
 .sw .qcmenu[hidden]{display:none}
 .sw .qci{display:flex;align-items:center;gap:10px;background:none;border:0;padding:0;color:var(--color-fg,#F3EEE6);text-decoration:none;cursor:pointer;font:inherit;opacity:0;transform:translateY(8px);transition:opacity .2s ease,transform .2s ease}
 .sw .qcm.on~.qcmenu .qci,.sw .qcmenu .qci{}
