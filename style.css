@@ -819,3 +819,13 @@ img{max-width:100%}
 .lx-top .bellb{border:1px solid #2A2724;border-radius:999px;padding:4px 10px;color:#8E887C;font:400 8.5px 'Jost',sans-serif;letter-spacing:.24em;text-transform:uppercase;background:none;cursor:pointer}
 .lx-top .bellb[data-st=on]{border-color:#C9A227;color:#E3C565}
 .lx-top .bellb[data-st=on]::before{content:'';display:inline-block;width:5px;height:5px;border-radius:50%;background:#E3C565;margin-right:6px;vertical-align:middle}
+
+/* Overview dropdown sections */
+.sw .accgrid{display:block!important}
+.sw section.card.acc{padding:0!important;margin:0}
+.sw section.card.acc>h2{cursor:pointer;display:flex!important;align-items:center;justify-content:space-between;margin:0!important;padding:16px 0;user-select:none;-webkit-tap-highlight-color:transparent}
+.sw section.card.acc>h2::after{content:"";display:block!important;width:7px;height:7px;border-right:1.5px solid var(--gold);border-bottom:1.5px solid var(--gold);transform:rotate(45deg);transition:transform .25s ease;margin-right:4px}
+.sw section.card.acc.open>h2::after{transform:rotate(-135deg)}
+.sw section.card.acc:not(.open)>:not(h2){display:none!important}
+.sw section.card.acc.open{padding-bottom:22px!important}
+.sw section.card.acc.open>h2{padding-bottom:10px}

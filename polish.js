@@ -107,3 +107,20 @@ window.dash.onData(()=>{const o=window.dash.data('orders');if(o.status!=='ok')re
  (async()=>{const shown=await pushNudge(rows);const afterNudge=()=>{let tries=0;const t=setInterval(()=>{tries++;if(document.querySelector('.lx-sheet-back')){if(tries>240)clearInterval(t);return;}clearInterval(t);welcome(rows);},400);};if(shown)afterNudge();else setTimeout(()=>welcome(rows),700);})();}});
 new MutationObserver(()=>scheduleLinkify()).observe(document.getElementById('pane-help')||sw,{childList:true,subtree:true});
 })();
+
+/* Overview: tidy dropdown sections */
+(function(){
+ const pane=document.getElementById('pane-ov');if(!pane||pane.__acc)return;pane.__acc=1;
+ const OPEN=['From Luxella','Next delivery','Your to-dos'];
+ pane.querySelectorAll('section.card').forEach(sec=>{
+  const h=sec.querySelector(':scope > h2');if(!h)return;
+  const t=h.textContent.trim();sec.classList.add('acc');
+  h.setAttribute('role','button');h.setAttribute('tabindex','0');
+  const set=o=>{sec.classList.toggle('open',o);h.setAttribute('aria-expanded',o?'true':'false');};
+  set(OPEN.includes(t));
+  const tog=()=>{set(!sec.classList.contains('open'));};
+  h.addEventListener('click',tog);
+  h.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();tog();}});
+ });
+ pane.querySelectorAll('.grid').forEach(g=>g.classList.add('accgrid'));
+})();
