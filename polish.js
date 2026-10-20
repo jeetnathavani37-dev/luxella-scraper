@@ -133,14 +133,29 @@ new MutationObserver(()=>scheduleLinkify()).observe(document.getElementById('pan
   else if(tries>60)clearInterval(iv);},500);
 })();
 
-/* Quick-contact buttons above the chat bubble: WhatsApp + GPay */
+/* One speed-dial: Chat / WhatsApp / GPay inside a single button */
 (function(){
- const fab=document.getElementById('chatfab');if(!fab||document.getElementById('qc-wa'))return;
+ const fab=document.getElementById('chatfab');if(!fab||document.getElementById('qc-main'))return;
  const ios=/iPhone|iPad|iPod/i.test(navigator.userAgent);
- const upi='pa=jeetnathavani37-1@okaxis&pn=Luxella&cu=INR';
- const mk=(id,label,href,svg,off)=>{const a=document.createElement('a');a.id=id;a.className='qcb';a.href=href;a.setAttribute('aria-label',label);a.title=label;a.style.bottom='calc(max(16px,env(safe-area-inset-bottom,0px)) + '+off+'px)';if(/^https/.test(href)){a.target='_blank';a.rel='noopener';}a.innerHTML=svg;fab.parentNode.appendChild(a);return a;};
- const wa=mk('qc-wa','WhatsApp Luxella','https://wa.me/918724079056?text='+encodeURIComponent('Hi Luxella'),'<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2.2A9.8 9.8 0 0 0 3.6 17l-1.4 4.8 4.9-1.3A9.8 9.8 0 1 0 12 2.2Zm0 17.9c-1.5 0-2.9-.4-4.1-1.1l-.3-.2-2.9.8.8-2.8-.2-.3a8.1 8.1 0 1 1 6.7 3.6Zm4.5-6c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1-1.5-.7-2.4-1.3-3.4-2.9-.1-.2 0-.4.1-.5l.4-.5c.1-.1.2-.3.200-.4.100-.1 0-.3 0-.4l-.8-1.800c-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.2.3-.9.9-.9 2.200s.9 2.500 1.100 2.700c.1.200 1.800 2.800 4.400 3.900 1.600.7 2.300.7 3.100.6.500-.1 1.5-.6 1.700-1.200.2-.6.2-1.100.2-1.200-.1-.1-.2-.2-.5-.3Z"/></svg>',184);
- const gp=mk('qc-gp','Pay with GPay',(ios?'gpay://upi/pay?':'tez://upi/pay?')+upi,'<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3 7.500A2.500 2.500 0 0 1 5.500 5h13A2.500 2.500 0 0 1 21 7.500v9a2.500 2.500 0 0 1-2.500 2.500h-13A2.500 2.500 0 0 1 3 16.500v-9Zm2 .5v2h14V8a.5.5 0 0 0-.5-.5h-13a.5.5 0 0 0-.5.5Zm14 4H5v4.500a.5.5 0 0 0 .5.5h13a.5.5 0 0 0 .5-.5V12Zm-4 1.5h2.500v1.5H15v-1.5Z"/></svg>',128);
- const sync=()=>{const h=fab.hidden;wa.style.display=gp.style.display=h?'none':'flex';};
+ const par=fab.parentNode;
+ const IC={
+  chat:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v8a2.5 2.5 0 0 1-2.5 2.5H10l-4.2 3.4c-.6.5-1.3 0-1.3-.7V16A2.5 2.5 0 0 1 4 13.5v-8Z"/></svg>',
+  wa:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 2.2A9.8 9.8 0 0 0 3.6 17l-1.4 4.8 4.9-1.3A9.8 9.8 0 1 0 12 2.2Zm0 17.9c-1.5 0-2.9-.4-4.1-1.1l-.3-.2-2.9.8.8-2.8-.2-.3a8.1 8.1 0 1 1 6.7 3.6Zm4.5-6c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1-1.5-.7-2.4-1.3-3.4-2.9-.1-.2 0-.4.1-.5l.4-.5c.1-.1.2-.3.2-.4.1-.1 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.2.3-.9.9-.9 2.2s.9 2.5 1.1 2.7c.1.2 1.8 2.8 4.4 3.9 1.6.7 2.3.7 3.1.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.2-.2-.5-.3Z"/></svg>',
+  pay:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M3 7.5A2.5 2.5 0 0 1 5.5 5h13A2.5 2.5 0 0 1 21 7.5v9a2.5 2.5 0 0 1-2.5 2.5h-13A2.5 2.5 0 0 1 3 16.5v-9ZM5 8v2h14V8a.5.5 0 0 0-.5-.5h-13A.5.5 0 0 0 5 8Zm14 4H5v4.5a.5.5 0 0 0 .5.5h13a.5.5 0 0 0 .5-.5V12Zm-4 1.5h2.5V15H15v-1.5Z"/></svg>',
+  plus:'<svg viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" d="M12 5v14M5 12h14"/></svg>'};
+ const main=document.createElement('button');main.id='qc-main';main.type='button';main.className='qcm';main.setAttribute('aria-label','Contact and pay');main.setAttribute('aria-expanded','false');main.innerHTML=IC.plus;
+ const menu=document.createElement('div');menu.id='qc-menu';menu.className='qcmenu';menu.hidden=true;
+ const upiBase=()=>{const p=(window.photos&&window.photos.payinfo)||{};return p.upi||'jeetnathavani37-1@okaxis';};
+ const item=(label,svg,fn,href)=>{const e=document.createElement(href?'a':'button');e.className='qci';if(href){e.href=href;if(/^https/.test(href)){e.target='_blank';e.rel='noopener';}}else e.type='button';e.innerHTML='<span class="ql">'+label+'</span><span class="qb">'+svg+'</span>';e.addEventListener('click',()=>{close();if(fn)fn();});menu.appendChild(e);};
+ const open=()=>{menu.hidden=false;requestAnimationFrame(()=>main.classList.add('on'));main.setAttribute('aria-expanded','true');};
+ const close=()=>{main.classList.remove('on');main.setAttribute('aria-expanded','false');setTimeout(()=>{if(!main.classList.contains('on'))menu.hidden=true;},200);};
+ item('Chat with Luxella',IC.chat,()=>fab.click());
+ item('WhatsApp',IC.wa,null,'https://wa.me/918724079056?text='+encodeURIComponent('Hi Luxella'));
+ item('Pay with GPay',IC.pay,()=>{if(window.openPay)window.openPay();else location.href=(ios?'gpay://upi/pay?':'tez://upi/pay?')+'pa='+encodeURIComponent(upiBase())+'&pn=Luxella&cu=INR';});
+ par.appendChild(menu);par.appendChild(main);
+ main.addEventListener('click',()=>{menu.hidden?open():close();});
+ document.addEventListener('click',e=>{if(!menu.hidden&&!menu.contains(e.target)&&e.target!==main&&!main.contains(e.target))close();});
+ document.addEventListener('keydown',e=>{if(e.key==='Escape')close();});
+ const sync=()=>{const h=fab.hidden;main.style.display=h?'none':'flex';if(h)close();};
  new MutationObserver(sync).observe(fab,{attributes:true,attributeFilter:['hidden']});sync();
 })();
