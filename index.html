@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en">
+<head>
+<base href="/">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>Luxella · Private Client</title>
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="gate" class="lx-gate" hidden></div>
+<div id="top" class="lx-top" hidden></div>
+<div id="dash-root" hidden>
+<div class="sw">
+<input type="file" id="ph-file" accept="image/*" hidden>
+<input type="file" id="bl-file" accept="image/*" hidden>
+<input type="file" id="ss-file" accept="image/*" hidden>
+<input type="file" id="cl-file" accept="image/*" hidden>
+<input type="file" id="doc-file" accept="image/*,.pdf" hidden>
+<input type="file" id="pod-file" accept="image/*" hidden>
+<input type="file" id="qc-file" accept="image/*" hidden>
+<div class="notif" id="notif" hidden><div class="nh"><span class="eyebrow">Updates</span><span class="lbl" id="notif-n"></span><button class="chip" id="notif-x" type="button">Hide</button></div><ul id="notif-list" class="tl"></ul></div>
+<div class="hero">
+<div class="hero-top"><span class="eyebrow">Luxella · Private client service</span><span class="hdrbtns" id="hdrbtns"></span><button class="chip tog" id="bell" type="button" aria-pressed="false" title="Recent activity">Activity</button><button class="chip tog" id="priv-toggle" type="button" aria-pressed="false" title="Hide amounts">Amounts</button><button class="chip manage owner-toggle" id="mg-toggle" type="button" hidden aria-pressed="false">Manage</button></div>
+<div class="hero-main"><span id="clogo"></span><div><h1 id="h1">Your Luxella orders</h1><p class="hero-cap" id="hero-cap">Curated pieces, tracked end to end. Every reference below is one order, from the retailer to your door.</p></div></div>
+<div class="rule-double"></div>
+<p class="sub"><span class="fresh" id="fresh"><span class="dot"></span><span id="fresh-t">Updated on 19th October</span></span><span class="sep">·</span><span id="contact-line">Questions? Message Luxella on WhatsApp.</span><span class="sep">·</span><span id="season">Autumn 2026</span></p>
+</div>
+<div class="tabs" role="tablist"><button class="tab" id="tab-ov" role="tab" aria-selected="true">Overview</button><button class="tab" id="tab-tr" role="tab" aria-selected="false">Tracker</button><button class="tab" id="tab-al" role="tab" aria-selected="false">Orders</button><button class="tab" id="tab-pay" role="tab" aria-selected="false">Payments</button><button class="tab" id="tab-ad" role="tab" aria-selected="false">Address</button><button class="tab" id="tab-msg" role="tab" aria-selected="false">Messages</button><button class="tab" id="tab-st" role="tab" aria-selected="false">Stats</button><button class="tab" id="tab-help" role="tab" aria-selected="false">Help</button></div>
+<div class="mini" id="mini"></div>
+<div id="pane-ov">
+<div id="banner" hidden class="banner"><span class="pulse"></span><div><p class="big" id="bn-t"></p><p class="lbl" id="bn-s" style="margin:0"></p></div></div>
+<div class="tiles">
+<div class="card" data-tap="al"><div class="lbl">Total orders</div><div class="big" data-source="totals" data-row="0" data-field="orders">—</div></div>
+<div class="card" data-tap="al:delivered"><div class="lbl">Delivered</div><div class="big ok" data-source="totals" data-row="0" data-field="delivered">—</div></div>
+<div class="card" data-tap="tr"><div class="lbl">On the way</div><div class="big warn" data-source="totals" data-row="0" data-field="open">—</div></div>
+<div class="card" data-tap="pay"><div class="lbl">Paid</div><div class="big ok" data-source="totals" data-row="0" data-field="received">—</div></div>
+<div class="card" data-tap="al:due"><div class="lbl">Due</div><div class="big bad" data-source="totals" data-row="0" data-field="pending">—</div></div>
+</div>
+<div class="qa" id="qa"><button class="btn2" data-go="pay">Pay now</button><button class="btn2" data-go="ad">Share address</button><button class="btn2" data-go="tr">Track latest</button><button class="btn2" data-go="help">Ask for a quote</button></div>
+<section class="card"><h2>From Luxella</h2><div id="pinned" class="pinned"><span class="lbl">No note right now.</span></div></section>
+<section class="card"><h2>Timeline</h2><p class="note">Open orders from order date to ETA, on one calendar</p><div id="gantt" class="gantt"></div></section>
+<div class="grid">
+<section class="card"><h2>Ready now in India</h2><p class="note">Pieces Luxella has in hand. Reserve and it ships within a day of payment.</p><div id="stock" class="act"></div></section>
+<section class="card"><h2>Place a new order</h2><p class="note">Three steps. Nothing gets missed, and payment details are right here.</p>
+<div class="step"><span class="sn">1</span>The piece</div>
+<div class="form"><label>Item<input id="no-item" type="text" placeholder="e.g. Coach Tabby 26"></label><label>Brand<input id="no-brand" type="text"></label><label>Size / colour<input id="no-size" type="text"></label><label>Qty<input id="no-qty" type="number" value="1" min="1"></label><label class="wide">Product link (optional)<input id="no-link" type="url" placeholder="https://"></label><label class="wide">Notes<input id="no-notes" type="text" placeholder="Deadline, gift wrap, alternatives…"></label></div>
+<div class="step"><span class="sn">2</span>Delivery</div>
+<div class="form"><label class="wide">Deliver to<select id="no-addr"></select></label><label class="wide">New address (if not on file)<input id="no-newaddr" type="text" placeholder="Full address with pincode and phone"></label></div>
+<div class="step"><span class="sn">3</span>Payment</div>
+<div class="form"><label>Agreed price ₹<input id="no-price" type="number" inputmode="numeric" placeholder="as quoted"></label><label>Paying by<select id="no-pay"><option>UPI</option><option>Bank transfer</option><option>Will pay after confirmation</option></select></label><label>Paid amount ₹ (if already paid)<input id="no-paid" type="number" inputmode="numeric"></label></div>
+<div id="no-payinfo" class="payinline"></div>
+<textarea id="no-text" class="msgbox" readonly rows="8"></textarea>
+<div class="row" style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap"><button class="btn" id="no-copy" type="button">Copy request</button><a class="btn2" id="no-wa" href="#" target="_blank" rel="noopener">Send on WhatsApp</a><span class="lbl" id="no-msg"></span></div></section>
+<section class="card"><h2>Quotes & wishlist</h2><p class="note">Pieces you asked about. Accept a quote to start an order.</p><div id="quotes" class="act"></div></section>
+</div>
+<section class="card"><h2>Departures</h2><p class="note">Every open reference, as a board</p><div class="scroll"><table class="board" id="board"><thead><tr><th>Ref.</th><th>Piece</th><th>Origin</th><th>Hub</th><th>India</th><th>Status</th><th>ETA</th></tr></thead><tbody></tbody></table></div></section>
+<div class="grid">
+<section class="card"><h2>Next 7 days</h2><p class="note">What is due this week</p><div id="week" class="act"></div></section>
+<section class="card"><h2>Featured piece</h2><p class="note">Your most recent order</p><div id="featured" class="feat"></div></section>
+<section class="card"><h2>At a glance</h2><div class="glance" id="glance"></div></section>
+</div>
+<div class="grid">
+<section class="card"><h2>Next delivery</h2><p class="note">Closest open order</p><div id="nextdel" class="nxt" data-source="orders"></div><div class="hs"><input id="hq" type="search" placeholder="Find an order (#1002, Puma…)"></div>
+<div class="ql"><button class="chip" id="ql-tr" type="button">Open tracker</button><button class="chip" id="ql-pay" type="button">Payments</button><button class="chip" id="ql-ad" type="button">Address</button></div></section>
+<section class="card"><h2>Your to-dos</h2><p class="note">Things waiting on you</p><div id="actions" class="act" data-source="actions"></div></section>
+</div>
+<div class="grid">
+<section class="card"><h2>Where things stand</h2><p class="note">Orders by stage</p><div id="statbox" class="stat" data-source="orders"></div></section>
+<section class="card"><h2>Recent activity</h2><p class="note">Latest orders first</p><ul id="timeline" class="tl"></ul></section>
+<section class="card"><h2>Contact</h2><p class="note">Reach Luxella directly</p><div id="contact"></div></section>
+</div>
+</div>
+<div id="pane-tr" hidden>
+<div class="grid">
+<section class="card"><h2>Countdown</h2><p class="note">Live, to the next ETA</p><div id="countdown" class="bezelwrap"></div></section>
+<section class="card"><h2>Delivery calendar</h2><p class="note">Green = expected delivery, grey = order placed</p><div class="calhd"><button class="chip" id="cal-prev" type="button">‹</button><span id="cal-title"></span><button class="chip" id="cal-next" type="button">›</button></div><div id="cal" class="cal"></div></section>
+</div>
+<section class="card"><h2>Order tracker</h2><p class="note">Open orders only. Green is done, amber is the current step. Delivered orders are in the All orders tab.</p><div class="tools"><span id="trk-chips"></span><select id="trk-sort" style="margin-left:auto"><option value="stage">Sort: furthest along</option><option value="eta">Sort: soonest ETA</option><option value="date">Sort: newest</option></select></div><div id="tracker" data-source="orders" data-row-key="item"></div></section>
+</div>
+<div id="pane-al" hidden>
+<section class="card"><h2>All orders</h2>
+<p class="note">Every order, lifetime. Filter by date, brand or order type.</p>
+<div class="form" style="margin-bottom:var(--cds-gap-sm)">
+<label>From<input id="f-from" type="date"></label>
+<label>To<input id="f-to" type="date"></label>
+<label>Brand<select id="f-brand"><option value="">All brands</option></select></label>
+<label>Order type<select id="f-type"><option value="">All types</option></select></label>
+</div>
+<div class="tools"><input id="q" type="search" placeholder="Search, or try: late, due, this month"><span id="qsug"></span><span id="chips"></span><select id="f-group"><option value="">No grouping</option><option value="brand">Group by brand</option><option value="month">Group by month</option><option value="status">Group by status</option></select><button class="btn2" id="f-cols" type="button">Columns</button><button class="btn2" id="f-reset" type="button">Reset</button></div><div id="colpick" class="colpick" hidden></div>
+<p class="lbl" id="f-sum" style="margin:0 0 var(--cds-gap-sm)"></p>
+<div class="scroll">
+<table id="ordT" data-source="orders" data-row-key="item"><thead><tr><th data-field="photo_url">Photo</th><th data-field="order_no" data-k="order_no">Order #</th><th data-field="item" data-k="item">Item</th><th data-field="brand" data-k="brand">Brand</th><th data-field="order_date" data-k="order_date">Date</th><th data-field="order_type" data-k="order_type">Order type</th><th data-field="direct" data-k="direct">Ships</th><th data-field="status" data-k="status">Status</th><th class="n" data-field="payout" data-k="payout">Amount (₹)</th><th data-field="payout_status" data-k="payout_status">Payment</th><th data-field="intl_tracking_no" data-k="intl_tracking_no">International tracking</th><th data-field="eta_date" data-k="eta_date">ETA</th><th data-field="shipping_date" data-k="shipping_date">Shipping date</th><th data-field="local_tracking" data-k="local_tracking">India tracking</th><th>Actions</th></tr></thead><tbody></tbody></table></div></section>
+<div class="grid">
+<section class="card"><h2>Activity log</h2><p class="note">Every update across your orders, newest first</p><ul id="actlog" class="tl"></ul></section>
+<section class="card"><h2>Document vault</h2><p class="note">Receipts and invoices attached to your orders</p><div id="vault" class="docs"></div><p style="margin:12px 0 0"><button class="btn2" id="csv-copy" type="button">Copy orders as CSV</button></p></section>
+</div>
+</div>
+<div id="pane-pay" hidden>
+<div class="grid">
+<section class="card"><h2>Statement of account</h2><p class="note">Charges and payments, with running balance</p><div class="tools"><select id="st-month"><option value="">All months</option></select></div><div class="scroll"><table id="ledger" data-source="orders" data-row-key="item"><thead><tr><th>Date</th><th>Ref.</th><th>Description</th><th class="n">Charge</th><th class="n">Paid</th><th class="n">Balance</th></tr></thead><tbody></tbody></table></div><p style="margin:12px 0 0"><button class="btn2" id="st-copy" type="button">Copy statement</button></p></section>
+<section class="card"><h2>Payment instructions</h2><p class="note">How to pay Luxella</p><div id="payinfo"><span class="lbl">Payment details will appear here.</span></div></section>
+</div>
+<div class="paytiles">
+<div class="card" data-tap="al"><div class="lbl">Total billed</div><div class="big" data-source="totals" data-row="0" data-field="billed">—</div></div>
+<div class="card"><div class="lbl">Paid</div><div class="big ok" data-source="totals" data-row="0" data-field="received">—</div></div>
+<div class="card"><div class="lbl">Due</div><div class="big bad" data-source="totals" data-row="0" data-field="pending">—</div></div>
+</div>
+<div class="grid">
+<section class="card"><h2>Payment progress</h2><p class="note">Paid share of everything billed</p><div id="payprog"></div></section>
+<section class="card"><h2>This month</h2><p class="note" id="tm-note">Compared with last month</p><div id="thismonth"></div></section>
+</div>
+<section class="card"><h2>Payments</h2><p class="note">One line per order. Green is paid, red is due. Payment screenshots show here once added.</p>
+<div class="scroll"><table id="payT" data-source="orders" data-row-key="item"><thead><tr><th data-field="order_no">Order #</th><th data-field="item">Paid for</th><th class="n" data-field="payout">Amount (₹)</th><th data-field="payout_status">Status</th><th data-field="payment_date">Received at</th><th>Screenshot</th></tr></thead><tbody></tbody></table></div>
+<p class="lbl" id="pay-note" style="margin:10px 0 0"></p></section>
+</div>
+<div id="pane-ad" hidden>
+<section class="card" style="margin-bottom:var(--cds-gap-md)"><h2>Shipping address</h2>
+<p class="note">When an order reaches "Address requested", paste your full address here and tap Save. Luxella sees it directly.</p>
+<div class="form">
+<label>Order<select id="a-order"></select></label>
+<label>Phone<input id="a-phone" type="tel" autocomplete="tel" placeholder="+91 …"></label>
+<label class="wide">Full address (paste here)<textarea id="a-addr" rows="5" placeholder="Name&#10;House / flat, street, area&#10;City, State – Pincode"></textarea></label>
+<label class="wide">Delivery preferences (optional)<input id="a-pref" type="text" placeholder="e.g. Call before delivery · leave with security · weekdays after 6pm"></label>
+</div>
+<p style="margin:12px 0 0;display:flex;gap:8px;flex-wrap:wrap;align-items:center"><button class="btn" id="a-save" type="button">Save address</button><button class="btn2" id="a-copy" type="button">Copy instead</button> <span class="lbl" id="a-msg"></span></p></section>
+<section class="card"><h2>Address book</h2><p class="note">Addresses Luxella has on file for you. The default is used unless you say otherwise.</p><div id="addrbook" class="act"></div></section>
+<section class="card"><h2>Saved addresses</h2><p class="note">On file for your open orders. Once an order is delivered, its address is removed from here.</p><div id="a-list" class="act"><span class="lbl">Nothing saved yet.</span></div></section>
+</div>
+<div id="pane-st" hidden>
+<div class="tiles" id="st-tiles"></div>
+<div class="grid">
+<section class="card"><h2>Orders by month</h2><p class="note">Count and value</p><div id="st-month"></div></section>
+<section class="card"><h2>Spend by brand</h2><p class="note">Total order value per brand, in ₹</p><div id="brandBars" data-source="by_brand" style="min-height:110px"></div></section>
+</div>
+<div class="grid">
+<section class="card"><h2>By brand</h2><div class="scroll">
+<table id="brandT" data-source="by_brand" data-row-key="brand"><thead><tr><th data-field="brand">Brand</th><th class="n" data-field="orders">Orders</th><th class="n" data-field="sale_value">Amount (₹)</th></tr></thead><tbody></tbody></table></div></section>
+<section class="card"><h2>Order mix</h2><p class="note">By type and by status</p><div id="st-mix" class="glance"></div></section>
+</div>
+<div class="grid">
+<section class="card"><h2>Spend by month</h2><p class="note">Order value per month, in ₹</p><div id="monthBars" data-source="by_month" style="min-height:80px"></div></section>
+<section class="card"><h2>Delivery performance</h2><p class="note">From stage dates on your orders</p><div id="perf" class="glance"></div></section>
+<section class="card"><h2>Payments</h2><p class="note">Lifetime</p><div id="st-pay" class="glance"></div></section>
+<section class="card"><h2>Records</h2><p class="note">Highs and firsts</p><div id="st-rec" class="glance"></div></section>
+</div>
+</div>
+<div id="pane-msg" hidden>
+<div class="howto" id="howto"><span><b>1</b> Pick the order below</span><span><b>2</b> Tap the stage</span><span><b>3</b> Copy or open in WhatsApp</span></div>
+<section class="card"><h2>Today's batch</h2><p class="note">Messages worth sending today, ready to go. Tick them off as you send.</p><div id="batch" class="act"></div></section>
+<section class="card"><h2>Combined update</h2><p class="note">One message covering several orders for the same customer</p><div class="tools" id="cb-pick"></div><textarea id="cb-text" class="msgbox" readonly rows="6"></textarea><div class="row" style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap"><button class="btn" id="cb-copy" type="button">Copy</button><a class="btn2" id="cb-wa" href="#" target="_blank" rel="noopener">Open in WhatsApp</a></div></section>
+<section class="card"><h2>Message generator</h2><p class="note" id="mg-note">Messages you can forward to your customers. Tap a stage, add a line if needed, copy or open in WhatsApp.</p>
+<div class="tools"><span class="lbl mg-own" hidden>Audience</span><select id="mg-aud" class="mg-own" hidden><option value="cust">My customer</option><option value="me">Me, from Luxella</option></select><input id="mg-name" type="text" placeholder="Customer name (optional)" style="max-width:14rem"><select id="mg-lang"><option value="en">English</option><option value="hi">Hinglish</option><option value="dv">हिन्दी</option></select><select id="mg-tone"><option value="friendly">Friendly</option><option value="pro">Professional</option></select><button class="chip tog" id="mg-emoji" type="button" aria-pressed="false">Emoji</button><input id="mg-sign" type="text" placeholder="Sign-off (default: business name)" style="max-width:16rem"><button class="btn2" id="mg-all" type="button">Copy current updates for all open orders</button><span class="lbl" id="mg-msg"></span></div>
+<div id="mg-list"></div></section>
+<div class="grid">
+<section class="card"><h2>Pitch a piece</h2><p class="note">Turn a quote into a customer offer at your price</p><div class="form"><label>Piece<select id="pt-item"></select></label><label>Your price ₹<input id="pt-price" type="number" inputmode="numeric"></label><label>Delivery in (days)<input id="pt-days" type="number" inputmode="numeric" placeholder="18"></label></div><textarea id="pt-text" class="msgbox" readonly rows="5"></textarea><div class="row" style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap"><button class="btn" id="pt-copy" type="button">Copy</button><a class="btn2" id="pt-wa" href="#" target="_blank" rel="noopener">Open in WhatsApp</a></div></section>
+<section class="card"><h2>Occasions & care</h2><p class="note">Greetings, delay notes, review requests. Tap to copy.</p><div id="occ" class="act"></div><div class="form" style="margin-top:10px"><label>New date for delay note<input id="occ-date" type="date"></label></div></section>
+<section class="card"><h2>Quick replies</h2><p class="note">Answers to the questions customers ask most. Tap to copy.</p><div id="qr" class="act"></div></section>
+<section class="card"><h2>Payment request</h2><p class="note">Ask a customer to pay, with your UPI if saved</p><div class="form"><label>Amount ₹<input id="pr-amt" type="number" inputmode="numeric"></label><label>For<input id="pr-for" type="text" placeholder="e.g. Coach Teri Crossbody"></label></div><textarea id="pr-text" class="msgbox" readonly rows="4"></textarea><div class="row" style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap"><button class="btn" id="pr-copy" type="button">Copy</button><a class="btn2" id="pr-wa" href="#" target="_blank" rel="noopener">Open in WhatsApp</a></div></section>
+</div>
+<section class="card"><h2>Your business name</h2><p class="note">Used in customer-facing messages</p><div id="bizname"></div></section>
+</div>
+<div id="pane-help" hidden>
+<div class="grid">
+<section class="card"><h2>Service standards</h2><p class="note">What you can expect from Luxella on every order</p><div class="act" id="sla">
+<div class="it"><span class="dot"></span><span>Order confirmation within 24 hours of payment<small>Retailer order ID shared as soon as it is placed</small></span></div>
+<div class="it"><span class="dot"></span><span>ETA set at hub receipt: 18 days to India<small>Revised the same day if a courier reports a delay</small></span></div>
+<div class="it"><span class="dot"></span><span>Address requested at step 7, dispatched within 1 working day of receiving it<small>India tracking shared on dispatch</small></span></div>
+<div class="it"><span class="dot"></span><span>Receipts and documents available here for every order<small>Retailer invoice attached when the retailer provides one</small></span></div>
+</div></section>
+<section class="card"><h2>Report an issue</h2><p class="note">Structured claim, so it is resolved faster</p>
+<div class="form"><label>Order<select id="cl-order"></select></label><label>Issue<select id="cl-type"><option>Wrong size</option><option>Wrong item or colour</option><option>Damaged on arrival</option><option>Missing from parcel</option><option>Not delivered, marked delivered</option><option>Other</option></select></label><label class="wide">Details<textarea id="cl-desc" rows="3" placeholder="What happened, when you noticed, what you would like done"></textarea></label></div>
+<p style="margin:12px 0 0;display:flex;gap:8px;align-items:center;flex-wrap:wrap"><button class="btn" id="cl-copy" type="button">Copy claim</button><span class="lbl" id="cl-msg">Attach photos on WhatsApp after pasting.</span></p></section>
+</div>
+<div class="grid">
+<section class="card"><h2>Promise date calculator</h2><p class="note">What to tell your customer, with a safety buffer</p><div class="form"><label>Route<select id="pd-route"><option value="us">USA store → India</option><option value="uk">UK store → India</option><option value="ca">Canada store → India</option><option value="in">In hand (India)</option></select></label><label>Order placed on<input id="pd-date" type="date"></label></div><div id="pd-out" class="glance" style="margin-top:12px"></div></section>
+<section class="card"><h2>Care guide</h2><p class="note">Keep pieces looking new</p><div class="act">
+<div class="it"><span class="dot"></span><span>Leather bags<small>Store stuffed, in the dust bag, away from sunlight. Wipe with a dry soft cloth; condition twice a year. Avoid rain and hand sanitiser on the leather.</small></span></div>
+<div class="it"><span class="dot"></span><span>Coated canvas (signature prints)<small>Damp cloth only, no alcohol. Rotate use so the corners wear evenly.</small></span></div>
+<div class="it"><span class="dot"></span><span>Sneakers and slides<small>Brush dry dirt first, then mild soap on a cloth. Air dry away from heat. Keep the box for resale value.</small></span></div>
+<div class="it"><span class="dot"></span><span>Boots (Dr. Martens)<small>Wonder Balsam or any leather balm monthly in the first season. Expect a 2–3 week break-in.</small></span></div>
+<div class="it"><span class="dot"></span><span>Watches<small>Avoid magnets and steam. Service every 4–5 years. Keep the warranty card with the box.</small></span></div>
+</div><p style="margin:12px 0 0"><button class="btn2" id="aftercare" type="button">Request repair / aftercare</button></p></section>
+<section class="card"><h2>Stage glossary</h2><p class="note">What each step on the tracker means</p><ol id="gloss" class="gloss"></ol></section>
+<section class="card"><h2>Courier desks</h2><p class="note">Official tracking pages, if you prefer the carrier's own site</p><div class="docs" id="couriers"></div></section>
+<section class="card"><h2>Terms of service</h2><p class="note">Payment, shipping and cancellation terms</p><div id="terms" class="terms"><span class="lbl">Terms will be published here.</span></div></section>
+<section class="card"><h2>Data & privacy</h2><p class="note">What this page holds and who can see it</p><div class="act">
+<div class="it"><span class="dot"></span><span>This page shows only your orders, amounts and shipping progress.<small>No card or bank details are stored here.</small></span></div>
+<div class="it"><span class="dot"></span><span>Anyone with the link can view it. Keep it private.<small>Ask Luxella to rotate the link if it is shared by mistake.</small></span></div>
+<div class="it"><span class="dot"></span><span>Addresses you save are visible to Luxella only for dispatch.<small>Delivered orders are cleared from the Address tab automatically.</small></span></div>
+</div></section>
+</div>
+<section class="card faq"><h2>How it works</h2><p class="note">Short answers to the usual questions</p>
+<details><summary>What if the store cancels?</summary><p>Stores confirm within about a week of placing. In the rare case a store cancels (stock or payment check), Luxella either sources the same piece from another store or refunds you in full. You will see this between "Order placed" and "Order confirmed" on the tracker.</p></details>
+<details><summary>What does ETA mean?</summary><p>Estimated arrival in India, counted 18 days from the day the parcel reaches our international hub. It moves if the courier is slow; the tracker always shows the live step.</p></details>
+<details><summary>Direct vs via Luxella?</summary><p>Direct: once the parcel lands in India it ships straight to your address. Via Luxella: it comes to us first for checking, then we ship it to you.</p></details>
+<details><summary>When do you need my address?</summary><p>At step 7, "Address requested". The Address tab and your to-dos will tell you. Share it there or on WhatsApp.</p></details>
+<details><summary>What is "In hand"?</summary><p>Pieces we already had in stock in India. No international leg, so they ship within a day or two of payment.</p></details>
+<details><summary>Returns and sizing</summary><p>Check the Size guide before confirming. For a wrong size or defect, send photos to Luxella within 48 hours of delivery and we will sort it out case by case.</p></details>
+</section>
+<section class="card sz"><h2>Size guide</h2><p class="note">Approximate conversions used by most brands. When in doubt, send Luxella a photo of your current shoe's size label.</p>
+<h3 style="font-size:var(--cds-font-size-body);margin:10px 0 6px">Men's shoes</h3>
+<div class="scroll"><table><thead><tr><th>UK</th><th>US</th><th>EU</th><th>CM</th></tr></thead><tbody>
+<tr><td>6</td><td>7</td><td>40</td><td>25</td></tr><tr><td>7</td><td>8</td><td>41</td><td>26</td></tr><tr><td>8</td><td>9</td><td>42</td><td>27</td></tr><tr><td>8.5</td><td>9.5</td><td>42.5</td><td>27.5</td></tr><tr><td>9</td><td>10</td><td>43</td><td>28</td></tr><tr><td>10</td><td>11</td><td>44.5</td><td>29</td></tr><tr><td>11</td><td>12</td><td>46</td><td>30</td></tr><tr><td>12</td><td>13</td><td>47</td><td>31</td></tr>
+</tbody></table></div>
+<h3 style="font-size:var(--cds-font-size-body);margin:14px 0 6px">Brand notes</h3>
+<div class="act">
+<div class="it"><span class="dot" style="color:var(--color-fg-muted)"></span><span>Adidas Adizero runs narrow and about half a size small. Most people size up.</span></div>
+<div class="it"><span class="dot" style="color:var(--color-fg-muted)"></span><span>Puma Speedcat fits snug and low. True to size for narrow feet, half up for wide.</span></div>
+<div class="it"><span class="dot" style="color:var(--color-fg-muted)"></span><span>Coach slides and sandals come in US sizes. UK 8.5 is US 9.</span></div>
+<div class="it"><span class="dot" style="color:var(--color-fg-muted)"></span><span>Bags and wallets have no size. Check the dimensions in the product photo before confirming.</span></div>
+</div>
+<p class="lbl" style="margin:12px 0 0">These are general guides, not the brand's official chart. Final fit depends on the model.</p></section>
+<div class="grid">
+<section class="card"><h2>Ask for a quote</h2><p class="note">Want something new? Fill this in and send it to Luxella.</p>
+<div class="form"><label>Item<input id="rq-item" type="text" placeholder="e.g. Coach Tabby 26"></label><label>Size / colour<input id="rq-size" type="text"></label><label>Budget (₹)<input id="rq-budget" type="text" inputmode="numeric"></label></div>
+<p style="margin:10px 0 0;display:flex;gap:8px;align-items:center;flex-wrap:wrap"><button class="btn" id="rq-copy" type="button">Copy request</button><span class="lbl" id="rq-msg"></span></p></section>
+</div>
+</div>
+<div class="colophon"><div class="rule-double"></div><span>Luxella</span><span>Private client service</span><span id="colo-year"></span></div>
+<button class="totop" id="totop" type="button" aria-label="Back to top" hidden>↑</button>
+<button class="chatfab" id="chatfab" type="button" aria-label="Ask Luxella" title="Ask Luxella"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v8a2.5 2.5 0 0 1-2.5 2.5H10l-4.2 3.4c-.6.5-1.3 0-1.3-.7V16A2.5 2.5 0 0 1 4 13.5v-8Z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><circle cx="8.5" cy="9.5" r=".9" fill="currentColor"/><circle cx="12" cy="9.5" r=".9" fill="currentColor"/><circle cx="15.5" cy="9.5" r=".9" fill="currentColor"/></svg><span class="cdot"></span></button>
+<div class="chat" id="chat" hidden><div class="ch"><span class="eyebrow">Ask Luxella</span><span class="lbl" id="chat-mode"></span><button class="chip" id="chat-new" type="button">New</button><button class="chip" id="chat-x" type="button">Close</button></div><div class="cm" id="chat-msgs"></div><div class="cs" id="chat-sug"></div><div class="ci" id="chat-form"><input id="chat-in" type="text" placeholder="Where is my Bay Slides?" autocomplete="off"><button class="btn" type="button" id="chat-send">Send</button></div></div>
+</div>
+</div>
+<script src="vendor/supabase.js"></script>
+<script src="shim.js"></script>
+</body>
+</html>
