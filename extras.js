@@ -465,7 +465,7 @@ window.__lxSetStage=async function(r0,k){
  const r=curOrder(r0.item)||r0;const cur=Number(r.stage||1);if(k===cur)return;
  const name=STAGES[k-1];
  if(k<cur&&!confirm('Move "'+r.item+'" back to "'+name+'"? Dates of later steps will be cleared (you can undo).'))return;
- const ok=await applyChange(r.item,{stage:k,status:name},n=>{const st=Object.assign({},n.stages||{});if(k<cur){Object.keys(st).forEach(x=>{if(Number(x)>k)delete st[x];});}else{for(let x=cur+1;x<=k;x++){if(x!==k&&isLocalO(r)&&x>=4&&x<=6)continue;if(!st[x])st[x]=todayS();}}if(!st[k])st[k]=todayS();return Object.assign(n,{order:r.item,items:n.items||[],stages:st});},(r.order_no||r.item)+' → '+name);
+ const ok=await applyChange(r.item,{stage:k,status:name},n=>{const st=Object.assign({},n.stages||{});if(k<cur){Object.keys(st).forEach(x=>{if(Number(x)>k)delete st[x];});}else{for(let x=cur+1;x<=k;x++){if(x!==k&&isLocalO(r)&&x>=4&&x<=6)continue;if(!st[x])st[x]=todayS();}}if(!st[k])st[k]=todayS();const out=Object.assign(n,{order:r.item,items:n.items||[],stages:st});if(Number(out.stageOverride||0)>k)out.stageOverride=k;return out;},(r.order_no||r.item)+' → '+name);
  if(ok)say(name);
 };
 function detectIntl(n){n=String(n).replace(/\s+/g,'');if(/^1Z[0-9A-Z]{16}$/i.test(n))return 'ups';if(/^(92|93|94|95)\d{18,20}$/.test(n)||/^[A-Z]{2}\d{9}US$/i.test(n))return 'usps';if(/^\d{10}$/.test(n))return 'dhl';if(/^\d{12}$|^\d{15}$|^\d{20}$|^\d{22}$/.test(n))return 'fedex';return '';}
