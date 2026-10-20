@@ -815,3 +815,7 @@ img{max-width:100%}
  .sw img.ph,.sw #clogo img{transition:transform .25s ease;will-change:transform}
 }
 @keyframes lxshine{from{-webkit-mask-position:120% 0;mask-position:120% 0}to{-webkit-mask-position:-120% 0;mask-position:-120% 0}}
+
+.lx-top .bellb{border:1px solid #2A2724;border-radius:999px;padding:4px 10px;color:#8E887C;font:400 8.5px 'Jost',sans-serif;letter-spacing:.24em;text-transform:uppercase;background:none;cursor:pointer}
+.lx-top .bellb[data-st=on]{border-color:#C9A227;color:#E3C565}
+.lx-top .bellb[data-st=on]::before{content:'';display:inline-block;width:5px;height:5px;border-radius:50%;background:#E3C565;margin-right:6px;vertical-align:middle}

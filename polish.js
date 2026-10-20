@@ -69,8 +69,35 @@ function gyro(){if(RMQ||!('DeviceOrientationEvent' in window))return;let armed=f
 /* ---------- press feedback + one-time wordmark shimmer ---------- */
 function shimmer(){const l=sw.querySelector('.hlogo');if(!l||RMQ)return;l.classList.add('shine');setTimeout(()=>l.classList.remove('shine'),2600);}
 
+
+/* ---------- push notifications ---------- */
+const PUSH_FN='https://qzripzgbstvxkfobzhyv.supabase.co/functions/v1/lx-push';
+const b64=(s)=>{const p='='.repeat((4-s.length%4)%4);const r=atob((s+p).replace(/-/g,'+').replace(/_/g,'/'));return Uint8Array.from(r,c=>c.charCodeAt(0));};
+const pushSupported=()=>'serviceWorker' in navigator&&'PushManager' in window&&'Notification' in window;
+const isIOS=/iPhone|iPad|iPod/.test(navigator.userAgent);
+const standalone=()=>window.matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
+let swReg=null;
+async function swReady(){if(swReg)return swReg;if(!('serviceWorker' in navigator))return null;try{swReg=await navigator.serviceWorker.register('sw.js',{scope:'./'});await navigator.serviceWorker.ready;return swReg;}catch(e){return null;}}
+async function pushState(){if(!pushSupported())return 'unsupported';if(Notification.permission==='denied')return 'denied';const r=await swReady();if(!r)return 'unsupported';const s=await r.pushManager.getSubscription();return s?'on':'off';}
+async function pushOn(){const r=await swReady();if(!r)throw new Error('Not supported here');const perm=await Notification.requestPermission();if(perm!=='granted')throw new Error('Permission not given');
+ const {key}=await (await fetch(PUSH_FN+'?vapid=1')).json();let sub=await r.pushManager.getSubscription();if(!sub)sub=await r.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:b64(key)});
+ const {data:{session}}=await window.sb.auth.getSession();const email=(session&&session.user.email||'').toLowerCase();const c=window.lx&&window.lx.client();
+ const row={client_id:owner?null:(c&&c.id)||null,user_email:email,endpoint:sub.endpoint,sub:sub.toJSON(),ua:navigator.userAgent.slice(0,160)};
+ const res=await window.sb.from('lx_push_subs').upsert(row,{onConflict:'endpoint'});if(res.error)throw new Error(res.error.message);
+ LS.set('lx_push_prompted',1);}
+async function pushOff(){const r=await swReady();const sub=r&&await r.pushManager.getSubscription();if(sub){await window.sb.from('lx_push_subs').delete().eq('endpoint',sub.endpoint);await sub.unsubscribe();}}
+function bellUI(){const top=document.getElementById('top');if(!top||top.querySelector('.bellb'))return;const b=el('button','bellb');b.type='button';b.title='Order notifications';b.setAttribute('aria-label','Order notifications');top.insertBefore(b,top.querySelector('#tb-switch')||top.querySelector('#tb-out'));
+ const paint=async()=>{const st=await pushState();b.dataset.st=st;b.textContent=st==='on'?'Alerts on':st==='denied'?'Alerts blocked':'Alerts';};paint();
+ b.addEventListener('click',async()=>{const st=await pushState();if(st==='unsupported'){say(isIOS&&!standalone()?'On iPhone: Share → Add to Home Screen, then open from there to enable alerts.':'Notifications are not supported in this browser.');return;}if(st==='denied'){say('Notifications are blocked for this site in your browser settings.');return;}try{if(st==='on'){await pushOff();say('Alerts turned off.');}else{await pushOn();say('You will be notified at every order update.');}}catch(e){say(e.message||'Could not change alerts.');}paint();});}
+async function pushNudge(rows){if(owner||!rows.length||LS.get('lx_push_prompted'))return;const st=await pushState();if(st!=='off')return;
+ const back=el('div','lx-sheet-back');const sh=el('div','lx-sheet');back.appendChild(sh);sh.appendChild(el('span','eyebrow','Stay informed'));sh.appendChild(el('h3',null,'Hear about every update'+(first()?', '+first():'')+'.'));sh.appendChild(el('p','lxp','A quiet notification on this device whenever an order moves — confirmed, shipped, landed in India, out for delivery, delivered. Nothing promotional, ever.'));
+ const row=el('div','lxrow');const ok=el('button','btn','Turn on alerts');ok.type='button';ok.addEventListener('click',async()=>{try{await pushOn();say('Alerts on.');}catch(e){say(e.message);}close();const bb=document.querySelector('.bellb');if(bb)bb.remove();bellUI();});row.appendChild(ok);
+ const no=el('button','btn2','Not now');no.type='button';no.addEventListener('click',()=>{LS.set('lx_push_prompted',1);close();});row.appendChild(no);sh.appendChild(row);
+ function close(){back.classList.remove('on');setTimeout(()=>back.remove(),RMQ?0:260);}back.addEventListener('click',e=>{if(e.target===back)close();});
+ document.body.appendChild(back);requestAnimationFrame(()=>back.classList.add('on'));}
+
 /* ---------- boot ---------- */
 let booted=false;
-window.dash.onData(()=>{const o=window.dash.data('orders');if(o.status!=='ok')return;const rows=o.data||[];monogram();personalLine(rows);scheduleLinkify();if(!booted){booted=true;setTimeout(()=>welcome(rows),900);shimmer();gyro();}});
+window.dash.onData(()=>{const o=window.dash.data('orders');if(o.status!=='ok')return;const rows=o.data||[];monogram();personalLine(rows);scheduleLinkify();if(!booted){booted=true;bellUI();setTimeout(()=>welcome(rows),900);setTimeout(()=>{let tries=0;const t=setInterval(()=>{tries++;if(document.querySelector('.lx-sheet-back')){if(tries>120)clearInterval(t);return;}clearInterval(t);pushNudge(rows);},500);},2500);shimmer();gyro();}});
 new MutationObserver(()=>scheduleLinkify()).observe(document.getElementById('pane-help')||sw,{childList:true,subtree:true});
 })();
