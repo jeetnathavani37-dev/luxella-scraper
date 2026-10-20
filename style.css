@@ -784,3 +784,34 @@ img{max-width:100%}
 .sw .mgu .inp{width:auto;flex:1 1 160px}
 .sw .form input[type=date]{color-scheme:dark}
 @media (max-width:520px){.sw .mgu .inp{flex:1 1 100%}.sw .btn2.danger{margin-left:0}}
+
+/* polish layer */
+.lx-prog{position:fixed;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,#8C6E16,#E3C565,#C9A227);transform-origin:0 50%;transform:scaleX(0);z-index:80;pointer-events:none}
+.lx-top .mono{width:22px;height:22px;border:1px solid #C9A227;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font:500 8px 'Jost',sans-serif;letter-spacing:.08em;color:#E3C565;margin-right:8px;flex:0 0 auto}
+.sw .lx-since{margin-top:6px;opacity:.85}
+.sw a.tapl{color:inherit;text-decoration:none;border-bottom:1px solid var(--gold);padding-bottom:1px}
+.sw a.tapl:active{opacity:.6}
+.lx-sheet-back{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);z-index:75;display:flex;align-items:flex-end;justify-content:center;opacity:0;transition:opacity .26s ease}
+.lx-sheet-back.on{opacity:1}
+.lx-sheet{width:min(560px,100%);background:#0E0D0C;border:1px solid #2A2724;border-bottom:0;padding:22px 20px max(22px,env(safe-area-inset-bottom,0px));transform:translateY(24px);transition:transform .3s cubic-bezier(.2,.8,.2,1);font-family:'Jost',sans-serif;font-weight:300;color:#F3EEE6}
+.lx-sheet-back.on .lx-sheet{transform:none}
+.lx-sheet .eyebrow{font-size:9.5px;letter-spacing:.34em;text-transform:uppercase;color:#C9A227}
+.lx-sheet h3{font-family:'Cormorant Garamond',serif;font-weight:300;font-size:26px;margin:8px 0 10px;letter-spacing:.01em}
+.lx-sheet .lxp{font-size:13.5px;line-height:1.65;color:#A39C90;margin:0 0 14px}
+.lx-sheet .lxul{list-style:none;margin:0 0 14px;padding:0}
+.lx-sheet .lxul li{display:flex;flex-direction:column;gap:2px;padding:9px 0;border-top:1px solid #232120}
+.lx-sheet .lxul li b{font-weight:400;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:#E3C565}
+.lx-sheet .lxul li span{font-size:13.5px;color:#F3EEE6}
+.lx-sheet .lxrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+.lx-sheet .btn{border:1px solid #F3EEE6;background:#F3EEE6;color:#0A0A0A;padding:10px 16px;font:500 9.5px 'Jost',sans-serif;letter-spacing:.3em;text-transform:uppercase;cursor:pointer}
+.lx-sheet .btn2{border:1px solid #2A2724;background:transparent;color:#F3EEE6;padding:10px 14px;font:400 9.5px 'Jost',sans-serif;letter-spacing:.3em;text-transform:uppercase;cursor:pointer}
+@media (prefers-reduced-motion:no-preference){
+ .sw [id^=pane-]:not([hidden]){animation:swfade .32s ease both}
+ .sw .tab:active,.sw .btn:active,.sw .btn2:active,.sw .chip:active,.lx-sheet button:active{transform:scale(.97)}
+ .sw .tab,.sw .btn,.sw .btn2,.sw .chip{transition:transform .12s ease,opacity .2s ease,border-color .2s ease}
+ .hero-top .hlogo{transition:transform .5s cubic-bezier(.2,.8,.2,1);transform-style:preserve-3d}
+ .hero-top .hlogo:hover{transform:perspective(600px) rotateY(14deg) rotateX(4deg)}
+ .hero-top .hlogo.shine{-webkit-mask-image:linear-gradient(110deg,#000 40%,rgba(0,0,0,.35) 50%,#000 60%);mask-image:linear-gradient(110deg,#000 40%,rgba(0,0,0,.35) 50%,#000 60%);-webkit-mask-size:300% 100%;mask-size:300% 100%;animation:lxshine 2.4s ease-in-out 1}
+ .sw img.ph,.sw #clogo img{transition:transform .25s ease;will-change:transform}
+}
+@keyframes lxshine{from{-webkit-mask-position:120% 0;mask-position:120% 0}to{-webkit-mask-position:-120% 0;mask-position:-120% 0}}
