@@ -132,3 +132,15 @@ new MutationObserver(()=>scheduleLinkify()).observe(document.getElementById('pan
   if(!bn.hidden){clearInterval(iv);setTimeout(()=>{bn.classList.add('fadeout');setTimeout(()=>{bn.dataset.done='1';},700);},15000);}
   else if(tries>60)clearInterval(iv);},500);
 })();
+
+/* Quick-contact buttons above the chat bubble: WhatsApp + GPay */
+(function(){
+ const fab=document.getElementById('chatfab');if(!fab||document.getElementById('qc-wa'))return;
+ const ios=/iPhone|iPad|iPod/i.test(navigator.userAgent);
+ const upi='pa=jeetnathavani37-1@okaxis&pn=Luxella&cu=INR';
+ const mk=(id,label,href,svg,off)=>{const a=document.createElement('a');a.id=id;a.className='qcb';a.href=href;a.setAttribute('aria-label',label);a.title=label;a.style.bottom='calc(max(16px,env(safe-area-inset-bottom,0px)) + '+off+'px)';if(/^https/.test(href)){a.target='_blank';a.rel='noopener';}a.innerHTML=svg;fab.parentNode.appendChild(a);return a;};
+ const wa=mk('qc-wa','WhatsApp Luxella','https://wa.me/918724079056?text='+encodeURIComponent('Hi Luxella'),'<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2.2A9.8 9.8 0 0 0 3.6 17l-1.4 4.8 4.9-1.3A9.8 9.8 0 1 0 12 2.2Zm0 17.9c-1.5 0-2.9-.4-4.1-1.1l-.3-.2-2.9.8.8-2.8-.2-.3a8.1 8.1 0 1 1 6.7 3.6Zm4.5-6c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1-1.5-.7-2.4-1.3-3.4-2.9-.1-.2 0-.4.1-.5l.4-.5c.1-.1.2-.3.200-.4.100-.1 0-.3 0-.4l-.8-1.800c-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.2.3-.9.9-.9 2.200s.9 2.500 1.100 2.700c.1.200 1.800 2.800 4.400 3.900 1.600.7 2.300.7 3.100.6.500-.1 1.5-.6 1.700-1.200.2-.6.2-1.100.2-1.200-.1-.1-.2-.2-.5-.3Z"/></svg>',184);
+ const gp=mk('qc-gp','Pay with GPay',(ios?'gpay://upi/pay?':'tez://upi/pay?')+upi,'<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3 7.500A2.500 2.500 0 0 1 5.500 5h13A2.500 2.500 0 0 1 21 7.500v9a2.500 2.500 0 0 1-2.500 2.500h-13A2.500 2.500 0 0 1 3 16.500v-9Zm2 .5v2h14V8a.5.5 0 0 0-.5-.5h-13a.5.5 0 0 0-.5.5Zm14 4H5v4.500a.5.5 0 0 0 .5.5h13a.5.5 0 0 0 .5-.5V12Zm-4 1.5h2.500v1.5H15v-1.5Z"/></svg>',128);
+ const sync=()=>{const h=fab.hidden;wa.style.display=gp.style.display=h?'none':'flex';};
+ new MutationObserver(sync).observe(fab,{attributes:true,attributeFilter:['hidden']});sync();
+})();

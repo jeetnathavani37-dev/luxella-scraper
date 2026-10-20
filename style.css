@@ -833,3 +833,8 @@ img{max-width:100%}
 .sw .banner{transition:opacity .7s ease,max-height .7s ease}
 .sw .banner.fadeout{opacity:0}
 .sw .banner[data-done]{display:none!important}
+
+/* quick-contact buttons */
+.sw .qcb{position:fixed;right:max(23px,env(safe-area-inset-right,0px));z-index:31;width:40px;height:40px;border-radius:50%!important;display:flex;align-items:center;justify-content:center;background:#0A0A0A;border:1px solid var(--gold);color:var(--gold);box-shadow:0 6px 18px rgba(0,0,0,.45);transition:transform .2s,background .2s,color .2s;text-decoration:none}
+.sw .qcb svg{width:20px;height:20px;display:block}
+.sw .qcb:hover{background:var(--gold);color:#0A0A0A;transform:translateY(-1px)}
