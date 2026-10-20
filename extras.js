@@ -390,7 +390,7 @@ function diffKeys(a,b){const un=x=>x&&x.data&&typeof x.data==='object'?x.data:x;
 function renderAudit(body){
  fold(body,'ops-audit','Activity log (who changed what)',w=>{
   const btn=el('button','btn2','Load latest');btn.type='button';const list=el('div');
-  const draw=()=>{list.textContent='';if(!opsState.audit.length){list.appendChild(el('p','note','Tap Load latest.'));return;}opsState.audit.forEach(a=>{const keys=a.op==='UPDATE'?diffKeys(a.old_data,a.new_data):[];const what=a.tbl+' '+String(a.op||'').toLowerCase()+' · '+(a.ref||'')+(keys.length?' · '+keys.slice(0,5).join(', '):'');const r=el('div','xo-row');r.appendChild(el('small',null,hm(a.at)));r.appendChild(el('span',null,what));r.appendChild(el('small',null,String(a.actor||'').split('@')[0]));list.appendChild(r);});};
+  const draw=()=>{list.textContent='';if(!opsState.audit.length){list.appendChild(el('p','note','Tap Load latest.'));return;}opsState.audit.forEach(a=>{const keys=a.op==='UPDATE'?diffKeys(a.old_data,a.new_data):[];const what=a.tbl+' '+String(a.op||'').toLowerCase()+' · '+(a.ref||'')+(keys.length?' · '+keys.slice(0,5).join(', '):'');const r=el('div','xo-row');r.appendChild(el('small',null,hm(a.at)));r.appendChild(el('span',null,what));r.appendChild(el('small',null,String(a.actor||'').split('@')[0]));if(a.tbl==='lx_orders'&&a.op==='UPDATE'&&a.old_data&&a.old_data.data&&a.ref){const rv=el('button','btn2','Revert');rv.type='button';rv.addEventListener('click',async()=>{if(!confirm('Restore "'+a.ref+'" to how it was before this change?'))return;const r0=curOrder(a.ref);if(r0)await applyChange(a.ref,a.old_data.data,null,'Reverted '+a.ref);else say('Order not found');});r.appendChild(rv);}list.appendChild(r);});};
   btn.addEventListener('click',async()=>{btn.disabled=true;try{const cid=window.lx.client().id;const r=await window.lx.auditList(cid);opsState.audit=r;draw();}catch(e){say('Could not load log');}btn.disabled=false;});
   w.appendChild(btn);w.appendChild(list);draw();});
 }
@@ -425,9 +425,80 @@ window.__lxDrawer=function(r,pan){
  ab.appendChild(cx);pan.appendChild(ab);
 };
 
+/* ================= Owner: tracker controls with undo ================= */
+const COURIERS=[['','—'],['fedex','FedEx'],['ups','UPS'],['dhl','DHL Express'],['usps','USPS'],['delhivery','Delhivery'],['bluedart','Blue Dart'],['dtdc','DTDC'],['ekart','Ekart'],['xpressbees','XpressBees'],['india-post','India Post'],['tirupati-courier','Tirupati Courier']];
+const CNAME=Object.fromEntries(COURIERS);
+const undoStack=[];let toastEl=null,toastT=null;
+const curOrder=item=>ordersData().find(x=>x.item===item);
+const clone=v=>JSON.parse(JSON.stringify(v));
+function showUndo(desc){
+ if(!toastEl){toastEl=el('div','xo-toast');document.body.appendChild(toastEl);}
+ toastEl.textContent='';toastEl.appendChild(el('span',null,desc));const b=el('button',null,'Undo');b.type='button';b.addEventListener('click',()=>{toastEl.hidden=true;undoLast();});toastEl.appendChild(b);toastEl.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>{toastEl.hidden=true;},10000);
+}
+async function applyChange(item,patch,notesFn,desc){
+ const r=curOrder(item);if(!r)return false;const key=slugOf(item);const n=photos.notes[key];
+ const snap={item,order:clone(r),notes:n?clone(n):null,key,desc};
+ try{
+  const d=Object.assign({},r,patch);delete d.item;await window.lx.saveOrder(item,d);
+  if(notesFn){const cur=n?clone(n):{order:item,items:[]};await photos.db.doc('notes/'+key).set(notesFn(cur));}
+  undoStack.push(snap);if(undoStack.length>30)undoStack.shift();showUndo(desc);renderUndoBar();return true;
+ }catch(e){say('Could not save. Nothing changed.');return false;}
+}
+async function undoLast(){
+ const s=undoStack.pop();if(!s)return;
+ try{const d=clone(s.order);delete d.item;await window.lx.saveOrder(s.item,d);
+  if(s.notes)await photos.db.doc('notes/'+s.key).set(s.notes);else{try{await photos.db.doc('notes/'+s.key).delete();}catch(e){}}
+  say('Undone: '+s.desc);}catch(e){undoStack.push(s);say('Could not undo.');}
+ renderUndoBar();
+}
+function renderUndoBar(){
+ const bar=$('xo-undobar');if(!bar)return;bar.textContent='';
+ const b=el('button','btn2','Undo last change');b.type='button';b.disabled=!undoStack.length;b.addEventListener('click',undoLast);bar.appendChild(b);
+ bar.appendChild(el('span','note',undoStack.length?(' '+undoStack[undoStack.length-1].desc):' Nothing to undo yet. Every change you make here can be undone.'));
+}
+function buildUndoBar(){const pane=$('pane-tr');if(!pane||$('xo-undobar'))return;const bar=el('div','xo-undobar owner');bar.id='xo-undobar';pane.insertBefore(bar,pane.firstChild);renderUndoBar();}
+window.__lxSetStage=async function(r0,k){
+ const r=curOrder(r0.item)||r0;const cur=Number(r.stage||1);if(k===cur)return;
+ const name=STAGES[k-1];
+ if(k<cur&&!confirm('Move "'+r.item+'" back to "'+name+'"? Dates of later steps will be cleared (you can undo).'))return;
+ const ok=await applyChange(r.item,{stage:k,status:name},n=>{const st=Object.assign({},n.stages||{});if(k<cur){Object.keys(st).forEach(x=>{if(Number(x)>k)delete st[x];});}if(!st[k])st[k]=todayS();return Object.assign(n,{order:r.item,items:n.items||[],stages:st});},(r.order_no||r.item)+' → '+name);
+ if(ok)say(name);
+};
+const openTrk={};
+window.__lxTrk=function(r,card){
+ if(!isOwner())return;
+ const item=r.item,stage=Number(r.stage||1);
+ const box2=el('div','xo-trk owner');
+ const row=el('div','xo-row');
+ const back=el('button','btn2','◀ Back');back.type='button';back.disabled=stage<=1;back.addEventListener('click',()=>window.__lxSetStage(r,stage-1));
+ const nx=el('button','btn',stage>=9?'Delivered ✓':'Next ▶ '+STAGES[stage]);nx.type='button';nx.disabled=stage>=9;nx.addEventListener('click',()=>window.__lxSetStage(r,stage+1));
+ const jump=el('select','xo-in');STAGES.forEach((n,i)=>{const o=el('option',null,(i+1)+' · '+n);o.value=String(i+1);if(i+1===stage)o.selected=true;jump.appendChild(o);});jump.addEventListener('change',()=>window.__lxSetStage(r,Number(jump.value)));
+ row.appendChild(back);row.appendChild(nx);row.appendChild(jump);box2.appendChild(row);
+ const det=el('details','xo-fold');det.open=!!openTrk[item];det.addEventListener('toggle',()=>{openTrk[item]=det.open;});det.appendChild(el('summary',null,'Edit details, tracking, payment'));
+ const f=el('div','xo-form');
+ const lab=(t,i)=>{const l=el('label','xo-lbl');l.appendChild(el('span',null,t));l.appendChild(i);return l;};
+ const eta=field('ETA','date');eta.value=r.eta_date||'';const sh=field('Shipped','date');sh.value=r.shipping_date||'';
+ const it=field('Intl tracking no.');it.value=r.intl_tracking_no||'';const ic=el('select','xo-in');const lt=field('India tracking no.');lt.value=r.local_tracking||'';const lc=el('select','xo-in');
+ COURIERS.forEach(([v,n])=>{[ic,lc].forEach((s,j)=>{const o=el('option',null,n);o.value=v;if(v===(j?r.local_courier_slug:r.intl_courier_slug)||(!v&&!(j?r.local_courier_slug:r.intl_courier_slug)))o.selected=true;s.appendChild(o);});});
+ const ps=el('select','xo-in');['Pending','Received'].forEach(v=>{const o=el('option',null,v);o.value=v;if(v===(r.payout_status||'Pending'))o.selected=true;ps.appendChild(o);});
+ const am=field('Order value ₹','number');am.value=r.payout!=null?r.payout:'';
+ [lab('ETA',eta),lab('Shipped on',sh),lab('Intl courier',ic),lab('Intl tracking',it),lab('India courier',lc),lab('India tracking',lt),lab('Payment',ps),lab('Value ₹',am)].forEach(x=>f.appendChild(x));
+ det.appendChild(f);
+ const sv=el('button','btn','Save changes');sv.type='button';sv.addEventListener('click',async()=>{
+  const patch={eta_date:eta.value,shipping_date:sh.value,intl_tracking_no:it.value.trim(),intl_courier_slug:ic.value,intl_courier:CNAME[ic.value]||'',local_tracking:lt.value.trim(),local_courier_slug:lc.value,local_courier:CNAME[lc.value]||'',payout_status:ps.value,payout:am.value===''?null:Number(am.value)};
+  if(eta.value&&eta.value!==(r.eta_date||'')&&r.eta_date)patch.eta_prev=r.eta_date;
+  if(ps.value==='Received'&&r.payout_status!=='Received')patch.payment_date=todayS();
+  const changed=Object.keys(patch).filter(k=>String(patch[k]==null?'':patch[k])!==String(r[k]==null?'':r[k])&&k!=='eta_prev'&&k!=='payment_date');
+  if(!changed.length){say('Nothing changed');return;}
+  if(await applyChange(item,patch,null,(r.order_no||r.item)+': edited '+changed.map(k=>k.replace(/_/g,' ')).join(', ')))say('Saved');});
+ const more=el('button','btn2','Delay, parcels, costs…');more.type='button';more.addEventListener('click',()=>{if(typeof openDrawer==='function')openDrawer(curOrder(item)||r);});
+ const fr=el('div','xo-row');fr.appendChild(sv);fr.appendChild(more);det.appendChild(fr);
+ box2.appendChild(det);card.appendChild(box2);
+};
+
 /* boot for the flows */
 ready(()=>{
- buildPaySub();buildRequests();if(isOwner())buildOps();
+ buildPaySub();buildRequests();if(isOwner()){buildOps();buildUndoBar();try{render();}catch(e){}}
  photos.db.collection('paysub').onSnapshot(s=>{const m={};s.docs.forEach(d=>{if(d.exists)m[d.id]=Object.assign({id:d.id},d.data());});psState.subs=m;renderPaySub();},()=>{});
  photos.db.collection('requests').onSnapshot(s=>{const m={};s.docs.forEach(d=>{if(d.exists)m[d.id]=d.data();});rqState.items=m;renderRequests();},()=>{});
  photos.db.collection('quote_resp').onSnapshot(s=>{Object.keys(qrState).forEach(k=>delete qrState[k]);s.docs.forEach(d=>{if(d.exists)qrState[d.id]=d.data();});if(typeof renderQuotes==='function')renderQuotes();},()=>{});
