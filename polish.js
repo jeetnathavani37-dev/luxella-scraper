@@ -194,3 +194,10 @@ new MutationObserver(()=>scheduleLinkify()).observe(document.getElementById('pan
  const place=()=>{const top=document.getElementById('top');if(!top||top.querySelector('.srchb'))return;const b=el('button','srchb');b.type='button';b.setAttribute('aria-label','Search');b.title='Search (Ctrl K)';b.innerHTML='<svg viewBox="0 0 24 24" width="14" height="14"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m16 16 4.5 4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span>Search</span>';b.addEventListener('click',open);const who=top.querySelector('.who');top.insertBefore(b,who||null);};
  place();new MutationObserver(place).observe(document.body,{childList:true,subtree:true});
 })();
+
+/* Empty state: no outstanding balance reads as words, not a buried ₹0 */
+(function(){
+ const t=document.querySelector('[data-source="totals"][data-field="pending"]');if(!t)return;
+ let busy=false;const fix=()=>{if(busy)return;busy=true;const v=t.textContent.replace(/[^0-9]/g,'');if(t.textContent.trim()!=='—'&&Number(v||'1')===0&&!/None/.test(t.textContent)){t.textContent='None';t.title='No outstanding balance';t.classList.remove('bad');t.classList.add('ok');}busy=false;};
+ new MutationObserver(fix).observe(t,{childList:true,characterData:true,subtree:true});fix();
+})();

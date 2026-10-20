@@ -75,6 +75,7 @@ window.dash={
 const FN_URL=SUPABASE_URL+'/functions/v1/lx-admin';
 async function adminCall(body){const {data:{session}}=await sb.auth.getSession();const r=await fetch(FN_URL,{method:'POST',headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':'Bearer '+(session?session.access_token:'')},body:JSON.stringify(body)});const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error||('HTTP '+r.status));return j;}
 window.lx={
+ auth:{get email(){return S.email},async changePassword(pw){const r=await sb.auth.updateUser({password:pw});if(r.error)throw r.error;},async signOutAll(){await sb.auth.signOut({scope:'global'});}},
  isOwner:()=>S.owner,client:()=>S.client,
  async saveOrder(item,data){const r=await sb.from('lx_orders').upsert({client_id:S.client.id,item,data,updated_at:new Date().toISOString()},{onConflict:'client_id,item'});if(r.error)throw new Error(r.error.message);const i=S.orders.findIndex(o=>o.item===item);const row=Object.assign({item},data);if(i>=0)S.orders[i]=row;else S.orders.push(row);fire();},
  async renameOrder(oldItem,newItem,data){if(oldItem===newItem)return this.saveOrder(newItem,data);await this.saveOrder(newItem,data);await this.deleteOrder(oldItem);},
@@ -98,7 +99,7 @@ async function start(){const {data:{session}}=await sb.auth.getSession();S.sessi
  if(!slug&&S.owner){gatePick();return;}
  S.client=clients[0];window.LX_CLIENT={name:S.client.name,biz:S.client.biz||''};document.title=S.client.name.split(' ')[0]+' · Luxella';
  await loadAll();subscribe();g('gate').hidden=true;topbar();g('dash-root').hidden=false;
- if(!window.__pageLoaded){window.__pageLoaded=true;const s=document.createElement('script');s.src='app.js';s.onload=()=>{fire();{const q=document.createElement('script');q.src='polish.js';document.body.appendChild(q);}if(S.owner){const m=document.createElement('script');m.src='manage.js';document.body.appendChild(m);}};document.body.appendChild(s);}else fire();}
+ if(!window.__pageLoaded){window.__pageLoaded=true;const s=document.createElement('script');s.src='app.js';s.onload=()=>{fire();{const q=document.createElement('script');q.src='polish.js';document.body.appendChild(q);}{const x=document.createElement('script');x.src='extras.js';document.body.appendChild(x);}if(S.owner){const m=document.createElement('script');m.src='manage.js';document.body.appendChild(m);}};document.body.appendChild(s);}else fire();}
 sb.auth.onAuthStateChange((ev)=>{if(ev==='SIGNED_IN'||ev==='TOKEN_REFRESHED'){if(!S.client)start();}if(ev==='SIGNED_OUT'){location.reload();}});
 start();
 })();
