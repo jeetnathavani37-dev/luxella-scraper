@@ -140,6 +140,27 @@ async function renderClient(){
     row.appendChild(el('span','ad-mut','Stage '+(Number(o.stage)||1)+' · '+STAGES[(Number(o.stage)||1)-1]));
     const del=el('button','ad-b d','Delete');del.type='button';del.onclick=async()=>{if(!confirm('Delete "'+o.item+'"? Cannot be undone.'))return;const x=await sb.from('lx_orders').delete().match({client_id:c.id,item:o.item});if(x.error){toast(x.error.message);return;}counts[c.id].o=Math.max(0,counts[c.id].o-1);renderList();row.remove();toast('Deleted');};
     row.appendChild(del);ol.appendChild(row);});
+  /* data (raw docs: notes, payinfo, terms, etc.) */
+  const dc=el('div','ad-card');dc.appendChild(el('h2',null,'Page data'));dc.appendChild(el('p','ad-mut','Is client page ka saara stored data (notes, payment details, addresses, quotes…). Edit karke Save dabao.'));
+  const dl=el('div');dc.appendChild(dl);m.appendChild(dc);
+  const dr=await sb.from('lx_docs').select('collection,doc_id,data').eq('client_id',c.id).order('collection');
+  if(dr.error)dl.appendChild(el('p','ad-mut',dr.error.message));
+  else if(!(dr.data||[]).length)dl.appendChild(el('p','ad-mut','No data yet.'));
+  (dr.data||[]).forEach(x=>{
+    const det=document.createElement('details');det.style.cssText='border-top:1px solid #232120;padding:8px 0';
+    const sm=document.createElement('summary');sm.style.cursor='pointer';sm.textContent=x.collection+' / '+x.doc_id;det.appendChild(sm);
+    const ta=document.createElement('textarea');ta.style.cssText='width:100%;min-height:160px;background:#0A0A0A;color:#F3EEE6;border:1px solid #2A2724;font:12px ui-monospace,monospace;padding:8px;margin-top:8px';ta.value=JSON.stringify(x.data,null,2);det.appendChild(ta);
+    const rw=el('div','row');const sv=el('button','ad-b','Save');sv.type='button';const dd=el('button','ad-b d','Delete');dd.type='button';rw.append(sv,dd);det.appendChild(rw);
+    sv.onclick=async()=>{let j;try{j=JSON.parse(ta.value);}catch(e){toast('Invalid JSON');return;}const u=await sb.from('lx_docs').update({data:j}).match({client_id:c.id,collection:x.collection,doc_id:x.doc_id});toast(u.error?u.error.message:'Saved');};
+    dd.onclick=async()=>{if(!confirm('Delete '+x.collection+'/'+x.doc_id+'?'))return;const u=await sb.from('lx_docs').delete().match({client_id:c.id,collection:x.collection,doc_id:x.doc_id});if(u.error){toast(u.error.message);return;}det.remove();toast('Deleted');};
+    dl.appendChild(det);});
+
+  /* audit */
+  const ac=el('div','ad-card');ac.appendChild(el('h2',null,'Recent changes'));m.appendChild(ac);
+  const au=await sb.from('lx_audit').select('at,actor,tbl,op,ref').eq('client_id',c.id).order('at',{ascending:false}).limit(25);
+  if(au.error)ac.appendChild(el('p','ad-mut',au.error.message));
+  else if(!(au.data||[]).length)ac.appendChild(el('p','ad-mut','Nothing yet.'));
+  (au.data||[]).forEach(a=>ac.appendChild(el('div','ad-mut',new Date(a.at).toLocaleString('en-IN')+' · '+(a.actor||'')+' · '+a.op+' '+a.tbl+' '+(a.ref||''))));
 }
 
 (async function init(){

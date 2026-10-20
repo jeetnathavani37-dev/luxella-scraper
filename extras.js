@@ -91,7 +91,7 @@ function buildSupport(){
 }
 
 /* ================= Account tab ================= */
-const PUSHCATS=[['orders','Order updates','Stage changes, tracking, delivery window'],['payments','Payments','Payment received and recorded'],['photos','Photos and proofs','Delivery proof, photos'],['notes','Notes from Luxella','Pinned notes on your page'],['quotes','Quotes and requests','New quotes and updates on your requests'],['support','Support replies','Replies and status changes on your cases']];
+const PUSHCATS=[['orders','Order updates','Stage changes, tracking, delivery window'],['payments','Payments','Payment received and recorded'],['notes','Notes from Luxella','Pinned notes on your page'],['quotes','Quotes and requests','New quotes and updates on your requests'],['support','Support replies','Replies and status changes on your cases']];
 let prefs={push:{},channel:'WhatsApp',sourcing:{}};
 function buildAccount(){
  const tabs=document.querySelector('.tabs');if(!tabs||$('tab-acct'))return;
