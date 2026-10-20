@@ -77,7 +77,7 @@ async function start(){const {data:{session}}=await sb.auth.getSession();S.sessi
  let q=sb.from('lx_clients').select('id,slug,name,biz');q=slug?q.eq('slug',slug):q;const {data:clients,error}=await q;
  if(error){gate('<img class="logo" src="assets/luxella_logo.png" alt="Luxella"><p>'+esc(error.message)+'</p>');return;}
  if(!clients||!clients.length){if(S.owner){gatePick();return;}gateNoAccess();return;}
- if(!slug&&clients.length>1&&S.owner){gatePick();return;}
+ if(!slug&&S.owner){gatePick();return;}
  S.client=clients[0];window.LX_CLIENT={name:S.client.name,biz:S.client.biz||''};document.title=S.client.name.split(' ')[0]+' · Luxella';
  await loadAll();subscribe();g('gate').hidden=true;topbar();g('dash-root').hidden=false;
  if(!window.__pageLoaded){window.__pageLoaded=true;const s=document.createElement('script');s.src='app.js';s.onload=()=>fire();document.body.appendChild(s);}else fire();}
