@@ -888,3 +888,7 @@ img{max-width:100%}
 .sw .stov{position:fixed;inset:0;z-index:70;background:#111;display:flex;flex-direction:column}
 .sw .stbar{display:flex;gap:10px;justify-content:flex-end;padding:10px 14px;border-bottom:1px solid var(--line)}
 .sw .stfr{flex:1;width:100%;border:0;background:#fff}
+
+/* owner chip must not overflow narrow screens */
+.sw .hero-top{flex-wrap:wrap;row-gap:8px}
+.sw #mg-toggle{max-width:100%}
