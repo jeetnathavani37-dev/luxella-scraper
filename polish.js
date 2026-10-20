@@ -111,10 +111,10 @@ new MutationObserver(()=>scheduleLinkify()).observe(document.getElementById('pan
 /* Overview: tidy dropdown sections */
 (function(){
  const pane=document.getElementById('pane-ov');if(!pane||pane.__acc)return;pane.__acc=1;
- const OPEN=['From Luxella','Next delivery','Your to-dos'];
+ const OPEN=['Next delivery','Your to-dos'];const FLAT=['At a glance','Featured piece','Departures'];
  pane.querySelectorAll('section.card').forEach(sec=>{
   const h=sec.querySelector(':scope > h2');if(!h)return;
-  const t=h.textContent.trim();sec.classList.add('acc');
+  const t=h.textContent.trim();if(FLAT.includes(t))return;sec.classList.add('acc');
   h.setAttribute('role','button');h.setAttribute('tabindex','0');
   const set=o=>{sec.classList.toggle('open',o);h.setAttribute('aria-expanded',o?'true':'false');};
   set(OPEN.includes(t));
