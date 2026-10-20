@@ -394,9 +394,9 @@ function renderAudit(body){
   btn.addEventListener('click',async()=>{btn.disabled=true;try{const cid=window.lx.client().id;const r=await window.lx.auditList(cid);opsState.audit=r;draw();}catch(e){say('Could not load log');}btn.disabled=false;});
   w.appendChild(btn);w.appendChild(list);draw();});
 }
-function buildOps(){
- const pane=$('pane-ov');if(!pane||$('ops'))return;
- const sec=el('section','card owner');sec.id='ops';sec.appendChild(el('h2',null,'Operations (private)'));sec.appendChild(el('p','note','Only you see this. Costs are stored separately from anything clients can read.'));
+function buildOps(n){
+ n=n||0;const pane=$('pane-mg');if(!pane){if(n<60)setTimeout(()=>buildOps(n+1),250);return;}if($('ops'))return;
+ const sec=el('section','card mgc');sec.id='ops';sec.appendChild(el('h2',null,'Operations'));sec.appendChild(el('p','note','Only you see the Admin tab. Costs are stored separately from anything clients can read.'));
  const b=el('div');b.id='ops-body';sec.appendChild(b);pane.insertBefore(sec,pane.firstChild);
  const load=async()=>{try{opsState.costs=await window.lx.costsList();opsState.client=opsState.costs['__client__']||{};delete opsState.costs['__client__'];}catch(e){}renderOps();};load();setInterval(()=>{if(!document.querySelector('#ops-body details[open]'))renderOps();},5000);opsState.reload=load;
 }

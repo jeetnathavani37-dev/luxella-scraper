@@ -10,7 +10,7 @@ const today=()=>new Date().toISOString().slice(0,10);
 
 /* ---------- tab + pane ---------- */
 const tabs=document.querySelector('.tabs'); if(!tabs) return;
-const tb=el('button','tab','Manage'); tb.id='tab-mg'; tb.setAttribute('role','tab'); tb.setAttribute('aria-selected','false'); tabs.appendChild(tb);
+const tb=el('button','tab','Admin'); tb.id='tab-mg'; tb.setAttribute('role','tab'); tb.setAttribute('aria-selected','false'); tabs.appendChild(tb);
 const pane=el('div'); pane.id='pane-mg'; pane.hidden=true;
 const helpPane=$('pane-help'); helpPane.parentNode.insertBefore(pane,helpPane.nextSibling);
 const allIds=()=>[...tabs.querySelectorAll('.tab')].map(b=>b.id.replace('tab-',''));
