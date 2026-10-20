@@ -81,9 +81,9 @@ window.lx={
  async deleteOrder(item){const r=await sb.from('lx_orders').delete().match({client_id:S.client.id,item});if(r.error)throw new Error(r.error.message);S.orders=S.orders.filter(o=>o.item!==item);fire();},
  async listClients(){const r=await sb.from('lx_clients').select('id,slug,name,biz').order('name');if(r.error)throw new Error(r.error.message);return r.data;},
  async updateClient(patch){const r=await sb.from('lx_clients').update(patch).eq('id',S.client.id).select().single();if(r.error)throw new Error(r.error.message);S.client=r.data;window.LX_CLIENT={name:S.client.name,biz:S.client.biz||''};fire();return r.data;},
- async listUsers(){const r=await sb.from('lx_client_users').select('id,email').eq('client_id',S.client.id).order('email');if(r.error)throw new Error(r.error.message);return r.data;},
+ async listUsers(){const r=await sb.from('lx_client_users').select('email').eq('client_id',S.client.id).order('email');if(r.error)throw new Error(r.error.message);return r.data;},
  async addUser(email){const r=await sb.from('lx_client_users').insert({client_id:S.client.id,email:email.toLowerCase()});if(r.error)throw new Error(r.error.message);},
- async removeUser(id){const r=await sb.from('lx_client_users').delete().eq('id',id);if(r.error)throw new Error(r.error.message);},
+ async removeUser(email){const r=await sb.from('lx_client_users').delete().match({client_id:S.client.id,email});if(r.error)throw new Error(r.error.message);},
  setPassword:(email,password)=>adminCall({action:'set_password',email,password}),
  deleteLogin:(email)=>adminCall({action:'delete_user',email})
 };
