@@ -91,7 +91,7 @@ function buildSupport(){
 }
 
 /* ================= Account tab ================= */
-const PUSHCATS=[['orders','Order updates','Stage changes, tracking, delivery window'],['payments','Payments','Payment received and recorded'],['photos','Photos and proofs','Quality check, delivery proof, photos'],['notes','Notes from Luxella','Pinned notes on your page'],['support','Support replies','Replies and status changes on your cases']];
+const PUSHCATS=[['orders','Order updates','Stage changes, tracking, delivery window'],['payments','Payments','Payment received and recorded'],['photos','Photos and proofs','Quality check, delivery proof, photos'],['notes','Notes from Luxella','Pinned notes on your page'],['quotes','Quotes and requests','New quotes and updates on your requests'],['support','Support replies','Replies and status changes on your cases']];
 let prefs={push:{},channel:'WhatsApp',sourcing:{}};
 function buildAccount(){
  const tabs=document.querySelector('.tabs');if(!tabs||$('tab-acct'))return;
@@ -149,5 +149,143 @@ ready(()=>{
  photos.db.collection('case_msgs').onSnapshot(s=>{const m={};s.docs.forEach(d=>{if(!d.exists)return;const x=d.data();if(x&&x.case)(m[x.case]=m[x.case]||[]).push(x);});state.msgs=m;renderSupport();},()=>{});
  photos.db.collection('prefs').onSnapshot(s=>{s.docs.forEach(d=>{if(d.id==='main'&&d.exists){const x=d.data()||{};prefs={push:x.push||{},channel:x.channel||'WhatsApp',sourcing:x.sourcing||{}};drawAccount();}});},()=>{});
  renderSupport();
+});
+
+/* ================= Payments: submit -> pending verification -> verified ================= */
+const psState={subs:{}};
+const inr=n=>'₹'+(typeof fmt==='function'?fmt(Number(n||0)):String(n));
+const slugOf=x=>(typeof pslug==='function'?pslug(x):String(x));
+function hash(str){let h=5381;for(let i=0;i<str.length;i++)h=((h<<5)+h+str.charCodeAt(i))|0;return Math.abs(h).toString(36);}
+function ordersData(){const o=dash.data('orders');return o.status==='ok'?o.data:[];}
+function dueOf(r){return Math.max(0,Number(r.payout||0)-(typeof paidAmt==='function'?paidAmt(r):0));}
+function pendingFor(item){return Object.values(psState.subs).filter(x=>x.order===item&&x.status==='Pending verification').reduce((s,x)=>s+Number(x.amount||0),0);}
+
+async function verifySub(sub){
+ try{
+  const key=slugOf(sub.order);const cur=(photos.payrec[key]&&photos.payrec[key].items)||[];
+  if(!cur.some(x=>x.sub===sub.id)){await photos.db.doc('payrec/'+key).set({order:sub.order,items:cur.concat([{amount:Number(sub.amount),at:new Date().toISOString().slice(0,10),method:sub.method||'UPI',ref:sub.ref||'',sub:sub.id}])});}
+  await photos.db.doc('paysub/'+sub.id).set(Object.assign({},sub,{status:'Verified',verifiedAt:nowIso()}));
+  const r=ordersData().find(x=>x.item===sub.order);
+  if(r){const paid=cur.reduce((s,x)=>s+Number(x.amount||0),0)+(cur.some(x=>x.sub===sub.id)?0:Number(sub.amount));if(paid>=Number(r.payout||0)&&r.payout_status!=='Received'){const d=Object.assign({},r);delete d.item;d.payout_status='Received';d.payment_date=new Date().toISOString().slice(0,10);await window.lx.saveOrder(r.item,d);}}
+  say('Payment verified. Balance updated.');
+ }catch(e){say('Could not verify. Try again.');}
+}
+async function rejectSub(sub){const reason=prompt('Reason shown to the client (e.g. amount not received, wrong reference):','Not received in our account yet. Please check the reference and resubmit.');if(reason===null)return;try{await photos.db.doc('paysub/'+sub.id).set(Object.assign({},sub,{status:'Rejected',reason,reviewedAt:nowIso()}));say('Marked as rejected.');}catch(e){say('Could not update.');}}
+
+function renderPaySub(){
+ const host=$('paysub-list');if(!host)return;host.textContent='';
+ const list=Object.values(psState.subs).sort((a,b)=>String(b.at||'')<String(a.at||'')?-1:1);
+ const pend=list.filter(x=>x.status==='Pending verification').reduce((s,x)=>s+Number(x.amount||0),0);
+ const sm=$('paysub-sum');if(sm)sm.textContent=pend?inr(pend)+' awaiting verification. It is not counted as received until Luxella confirms it.':'';
+ const pb=$('tab-pay');if(pb&&isOwner()){let b=pb.querySelector('.xbdg');const n=list.filter(x=>x.status==='Pending verification').length;if(n){if(!b){b=el('span','bdg xbdg');pb.appendChild(b);}b.textContent=String(n);}else if(b)b.remove();}
+ if(!list.length){host.appendChild(el('p','lbl','No submissions yet.'));return;}
+ list.forEach(x=>{const row=el('div','xps');const l=el('div','xps-l');l.appendChild(el('div','xps-t',inr(x.amount)+' · '+x.order));l.appendChild(el('div','lbl',(x.method||'')+(x.ref?' · ref '+x.ref:'')+' · '+hm(x.at)));if(x.status==='Rejected'&&x.reason)l.appendChild(el('div','xc-n',x.reason));if(x.proof){const a=el('a','xc-th');a.href=x.proof;a.target='_blank';a.rel='noopener';const im=el('img');im.src=x.proof;im.alt='Proof';im.loading='lazy';a.appendChild(im);l.appendChild(a);}row.appendChild(l);
+  const c=el('span','xchip '+(x.status==='Verified'?'x-resolved':x.status==='Rejected'?'x-reopened':''),x.status);row.appendChild(c);
+  if(isOwner()&&x.status==='Pending verification'){const o=el('div','xc-own owner');const v=el('button','btn','Verify');v.type='button';v.addEventListener('click',()=>verifySub(x));const r=el('button','btn2','Reject');r.type='button';r.addEventListener('click',()=>rejectSub(x));o.appendChild(v);o.appendChild(r);row.appendChild(o);}
+  host.appendChild(row);});
+}
+
+function buildPaySub(){
+ const pane=$('pane-pay');if(!pane||$('paysub'))return;
+ const sec=el('section','card');sec.id='paysub';
+ sec.innerHTML='<h2>Submit a payment</h2><p class="note">Paid already? Tell us the details. Luxella checks it against the account and confirms here. Until then it is shown as pending, never as received.</p><p class="lbl" id="paysub-sum"></p>';
+ const form=el('div','xs-form');form.style.borderTop='0';
+ form.innerHTML='<div class="form"><label>Order<select id="ps-order"></select></label><label>Amount ₹<input id="ps-amt" type="number" inputmode="numeric" min="1"></label><label>Paid by<select id="ps-method"><option>UPI</option><option>Bank transfer</option><option>Other</option></select></label><label>Reference / UTR<input id="ps-ref" type="text" placeholder="Transaction ID" autocomplete="off"></label><label class="wide">Screenshot (optional)<input id="ps-file" type="file" accept="image/*"></label></div><p class="xs-act"><button class="btn" id="ps-send" type="button">Submit payment</button><span class="lbl" id="ps-msg"></span></p>';
+ if(!isOwner())sec.appendChild(form);
+ sec.appendChild(el('h2',null,'Submitted payments')).style.marginTop='18px';sec.appendChild(el('div','xs-list')).id='paysub-list';
+ pane.insertBefore(sec,pane.firstChild);
+ const fill=()=>{const s=$('ps-order');if(!s)return;const cur=s.value;s.textContent='';ordersData().filter(r=>dueOf(r)>0).forEach(r=>{const o=el('option',null,(r.order_no?r.order_no+' · ':'')+r.item+' · '+inr(dueOf(r))+' due');o.value=r.item;s.appendChild(o);});if(cur)s.value=cur;const r0=ordersData().find(r=>r.item===s.value);if(r0&&!$('ps-amt').value)$('ps-amt').value=Math.max(0,dueOf(r0)-pendingFor(r0.item))||'';};
+ fill();dash.onData(()=>{fill();});
+ if($('ps-order'))$('ps-order').addEventListener('change',()=>{const r0=ordersData().find(r=>r.item===$('ps-order').value);$('ps-amt').value=r0?Math.max(0,dueOf(r0)-pendingFor(r0.item)):'';});
+ let busy=false;
+ if($('ps-send'))$('ps-send').addEventListener('click',async()=>{if(busy)return;const m=$('ps-msg');const item=$('ps-order').value;const amt=Number($('ps-amt').value);const ref=$('ps-ref').value.trim();
+  if(!item){m.textContent='No order has a balance due.';return;}if(!(amt>0)){m.textContent='Enter the amount you paid.';return;}
+  const r0=ordersData().find(r=>r.item===item);if(r0&&amt>dueOf(r0)+0.5){m.textContent='That is more than the balance due ('+inr(dueOf(r0))+'). Check the amount.';return;}
+  if($('ps-method').value!=='Other'&&ref.length<6){m.textContent='Add the transaction reference (at least 6 characters). It helps us confirm faster.';return;}
+  const id='ps-'+hash(item+'|'+amt+'|'+ref.toLowerCase());if(psState.subs[id]){m.textContent='You already submitted this payment.';return;}
+  busy=true;$('ps-send').disabled=true;m.textContent='Submitting…';
+  try{let proof='';const f=$('ps-file').files&&$('ps-file').files[0];if(f){if(f.size>8*1024*1024)throw new Error('big');const a=await photos.assets.upload(f);proof=a.url;}
+   await photos.db.doc('paysub/'+id).set({id,order:item,amount:amt,method:$('ps-method').value,ref,proof,status:'Pending verification',at:nowIso()});
+   $('ps-ref').value='';$('ps-file').value='';m.textContent='Submitted. Luxella will confirm it here.';say('Payment submitted');
+  }catch(e){m.textContent='Could not submit. Your details are kept, try again.';}
+  busy=false;$('ps-send').disabled=false;});
+}
+
+/* ================= Product requests (Overview) ================= */
+const RQ_FLOW=['Submitted','Under review','Availability checking','Quote ready','Approved','Order created','Unavailable / closed'];
+const rqState={items:{}};
+function renderRequests(){
+ const host=$('rq-list');if(!host)return;host.textContent='';
+ const list=Object.entries(rqState.items).map(([id,v])=>Object.assign({id},v)).sort((a,b)=>String(b.at||'')<String(a.at||'')?-1:1);
+ if(!list.length){host.appendChild(el('p','lbl','No requests yet.'));return;}
+ list.forEach(x=>{const row=el('div','xps');const l=el('div','xps-l');l.appendChild(el('div','xps-t',[x.brand,x.product].filter(Boolean).join(' ')+(x.qty>1?' × '+x.qty:'')));l.appendChild(el('div','lbl',[x.spec,x.budget?'Budget '+inr(x.budget):'',x.needBy?'Need by '+dstr(x.needBy):'',x.urgent?'Urgent':'','Sent '+dstr(x.at)].filter(Boolean).join(' · ')));if(x.link){const a=el('a','lbl','View product link');a.href=x.link;a.target='_blank';a.rel='noopener';l.appendChild(a);}if(x.note)l.appendChild(el('div','xc-n',x.note));if(x.photo){const a=el('a','xc-th');a.href=x.photo;a.target='_blank';a.rel='noopener';const im=el('img');im.src=x.photo;im.alt='Reference';im.loading='lazy';a.appendChild(im);l.appendChild(a);}row.appendChild(l);
+  row.appendChild(el('span','xchip '+(x.status==='Unavailable / closed'?'x-reopened':x.status==='Order created'?'x-resolved':''),x.status||'Submitted'));
+  if(isOwner()){const o=el('div','xc-own owner');const sel=el('select');RQ_FLOW.forEach(s=>{const op=el('option',null,s);op.value=s;if(s===x.status)op.selected=true;sel.appendChild(op);});const b=el('button','btn2','Update');b.type='button';b.addEventListener('click',async()=>{try{await photos.db.doc('requests/'+x.id).set(Object.assign({},x,{id:undefined,status:sel.value,updated:nowIso()}));say('Request updated');}catch(e){say('Could not update');}});o.appendChild(sel);o.appendChild(b);
+   const q=el('button','btn2','Create quote');q.type='button';q.addEventListener('click',async()=>{const p=prompt('Selling price ₹ for '+[x.brand,x.product].join(' ')+':');if(!p||!(Number(p)>0))return;try{await photos.db.collection('quotes').add({item:[x.brand,x.product].filter(Boolean).join(' '),price:Number(p),shipping:0,total:Number(p),advance:'50%',window:'',valid:'',note:x.spec||'',request:x.id,status:'Quoted',at:new Date().toISOString().slice(0,10)});await photos.db.doc('requests/'+x.id).set(Object.assign({},x,{id:undefined,status:'Quote ready',updated:nowIso()}));say('Quote posted');}catch(e){say('Could not create quote');}});o.appendChild(q);row.appendChild(o);}
+  host.appendChild(row);});
+}
+function buildRequests(){
+ const q=$('quotes');const qs=q&&q.closest('section');if(!qs||$('rq'))return;
+ const sec=el('section','card acc');sec.id='rq';const h=el('h2',null,'Request a product');h.setAttribute('role','button');h.tabIndex=0;sec.appendChild(h);
+ sec.appendChild(el('p','note','Tell us what you want sourced. We check availability and send you a quote to approve.'));
+ const body=el('div');
+ body.innerHTML='<div class="form"><label>Brand<input id="rq-brand" type="text"></label><label>Product<input id="rq-prod" type="text" placeholder="e.g. Coach Tabby 26"></label><label>Size / colour<input id="rq-spec" type="text"></label><label>Qty<input id="rq-qty" type="number" value="1" min="1"></label><label>Budget ₹ (optional)<input id="rq-budget" type="number" inputmode="numeric"></label><label>Need it by (optional)<input id="rq-need" type="date"></label><label class="wide">Product link (optional)<input id="rq-link" type="url" placeholder="https://"></label><label class="wide">Reference photo (optional)<input id="rq-photo" type="file" accept="image/*"></label><label class="wide">Notes<textarea id="rq-note" rows="2"></textarea></label><label class="xs-sw" style="grid-column:1/-1"><input id="rq-urgent" type="checkbox"><span><b>Urgent</b><small>Only if it genuinely cannot wait</small></span></label></div><p class="xs-act"><button class="btn" id="rq-send" type="button">Send request</button><span class="lbl" id="rq-msg"></span></p><h2 style="margin-top:18px">Your requests</h2><div id="rq-list" class="xs-list"></div>';
+ if(isOwner()){body.innerHTML='<h2>Client requests</h2><div id="rq-list" class="xs-list"></div>';}
+ sec.appendChild(body);qs.parentNode.insertBefore(sec,qs.nextSibling);
+ const set=o=>{sec.classList.toggle('open',o);h.setAttribute('aria-expanded',String(o));};set(false);h.addEventListener('click',()=>set(!sec.classList.contains('open')));h.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();set(!sec.classList.contains('open'));}});
+ let draft=null,busy=false;
+ const send=$('rq-send');if(send)send.addEventListener('click',async()=>{if(busy)return;const m=$('rq-msg');const brand=$('rq-brand').value.trim(),prod=$('rq-prod').value.trim();if(!prod){m.textContent='Tell us which product you want.';return;}
+  busy=true;send.disabled=true;m.textContent='Sending…';draft=draft||'rq-'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+  try{let photo='';const f=$('rq-photo').files&&$('rq-photo').files[0];if(f){const a=await photos.assets.upload(f);photo=a.url;}
+   await photos.db.doc('requests/'+draft).set({brand,product:prod,spec:$('rq-spec').value.trim(),qty:Number($('rq-qty').value||1),budget:Number($('rq-budget').value||0)||0,needBy:$('rq-need').value,link:$('rq-link').value.trim(),photo,note:$('rq-note').value.trim(),urgent:$('rq-urgent').checked,status:'Submitted',at:nowIso()});
+   draft=null;['rq-brand','rq-prod','rq-spec','rq-budget','rq-need','rq-link','rq-note'].forEach(i=>$(i).value='');$('rq-photo').value='';$('rq-urgent').checked=false;$('rq-qty').value=1;m.textContent='Sent. We will review it and reply with availability or a quote.';say('Request sent');
+  }catch(e){m.textContent='Could not send. Your details are kept, try again.';}
+  busy=false;send.disabled=false;});
+}
+
+/* ================= Quote approval ================= */
+const qrState={};window.__lxQR=qrState;
+function quoteExpired(q){return !!q.valid&&q.valid<new Date().toISOString().slice(0,10);}
+function openQuote(q){
+ const old=document.querySelector('.sw .drawer');if(old)old.remove();
+ const dr=el('div','drawer');dr.addEventListener('click',e=>{if(e.target===dr)dr.remove();});const pan=el('div','pan');
+ const x=el('button','x','×');x.type='button';x.setAttribute('aria-label','Close');x.addEventListener('click',()=>dr.remove());pan.appendChild(x);
+ pan.appendChild(el('h3',null,'Review your quote'));pan.appendChild(el('div','spec',q.item));
+ const kv=(k,v)=>{const d=el('div','kv');d.appendChild(el('span','lbl',k));d.appendChild(el('span',null,v));pan.appendChild(d);};
+ const price=Number(q.price||0),ship=Number(q.shipping||0),total=Number(q.total||price+ship);
+ if(q.note)kv('Details',q.note);kv('Availability',q.avail||'Confirmed by Luxella at the time of quoting');kv('Price',inr(price));kv('Other charges',ship?inr(ship):'None, all-inclusive');kv('Total payable',inr(total));
+ kv('Advance to confirm',q.advance?(String(q.advance).includes('%')?q.advance+' of total':inr(String(q.advance).replace(/[^0-9.]/g,''))):'50% of total');
+ kv('Delivery window',q.window||'Quoted separately. It starts once the piece reaches our international hub.');
+ kv('Quote valid till',q.valid?dstr(q.valid):'No expiry set');
+ const resp=qrState['qr-'+q.id];
+ if(resp){pan.appendChild(el('p','xc-n','You '+(resp.decision==='approved'?'approved':'declined')+' this quote on '+dstr(resp.at)+'.'));}
+ else if(quoteExpired(q)){pan.appendChild(el('p','xc-n','This quote has expired. Ask Luxella to revalidate it before approving.'));const a=el('a','btn','Ask Luxella to revalidate');a.href='https://wa.me/918724079056?text='+encodeURIComponent('Hi Luxella, please revalidate the quote for '+q.item+'.');a.target='_blank';a.rel='noopener';pan.appendChild(a);}
+ else if(!isOwner()){
+  const lab=el('label','xs-sw');const cb=el('input');cb.type='checkbox';const tx=el('span');tx.appendChild(el('b',null,'I have read the order terms'));const sm=el('small');sm.textContent='Including cancellation and sourcing terms. ';const rd=el('a',null,'Read the terms');rd.href='#';rd.style.textDecoration='underline';rd.addEventListener('click',e=>{e.preventDefault();dr.remove();goTab('pol');});sm.appendChild(rd);tx.appendChild(sm);lab.appendChild(cb);lab.appendChild(tx);pan.appendChild(lab);
+  const row=el('p','xs-act');const ok=el('button','btn','Approve this quote');ok.type='button';ok.disabled=true;cb.addEventListener('change',()=>{ok.disabled=!cb.checked;});
+  const no=el('button','btn2','Decline');no.type='button';const msg=el('span','lbl');
+  const decide=async dec=>{ok.disabled=no.disabled=true;msg.textContent='Saving…';try{await photos.db.doc('quote_resp/qr-'+q.id).set({id:'qr-'+q.id,quote:q.id,item:q.item,total,decision:dec});msg.textContent=dec==='approved'?'Approved. Luxella will confirm the order and the advance.':'Declined.';say(dec==='approved'?'Quote approved':'Quote declined');setTimeout(()=>dr.remove(),900);}catch(e){msg.textContent='Could not save. It may already be decided or have expired.';ok.disabled=!cb.checked;no.disabled=false;}};
+  ok.addEventListener('click',()=>decide('approved'));no.addEventListener('click',()=>{if(confirm('Decline this quote?'))decide('declined');});
+  row.appendChild(ok);row.appendChild(no);row.appendChild(msg);pan.appendChild(row);}
+ dr.appendChild(pan);sw.appendChild(dr);
+}
+window.openQuote=openQuote;
+window.__lxQuoteRow=function(q,row,t){
+ const resp=qrState['qr-'+q.id];const st=q.status||'Quoted';
+ if(resp&&st==='Quoted'){const b=el('div','lbl',resp.decision==='approved'?(isOwner()?'Client approved this quote on '+dstr(resp.at):'You approved this quote. Awaiting order confirmation.'):'Declined '+dstr(resp.at));b.style.color=resp.decision==='approved'?'var(--gold-2)':'var(--muted)';t.appendChild(b);}
+ if(st==='Quoted'||resp){const b=el('button',isOwner()?'btn2':'btn2',st==='Quoted'&&!resp&&!isOwner()?'Review & approve':'View');b.type='button';b.addEventListener('click',()=>openQuote(q));row.appendChild(b);}
+ if(isOwner()&&resp&&resp.decision==='approved'&&st==='Quoted'){const c=el('button','btn owner','Create order');c.type='button';c.addEventListener('click',async()=>{try{const rows=ordersData();const m=String(new Date().getMonth()+1).padStart(2,'0');const nums=rows.map(r=>String(r.order_no||'')).filter(n=>n.startsWith('#'+m)).map(n=>Number(n.slice(3))||0);const no='#'+m+String((nums.length?Math.max(...nums):0)+1).padStart(2,'0');
+  await window.lx.saveOrder(q.item,{item:q.item,order_no:no,order_date:new Date().toISOString().slice(0,10),brand:'',order_type:'ETA',direct:'Direct to client',payout:Number(q.total||q.price||0),payout_status:'Pending',stage:1,status:'Ordered',eta_date:'',shipping_date:'',intl_tracking_no:'',intl_courier:'',intl_courier_slug:'',local_tracking:'',local_courier:'',local_courier_slug:'',payment_date:''});
+  await photos.db.doc('quotes/'+q.id).set(Object.assign({},q,{id:undefined,status:'Ordered'}));if(q.request)try{const rq=rqState.items[q.request];if(rq)await photos.db.doc('requests/'+q.request).set(Object.assign({},rq,{status:'Order created',updated:nowIso()}));}catch(e){}
+  say('Order '+no+' created');}catch(e){say('Could not create the order');}});row.appendChild(c);}
+};
+
+/* boot for the flows */
+ready(()=>{
+ buildPaySub();buildRequests();
+ photos.db.collection('paysub').onSnapshot(s=>{const m={};s.docs.forEach(d=>{if(d.exists)m[d.id]=Object.assign({id:d.id},d.data());});psState.subs=m;renderPaySub();},()=>{});
+ photos.db.collection('requests').onSnapshot(s=>{const m={};s.docs.forEach(d=>{if(d.exists)m[d.id]=d.data();});rqState.items=m;renderRequests();},()=>{});
+ photos.db.collection('quote_resp').onSnapshot(s=>{Object.keys(qrState).forEach(k=>delete qrState[k]);s.docs.forEach(d=>{if(d.exists)qrState[d.id]=d.data();});if(typeof renderQuotes==='function')renderQuotes();},()=>{});
+ renderPaySub();renderRequests();
 });
 })();
