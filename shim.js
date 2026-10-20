@@ -98,16 +98,18 @@ window.lx={
 };
 
 /* ---- boot ---- */
-function topbar(){const t=g('top');t.hidden=false;t.innerHTML='<img class="tlogo" src="assets/luxella_logo.png" alt="Luxella"><span class="who">'+esc(S.email)+'</span>'+(S.owner?'<button id="tb-switch">Switch client</button>':'')+'<button id="tb-out">Sign out</button>';if(S.owner)g('tb-switch').onclick=()=>{location.href=new URL('./',document.baseURI).href;};g('tb-out').onclick=()=>sb.auth.signOut().then(()=>{location.href=new URL('./',document.baseURI).href;});}
+function topbar(){const t=g('top');t.hidden=false;t.innerHTML='<img class="tlogo" src="assets/luxella_logo.png" alt="Luxella"><span class="who">'+esc(S.email)+'</span>'+(S.owner?'<button id="tb-switch">← Admin</button>':'')+'<button id="tb-out">Sign out</button>';if(S.owner)g('tb-switch').onclick=()=>{location.href=new URL('admin',document.baseURI).href;};g('tb-out').onclick=()=>sb.auth.signOut().then(()=>{location.href=new URL('./',document.baseURI).href;});}
+window.__lxAdmin={sb,S,esc,adminCall:(b)=>adminCall(b)};
 async function start(){const {data:{session}}=await sb.auth.getSession();S.session=session;if(!session){gateLogin();return;}S.email=(session.user.email||'').toLowerCase();S.owner=['jeetnathavani37@gmail.com','jeetnatb@gmail.com'].includes(S.email);
  const basePath=new URL(document.baseURI).pathname;const rel=location.pathname.startsWith(basePath)?location.pathname.slice(basePath.length):'';const seg=rel.split('/').filter(Boolean)[0]||'';const slug=new URLSearchParams(location.search).get('c')||(seg==='index.html'?'':seg);
+ if(slug==='admin'){if(!S.owner){gateNoAccess();return;}g('gate').hidden=true;g('top').hidden=true;g('dash-root').hidden=true;g('admin-root').hidden=false;if(window.__adminLoaded)return;window.__adminLoaded=1;const a=document.createElement('script');a.src='admin.js';document.body.appendChild(a);return;}
  let q=sb.from('lx_clients').select('id,slug,name,biz');q=slug?q.eq('slug',slug):q;const {data:clients,error}=await q;
  if(error){gate('<img class="logo" src="assets/luxella_logo.png" alt="Luxella"><p>'+esc(error.message)+'</p>');return;}
- if(!clients||!clients.length){if(S.owner){gatePick();return;}gateNoAccess();return;}
- if(!slug&&S.owner){gatePick();return;}
+ if(!clients||!clients.length){if(S.owner){location.replace(new URL('admin',document.baseURI).href);return;}gateNoAccess();return;}
+ if(!slug&&S.owner){location.replace(new URL('admin',document.baseURI).href);return;}
  S.client=clients[0];window.LX_CLIENT={name:S.client.name,biz:S.client.biz||''};document.title=S.client.name.split(' ')[0]+' · Luxella';
  await loadAll();subscribe();g('gate').hidden=true;topbar();g('dash-root').hidden=false;
- if(!window.__pageLoaded){window.__pageLoaded=true;const s=document.createElement('script');s.src='app.js';s.onload=()=>{fire();{const q=document.createElement('script');q.src='polish.js';document.body.appendChild(q);}{const x=document.createElement('script');x.src='extras.js';document.body.appendChild(x);}if(S.owner){const m=document.createElement('script');m.src='manage.js';document.body.appendChild(m);}};document.body.appendChild(s);}else fire();}
+ if(!window.__pageLoaded){window.__pageLoaded=true;const s=document.createElement('script');s.src='app.js';s.onload=()=>{fire();{const q=document.createElement('script');q.src='polish.js';document.body.appendChild(q);}{const x=document.createElement('script');x.src='extras.js';document.body.appendChild(x);}};document.body.appendChild(s);}else fire();}
 sb.auth.onAuthStateChange((ev)=>{if(ev==='SIGNED_IN'||ev==='TOKEN_REFRESHED'){if(!S.client)start();}if(ev==='SIGNED_OUT'){location.reload();}});
 start();
 })();
