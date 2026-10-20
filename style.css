@@ -5,6 +5,9 @@ img{max-width:100%}
 #dash-root{padding:0 max(16px,env(safe-area-inset-left,0px)) 0 max(16px,env(safe-area-inset-right,0px))}
 .lx-gate{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:#0A0A0A}
 .lx-gate .box{width:min(420px,100%);border:1px solid #2A2724;padding:34px 28px;text-align:center}
+.lx-gate .logo{width:150px;height:auto;display:block;margin:0 auto 18px}
+.lx-gate .keep{display:flex;align-items:center;gap:9px;justify-content:flex-start;text-align:left;font:300 11.5px 'Jost',sans-serif;letter-spacing:.06em;color:#A39C90;margin:-4px 0 18px;cursor:pointer}
+.lx-gate .keep input{width:14px;height:14px;margin:0;accent-color:#C9A227;border:0;padding:0}
 .lx-gate h1{font-family:'Jost',sans-serif;font-weight:300;font-size:20px;letter-spacing:.34em;text-transform:uppercase;margin:0 0 6px;color:#F3EEE6}
 .lx-gate p{font-family:'Cormorant Garamond',serif;font-size:17px;color:#A39C90;margin:0 0 22px}
 .lx-gate input{width:100%;box-sizing:border-box;background:transparent;border:0;border-bottom:1px solid #2A2724;color:#F3EEE6;padding:12px 0;font:300 15px 'Jost',sans-serif;margin-bottom:16px;outline:0}
@@ -15,7 +18,9 @@ img{max-width:100%}
 .lx-gate .pick button{background:transparent;color:#F3EEE6;border-color:#2A2724;text-align:left;letter-spacing:.2em}
 .lx-gate .pick button:hover{border-color:#C9A227}
 .lx-gate .out{margin-top:18px;font-size:9px;letter-spacing:.3em;text-transform:uppercase;color:#5A554C;cursor:pointer;background:none;border:0;width:auto}
-.lx-top{display:flex;justify-content:flex-end;gap:14px;padding:10px max(16px,env(safe-area-inset-left,0px));font:400 9px 'Jost',sans-serif;letter-spacing:.3em;text-transform:uppercase;color:#5A554C}
+.lx-top .tlogo{height:14px;width:auto;margin-right:auto;opacity:.9;flex:0 0 auto}
+.lx-top .who{opacity:.8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:38vw}
+.lx-top{display:flex;align-items:center;justify-content:flex-end;gap:14px;padding:10px max(16px,env(safe-area-inset-left,0px));font:400 9px 'Jost',sans-serif;letter-spacing:.3em;text-transform:uppercase;color:#5A554C}
 .lx-top button{background:none;border:0;color:#8E887C;font:inherit;letter-spacing:inherit;text-transform:inherit;cursor:pointer}
 
 @font-face{font-family:'Cormorant Garamond';font-style:normal;font-weight:300 700;font-display:swap;src:url(assets/cormorant.woff2) format('woff2')}
@@ -326,6 +331,9 @@ img{max-width:100%}
 /* Rolex · Prada inspired details */
 .sw .hero{margin-bottom:34px}
 .sw .hero-top{display:flex;align-items:center;gap:12px;margin-bottom:38px}
+.hero-top .hlogo{height:24px;width:auto;margin-right:2px;flex:0 0 auto}
+.hero-top .eyebrow{white-space:nowrap}
+@media (max-width:520px){.hero-top>.eyebrow{display:none}}
 .sw .eyebrow{font-size:9.5px;letter-spacing:.34em;text-transform:uppercase;color:var(--gold);font-weight:600}
 .sw .hero-main{display:flex;align-items:flex-end;gap:26px;flex-wrap:wrap}
 .sw .hero h1{font-size:58px;line-height:.98;margin:0}

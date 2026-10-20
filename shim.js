@@ -3,7 +3,9 @@
 (function(){
 const SUPABASE_URL='https://qzripzgbstvxkfobzhyv.supabase.co';
 const SUPABASE_KEY='sb_publishable_-EA-q_dacUuWovbrCW5XVw_pPZ2vK_O';
-const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+const KEEP_KEY='lx_keep';const keep=()=>{try{return localStorage.getItem(KEEP_KEY)!=='0';}catch(e){return true;}};
+const store={getItem:k=>{try{return localStorage.getItem(k)??sessionStorage.getItem(k);}catch(e){return null;}},setItem:(k,v)=>{try{if(keep()){localStorage.setItem(k,v);sessionStorage.removeItem(k);}else{sessionStorage.setItem(k,v);localStorage.removeItem(k);}}catch(e){}},removeItem:k=>{try{localStorage.removeItem(k);sessionStorage.removeItem(k);}catch(e){}}};
+const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storage:store}});
 window.sb=sb;
 
 /* ---- tiny d3 stand-in (only what the page uses) ---- */
@@ -20,13 +22,13 @@ const esc=s=>String(s==null?'':s);
 
 /* ---- auth gate ---- */
 function gate(html){const w=g('gate');w.hidden=false;w.innerHTML='<div class="box">'+html+'</div>';g('dash-root').hidden=true;g('top').hidden=true;}
-function gateLogin(msg){gate('<h1>Luxella</h1><p>Private client access. Sign in with the email and password Luxella gave you.</p><input id="lg-email" type="email" placeholder="Email" autocomplete="username"><input id="lg-pass" type="password" placeholder="Password" autocomplete="current-password"><button id="lg-go">Sign in</button><div class="m" id="lg-m">'+esc(msg||'')+'</div>');
+function gateLogin(msg){gate('<img class="logo" src="assets/luxella_logo.png" alt="Luxella"><p>Private client access. Sign in with the email and password Luxella gave you.</p><input id="lg-email" type="email" placeholder="Email" autocomplete="username"><input id="lg-pass" type="password" placeholder="Password" autocomplete="current-password"><label class="keep"><input type="checkbox" id="lg-keep" checked><span>Keep me signed in on this device</span></label><button id="lg-go">Sign in</button><div class="m" id="lg-m">'+esc(msg||'')+'</div>');
  const em=g('lg-email'),pw=g('lg-pass'),m=g('lg-m');
- g('lg-go').onclick=async()=>{const email=em.value.trim().toLowerCase(),password=pw.value;if(!email||!password){m.textContent='Enter your email and password.';return;}m.textContent='Signing in…';const {error}=await sb.auth.signInWithPassword({email,password});if(error){m.textContent=/invalid/i.test(error.message)?'Email or password is incorrect. Message Luxella if you need a reset.':error.message;return;}m.textContent='';};
+ g('lg-go').onclick=async()=>{const email=em.value.trim().toLowerCase(),password=pw.value;if(!email||!password){m.textContent='Enter your email and password.';return;}m.textContent='Signing in…';try{localStorage.setItem(KEEP_KEY,g('lg-keep').checked?'1':'0');}catch(e){}const {error}=await sb.auth.signInWithPassword({email,password});if(error){m.textContent=/invalid/i.test(error.message)?'Email or password is incorrect. Message Luxella if you need a reset.':error.message;return;}m.textContent='';};
  [em,pw].forEach(x=>x.addEventListener('keydown',e=>{if(e.key==='Enter')g('lg-go').click();}));}
-function gateNoAccess(){gate('<h1>Luxella</h1><p>This email ('+esc(S.email)+') is not linked to a client page yet. Ask Luxella to add it.</p><button class="out" id="lg-out">Sign out</button>');g('lg-out').onclick=()=>sb.auth.signOut().then(()=>location.reload());}
-async function gatePick(){const {data,error}=await sb.from('lx_clients').select('id,slug,name,biz').order('name');if(error){gate('<h1>Luxella</h1><p>'+esc(error.message)+'</p>');return;}
- gate('<h1>Luxella</h1><p>Choose a client page to open.</p><div class="pick">'+(data||[]).map(c=>'<button data-s="'+esc(c.slug)+'">'+esc(c.name)+(c.biz?' · '+esc(c.biz):'')+'</button>').join('')+'</div><div class="pick" style="margin-top:18px"><input id="nc-name" placeholder="New client name"><input id="nc-slug" placeholder="slug (e.g. himanshu)"><input id="nc-email" placeholder="client email"><button id="nc-go">Create client</button></div><button class="out" id="lg-out">Sign out</button>');
+function gateNoAccess(){gate('<img class="logo" src="assets/luxella_logo.png" alt="Luxella"><p>This email ('+esc(S.email)+') is not linked to a client page yet. Ask Luxella to add it.</p><button class="out" id="lg-out">Sign out</button>');g('lg-out').onclick=()=>sb.auth.signOut().then(()=>location.reload());}
+async function gatePick(){const {data,error}=await sb.from('lx_clients').select('id,slug,name,biz').order('name');if(error){gate('<img class="logo" src="assets/luxella_logo.png" alt="Luxella"><p>'+esc(error.message)+'</p>');return;}
+ gate('<img class="logo" src="assets/luxella_logo.png" alt="Luxella"><p>Choose a client page to open.</p><div class="pick">'+(data||[]).map(c=>'<button data-s="'+esc(c.slug)+'">'+esc(c.name)+(c.biz?' · '+esc(c.biz):'')+'</button>').join('')+'</div><div class="pick" style="margin-top:18px"><input id="nc-name" placeholder="New client name"><input id="nc-slug" placeholder="slug (e.g. himanshu)"><input id="nc-email" placeholder="client email"><button id="nc-go">Create client</button></div><button class="out" id="lg-out">Sign out</button>');
  document.querySelectorAll('#gate .pick [data-s]').forEach(b=>b.onclick=()=>{location.search='?c='+b.getAttribute('data-s');});
  g('lg-out').onclick=()=>sb.auth.signOut().then(()=>location.reload());
  g('nc-go').onclick=async()=>{const name=g('nc-name').value.trim(),slug=g('nc-slug').value.trim().toLowerCase().replace(/[^a-z0-9-]/g,''),email=g('nc-email').value.trim().toLowerCase();if(!name||!slug)return;const r=await sb.from('lx_clients').insert({slug,name}).select().single();if(r.error){alert(r.error.message);return;}if(email)await sb.from('lx_client_users').insert({client_id:r.data.id,email});location.search='?c='+slug;};}
@@ -69,11 +71,11 @@ window.dash={
  refresh(){},params(){return {};},setParams(){},resetParams(){},setLink(name){try{history.replaceState(null,'','#'+name);}catch(e){}}};
 
 /* ---- boot ---- */
-function topbar(){const t=g('top');t.hidden=false;t.innerHTML='<span>'+esc(S.email)+'</span>'+(S.owner?'<button id="tb-switch">Switch client</button>':'')+'<button id="tb-out">Sign out</button>';if(S.owner)g('tb-switch').onclick=()=>{location.search='';};g('tb-out').onclick=()=>sb.auth.signOut().then(()=>{location.search='';location.reload();});}
+function topbar(){const t=g('top');t.hidden=false;t.innerHTML='<img class="tlogo" src="assets/luxella_logo.png" alt="Luxella"><span class="who">'+esc(S.email)+'</span>'+(S.owner?'<button id="tb-switch">Switch client</button>':'')+'<button id="tb-out">Sign out</button>';if(S.owner)g('tb-switch').onclick=()=>{location.search='';};g('tb-out').onclick=()=>sb.auth.signOut().then(()=>{location.search='';location.reload();});}
 async function start(){const {data:{session}}=await sb.auth.getSession();S.session=session;if(!session){gateLogin();return;}S.email=(session.user.email||'').toLowerCase();S.owner=['jeetnathavani37@gmail.com','jeetnatb@gmail.com'].includes(S.email);
  const basePath=new URL(document.baseURI).pathname;const rel=location.pathname.startsWith(basePath)?location.pathname.slice(basePath.length):'';const seg=rel.split('/').filter(Boolean)[0]||'';const slug=new URLSearchParams(location.search).get('c')||(seg==='index.html'?'':seg);
  let q=sb.from('lx_clients').select('id,slug,name,biz');q=slug?q.eq('slug',slug):q;const {data:clients,error}=await q;
- if(error){gate('<h1>Luxella</h1><p>'+esc(error.message)+'</p>');return;}
+ if(error){gate('<img class="logo" src="assets/luxella_logo.png" alt="Luxella"><p>'+esc(error.message)+'</p>');return;}
  if(!clients||!clients.length){if(S.owner){gatePick();return;}gateNoAccess();return;}
  if(!slug&&clients.length>1&&S.owner){gatePick();return;}
  S.client=clients[0];window.LX_CLIENT={name:S.client.name,biz:S.client.biz||''};document.title=S.client.name.split(' ')[0]+' · Luxella';
