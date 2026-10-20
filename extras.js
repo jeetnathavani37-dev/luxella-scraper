@@ -446,6 +446,7 @@ async function applyChange(item,patch,notesFn,desc){
 }
 async function undoLast(){
  const s=undoStack.pop();if(!s)return;
+ if(s.created){try{await window.lx.deleteOrder(s.item);say('Undone: '+s.desc);}catch(e){undoStack.push(s);say('Could not undo.');}renderUndoBar();return;}
  try{const d=clone(s.order);delete d.item;await window.lx.saveOrder(s.item,d);
   if(s.notes)await photos.db.doc('notes/'+s.key).set(s.notes);else{try{await photos.db.doc('notes/'+s.key).delete();}catch(e){}}
   say('Undone: '+s.desc);}catch(e){undoStack.push(s);say('Could not undo.');}
@@ -464,41 +465,57 @@ window.__lxSetStage=async function(r0,k){
  const ok=await applyChange(r.item,{stage:k,status:name},n=>{const st=Object.assign({},n.stages||{});if(k<cur){Object.keys(st).forEach(x=>{if(Number(x)>k)delete st[x];});}if(!st[k])st[k]=todayS();return Object.assign(n,{order:r.item,items:n.items||[],stages:st});},(r.order_no||r.item)+' → '+name);
  if(ok)say(name);
 };
-const openTrk={};
+function detectIntl(n){n=String(n).replace(/\s+/g,'');if(/^1Z[0-9A-Z]{16}$/i.test(n))return 'ups';if(/^(92|93|94|95)\d{18,20}$/.test(n)||/^[A-Z]{2}\d{9}US$/i.test(n))return 'usps';if(/^\d{10}$/.test(n))return 'dhl';if(/^\d{12}$|^\d{15}$|^\d{20}$|^\d{22}$/.test(n))return 'fedex';return '';}
+function detectLocal(n){n=String(n).replace(/\s+/g,'');if(/^\d{11}$/.test(n))return 'bluedart';if(/^\d{13,14}$/.test(n))return 'delhivery';if(/^[A-Z]\d{8,10}$/i.test(n))return 'dtdc';if(/^[A-Z]{2}\d{9}IN$/i.test(n))return 'india-post';return '';}
 window.__lxTrk=function(r,card){
  if(!isOwner())return;
- const item=r.item,stage=Number(r.stage||1);
+ const item=r.item,stage=Number(r.stage||1),local=String(r.order_type).indexOf('Local')>=0;
  const box2=el('div','xo-trk owner');
- const row=el('div','xo-row');
- const back=el('button','btn2','◀ Back');back.type='button';back.disabled=stage<=1;back.addEventListener('click',()=>window.__lxSetStage(r,stage-1));
- const nx=el('button','btn',stage>=9?'Delivered ✓':'Next ▶ '+STAGES[stage]);nx.type='button';nx.disabled=stage>=9;nx.addEventListener('click',()=>window.__lxSetStage(r,stage+1));
- const jump=el('select','xo-in');STAGES.forEach((n,i)=>{const o=el('option',null,(i+1)+' · '+n);o.value=String(i+1);if(i+1===stage)o.selected=true;jump.appendChild(o);});jump.addEventListener('change',()=>window.__lxSetStage(r,Number(jump.value)));
- row.appendChild(back);row.appendChild(nx);row.appendChild(jump);box2.appendChild(row);
- const det=el('details','xo-fold');det.open=!!openTrk[item];det.addEventListener('toggle',()=>{openTrk[item]=det.open;});det.appendChild(el('summary',null,'Edit details, tracking, payment'));
+ /* row 1: big stage buttons + paid */
+ const row=el('div','xo-row xo-big');
+ const back=el('button','btn2','◀');back.type='button';back.title='Go back one step';back.disabled=stage<=1;back.addEventListener('click',()=>window.__lxSetStage(r,stage-1));
+ const nx=el('button','btn',stage>=9?'Delivered ✓':'Next: '+STAGES[stage]+' ▶');nx.type='button';nx.disabled=stage>=9;nx.addEventListener('click',()=>window.__lxSetStage(r,stage+1));
+ const paid=r.payout_status==='Received';
+ const pb=el('button','btn2',paid?'✓ Paid':'Mark paid');pb.type='button';pb.addEventListener('click',()=>applyChange(item,paid?{payout_status:'Pending',payment_date:''}:{payout_status:'Received',payment_date:todayS()},null,(r.order_no||item)+(paid?': marked unpaid':': marked paid')));
+ row.appendChild(back);row.appendChild(nx);row.appendChild(pb);box2.appendChild(row);
+ /* row 2: tap-to-edit fields, auto-save */
  const f=el('div','xo-form');
  const lab=(t,i)=>{const l=el('label','xo-lbl');l.appendChild(el('span',null,t));l.appendChild(i);return l;};
- const eta=field('ETA','date');eta.value=r.eta_date||'';const sh=field('Shipped','date');sh.value=r.shipping_date||'';
- const it=field('Intl tracking no.');it.value=r.intl_tracking_no||'';const ic=el('select','xo-in');const lt=field('India tracking no.');lt.value=r.local_tracking||'';const lc=el('select','xo-in');
- COURIERS.forEach(([v,n])=>{[ic,lc].forEach((s,j)=>{const o=el('option',null,n);o.value=v;if(v===(j?r.local_courier_slug:r.intl_courier_slug)||(!v&&!(j?r.local_courier_slug:r.intl_courier_slug)))o.selected=true;s.appendChild(o);});});
- const ps=el('select','xo-in');['Pending','Received'].forEach(v=>{const o=el('option',null,v);o.value=v;if(v===(r.payout_status||'Pending'))o.selected=true;ps.appendChild(o);});
- const am=field('Order value ₹','number');am.value=r.payout!=null?r.payout:'';
- [lab('ETA',eta),lab('Shipped on',sh),lab('Intl courier',ic),lab('Intl tracking',it),lab('India courier',lc),lab('India tracking',lt),lab('Payment',ps),lab('Value ₹',am)].forEach(x=>f.appendChild(x));
- det.appendChild(f);
- const sv=el('button','btn','Save changes');sv.type='button';sv.addEventListener('click',async()=>{
-  const patch={eta_date:eta.value,shipping_date:sh.value,intl_tracking_no:it.value.trim(),intl_courier_slug:ic.value,intl_courier:CNAME[ic.value]||'',local_tracking:lt.value.trim(),local_courier_slug:lc.value,local_courier:CNAME[lc.value]||'',payout_status:ps.value,payout:am.value===''?null:Number(am.value)};
-  if(eta.value&&eta.value!==(r.eta_date||'')&&r.eta_date)patch.eta_prev=r.eta_date;
-  if(ps.value==='Received'&&r.payout_status!=='Received')patch.payment_date=todayS();
-  const changed=Object.keys(patch).filter(k=>String(patch[k]==null?'':patch[k])!==String(r[k]==null?'':r[k])&&k!=='eta_prev'&&k!=='payment_date');
-  if(!changed.length){say('Nothing changed');return;}
-  if(await applyChange(item,patch,null,(r.order_no||r.item)+': edited '+changed.map(k=>k.replace(/_/g,' ')).join(', ')))say('Saved');});
- const more=el('button','btn2','Delay, parcels, costs…');more.type='button';more.addEventListener('click',()=>{if(typeof openDrawer==='function')openDrawer(curOrder(item)||r);});
- const fr=el('div','xo-row');fr.appendChild(sv);fr.appendChild(more);det.appendChild(fr);
- box2.appendChild(det);card.appendChild(box2);
+ const eta=field('ETA','date');eta.value=r.eta_date||'';
+ eta.addEventListener('change',()=>{const p={eta_date:eta.value};if(r.eta_date&&eta.value&&eta.value!==r.eta_date)p.eta_prev=r.eta_date;applyChange(item,p,null,(r.order_no||item)+': ETA '+(eta.value?dstr(eta.value):'cleared'));});
+ f.appendChild(lab('ETA',eta));
+ const trk=(label,key,ckey,cname,det)=>{
+  const inp=field('Paste tracking no.');inp.value=r[key]||'';
+  const sel=el('select','xo-in xo-cour');COURIERS.forEach(([v,n])=>{const o=el('option',null,n);o.value=v;if(v===(r[ckey]||''))o.selected=true;sel.appendChild(o);});
+  inp.addEventListener('change',()=>{const v=inp.value.trim();const c=det(v)||(r[ckey]||'');const p={};p[key]=v;p[ckey]=c;p[cname]=CNAME[c]||'';applyChange(item,p,null,(r.order_no||item)+': '+label.toLowerCase()+' tracking '+(v?'set':'cleared')+(c&&v?' ('+CNAME[c]+')':''));});
+  sel.addEventListener('change',()=>{const p={};p[ckey]=sel.value;p[cname]=CNAME[sel.value]||'';applyChange(item,p,null,(r.order_no||item)+': '+label.toLowerCase()+' courier '+(CNAME[sel.value]||'cleared'));});
+  const w=el('div','xo-lbl xo-trkw');w.appendChild(el('span',null,label));const g=el('div','xo-row');g.appendChild(inp);g.appendChild(sel);w.appendChild(g);return w;};
+ if(!local)f.appendChild(trk('International','intl_tracking_no','intl_courier_slug','intl_courier',detectIntl));
+ if(local||stage>=6||r.local_tracking)f.appendChild(trk('India','local_tracking','local_courier_slug','local_courier',detectLocal));
+ box2.appendChild(f);
+ const fr=el('div','xo-row');const more=el('button','xo-link','More: delay, parcels, costs, cancel →');more.type='button';more.addEventListener('click',()=>{if(typeof openDrawer==='function')openDrawer(curOrder(item)||r);});fr.appendChild(more);
+ box2.appendChild(fr);card.appendChild(box2);
 };
+
+/* quick add order */
+function buildQuickAdd(){
+ const bar=$('xo-undobar');if(!bar||$('xo-qa'))return;
+ const d=el('details','xo-fold');d.id='xo-qa';d.appendChild(el('summary',null,'+ Add new order'));
+ const f=el('div','xo-form');
+ const it=field('Item (e.g. Coach Tabby 26, Black)'),br=field('Brand'),pr=field('Price ₹','number');pr.inputMode='numeric';
+ const ty=el('select','xo-in');[['ETA','ETA (sourced)'],['In hand (Local)','In hand (Local)']].forEach(([v,n])=>{const o=el('option',null,n);o.value=v;ty.appendChild(o);});
+ const ro=el('select','xo-in');[['Direct to client','Direct to client'],['Indirect (via me)','Via reseller']].forEach(([v,n])=>{const o=el('option',null,n);o.value=v;ro.appendChild(o);});
+ const go=el('button','btn','Add order');go.type='button';
+ go.addEventListener('click',async()=>{const name=it.value.trim();if(!name){say('Enter the item name');return;}if(curOrder(name)){say('An order with this name already exists');return;}
+  const rows=ordersData();const m=String(new Date().getMonth()+1).padStart(2,'0');const nums=rows.map(r=>String(r.order_no||'')).filter(n=>n.startsWith('#'+m)).map(n=>Number(n.slice(3))||0);const no='#'+m+String((nums.length?Math.max(...nums):0)+1).padStart(2,'0');
+  go.disabled=true;try{await window.lx.saveOrder(name,{item:name,order_no:no,order_date:todayS(),brand:br.value.trim(),order_type:ty.value,direct:ro.value,payout:pr.value===''?null:Number(pr.value),payout_status:'Pending',stage:1,status:STAGES[0],eta_date:'',shipping_date:'',intl_tracking_no:'',intl_courier:'',intl_courier_slug:'',local_tracking:'',local_courier:'',local_courier_slug:''});
+   undoStack.push({created:true,item:name,desc:'Added '+no+' '+name});showUndo('Added '+no+' '+name);renderUndoBar();it.value=br.value=pr.value='';d.open=false;}catch(e){say('Could not add the order');}go.disabled=false;});
+ [it,br,pr,ty,ro,go].forEach(x=>f.appendChild(x));d.appendChild(f);bar.parentNode.insertBefore(d,bar.nextSibling);
+}
 
 /* boot for the flows */
 ready(()=>{
- buildPaySub();buildRequests();if(isOwner()){buildOps();buildUndoBar();try{render();}catch(e){}}
+ buildPaySub();buildRequests();if(isOwner()){buildOps();buildUndoBar();buildQuickAdd();try{render();}catch(e){}}
  photos.db.collection('paysub').onSnapshot(s=>{const m={};s.docs.forEach(d=>{if(d.exists)m[d.id]=Object.assign({id:d.id},d.data());});psState.subs=m;renderPaySub();},()=>{});
  photos.db.collection('requests').onSnapshot(s=>{const m={};s.docs.forEach(d=>{if(d.exists)m[d.id]=d.data();});rqState.items=m;renderRequests();},()=>{});
  photos.db.collection('quote_resp').onSnapshot(s=>{Object.keys(qrState).forEach(k=>delete qrState[k]);s.docs.forEach(d=>{if(d.exists)qrState[d.id]=d.data();});if(typeof renderQuotes==='function')renderQuotes();},()=>{});
