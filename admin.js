@@ -65,6 +65,7 @@ function shell(){
 
 function renderList(){
   const w=document.getElementById('ad-list');w.textContent='';
+  const db=el('button','ad-c'+(!sel?' on':''));db.type='button';db.appendChild(el('b',null,'Dashboard'));db.appendChild(el('small',null,'All clients overview'));db.onclick=()=>{sel=null;history.replaceState(null,'','#');renderList();renderClient();};w.appendChild(db);
   if(!clients.length)w.appendChild(el('p','ad-mut','No clients yet.'));
   clients.forEach(c=>{
     const b=el('button','ad-c'+(sel&&sel.id===c.id?' on':''));b.type='button';
@@ -91,7 +92,7 @@ async function createClient(){
 
 async function renderClient(){
   const m=document.getElementById('ad-main');m.textContent='';
-  if(!sel){m.appendChild(el('h2',null,'Pick a client'));m.appendChild(el('p','ad-mut','Left se client chuno ya naya banao. Yaha se sab clients ke logins, orders aur details manage hote hain.'));return;}
+  if(!sel){return renderDash(m);}
   const c=sel;
   const head=el('div','ad-card');
   head.innerHTML='<h2>'+esc(c.name)+'</h2><p class="ad-mut">'+esc(base(c.slug))+'</p>';
@@ -163,10 +164,49 @@ async function renderClient(){
   (au.data||[]).forEach(a=>ac.appendChild(el('div','ad-mut',new Date(a.at).toLocaleString('en-IN')+' · '+(a.actor||'')+' · '+a.op+' '+a.tbl+' '+(a.ref||''))));
 }
 
+async function renderDash(m){
+  m.appendChild(el('h2',null,'Dashboard'));
+  const [o,a]=await Promise.all([sb.from('lx_orders').select('client_id,item,data'),sb.from('lx_audit').select('at,actor,tbl,op,ref,client_id').order('at',{ascending:false}).limit(15)]);
+  if(o.error){m.appendChild(el('p','ad-mut',o.error.message));return;}
+  const name=id=>(clients.find(c=>c.id===id)||{}).name||'?';
+  const rows=(o.data||[]).map(x=>Object.assign({_c:x.client_id,item:x.item},x.data));
+  const today=new Date().toISOString().slice(0,10);
+  const val=r=>Number(r.payout)||0,del=r=>Number(r.stage)>=9||/deliver/i.test(r.status||'');
+  const open=rows.filter(r=>!del(r)),pend=rows.filter(r=>r.payout_status!=='Received');
+  const sum=a=>a.reduce((t,r)=>t+val(r),0);
+  const late=open.filter(r=>r.eta_date&&r.eta_date<today);
+  const kpi=(k,v,sub)=>{const d=el('div','ad-card');d.style.margin='0';d.appendChild(el('div','ad-mut',k));const b=el('div',null,v);b.style.cssText='font-size:26px;margin-top:4px;color:#E3C565';d.appendChild(b);if(sub)d.appendChild(el('div','ad-mut',sub));return d;};
+  const g=el('div');g.style.cssText='display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:16px';
+  g.append(kpi('Clients',String(clients.length)),kpi('Orders',String(rows.length),open.length+' open · '+(rows.length-open.length)+' delivered'),kpi('Total value',inr(sum(rows))),kpi('Payment pending',inr(sum(pend)),pend.length+' orders'),kpi('Late vs ETA',String(late.length),'open orders past ETA'));
+  m.appendChild(g);
+  // per client
+  const pc=el('div','ad-card');pc.appendChild(el('h2',null,'By client'));
+  clients.forEach(c=>{const r=rows.filter(x=>x._c===c.id);const row=el('div','ad-o');row.style.gridTemplateColumns='1fr auto auto';
+    const l=el('div');l.appendChild(el('span',null,c.name));l.appendChild(el('small',null,r.length+' orders · '+r.filter(x=>!del(x)).length+' open · '+inr(sum(r))));row.appendChild(l);
+    row.appendChild(el('span','ad-mut','Pending '+inr(sum(r.filter(x=>x.payout_status!=='Received')))));
+    const b=el('button','ad-b g','Open');b.type='button';b.onclick=()=>{sel=c;renderList();renderClient();};row.appendChild(b);pc.appendChild(row);});
+  m.appendChild(pc);
+  // stages
+  const sc=el('div','ad-card');sc.appendChild(el('h2',null,'Open orders by stage'));
+  const mx=Math.max(1,...STAGES.map((_,i)=>open.filter(r=>(Number(r.stage)||1)===i+1).length));
+  STAGES.forEach((st,i)=>{const n=open.filter(r=>(Number(r.stage)||1)===i+1).length;if(!n)return;const row=el('div');row.style.cssText='display:grid;grid-template-columns:15rem 1fr 2rem;gap:10px;align-items:center;margin:6px 0;font-size:12.5px';row.appendChild(el('span','ad-mut',(i+1)+' · '+st));const bar=el('div');bar.style.cssText='height:8px;background:#C9A227;width:'+Math.round(n/mx*100)+'%';row.appendChild(bar);row.appendChild(el('span',null,String(n)));sc.appendChild(row);});
+  if(!open.length)sc.appendChild(el('p','ad-mut','No open orders.'));m.appendChild(sc);
+  // attention
+  const at=el('div','ad-card');at.appendChild(el('h2',null,'Needs attention'));
+  late.sort((x,y)=>x.eta_date.localeCompare(y.eta_date)).forEach(r=>at.appendChild(el('div','ad-mut','Late · '+name(r._c)+' · '+(r.order_no||'')+' '+r.item+' · ETA '+r.eta_date+' · stage '+(r.stage||1))));
+  const dn=rows.filter(r=>del(r)&&r.payout_status!=='Received');
+  dn.forEach(r=>at.appendChild(el('div','ad-mut','Delivered, payment pending · '+name(r._c)+' · '+(r.order_no||'')+' '+r.item+' · '+inr(r.payout))));
+  if(!late.length&&!dn.length)at.appendChild(el('p','ad-mut','All clear.'));m.appendChild(at);
+  // activity
+  const ac=el('div','ad-card');ac.appendChild(el('h2',null,'Recent activity'));
+  (a.data||[]).forEach(x=>ac.appendChild(el('div','ad-mut',new Date(x.at).toLocaleString('en-IN')+' · '+name(x.client_id)+' · '+(x.actor||'')+' · '+x.op+' '+x.tbl+' '+(x.ref||''))));
+  if(!(a.data||[]).length)ac.appendChild(el('p','ad-mut','Nothing yet.'));m.appendChild(ac);
+}
+
 (async function init(){
   shell();
   try{await loadClients();}catch(e){root.querySelector('#ad-main').textContent=e.message;return;}
-  const h=decodeURIComponent((location.hash||'').slice(1));sel=clients.find(c=>c.slug===h)||clients[0]||null;
+  const h=decodeURIComponent((location.hash||'').slice(1));sel=clients.find(c=>c.slug===h)||null;
   renderList();renderClient();
 })();
 })();
