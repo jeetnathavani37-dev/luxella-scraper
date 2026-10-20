@@ -396,6 +396,7 @@ img{max-width:100%}
 @media (max-width:640px){.sw .feat{grid-template-columns:96px 1fr}.sw .feat .ph{width:96px;height:120px}.sw .glance{grid-template-columns:1fr 1fr}.sw .clk .t{font-size:24px}}
 
 .sw .terms,.sw #payinfo{font-size:13.5px;line-height:1.7;white-space:pre-wrap}
+.sw .terms .tintro,.sw .terms .tlead,.sw .terms .tbody,.sw .terms .tclose,.sw .terms .tshort{white-space:normal}
 .sw #payinfo .k{font-size:9.5px;letter-spacing:.26em;text-transform:uppercase;color:var(--muted);display:block;margin-top:10px}
 .sw #payinfo .v{font-family:var(--font-anthropic-serif);font-size:20px}
 .sw #ledger td.bal{color:var(--gold-2)}
@@ -739,3 +740,22 @@ img{max-width:100%}
 .sw .chatfab .cdot{position:absolute;top:4px;right:4px;width:10px;height:10px;border-radius:50%!important;background:#D96C5F;border:2px solid #0A0A0A;display:none}
 .sw .chatfab.has .cdot{display:block}
 @media (prefers-reduced-motion:no-preference){.sw .chatfab{animation:swup .6s .9s cubic-bezier(.2,.7,.2,1) both}}
+
+/* terms accordion */
+.sw .terms .tintro{font-family:var(--font-anthropic-serif);font-size:16px;line-height:1.6;color:var(--color-fg);margin:0 0 14px;font-weight:300}
+.sw .terms details.tpart{border-top:1px solid var(--line);padding:2px 0}
+.sw .terms details.tpart:last-of-type{border-bottom:1px solid var(--line)}
+.sw .terms summary{list-style:none;cursor:pointer;display:flex;gap:14px;align-items:baseline;padding:12px 0;letter-spacing:.14em;text-transform:uppercase;font-size:11.5px;font-weight:400;color:var(--color-fg)}
+.sw .terms summary::-webkit-details-marker{display:none}
+.sw .terms summary::after{content:'+';margin-left:auto;color:var(--gold);font-weight:300;font-size:16px;line-height:1}
+.sw .terms details[open]>summary::after{content:'–'}
+.sw .terms .tnum{color:var(--gold);min-width:22px;font-size:11px;letter-spacing:.1em}
+.sw .terms details.tsec{margin:0 0 4px 36px;border-top:1px dashed var(--line)}
+.sw .terms details.tsec summary{text-transform:none;letter-spacing:.02em;font-size:14px;padding:10px 0;font-family:var(--font-anthropic-serif);font-weight:400}
+.sw .terms .tlead{margin:0 0 8px;color:var(--color-fg);font-weight:400;font-size:13.5px;line-height:1.6}
+.sw .terms .tbody{margin:0 0 10px;color:var(--muted);font-size:13px;line-height:1.7}
+.sw .terms .tshort{display:grid;grid-template-columns:auto 1fr;gap:8px 16px;margin:4px 0 14px 36px}
+.sw .terms .tk{letter-spacing:.14em;text-transform:uppercase;font-size:10.5px;color:var(--gold);padding-top:3px}
+.sw .terms .tv{font-size:13px;line-height:1.6;color:var(--muted)}
+.sw .terms .tclose{margin:14px 0 0;font-family:var(--font-anthropic-serif);font-size:14.5px;line-height:1.6;color:var(--color-fg);font-weight:300}
+@media (max-width:420px){.sw .terms .tshort{grid-template-columns:1fr;gap:2px 0;margin-left:0}.sw .terms .tv{margin-bottom:8px}.sw .terms details.tsec{margin-left:0}}
