@@ -83,6 +83,8 @@ window.lx={
  auth:{get email(){return S.email},async changePassword(pw){const r=await sb.auth.updateUser({password:pw});if(r.error)throw r.error;},async signOutAll(){await sb.auth.signOut({scope:'global'});}},
  isOwner:()=>S.owner,client:()=>S.client,
  async saveOrder(item,data){const r=await sb.from('lx_orders').upsert({client_id:S.client.id,item,data,updated_at:new Date().toISOString()},{onConflict:'client_id,item'});if(r.error)throw new Error(r.error.message);const i=S.orders.findIndex(o=>o.item===item);const row=Object.assign({item},data);if(i>=0)S.orders[i]=row;else S.orders.push(row);fire();},
+ async costsList(){const r=await sb.from('lx_costs').select('item,data').eq('client_id',S.client.id);if(r.error)throw new Error(r.error.message);const m={};(r.data||[]).forEach(x=>{m[x.item]=x.data;});return m;},
+ async costSave(item,data){const r=await sb.from('lx_costs').upsert({client_id:S.client.id,item,data,updated_at:new Date().toISOString()},{onConflict:'client_id,item'});if(r.error)throw new Error(r.error.message);},
  async renameOrder(oldItem,newItem,data){if(oldItem===newItem)return this.saveOrder(newItem,data);await this.saveOrder(newItem,data);await this.deleteOrder(oldItem);},
  async deleteOrder(item){const r=await sb.from('lx_orders').delete().match({client_id:S.client.id,item});if(r.error)throw new Error(r.error.message);S.orders=S.orders.filter(o=>o.item!==item);fire();},
  async listClients(){const r=await sb.from('lx_clients').select('id,slug,name,biz').order('name');if(r.error)throw new Error(r.error.message);return r.data;},

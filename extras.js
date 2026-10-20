@@ -321,9 +321,66 @@ window.__lxDrawer=function(r,pan){
  if(own&&done){const fb=fbState.items['fb-'+oslug(r.item)];if(fb){const b=box('Client feedback');b.appendChild(el('p',null,'★'.repeat(fb.rating||0)+'☆'.repeat(5-(fb.rating||0))+(fb.note?' · '+fb.note:'')));pan.appendChild(b);}}
 };
 
+/* ================= Owner: Operations (action queue + profit). Costs live in owner-only lx_costs, never in client-readable tables. ================= */
+const opsState={costs:{}};
+const todayS=()=>new Date().toISOString().slice(0,10);
+const isCancelled=r=>/cancel/i.test(String(r.status||''));
+function costTotal(c){return ['product','intl','dom','other'].reduce((s,k)=>s+Number((c||{})[k]||0),0);}
+function profitOf(r){const c=opsState.costs[r.item];if(!c)return null;const rev=Number(r.payout||0),cost=costTotal(c);return {rev,cost,profit:rev-cost,margin:rev?(rev-cost)/rev*100:0,final:!!c.final};}
+function openOrder(item){const r=ordersData().find(x=>x.item===item);if(r&&typeof openDrawer==='function')openDrawer(r);}
+function queueItems(){
+ const q=[],t=todayS(),rows=ordersData().filter(r=>!isCancelled(r));
+ rows.forEach(r=>{const open=!isDone(r);
+  if(open&&r.eta_date&&r.eta_date<t)q.push({k:'Overdue',t:(r.order_no||'')+' '+r.item+' · ETA '+dstr(r.eta_date),go:()=>openOrder(r.item)});
+  if(open&&Number(r.stage||1)>=4&&!r.intl_tracking_no&&!(r.parcels&&r.parcels.length))q.push({k:'Tracking missing',t:(r.order_no||'')+' '+r.item,go:()=>openOrder(r.item)});
+  if(open&&r.eta_date&&r.eta_date>=t&&!costTotal(opsState.costs[r.item]))q.push({k:'Cost not entered',t:(r.order_no||'')+' '+r.item,go:()=>openOrder(r.item),low:1});});
+ Object.values(psState.subs).filter(x=>x.status==='Pending verification').forEach(x=>q.push({k:'Verify payment',t:inr(x.amount)+' · '+x.order+' · '+(x.ref||''),go:()=>goTab('pay')}));
+ Object.values(photos.quotes||{}).forEach(x=>{const st=x.status||'Quoted';if(st==='Quoted'&&x.valid){const d=Math.round((new Date(x.valid)-Date.now())/864e5);if(d<=3&&d>=0)q.push({k:'Quote expiring',t:x.item+' · '+dstr(x.valid),go:()=>goTab('ov')});}});
+ Object.entries(qrState).forEach(([id,x])=>{if(x.decision==='approved'){const qt=(photos.quotes||{})[x.quote];if(qt&&(qt.status||'Quoted')==='Quoted')q.push({k:'Approved quote',t:x.item+' · create order',go:()=>goTab('ov')});}});
+ Object.values(rqState.items).forEach(x=>{if(x.status==='Submitted')q.push({k:'New request',t:(x.brand?x.brand+' ':'')+x.product,go:()=>goTab('ov')});});
+ Object.values(state.cases).forEach(c=>{if(c.status==='Submitted'||c.status==='Reopened')q.push({k:'Support case',t:c.ref+' · '+(c.type||''),go:()=>goTab('help')});});
+ return q.sort((a,b)=>(a.low?1:0)-(b.low?1:0));
+}
+function renderOps(){
+ const sec=$('ops');if(!sec)return;const body=$('ops-body');body.textContent='';
+ const rows=ordersData().filter(r=>!isCancelled(r));
+ const sales=rows.reduce((s,r)=>s+Number(r.payout||0),0),cash=rows.reduce((s,r)=>s+(typeof paidAmt==='function'?paidAmt(r):0),0);
+ let realized=0,est=0,estN=0,noCost=0;rows.forEach(r=>{const p=profitOf(r);if(!p){noCost++;return;}if(isDone(r)&&p.final)realized+=p.profit;else{est+=p.profit;estN++;}});
+ const tiles=el('div','xo-tiles');
+ [['Sales (agreed)',inr(sales),'Order value, not cash'],['Cash received',inr(cash),'Verified payments'],['Outstanding',inr(Math.max(0,sales-cash)),'Sales minus cash'],['Realized profit',inr(realized),'Delivered, costs final'],['Pending profit (est.)',inr(est),estN+' order'+(estN===1?'':'s')+(noCost?' · '+noCost+' without cost':'')]].forEach(a=>{const d=el('div','xo-tile');d.appendChild(el('div','lbl',a[0]));d.appendChild(el('b',null,a[1]));d.appendChild(el('small',null,a[2]));tiles.appendChild(d);});
+ body.appendChild(tiles);
+ const qi=queueItems();body.appendChild(el('h3',null,'Action queue'+(qi.length?' ('+qi.length+')':'')));
+ if(!qi.length)body.appendChild(el('p','note','Nothing needs action right now.'));
+ qi.slice(0,25).forEach(i=>{const b=el('button','xo-q');b.type='button';b.appendChild(el('span','xchip',i.k));b.appendChild(el('span',null,i.t));b.addEventListener('click',i.go);body.appendChild(b);});
+ body.appendChild(el('h3',null,'Profit per order'));
+ const tb=el('div','xo-ptable');let any=false;
+ rows.slice().sort((a,b)=>String(b.order_date||'')<String(a.order_date||'')?-1:1).forEach(r=>{const p=profitOf(r);if(!p)return;any=true;const row=el('button','xo-prow');row.type='button';row.appendChild(el('span',null,(r.order_no||'')+' '+r.item));row.appendChild(el('span',null,inr(p.rev)+' − '+inr(p.cost)));const pf=el('b',null,inr(p.profit)+' · '+p.margin.toFixed(0)+'%');pf.style.color=p.profit<0?'var(--wine)':'inherit';row.appendChild(pf);row.appendChild(el('em',null,p.final?'Final':'Estimated'));row.addEventListener('click',()=>openOrder(r.item));tb.appendChild(row);});
+ body.appendChild(any?tb:el('p','note','Open an order and add its costs to see profit here.'));
+}
+function buildOps(){
+ const pane=$('pane-ov');if(!pane||$('ops'))return;
+ const sec=el('section','card owner');sec.id='ops';sec.appendChild(el('h2',null,'Operations (private)'));sec.appendChild(el('p','note','Only you see this. Costs are stored separately from anything clients can read.'));
+ const b=el('div');b.id='ops-body';sec.appendChild(b);pane.insertBefore(sec,pane.firstChild);
+ const load=async()=>{try{opsState.costs=await window.lx.costsList();}catch(e){}renderOps();};load();setInterval(renderOps,5000);opsState.reload=load;
+}
+const _drawer=window.__lxDrawer;
+window.__lxDrawer=function(r,pan){
+ _drawer(r,pan);
+ if(!isOwner())return;
+ const c=opsState.costs[r.item]||{};const b=box('Costs (private, ₹)');b.classList.add('owner');
+ const f=el('div','xo-form');const mk=(k,ph)=>{const i=field(ph,'number');i.inputMode='decimal';i.value=c[k]!=null?c[k]:'';i.dataset.k=k;f.appendChild(i);return i;};
+ const ins=[mk('product','Product cost'),mk('intl','Intl shipping'),mk('dom','India shipping'),mk('other','Fees / other')];
+ const lab=el('label','xo-fin');const cb=el('input');cb.type='checkbox';cb.checked=!!c.final;lab.appendChild(cb);lab.appendChild(document.createTextNode(' All costs final'));
+ const sv=el('button','btn2','Save costs');sv.type='button';const out=el('p','note');
+ const show=()=>{const d={};ins.forEach(i=>d[i.dataset.k]=Number(i.value||0));const t=costTotal(d),rev=Number(r.payout||0);out.textContent='Cost '+inr(t)+' · Profit '+inr(rev-t)+(rev?' · '+((rev-t)/rev*100).toFixed(0)+'%':'')+(cb.checked?'':' (estimated)');};
+ ins.forEach(i=>i.addEventListener('input',show));cb.addEventListener('change',show);show();
+ sv.addEventListener('click',async()=>{const d={final:cb.checked,at:nowIso()};ins.forEach(i=>d[i.dataset.k]=Number(i.value||0));try{await window.lx.costSave(r.item,d);opsState.costs[r.item]=d;renderOps();say('Costs saved');show();}catch(e){say('Could not save costs');}});
+ f.appendChild(lab);f.appendChild(sv);b.appendChild(f);b.appendChild(out);pan.appendChild(b);
+};
+
 /* boot for the flows */
 ready(()=>{
- buildPaySub();buildRequests();
+ buildPaySub();buildRequests();if(isOwner())buildOps();
  photos.db.collection('paysub').onSnapshot(s=>{const m={};s.docs.forEach(d=>{if(d.exists)m[d.id]=Object.assign({id:d.id},d.data());});psState.subs=m;renderPaySub();},()=>{});
  photos.db.collection('requests').onSnapshot(s=>{const m={};s.docs.forEach(d=>{if(d.exists)m[d.id]=d.data();});rqState.items=m;renderRequests();},()=>{});
  photos.db.collection('quote_resp').onSnapshot(s=>{Object.keys(qrState).forEach(k=>delete qrState[k]);s.docs.forEach(d=>{if(d.exists)qrState[d.id]=d.data();});if(typeof renderQuotes==='function')renderQuotes();},()=>{});
