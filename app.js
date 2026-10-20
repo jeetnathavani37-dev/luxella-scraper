@@ -53,7 +53,7 @@ function renderContact(){const w=document.getElementById('contact');w.textConten
   {const r2=document.createElement('p');r2.style.cssText='margin:8px 0 0;display:flex;gap:8px;flex-wrap:wrap';const lk=(t,h,ext)=>{const x=document.createElement('a');x.className='btn2';x.style.textDecoration='none';x.href=h;if(ext){x.target='_blank';x.rel='noopener';}x.textContent=t;r2.appendChild(x);};
    lk('Instagram @luxella.in','https://www.instagram.com/luxella.in/',1);lk('Email luxella.in@gmail.com','mailto:luxella.in@gmail.com?subject='+encodeURIComponent('Luxella · '+CLIENT()));lk('Call','tel:+917896697800');w.appendChild(r2);}
   if(c.hours){const h2=document.createElement('div');h2.className='lbl';h2.style.marginTop='6px';h2.textContent=c.hours;w.appendChild(h2);}
-  document.getElementById('contact-line').textContent='Questions? WhatsApp '+(c.phone||'Luxella')+'.';}
+  document.getElementById('contact-line').textContent='Questions? WhatsApp +91 87240 79056.';}
  else{const s=document.createElement('span');s.className='lbl';s.textContent='Contact details coming soon.';w.appendChild(s);}
  if(photos.canEdit){const f=document.createElement('div');f.className='form owner';f.style.marginTop='10px';const mk=(id,ph,val)=>{const i=document.createElement('input');i.id=id;i.className='inp';i.placeholder=ph;i.value=val||'';return i;};
   const nm=mk('ct-name','Name shown (e.g. Luxella)',c&&c.name),ph=mk('ct-phone','WhatsApp number with +91',c&&c.phone),hr=mk('ct-hours','Hours (e.g. 10am–8pm IST)',c&&c.hours);f.appendChild(nm);f.appendChild(ph);f.appendChild(hr);w.appendChild(f);
