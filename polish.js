@@ -124,3 +124,11 @@ new MutationObserver(()=>scheduleLinkify()).observe(document.getElementById('pan
  });
  pane.querySelectorAll('.grid').forEach(g=>g.classList.add('accgrid'));
 })();
+
+/* Update banner: show 15s at start, then fade away */
+(function(){
+ const bn=document.getElementById('banner');if(!bn||bn.__t)return;bn.__t=1;
+ let tries=0;const iv=setInterval(()=>{tries++;
+  if(!bn.hidden){clearInterval(iv);setTimeout(()=>{bn.classList.add('fadeout');setTimeout(()=>{bn.dataset.done='1';},700);},15000);}
+  else if(tries>60)clearInterval(iv);},500);
+})();

@@ -829,3 +829,7 @@ img{max-width:100%}
 .sw section.card.acc:not(.open)>:not(h2){display:none!important}
 .sw section.card.acc.open{padding-bottom:22px!important}
 .sw section.card.acc.open>h2{padding-bottom:10px}
+
+.sw .banner{transition:opacity .7s ease,max-height .7s ease}
+.sw .banner.fadeout{opacity:0}
+.sw .banner[data-done]{display:none!important}
