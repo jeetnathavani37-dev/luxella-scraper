@@ -280,12 +280,54 @@ window.__lxQuoteRow=function(q,row,t){
   say('Order '+no+' created');}catch(e){say('Could not create the order');}});row.appendChild(c);}
 };
 
+/* ================= Order extras: delay + revised ETA, parcels, reorder, feedback ================= */
+const PARCEL_ST=['In transit','Arrived in India','Domestic shipping','Delivered'];
+const fbState={items:{}};
+const oslug=t=>String(t).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,60);
+async function saveOrd(r,patch){const d=Object.assign({},r,patch);delete d.item;await window.lx.saveOrder(r.item,d);try{const n=ordersData().find(x=>x.item===r.item);if(n&&typeof openDrawer==='function')openDrawer(n);}catch(e){}}
+function isDone(r){return r.status==='Delivered'||Number(r.stage||1)>=9;}
+function box(title){const b=el('div','xo-box');b.appendChild(el('div','lbl',title));return b;}
+function field(ph,type){const i=el('input');i.type=type||'text';i.placeholder=ph;i.className='xo-in';return i;}
+window.__lxDrawer=function(r,pan){
+ const done=isDone(r),own=isOwner();
+ /* delay notice */
+ if(r.delay_reason&&!done){const b=box('Delay update');b.classList.add('xo-delay');b.appendChild(el('p',null,r.delay_reason));
+  if(r.eta_date){const e=el('p','xo-eta','Revised ETA: '+dstr(r.eta_date)+(r.eta_prev?' (earlier '+dstr(r.eta_prev)+')':''));b.appendChild(e);}pan.appendChild(b);}
+ /* parcels */
+ const parcels=Array.isArray(r.parcels)?r.parcels:[];
+ if(parcels.length||own){const b=box('Parcels'+(parcels.length>1?' ('+parcels.length+')':''));if(!parcels.length)b.classList.add('owner');
+  parcels.forEach((p,i)=>{const row=el('div','xo-row');row.appendChild(el('b',null,p.label||('Parcel '+(i+1))));row.appendChild(chipFor(p.status||'In transit'));
+   if(p.tracking){try{row.appendChild(trackLink(p.tracking,p.courier||''));}catch(e){row.appendChild(el('span',null,p.tracking));}}
+   if(own){const x=el('button','xo-x owner','×');x.type='button';x.title='Remove parcel';x.addEventListener('click',async()=>{if(!confirm('Remove this parcel?'))return;try{await saveOrd(r,{parcels:parcels.filter((_,j)=>j!==i)});say('Parcel removed');}catch(e){say('Could not save');}});row.appendChild(x);
+    const sel=el('select','xo-in owner');PARCEL_ST.forEach(t=>{const o=el('option',null,t);o.value=t;if(t===(p.status||'In transit'))o.selected=true;sel.appendChild(o);});sel.addEventListener('change',async()=>{try{await saveOrd(r,{parcels:parcels.map((q,j)=>j===i?Object.assign({},q,{status:sel.value,at:nowIso()}):q)});say('Parcel updated');}catch(e){say('Could not save');}});row.appendChild(sel);}
+   b.appendChild(row);});
+  if(own){const f=el('div','xo-form owner');const l=field('Label (e.g. Parcel 2: shoes)'),t=field('Tracking no.');const add=el('button','btn2','Add parcel');add.type='button';add.addEventListener('click',async()=>{if(!l.value.trim()&&!t.value.trim())return;try{await saveOrd(r,{parcels:parcels.concat([{label:l.value.trim(),tracking:t.value.trim(),status:'In transit',at:nowIso()}])});say('Parcel added');}catch(e){say('Could not save');}});f.appendChild(l);f.appendChild(t);f.appendChild(add);b.appendChild(f);}
+  pan.appendChild(b);}
+ /* owner: delay form */
+ if(own&&!done){const b=box('Set delay / revised ETA');b.classList.add('owner');const why=field('Reason (shown to client)'),dt=field('New ETA','date');why.value=r.delay_reason||'';dt.value=r.eta_date||'';
+  const save=el('button','btn2','Save');save.type='button';save.addEventListener('click',async()=>{try{const patch={delay_reason:why.value.trim(),delay_at:nowIso()};if(dt.value&&dt.value!==r.eta_date){patch.eta_prev=r.eta_date||'';patch.eta_date=dt.value;}await saveOrd(r,patch);say('Delay update saved');}catch(e){say('Could not save');}});
+  const clr=el('button','btn2','Clear');clr.type='button';clr.addEventListener('click',async()=>{try{await saveOrd(r,{delay_reason:'',eta_prev:''});say('Cleared');}catch(e){say('Could not save');}});
+  const f=el('div','xo-form');f.appendChild(why);f.appendChild(dt);f.appendChild(save);f.appendChild(clr);b.appendChild(f);pan.appendChild(b);}
+ /* reorder + feedback (client) */
+ if(!own&&done){
+  const b=box('After delivery');const fb=fbState.items['fb-'+oslug(r.item)];
+  if(fb){b.appendChild(el('p',null,'Your feedback: '+'★'.repeat(fb.rating||0)+'☆'.repeat(5-(fb.rating||0))+(fb.note?' · '+fb.note:'')));}
+  else{const stars=el('div','xo-stars');let val=0;const btns=[1,2,3,4,5].map(n=>{const x=el('button','xo-star','☆');x.type='button';x.addEventListener('click',()=>{val=n;btns.forEach((y,k)=>y.textContent=k<n?'★':'☆');});stars.appendChild(x);return x;});
+   const note=field('Anything we should know? (private, optional)');const send=el('button','btn2','Send feedback');send.type='button';
+   send.addEventListener('click',async()=>{if(!val){say('Pick a rating first');return;}send.disabled=true;try{const fo={id:'fb-'+oslug(r.item),order:r.item,rating:val,note:note.value.trim(),at:nowIso()};await photos.db.doc('feedback/fb-'+oslug(r.item)).set(fo);fbState.items[fo.id]=fo;say('Thank you for the feedback');try{openDrawer(r);}catch(e){}}catch(e){say('Could not send');send.disabled=false;}});
+   b.appendChild(el('p',null,'How was this order?'));b.appendChild(stars);b.appendChild(note);b.appendChild(send);}
+  const re=el('button','btn2','Reorder this');re.type='button';re.style.marginTop='8px';re.addEventListener('click',async()=>{if(!confirm('Send Luxella a request to source this again?'))return;re.disabled=true;try{const id='rq-'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);await photos.db.doc('requests/'+id).set({brand:r.brand||'',product:r.item,spec:'',qty:1,budget:0,needBy:'',link:'',photo:'',note:'Reorder of '+(r.order_no||r.item),urgent:false,status:'Submitted',at:nowIso()});say('Reorder request sent. Track it under Request a product.');}catch(e){say('Could not send');re.disabled=false;}});b.appendChild(re);
+  pan.appendChild(b);}
+ if(own&&done){const fb=fbState.items['fb-'+oslug(r.item)];if(fb){const b=box('Client feedback');b.appendChild(el('p',null,'★'.repeat(fb.rating||0)+'☆'.repeat(5-(fb.rating||0))+(fb.note?' · '+fb.note:'')));pan.appendChild(b);}}
+};
+
 /* boot for the flows */
 ready(()=>{
  buildPaySub();buildRequests();
  photos.db.collection('paysub').onSnapshot(s=>{const m={};s.docs.forEach(d=>{if(d.exists)m[d.id]=Object.assign({id:d.id},d.data());});psState.subs=m;renderPaySub();},()=>{});
  photos.db.collection('requests').onSnapshot(s=>{const m={};s.docs.forEach(d=>{if(d.exists)m[d.id]=d.data();});rqState.items=m;renderRequests();},()=>{});
  photos.db.collection('quote_resp').onSnapshot(s=>{Object.keys(qrState).forEach(k=>delete qrState[k]);s.docs.forEach(d=>{if(d.exists)qrState[d.id]=d.data();});if(typeof renderQuotes==='function')renderQuotes();},()=>{});
+ photos.db.collection('feedback').onSnapshot(sn=>{const m={};sn.docs.forEach(d=>{if(d.exists)m[d.id]=d.data();});fbState.items=m;},()=>{});
  renderPaySub();renderRequests();
 });
 })();

@@ -934,3 +934,10 @@ img{max-width:100%}
 .sw .xps-t{font-size:14px}
 .sw .xps .xc-own{flex-basis:100%;margin-top:4px}
 .sw section.card.acc#rq .form{margin-top:10px}
+
+.xo-box{margin:12px 0;padding:12px;border:1px solid var(--line,#ffffff22);border-radius:12px}
+.xo-box p{margin:6px 0;font-size:13px}.xo-delay{border-color:var(--gold-2,#c9a24a)}.xo-eta{font-weight:600}
+.xo-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:6px 0;font-size:13px}
+.xo-form{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.xo-in{flex:1 1 140px;min-width:0;padding:8px;border-radius:8px;border:1px solid var(--line,#ffffff33);background:transparent;color:inherit;font:inherit;font-size:13px}
+.xo-x{border:0;background:none;color:var(--muted);font-size:18px;cursor:pointer}
+.xo-stars{display:flex;gap:4px;margin:6px 0}.xo-star{border:0;background:none;color:var(--gold-2,#c9a24a);font-size:26px;cursor:pointer;padding:0 2px}
