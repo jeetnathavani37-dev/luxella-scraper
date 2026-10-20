@@ -49,7 +49,9 @@ function renderFresh(){const u=photos.updated;const t=document.getElementById('f
 function renderContact(){const w=document.getElementById('contact');w.textContent='';const c=photos.contact;
  if(c&&(c.phone||c.name)){const n=document.createElement('div');n.textContent=c.name||'Luxella';n.style.fontSize='var(--cds-font-size-heading)';w.appendChild(n);
   if(c.phone){const p=document.createElement('div');p.className='lbl';p.textContent='WhatsApp: '+c.phone;copyable(p,c.phone,'Number copied');w.appendChild(p);const row=document.createElement('p');row.style.cssText='margin:8px 0 0;display:flex;gap:8px;flex-wrap:wrap';row.appendChild(copyBtn('Copy number',()=>c.phone,'btn2'));
-   const a=document.createElement('a');a.className='btn2';a.style.textDecoration='none';a.href='https://wa.me/'+String(c.phone).replace(/[^0-9]/g,'');a.target='_blank';a.rel='noopener';a.textContent='Open WhatsApp';row.appendChild(a);w.appendChild(row);}
+   const a=document.createElement('a');a.className='btn2';a.style.textDecoration='none';a.href='https://wa.me/918724079056';a.target='_blank';a.rel='noopener';a.textContent='Open WhatsApp';row.appendChild(a);w.appendChild(row);}
+  {const r2=document.createElement('p');r2.style.cssText='margin:8px 0 0;display:flex;gap:8px;flex-wrap:wrap';const lk=(t,h,ext)=>{const x=document.createElement('a');x.className='btn2';x.style.textDecoration='none';x.href=h;if(ext){x.target='_blank';x.rel='noopener';}x.textContent=t;r2.appendChild(x);};
+   lk('Instagram @luxella.in','https://www.instagram.com/luxella.in/',1);lk('Email luxella.in@gmail.com','mailto:luxella.in@gmail.com?subject='+encodeURIComponent('Luxella · '+CLIENT()));lk('Call','tel:+917896697800');w.appendChild(r2);}
   if(c.hours){const h2=document.createElement('div');h2.className='lbl';h2.style.marginTop='6px';h2.textContent=c.hours;w.appendChild(h2);}
   document.getElementById('contact-line').textContent='Questions? WhatsApp '+(c.phone||'Luxella')+'.';}
  else{const s=document.createElement('span');s.className='lbl';s.textContent='Contact details coming soon.';w.appendChild(s);}
