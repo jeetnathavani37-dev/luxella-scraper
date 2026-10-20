@@ -322,7 +322,7 @@ window.__lxDrawer=function(r,pan){
 };
 
 /* ================= Owner: Operations (action queue + profit). Costs live in owner-only lx_costs, never in client-readable tables. ================= */
-const opsState={costs:{}};
+const opsState={costs:{},client:{},audit:[]};
 const todayS=()=>new Date().toISOString().slice(0,10);
 const isCancelled=r=>/cancel/i.test(String(r.status||''));
 function costTotal(c){return ['product','intl','dom','other'].reduce((s,k)=>s+Number((c||{})[k]||0),0);}
@@ -334,6 +334,9 @@ function queueItems(){
   if(open&&r.eta_date&&r.eta_date<t)q.push({k:'Overdue',t:(r.order_no||'')+' '+r.item+' · ETA '+dstr(r.eta_date),go:()=>openOrder(r.item)});
   if(open&&Number(r.stage||1)>=4&&!r.intl_tracking_no&&!(r.parcels&&r.parcels.length))q.push({k:'Tracking missing',t:(r.order_no||'')+' '+r.item,go:()=>openOrder(r.item)});
   if(open&&r.eta_date&&r.eta_date>=t&&!costTotal(opsState.costs[r.item]))q.push({k:'Cost not entered',t:(r.order_no||'')+' '+r.item,go:()=>openOrder(r.item),low:1});});
+ rows.forEach(r=>{try{if(!isDone(r)&&typeof attention==='function'){const a=attention(r);if(a&&a[0]==='High'&&!(r.eta_date&&r.eta_date<todayS()))q.push({k:'Stuck?',t:(r.order_no||'')+' '+r.item+' · '+(a[2]||''),go:()=>openOrder(r.item)});}}catch(e){}});
+ ordersData().filter(isCancelled).forEach(r=>{const paid=typeof paidAmt==='function'?paidAmt(r):0;if(paid>0)q.push({k:'Refund review',t:(r.order_no||'')+' '+r.item+' · '+inr(paid)+' paid, cancelled',go:()=>openOrder(r.item)});});
+ (opsState.client.followups||[]).forEach((f,i)=>{if(!f.done&&f.due&&f.due<=todayS())q.push({k:'Follow-up',t:f.text+' · '+dstr(f.due),go:()=>{const e=$('ops-crm');if(e)e.scrollIntoView({behavior:'smooth'});}});});
  Object.values(psState.subs).filter(x=>x.status==='Pending verification').forEach(x=>q.push({k:'Verify payment',t:inr(x.amount)+' · '+x.order+' · '+(x.ref||''),go:()=>goTab('pay')}));
  Object.values(photos.quotes||{}).forEach(x=>{const st=x.status||'Quoted';if(st==='Quoted'&&x.valid){const d=Math.round((new Date(x.valid)-Date.now())/864e5);if(d<=3&&d>=0)q.push({k:'Quote expiring',t:x.item+' · '+dstr(x.valid),go:()=>goTab('ov')});}});
  Object.entries(qrState).forEach(([id,x])=>{if(x.decision==='approved'){const qt=(photos.quotes||{})[x.quote];if(qt&&(qt.status||'Quoted')==='Quoted')q.push({k:'Approved quote',t:x.item+' · create order',go:()=>goTab('ov')});}});
@@ -356,12 +359,46 @@ function renderOps(){
  const tb=el('div','xo-ptable');let any=false;
  rows.slice().sort((a,b)=>String(b.order_date||'')<String(a.order_date||'')?-1:1).forEach(r=>{const p=profitOf(r);if(!p)return;any=true;const row=el('button','xo-prow');row.type='button';row.appendChild(el('span',null,(r.order_no||'')+' '+r.item));row.appendChild(el('span',null,inr(p.rev)+' − '+inr(p.cost)));const pf=el('b',null,inr(p.profit)+' · '+p.margin.toFixed(0)+'%');pf.style.color=p.profit<0?'var(--wine)':'inherit';row.appendChild(pf);row.appendChild(el('em',null,p.final?'Final':'Estimated'));row.addEventListener('click',()=>openOrder(r.item));tb.appendChild(row);});
  body.appendChild(any?tb:el('p','note','Open an order and add its costs to see profit here.'));
+ renderBulk(body,rows);renderCrm(body);renderAudit(body);
+}
+const openIn={};
+function fold(body,id,title,fn){const d=el('details','xo-fold');d.id=id;if(openIn[id])d.open=true;d.addEventListener('toggle',()=>{openIn[id]=d.open;});d.appendChild(el('summary',null,title));const w=el('div');d.appendChild(w);fn(w);body.appendChild(d);return d;}
+function renderBulk(body,rows){
+ fold(body,'ops-bulk','Bulk update orders',w=>{
+  const open=rows.filter(r=>!isDone(r));if(!open.length){w.appendChild(el('p','note','No open orders.'));return;}
+  const sel={};open.forEach(r=>{const l=el('label','xo-chk');const c=el('input');c.type='checkbox';c.addEventListener('change',()=>{sel[r.item]=c.checked;});l.appendChild(c);l.appendChild(document.createTextNode(' '+(r.order_no||'')+' '+r.item+' · '+(STAGES[Number(r.stage||1)-1]||'')));w.appendChild(l);});
+  const st=el('select','xo-in');STAGES.forEach((n,i)=>{const o=el('option',null,(i+1)+' · '+n);o.value=String(i+1);st.appendChild(o);});
+  const go=el('button','btn2','Apply to selected');go.type='button';
+  go.addEventListener('click',async()=>{const items=Object.keys(sel).filter(k=>sel[k]);if(!items.length){say('Select orders first');return;}const k=Number(st.value);if(!confirm('Move '+items.length+' order(s) to stage '+k+' · '+STAGES[k-1]+'?'))return;go.disabled=true;
+   try{for(const it of items){const r=ordersData().find(x=>x.item===it);if(!r)continue;const d=Object.assign({},r,{stage:k});delete d.item;await window.lx.saveOrder(it,d);
+     const key=slugOf(it),cur=photos.notes[key]||{};const s2=Object.assign({},cur.stages||{});if(!s2[k])s2[k]=todayS();await photos.db.doc('notes/'+key).set(Object.assign({},cur,{order:it,items:cur.items||[],stages:s2,stageOverride:Math.max(k,Number(cur.stageOverride||0))}));}
+    say(items.length+' order(s) updated');}catch(e){say('Stopped part-way. Check orders.');}go.disabled=false;});
+  const f=el('div','xo-form');f.appendChild(st);f.appendChild(go);w.appendChild(f);});
+}
+function renderCrm(body){
+ fold(body,'ops-crm','Client notes and follow-ups (private)',w=>{
+  const c=opsState.client;const ta=el('textarea','xo-in');ta.rows=4;ta.placeholder='Relationship notes, preferences, anything only you should see';ta.value=c.notes||'';
+  const save=async patch=>{const nx=Object.assign({},opsState.client,patch);try{await window.lx.costSave('__client__',nx);opsState.client=nx;renderOps();say('Saved');}catch(e){say('Could not save');}};
+  const sb=el('button','btn2','Save notes');sb.type='button';sb.addEventListener('click',()=>save({notes:ta.value}));w.appendChild(ta);w.appendChild(sb);
+  w.appendChild(el('h3',null,'Follow-ups'));
+  (c.followups||[]).forEach((f,i)=>{const row=el('div','xo-row');row.appendChild(el('span',null,(f.done?'✓ ':'')+f.text+(f.due?' · '+dstr(f.due):'')));const d=el('button','btn2',f.done?'Reopen':'Done');d.type='button';d.addEventListener('click',()=>save({followups:c.followups.map((x,j)=>j===i?Object.assign({},x,{done:!x.done}):x)}));const x=el('button','xo-x','×');x.type='button';x.addEventListener('click',()=>save({followups:c.followups.filter((_,j)=>j!==i)}));row.appendChild(d);row.appendChild(x);w.appendChild(row);});
+  const t=field('Follow up on…'),dt=field('Due','date');const add=el('button','btn2','Add');add.type='button';add.addEventListener('click',()=>{if(!t.value.trim())return;save({followups:(c.followups||[]).concat([{text:t.value.trim(),due:dt.value||'',done:false}])});});
+  const f=el('div','xo-form');f.appendChild(t);f.appendChild(dt);f.appendChild(add);w.appendChild(f);});
+ const d=$('ops-crm');if(d)d.id='ops-crm';
+}
+function diffKeys(a,b){const un=x=>x&&x.data&&typeof x.data==='object'?x.data:x;a=un(a);b=un(b);const k=new Set([...Object.keys(a||{}),...Object.keys(b||{})]);return [...k].filter(x=>x!=='updated_at'&&JSON.stringify((a||{})[x])!==JSON.stringify((b||{})[x]));}
+function renderAudit(body){
+ fold(body,'ops-audit','Activity log (who changed what)',w=>{
+  const btn=el('button','btn2','Load latest');btn.type='button';const list=el('div');
+  const draw=()=>{list.textContent='';if(!opsState.audit.length){list.appendChild(el('p','note','Tap Load latest.'));return;}opsState.audit.forEach(a=>{const keys=a.op==='UPDATE'?diffKeys(a.old_data,a.new_data):[];const what=a.tbl+' '+String(a.op||'').toLowerCase()+' · '+(a.ref||'')+(keys.length?' · '+keys.slice(0,5).join(', '):'');const r=el('div','xo-row');r.appendChild(el('small',null,hm(a.at)));r.appendChild(el('span',null,what));r.appendChild(el('small',null,String(a.actor||'').split('@')[0]));list.appendChild(r);});};
+  btn.addEventListener('click',async()=>{btn.disabled=true;try{const cid=window.lx.client().id;const r=await window.lx.auditList(cid);opsState.audit=r;draw();}catch(e){say('Could not load log');}btn.disabled=false;});
+  w.appendChild(btn);w.appendChild(list);draw();});
 }
 function buildOps(){
  const pane=$('pane-ov');if(!pane||$('ops'))return;
  const sec=el('section','card owner');sec.id='ops';sec.appendChild(el('h2',null,'Operations (private)'));sec.appendChild(el('p','note','Only you see this. Costs are stored separately from anything clients can read.'));
  const b=el('div');b.id='ops-body';sec.appendChild(b);pane.insertBefore(sec,pane.firstChild);
- const load=async()=>{try{opsState.costs=await window.lx.costsList();}catch(e){}renderOps();};load();setInterval(renderOps,5000);opsState.reload=load;
+ const load=async()=>{try{opsState.costs=await window.lx.costsList();opsState.client=opsState.costs['__client__']||{};delete opsState.costs['__client__'];}catch(e){}renderOps();};load();setInterval(()=>{if(!document.querySelector('#ops-body details[open]'))renderOps();},5000);opsState.reload=load;
 }
 const _drawer=window.__lxDrawer;
 window.__lxDrawer=function(r,pan){
@@ -374,8 +411,18 @@ window.__lxDrawer=function(r,pan){
  const sv=el('button','btn2','Save costs');sv.type='button';const out=el('p','note');
  const show=()=>{const d={};ins.forEach(i=>d[i.dataset.k]=Number(i.value||0));const t=costTotal(d),rev=Number(r.payout||0);out.textContent='Cost '+inr(t)+' · Profit '+inr(rev-t)+(rev?' · '+((rev-t)/rev*100).toFixed(0)+'%':'')+(cb.checked?'':' (estimated)');};
  ins.forEach(i=>i.addEventListener('input',show));cb.addEventListener('change',show);show();
- sv.addEventListener('click',async()=>{const d={final:cb.checked,at:nowIso()};ins.forEach(i=>d[i.dataset.k]=Number(i.value||0));try{await window.lx.costSave(r.item,d);opsState.costs[r.item]=d;renderOps();say('Costs saved');show();}catch(e){say('Could not save costs');}});
+ sv.addEventListener('click',async()=>{const d={final:cb.checked,at:nowIso(),supplier:sup.value.trim(),pref:pref.value.trim()};ins.forEach(i=>d[i.dataset.k]=Number(i.value||0));try{await window.lx.costSave(r.item,d);opsState.costs[r.item]=d;renderOps();say('Costs saved');show();}catch(e){say('Could not save costs');}});
+ const sup=field('Supplier / source','text'),pref=field('Purchase ref','text');sup.value=c.supplier||'';pref.value=c.pref||'';f.insertBefore(pref,f.firstChild);f.insertBefore(sup,f.firstChild);
  f.appendChild(lab);f.appendChild(sv);b.appendChild(f);b.appendChild(out);pan.appendChild(b);
+ sv.addEventListener('click',async()=>{try{const cur=Object.assign({},opsState.costs[r.item]||{},{supplier:sup.value.trim(),pref:pref.value.trim()});await window.lx.costSave(r.item,cur);opsState.costs[r.item]=cur;}catch(e){}});
+ /* adjustment / refund + cancel */
+ const ab=box('Adjustments and cancellation');ab.classList.add('owner');
+ const amt=field('Amount (negative = refund)','number'),note=field('Note');const ar=el('button','btn2','Record adjustment');ar.type='button';
+ ar.addEventListener('click',async()=>{const v=Number(amt.value);if(!v){say('Enter an amount');return;}try{const key=slugOf(r.item);const cur=(photos.payrec[key]&&photos.payrec[key].items)||[];await photos.db.doc('payrec/'+key).set({order:r.item,items:cur.concat([{amount:v,at:todayS(),method:v<0?'Refund':'Adjustment',ref:note.value.trim(),adj:true}])});say('Recorded');}catch(e){say('Could not record');}});
+ const f2=el('div','xo-form');f2.appendChild(amt);f2.appendChild(note);f2.appendChild(ar);ab.appendChild(f2);
+ const cx=el('button','btn2',isCancelled(r)?'Reinstate order':'Cancel order');cx.type='button';cx.style.marginTop='8px';
+ cx.addEventListener('click',async()=>{if(isCancelled(r)){if(!confirm('Reinstate this order?'))return;await saveOrd(r,{status:STAGES[Number(r.stage||1)-1]||'Ordered'});return;}const why=prompt('Reason for cancelling (kept internally):');if(why===null)return;const paid=typeof paidAmt==='function'?paidAmt(r):0;if(!confirm('Cancel '+r.item+'?'+(paid>0?' '+inr(paid)+' was paid: a refund review will be added to the queue.':'')))return;try{const cur=Object.assign({},opsState.costs[r.item]||{},{cancel_reason:why,cancelled_at:nowIso()});await window.lx.costSave(r.item,cur);opsState.costs[r.item]=cur;}catch(e){}await saveOrd(r,{status:'Cancelled'});});
+ ab.appendChild(cx);pan.appendChild(ab);
 };
 
 /* boot for the flows */
