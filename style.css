@@ -767,3 +767,20 @@ img{max-width:100%}
 .sw .terms .tv{font-size:13px;line-height:1.6;color:var(--muted)}
 .sw .terms .tclose{margin:14px 0 0;font-family:var(--font-anthropic-serif);font-size:14.5px;line-height:1.6;color:var(--color-fg);font-weight:300}
 @media (max-width:420px){.sw .terms .tshort{grid-template-columns:1fr;gap:2px 0;margin-left:0}.sw .terms .tv{margin-bottom:8px}.sw .terms details.tsec{margin-left:0}}
+
+/* owner manage tab */
+.sw .mgc{margin-bottom:14px}
+.sw .mgh{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.sw .mgh h2{margin:0}
+.sw .mgo{border:1px solid var(--line);padding:14px;margin-top:10px}
+.sw .mgo.editing{border-color:var(--gold)}
+.sw .mgo .hd{display:flex;flex-direction:column;gap:4px;margin-bottom:10px}
+.sw .mgo .hd b{font-family:var(--font-anthropic-serif);font-weight:400;font-size:16px}
+.sw .mgrow{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:12px 0 0}
+.sw .mgrow .qstage{width:auto;max-width:100%;flex:1 1 180px}
+.sw .btn2.danger{color:#c96b5f;border-color:#4a2a26;margin-left:auto}
+.sw .mgu{border-top:1px solid var(--line);padding:12px 0}
+.sw .mgu b{font-weight:400;letter-spacing:.04em;font-size:13.5px}
+.sw .mgu .inp{width:auto;flex:1 1 160px}
+.sw .form input[type=date]{color-scheme:dark}
+@media (max-width:520px){.sw .mgu .inp{flex:1 1 100%}.sw .btn2.danger{margin-left:0}}

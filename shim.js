@@ -70,6 +70,24 @@ window.dash={
  loader(){},colors:['#C9A227','#E3C565','#8C6E16','#A39C90','#D9BD6A','#6B5A24','#F0DFA4','#B59A45'],
  refresh(){},params(){return {};},setParams(){},resetParams(){},setLink(name){try{history.replaceState(null,'','#'+name);}catch(e){}}};
 
+
+/* ---- owner admin API (RLS allows owner only; passwords via lx-admin edge function) ---- */
+const FN_URL=SUPABASE_URL+'/functions/v1/lx-admin';
+async function adminCall(body){const {data:{session}}=await sb.auth.getSession();const r=await fetch(FN_URL,{method:'POST',headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':'Bearer '+(session?session.access_token:'')},body:JSON.stringify(body)});const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error||('HTTP '+r.status));return j;}
+window.lx={
+ isOwner:()=>S.owner,client:()=>S.client,
+ async saveOrder(item,data){const r=await sb.from('lx_orders').upsert({client_id:S.client.id,item,data,updated_at:new Date().toISOString()},{onConflict:'client_id,item'});if(r.error)throw new Error(r.error.message);const i=S.orders.findIndex(o=>o.item===item);const row=Object.assign({item},data);if(i>=0)S.orders[i]=row;else S.orders.push(row);fire();},
+ async renameOrder(oldItem,newItem,data){if(oldItem===newItem)return this.saveOrder(newItem,data);await this.saveOrder(newItem,data);await this.deleteOrder(oldItem);},
+ async deleteOrder(item){const r=await sb.from('lx_orders').delete().match({client_id:S.client.id,item});if(r.error)throw new Error(r.error.message);S.orders=S.orders.filter(o=>o.item!==item);fire();},
+ async listClients(){const r=await sb.from('lx_clients').select('id,slug,name,biz').order('name');if(r.error)throw new Error(r.error.message);return r.data;},
+ async updateClient(patch){const r=await sb.from('lx_clients').update(patch).eq('id',S.client.id).select().single();if(r.error)throw new Error(r.error.message);S.client=r.data;window.LX_CLIENT={name:S.client.name,biz:S.client.biz||''};fire();return r.data;},
+ async listUsers(){const r=await sb.from('lx_client_users').select('id,email').eq('client_id',S.client.id).order('email');if(r.error)throw new Error(r.error.message);return r.data;},
+ async addUser(email){const r=await sb.from('lx_client_users').insert({client_id:S.client.id,email:email.toLowerCase()});if(r.error)throw new Error(r.error.message);},
+ async removeUser(id){const r=await sb.from('lx_client_users').delete().eq('id',id);if(r.error)throw new Error(r.error.message);},
+ setPassword:(email,password)=>adminCall({action:'set_password',email,password}),
+ deleteLogin:(email)=>adminCall({action:'delete_user',email})
+};
+
 /* ---- boot ---- */
 function topbar(){const t=g('top');t.hidden=false;t.innerHTML='<img class="tlogo" src="assets/luxella_logo.png" alt="Luxella"><span class="who">'+esc(S.email)+'</span>'+(S.owner?'<button id="tb-switch">Switch client</button>':'')+'<button id="tb-out">Sign out</button>';if(S.owner)g('tb-switch').onclick=()=>{location.href=new URL('./',document.baseURI).href;};g('tb-out').onclick=()=>sb.auth.signOut().then(()=>{location.href=new URL('./',document.baseURI).href;});}
 async function start(){const {data:{session}}=await sb.auth.getSession();S.session=session;if(!session){gateLogin();return;}S.email=(session.user.email||'').toLowerCase();S.owner=['jeetnathavani37@gmail.com','jeetnatb@gmail.com'].includes(S.email);
@@ -80,7 +98,7 @@ async function start(){const {data:{session}}=await sb.auth.getSession();S.sessi
  if(!slug&&S.owner){gatePick();return;}
  S.client=clients[0];window.LX_CLIENT={name:S.client.name,biz:S.client.biz||''};document.title=S.client.name.split(' ')[0]+' · Luxella';
  await loadAll();subscribe();g('gate').hidden=true;topbar();g('dash-root').hidden=false;
- if(!window.__pageLoaded){window.__pageLoaded=true;const s=document.createElement('script');s.src='app.js';s.onload=()=>fire();document.body.appendChild(s);}else fire();}
+ if(!window.__pageLoaded){window.__pageLoaded=true;const s=document.createElement('script');s.src='app.js';s.onload=()=>{fire();if(S.owner){const m=document.createElement('script');m.src='manage.js';document.body.appendChild(m);}};document.body.appendChild(s);}else fire();}
 sb.auth.onAuthStateChange((ev)=>{if(ev==='SIGNED_IN'||ev==='TOKEN_REFRESHED'){if(!S.client)start();}if(ev==='SIGNED_OUT'){location.reload();}});
 start();
 })();

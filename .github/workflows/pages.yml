@@ -17,7 +17,7 @@ jobs:
         run: |
           set -e
           mkdir -p _site
-          cp -r assets vendor app.js shim.js style.css _site/
+          cp -r assets vendor app.js shim.js manage.js style.css _site/
           sed 's#<base href="/">#<base href="/luxella-scraper/">#' index.html > _site/index.html
           cp _site/index.html _site/404.html
           touch _site/.nojekyll
