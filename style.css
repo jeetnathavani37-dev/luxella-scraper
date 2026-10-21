@@ -1054,3 +1054,8 @@ img{max-width:100%}
 .sw{padding-bottom:calc(110px + env(safe-area-inset-bottom,0px))}
 .sw #pane-al .scroll,.sw #pane-ov{padding-bottom:0}
 .sw .drawer .pan{box-sizing:border-box}
+
+/* sticky tab bar: solid, clear of the status bar, sits above the mini strip; thin gold line at the very bottom */
+.sw .tabs{padding-top:env(safe-area-inset-top,0px);background:#0B0B0C!important;border-bottom:1px solid #3A3222;box-shadow:0 8px 14px -10px rgba(0,0,0,.9);z-index:20}
+.sw .mini{top:calc(env(safe-area-inset-top,0px) + 55px)!important;z-index:19;margin-top:-30px;padding-top:10px}
+body::after{content:"";position:fixed;left:0;right:0;bottom:0;height:3px;background:linear-gradient(90deg,#B8943F,#F4E1A0 50%,#B8943F);z-index:95;pointer-events:none}
