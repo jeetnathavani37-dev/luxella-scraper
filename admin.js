@@ -303,7 +303,9 @@ function newOrderCard(m,rows){
   [it,br,pr,eta].forEach(x=>x.style.cssText=sty);
   const ty=document.createElement('select');ty.style.cssText=sty;[['ETA','ETA (sourced)'],['In hand (Local)','In hand (Local)']].forEach(([v,t])=>{const o=document.createElement('option');o.value=v;o.textContent=t;ty.appendChild(o);});
   const ro=document.createElement('select');ro.style.cssText=sty;[['Direct to client','Direct to client'],['Indirect (via me)','Via reseller']].forEach(([v,t])=>{const o=document.createElement('option');o.value=v;o.textContent=t;ro.appendChild(o);});
-  g.append(mk('Client',cs),mk('Item',it),mk('Brand',br),mk('Price ₹',pr),mk('Type',ty),mk('Route',ro),mk('ETA (optional)',eta));card.appendChild(g);
+  const sz=document.createElement('input'),qt=document.createElement('input'),lk=document.createElement('input'),nt=document.createElement('input');
+  sz.placeholder='Size / colour';qt.type='number';qt.value='1';qt.min='1';lk.placeholder='Product link (optional)';nt.placeholder='Notes (optional)';[sz,qt,lk,nt].forEach(x=>x.style.cssText=sty);
+  g.append(mk('Client',cs),mk('Item',it),mk('Brand',br),mk('Size / colour',sz),mk('Qty',qt),mk('Price ₹',pr),mk('Type',ty),mk('Route',ro),mk('ETA (optional)',eta),mk('Product link',lk),mk('Notes',nt));card.appendChild(g);
   const rw=el('div','row');const go=el('button','ad-b','Add order');go.type='button';rw.appendChild(go);card.appendChild(rw);
   go.onclick=async()=>{
     const item=it.value.trim();if(!item){toast('Item ka naam daalo.');return;}
@@ -314,7 +316,7 @@ function newOrderCard(m,rows){
     const cn=(clients.find(c=>c.id===cs.value)||{}).name;
     if(!confirm(cn+' ke liye '+no+' '+item+' add hoga. Client ko "New order" mail/push jaayega. Pakka?'))return;
     go.disabled=true;
-    const data={order_no:no,order_date:todayA(),brand:br.value.trim(),order_type:ty.value,direct:ro.value,payout:pr.value===''?null:Number(pr.value),payout_status:'Pending',stage:1,status:STAGES[0],eta_date:eta.value||'',shipping_date:'',intl_tracking_no:'',intl_courier:'',intl_courier_slug:'',local_tracking:'',local_courier:'',local_courier_slug:''};
+    const data={order_no:no,order_date:todayA(),placed_by:'owner',size:sz.value.trim(),qty:Number(qt.value||1),product_link:lk.value.trim(),client_notes:nt.value.trim(),brand:br.value.trim(),order_type:ty.value,direct:ro.value,payout:pr.value===''?null:Number(pr.value),payout_status:'Pending',stage:1,status:STAGES[0],eta_date:eta.value||'',shipping_date:'',intl_tracking_no:'',intl_courier:'',intl_courier_slug:'',local_tracking:'',local_courier:'',local_courier_slug:''};
     const r=await sb.from('lx_orders').insert({client_id:cs.value,item,data});
     go.disabled=false;
     if(r.error){toast('Add nahi hua: '+r.error.message);return;}
