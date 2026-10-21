@@ -307,7 +307,7 @@ function newOrderCard(m,rows){
   const sz=document.createElement('input'),qt=document.createElement('input'),lk=document.createElement('input'),nt=document.createElement('input');
   sz.placeholder='Size / colour';qt.type='number';qt.value='1';qt.min='1';lk.placeholder='Product link (optional)';nt.placeholder='Notes (optional)';[sz,qt,lk,nt].forEach(x=>x.style.cssText=sty);
   g.append(mk('Client',cs),mk('Item',it),mk('Brand',br),mk('Size / colour',sz),mk('Qty',qt),mk('Price ₹',pr),mk('Type',ty),mk('Route',ro),mk('ETA (optional)',eta),mk('Product link',lk),mk('Notes',nt),mk('Photo (optional)',ph));card.appendChild(g);
-  const rw=el('div','row');const go=el('button','ad-b','Add order');go.type='button';const sl=el('button','ad-b g','Copy client link');sl.type='button';rw.append(go,sl);card.appendChild(rw);
+  const rw=el('div','row');const go=el('button','ad-b','Add order');go.type='button';const sl=el('button','ad-b g','Copy order link');sl.type='button';rw.append(go,sl);card.appendChild(rw);
   sl.onclick=async()=>{const q=new URLSearchParams();if(it.value.trim())q.set('item',it.value.trim());if(br.value.trim())q.set('brand',br.value.trim());if(sz.value.trim())q.set('size',sz.value.trim());if(qt.value&&qt.value!=='1')q.set('qty',qt.value);if(lk.value.trim())q.set('link',lk.value.trim());if(nt.value.trim())q.set('notes',nt.value.trim());if(pr.value)q.set('price',pr.value);const c=clients.find(x=>x.id===cs.value)||{};const u=location.origin+'/'+(c.slug||'')+(q.toString()?'?'+q:'')+'#new';try{await navigator.clipboard.writeText(u);toast('Client link copied.');}catch(e){toast(u);}};
   go.onclick=async()=>{
     const item=it.value.trim();if(!item){toast('Item ka naam daalo.');return;}
