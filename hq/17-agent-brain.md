@@ -38,10 +38,22 @@ data-model doc ke field names hi. $ amount: `price_usd` = is order ka item price
 - Kal subah ke liye 3-line "focus" agent row summary me likho (Overview "Aaj ka focus" isko dikhata hai): sabse urgent 3 kaam + ₹ impact.
 
 ## Client portal notes (scope='clients') — Oct 2026
-Admin panel (luxellaclients.duckdns.org/admin) ke "✦ Assistant" se notes aate hain: `kind='note'`, `data.scope='clients'`, `data.client` = slug (khaali ho to text se pehchaano: swayam / himanshu …), photo ho to `image_b64`.
-- Table: `lx_orders(id, client_id, data)` — client = `lx_clients.slug` → `client_id`. Order match: `data->>'item'` (ya order_no `#1001`, brand + item words). Do match ho to doubt → needs-jeet.
-- Fields: `status` / `stage` (sirf ye values: Order placed · Order confirmed · Shipped by retailer/outlet · Received at international hub · Shipped from international hub · Received at Indian warehouse · Address requested · Shipped from Indian warehouse · Delivered), `payout` (₹ price), `payout_status` ('Received' / 'Pending'), `payment_date`, `intl_tracking_no` + `intl_courier`, `local_tracking` + `local_courier`, `eta_date`, `shipping_date`, `order_date`, `order_type` (ETA / In hand (Local)), `direct`, `photo_url`, `size`, `qty`.
-- Update: `update lx_orders set data = data || '<json>'::jsonb where id = …` — sirf wahi fields jo note me clearly hain; stage kabhi peeche nahi; `status` aur `stage` dono same value. Price/payment change ho to `payment_date` bhi.
-- Client yeh page dekhta hai: koi internal baat (reshipper naam, cost, margin, KM, "Jeet") kisi field me mat likho. Client ko message bhejna = kabhi nahi (sirf Jeet).
-- Naya order banana ho / delete / client ka address-phone badalna → needs-jeet (proposal note.result me likho).
-- Note update: `status='done'`, `result='<short Hinglish: kya kiya, kaunsa order>'`.
+Admin panel (luxellaclients.duckdns.org/admin) ke "✦ Assistant" se notes aate hain: `kind='note'`, `data.scope='clients'`, `data.client` = slug (khaali ho to text se pehchaano: swayam / himanshu …), photo ho to `image_b64` (decode karke DEKHO — order screenshot, payment screenshot, tracking, product photo).
+Tum client portal ke orders **bana bhi sakte ho aur update bhi** kar sakte ho.
+
+**Table:** `lx_orders(id uuid, client_id uuid, item text, data jsonb, updated_at)`; client = `select id from lx_clients where slug=…`. `item` column + `data.item` dono me item naam.
+**Fields (data):** `order_no` ('#MMNN'), `item`, `brand`, `size`, `qty`, `order_date` (YYYY-MM-DD), `order_type` ('ETA' = international sourcing / 'In hand (Local)'), `direct` ('Indirect (via me)' = Luxella ke through / 'Direct to client'), `status` + `stage` (number 1–9, same pair): 1 Order placed · 2 Order confirmed · 3 Shipped by retailer/outlet · 4 Received at international hub · 5 Shipped from international hub · 6 Received at Indian warehouse · 7 Address requested · 8 Shipped from Indian warehouse · 9 Delivered. `payout` (₹ price to client), `payout_status` ('Pending'/'Received'), `payment_date`, `intl_tracking_no` + `intl_courier` + `intl_courier_slug` (ups/fedex/usps/dhl/amazon…), `local_tracking` + `local_courier` + `local_courier_slug` (delhivery/bluedart/dtdc/tirupati/shree-maruti…), `eta_date`, `shipping_date`, `photo_url`, `product_link`, `client_notes`, `delivery_address`, `delivery_phone`.
+
+**Naya order (note me clearly naya item + client):**
+1. Duplicate check: same client + same item (+size) already open hai? → naya mat banao, update karo.
+2. `order_no` = '#' + MM (order month) + next 2-digit number = (us month ke saare clients ka max NN) + 1. Example: Oct me max #1010 → #1011.
+3. Insert: `insert into lx_orders(client_id,item,data) values (<id>,'<item>', jsonb_build_object('item',…,'brand',…,'order_no',…,'order_date',<today IST ya note ki date>,'status','Order placed','stage',1,'payout',<₹>,'payout_status','Pending','order_type','ETA','direct','Indirect (via me)', …))` — jo pata hai wahi bharo, baaki khaali string.
+4. Price nahi pata → `payout` mat bharo aur note result me "price batao" (needs-jeet).
+
+**Purane order ka update:** order match = `order_no` ya item naam (+ brand/size). `update lx_orders set data = data || '<json>'::jsonb, item = coalesce(<item>, item), updated_at=now() where id=…`. Stage kabhi peeche nahi (cancel ke alawa). Payment aaya → `payout_status='Received'`, `payment_date`. Tracking → number + courier + slug. Delivered → status/stage 9.
+**Cancel:** sirf jab note me clearly "cancel" ho → `status='Cancelled'` (stage same) + note result. **Delete kabhi nahi.**
+
+**Rules:**
+- Client ye page dekhta hai: koi internal baat (reshipper, cost, margin, KM, Sourcex, "Jeet") kisi field me nahi. Client ko message bhejna kabhi nahi.
+- Do orders match ho jaayein / client pata na chale → `needs-jeet` + result me sawaal.
+- Har change ke baad note: `status='done'`, `result='<Hinglish: kya kiya — client · order_no · fields>'`. B2B me same order (lx_b2b client=Swayam/Himanshu) ho to wahan bhi same update karo.
