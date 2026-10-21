@@ -34,7 +34,8 @@ Har run me last 2 ghante ke **saare** inbox mails (Primary + Updates; promotions
 - Govt / tax / college (NMIMS) deadlines → info/warn.
 Format: `{level, text: "<kisse> — <kya hua> → Suggestion: <kya karo>"}`. Sirf padhna + suggest; reply/forward/label kabhi nahi. Passwords/OTP/account numbers kabhi copy mat karo.
 
-## Portal notes (chat box)
+## Portal notes (chat box) — BACKUP only
+Primary = Brain agent. Tum sirf woh notes lo jo `status='new'` aur 3 ghante se purane hain (Brain shayad ruka hai) — tab auditor ko handoff bhi.
 `select id, data from lx_b2b where kind='note' and data->>'status'='new' order by id;` — har note: text samjho (order ids, store order no., tracking, weights, dates, "delivered/shipped/landed/MRN/confirmation/payout received", reshipper names, prices). Normal rules se apply karo, phir note update: `status='done', result='<short Hinglish: kya kiya>'`. Doubt → `status='needs-jeet'` + action item.
 - **Photo notes:** agar note me `image_b64` hai (portal chat se aayi photo / screenshot — store order mail, shipping mail, courier label, invoice, WhatsApp chat): `select data->>'image_b64' from lx_b2b where kind='note' and id='<id>'` → python se base64 decode karke `/tmp/note-<id>.jpg` likho → Read tool se photo DEKHO. Usme se order US id, store order no, tracking, $ amount (price_usd / total_usd), date, product + size nikaalo aur sahi order pe likho. Photo padhne ke baad note me se `image_b64` hata do (`data - 'image_b64'`) taaki DB halka rahe.
 - `[voice]` se shuru hone wale notes = Jeet ki voice ka transcript — normal text ki tarah samjho. Jo kaam doosre desk ka ho → handoff.

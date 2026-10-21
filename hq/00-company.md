@@ -1,6 +1,6 @@
 # Luxella B2B HQ — Company Handbook
 
-> Har agent har run ki shuruaat me ye handbook padhta hai. Yahi "office ka rulebook" hai.
+> Har agent har run ki shuruaat me pehle `central-brain`, phir ye handbook padhta hai. Yahi "office ka rulebook" hai.
 
 ## Mission
 Luxella (founder: Jeet, Guwahati) US / UK / Canada ke official outlet stores se authentic luxury items khareedta hai aur **KicksMachine (KM)** ke won bids fulfil karta hai. Goal: **har bid pe 20–25% margin (final landed cost pe), har parcel time pe, har rupee time pe wapas.**
@@ -15,6 +15,9 @@ Luxella (founder: Jeet, Guwahati) US / UK / Canada ke official outlet stores se 
 | 💸 Finance | Payout agent | Roz 10:52am | Confirmation + 7 din, overdue chase |
 | 🔍 Verification | KM Reconciler agent | 9:23am + 9:23pm | KM All Orders vs portal line-by-line: cancelled, payout, US IDs, store order, tracking, confirmations (mail + MRN sheet) |
 | 🛡️ Audit | Auditor agent | Har 3 ghante | Sabki checking: kuch miss to nahi, data galat to nahi, koi agent ruka to nahi |
+| 🧠 Chief of Staff | Brain agent | Har ghante (8am–12am) | Portal chat ke notes / photos / voice → sahi order me |
+| 📊 Finance | CFO agent | 9:37am + 9:37pm | Invested, profit, bank, receivable, target (Money tab) |
+| 🧪 Reliability | QA agent | Har 6 ghante | Site, functions, KM link, agents heartbeat, data integrity |
 | 🔗 KM link | `km-sync` (server, no AI) | Har ghante :07 | KicksMachine Nexus portal **read-only** padhta hai → orders, status, SLA, bids, notifications portal me |
 
 Founder (Jeet) = final decision maker. Agents **suggest + prepare**; paise, messages bhejna, orders place karna — sirf Jeet.
@@ -56,4 +59,4 @@ Founder (Jeet) = final decision maker. Agents **suggest + prepare**; paise, mess
 - KM ki MRN Google Sheets **sirf READ** — kabhi edit nahi (Google Drive connector se read_file_content). IDs: `1Ws2jkWfUn1CCXMyBMsxoXgBGx0GLDlZBStBsh0PQXhs`, `1DsFFwTxyIKXPDeTXsQViyNF4hn4Q7pQEapkZKjA-Nug`.
 - Confirmation ka asli proof = operations@kicksmachine.com ka "ORDER RECEIVING CONFIRMATION WITH MRN" mail (thread me replies). Usme jo US IDs hain = confirmed; baaki delivered-but-not-confirmed.
 - KM ka "Awaiting pickup" status ignore.
-- Portal chat box: Jeet jo bhi paste karta hai uska jo turant samajh aata hai portal khud apply karta hai; baaki `kind='note'` (status 'new') me jaata hai — Mail agent har run me process karta hai.
+- Portal chat box: Jeet jo bhi paste karta hai uska jo turant samajh aata hai portal khud apply karta hai; baaki `kind='note'` (status 'new') me jaata hai — Brain agent har ghante process karta hai (Mail agent backup: sirf jo note 3 ghante se zyada `new` pada ho).
