@@ -39,7 +39,7 @@ const css=document.createElement('style');css.textContent=`
 .ad-mut{color:#A39C90;font-size:12.5px}
 .ad-toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:#C9A227;color:#0A0A0A;padding:10px 18px;font-size:13px;z-index:9}
 .ad-nav{display:flex;gap:4px}.ad-nb{background:transparent;border:1px solid #2A2724;color:#A39C90;padding:8px 16px;font:500 11px 'Jost',sans-serif;letter-spacing:.2em;text-transform:uppercase;cursor:pointer}.ad-nb.on{background:linear-gradient(180deg,#F4E1A0,#E3C06A 50%,#B8943F);color:#0A0A0A;border-color:#E3C06A}
-.ad-cv{padding:14px 18px}.ad-cv[hidden]{display:none}.ad-cvbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:8px}.ad-cc{background:#121214;border:1px solid #232120;color:#F3EEE6;padding:9px 14px;font:inherit;cursor:pointer}.ad-cc.on{border-color:#C9A227;background:#17150f;color:#E3C565}.ad-cvbar .ad-b{margin-left:auto}
+.ad-cv{padding:14px 18px}.ad-cv[hidden],.ad-bb[hidden]{display:none}.ad-cvbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:8px}.ad-cc{background:#121214;border:1px solid #232120;color:#F3EEE6;padding:9px 14px;font:inherit;cursor:pointer}.ad-cc.on{border-color:#C9A227;background:#17150f;color:#E3C565}.ad-cvbar .ad-b{margin-left:auto}
 .ad-fr{display:block;width:100%;max-width:480px;height:calc(100vh - 170px);min-height:600px;border:1px solid #3A3222;background:#0B0B0C;margin:10px auto 0}
 .ad-wrap[hidden]{display:none!important}
 .dz-hd{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}.dz-hd h2{margin:0!important;flex:0 0 auto}.dz-search{flex:1 1 260px;background:#0A0A0A;border:1px solid #2A2724;color:#F3EEE6;padding:10px 12px;font:inherit}.dz-auto{font-size:12px;color:#A39C90;display:flex;align-items:center;gap:6px}
@@ -574,7 +574,7 @@ async function renderDash(m){
 })();
 function clientsView(){
   const top=root.querySelector('.ad-top');const wrap=root.querySelector('.ad-wrap');
-  const nav=el('div','ad-nav');const b1=el('button','ad-nb on','Admin');const b2=el('button','ad-nb','Clients');nav.append(b1,b2);top.insertBefore(nav,top.querySelector('.sp'));
+  const nav=el('div','ad-nav');const b1=el('button','ad-nb on','Admin');const b2=el('button','ad-nb','Clients');const b3=el('button','ad-nb','B2B');nav.append(b1,b2,b3);top.insertBefore(nav,top.querySelector('.sp'));
   const cv=el('div','ad-cv');cv.hidden=true;root.appendChild(cv);
   const bar=el('div','ad-cvbar');const fr=document.createElement('iframe');fr.className='ad-fr';fr.title='Client view';
   const note=el('span','ad-mut','View only. Exactly what the client sees. Nothing can be changed here.');
@@ -583,8 +583,12 @@ function clientsView(){
   clients.forEach(c=>{const b=el('button','ad-cc',c.name);b.dataset.s=c.slug;b.onclick=()=>pick(c);bar.appendChild(b);});
   const open=el('a','ad-b g','Open in new tab');open.target='_blank';open.rel='noopener';open.onclick=()=>{if(cur)open.href=base('./')+cur.slug+'?asclient=1#ov';};
   bar.appendChild(open);cv.append(bar,note,fr);
-  const show=v=>{b1.classList.toggle('on',!v);b2.classList.toggle('on',v);wrap.hidden=v;cv.hidden=!v;if(v&&!cur&&clients.length){const h=(location.hash||'').match(/^#clients:(.+)$/);pick(clients.find(c=>h&&c.slug===decodeURIComponent(h[1]))||clients.find(c=>!/^zz/.test(c.slug))||clients[0]);}};
+  const bbp=el('div','ad-bb');bbp.hidden=true;root.appendChild(bbp);let bbLoaded=false;
+  const showB=()=>{[b1,b2].forEach(x=>x.classList.remove('on'));b3.classList.add('on');wrap.hidden=true;cv.hidden=true;bbp.hidden=false;try{history.replaceState(null,'',location.pathname+'#b2b');}catch(e){}
+    const go=()=>window.lxB2B(bbp,sb,toast);if(window.lxB2B){if(!bbLoaded){bbLoaded=true;go();}return;}const sc=document.createElement('script');sc.src=base('./')+'b2b.js?v='+Date.now();sc.onload=()=>{bbLoaded=true;go();};document.head.appendChild(sc);};
+  b3.onclick=showB;
+  const show=v=>{b3.classList.remove('on');bbp.hidden=true;b1.classList.toggle('on',!v);b2.classList.toggle('on',v);wrap.hidden=v;cv.hidden=!v;if(v&&!cur&&clients.length){const h=(location.hash||'').match(/^#clients:(.+)$/);pick(clients.find(c=>h&&c.slug===decodeURIComponent(h[1]))||clients.find(c=>!/^zz/.test(c.slug))||clients[0]);}};
   b1.onclick=()=>{show(false);try{history.replaceState(null,'',location.pathname+(sel?'#'+sel.slug:''));}catch(e){}};b2.onclick=()=>show(true);
-  if(/^#clients/.test(location.hash))show(true);
+  if(/^#clients/.test(location.hash))show(true);if(/^#b2b/.test(location.hash))showB();
 }
 })();
