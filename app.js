@@ -46,7 +46,7 @@ function renderPayments(rows){const tb=document.querySelector('#payT tbody');tb.
   tb.appendChild(tr);});
  const n=document.getElementById('pay-note');n.textContent=photos.canEdit?'':'Paid something? Send the screenshot to Luxella on WhatsApp and it will show here.';}
 function renderFresh(){const u=photos.updated;const t=document.getElementById('fresh-t'),d=document.querySelector('#fresh .dot');if(!u||!u.at){return;}const days=Math.round((Date.now()-new Date(u.at))/864e5);t.textContent='Updated '+fd(u.at)+(u.note?' · '+u.note:'');d.className='dot'+(days>3?' old':'');}
-function renderContact(){const w=document.getElementById('contact');w.textContent='';const c=photos.contact;
+function renderContact(){const w=document.getElementById('contact');w.textContent='';const c=(photos.contact&&(photos.contact.phone||photos.contact.name))?photos.contact:{name:'Luxella',phone:'+91 87240 79056',hours:'Private client service'};
  if(c&&(c.phone||c.name)){const n=document.createElement('div');n.textContent=c.name||'Luxella';n.style.fontSize='var(--cds-font-size-heading)';w.appendChild(n);
   if(c.phone){const p=document.createElement('div');p.className='lbl';p.textContent='WhatsApp: '+c.phone;copyable(p,c.phone,'Number copied');w.appendChild(p);const row=document.createElement('p');row.style.cssText='margin:8px 0 0;display:flex;gap:8px;flex-wrap:wrap';row.appendChild(copyBtn('Copy number',()=>c.phone,'btn2'));
    const a=document.createElement('a');a.className='btn2';a.style.textDecoration='none';a.href='https://wa.me/918724079056';a.target='_blank';a.rel='noopener';a.textContent='Open WhatsApp';row.appendChild(a);w.appendChild(row);}

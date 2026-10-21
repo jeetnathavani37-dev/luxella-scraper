@@ -61,7 +61,9 @@ ready(()=>{
   if(s===2){const pr=Number(val('price'));if(!(pr>0))return 'Enter the agreed price.';if(paidMode()){const pd=Number(val('paid'));if(!(pd>0))return 'Enter the amount you paid, or choose "Pay after confirmation".';if(pd>pr)return 'Paid amount is more than the price.';}}
   return '';};
  const later=()=>F.addr.value==='__later';const addrText=()=>later()?'To be shared later':(F.addr.value==='__new'?val('newaddr'):F.addr.value);
- const review=()=>{rv.textContent='';const row=(k,v)=>{const r=el('div','nwo-r');r.appendChild(el('span','k',k));r.appendChild(el('span','v',v));rv.appendChild(r);};
+ const ocard=(no,st)=>{const pr=Number(val('price')||0),pd=paidMode()?Number(val('paid')||0):0;const c=el('div','ocard');const th=el('div','oc-th');if(S.img){const im=el('img');im.src=S.img;im.alt='';th.appendChild(im);}else th.appendChild(el('span',null,(val('brand')||val('item')||'L').trim().charAt(0).toUpperCase()));c.appendChild(th);const m=el('div','oc-m');m.appendChild(el('div','oc-no',no||'Order preview'));m.appendChild(el('div','oc-it',val('item')||'—'));m.appendChild(el('div','oc-br',[val('brand'),val('size'),'Qty '+(val('qty')||'1')].filter(Boolean).join(' · ')));c.appendChild(m);const r=el('div','oc-r');r.appendChild(el('div','oc-pr',pr?inr(pr):'—'));r.appendChild(el('span','oc-st',st));c.appendChild(r);const f=el('div','oc-f');const cell=(k,v)=>{const d=el('div');d.appendChild(el('span','k',k));d.appendChild(el('span','v',v));f.appendChild(d);};cell('Delivery',later()?'Decide later':(addrText()||'—').split('\n')[0].slice(0,40));cell('Payment',pd?inr(pd)+' paid':'Pending');cell('Confirmation','24–48 hours');c.appendChild(f);return c;};
+ if(F.photo)F.photo.addEventListener('change',()=>{const fl=F.photo.files&&F.photo.files[0];S.img=null;if(fl&&/^image\//.test(fl.type)){try{S.img=URL.createObjectURL(fl);}catch(e){}}});
+ const review=()=>{rv.textContent='';rv.appendChild(ocard(null,'Ready to place'));const row=(k,v)=>{const r=el('div','nwo-r');r.appendChild(el('span','k',k));r.appendChild(el('span','v',v));rv.appendChild(r);};
   const pr=Number(val('price')),pd=paidMode()?Number(val('paid')||0):0;
   row('Piece',val('item')+(val('brand')?' ('+val('brand')+')':''));row('Size / colour',val('size')||'—');row('Qty',val('qty')||'1');if(val('link'))row('Link',val('link'));if(val('notes'))row('Notes',val('notes'));
   row('Deliver to',later()?'Decide later (we will ask before dispatch)':addrText()+' · '+val('phone'));row('Price',inr(pr));row('Paying by',F.pay.value);
@@ -89,7 +91,7 @@ ready(()=>{
    S.done={no,name,paid,price};
    panes.forEach(p=>p.hidden=true);prog.hidden=nav.hidden=true;intro.hidden=true;
    doneBox.hidden=false;doneBox.textContent='';
-   doneBox.appendChild(el('div','nwo-tick','✓'));doneBox.appendChild(el('h3',null,'Order placed · '+no));
+   doneBox.appendChild(el('div','nwo-tick','✓'));doneBox.appendChild(el('h3',null,'Order placed · '+no));doneBox.appendChild(ocard(no,'Awaiting confirmation'));
    doneBox.appendChild(el('p','note',name+' · '+inr(price)+(paid?' · '+inr(paid)+' payment submitted, pending verification':' · payment pending')+'. We will verify your payment and check availability, and confirm within 24–48 hours. A receipt email is on its way to you.'));
    const row=el('p','nwo-nav');const v=el('button','btn','View in Orders');v.type='button';v.addEventListener('click',()=>{const t=$('tab-al');if(t)t.click();window.scrollTo(0,0);});const again=el('button','btn2','Place another order');again.type='button';again.addEventListener('click',()=>{Object.keys(F).forEach(k=>{if(F[k].type==='file')F[k].value='';else if(F[k].tagName!=='SELECT')F[k].value='';});F.qty.value='1';tc.checked=false;S.step=0;S.done=null;doneBox.hidden=true;prog.hidden=nav.hidden=intro.hidden=false;next.disabled=false;S.busy=false;render();});row.appendChild(v);row.appendChild(waBtn(no));{const cp=el('button','btn2','Copy order link');cp.type='button';cp.addEventListener('click',async()=>{const u=location.origin+location.pathname+'#al';try{await navigator.clipboard.writeText(u);cp.textContent='Link copied';}catch(e){cp.textContent=u;}});row.appendChild(cp);}row.appendChild(again);doneBox.appendChild(row);
    S.busy=false;
@@ -162,3 +164,81 @@ function init(){
 const go=()=>{const h=(location.hash||'').slice(1);if(!/^(ov|tr|al|pay|ad|msg|st|pol|help)$/.test(h))return false;const t=document.getElementById('tab-'+h);if(!t)return false;t.click();window.scrollTo(0,0);return true;};
 let n=0;const t=setInterval(()=>{n++;let ok=false;try{ok=typeof dash!=='undefined'&&document.getElementById('tab-tr');}catch(e){}if(ok){clearInterval(t);setTimeout(go,500);window.addEventListener('hashchange',go);}else if(n>200)clearInterval(t);},150);
 })();
+
+/* Terms quick points, Payments pay-now card, Address helpers, scroll polish */
+(function(){
+'use strict';
+const $=id=>document.getElementById(id);
+const el=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e;};
+const inr=v=>'₹'+Number(v||0).toLocaleString('en-IN');
+const wait=(cond,cb,max)=>{let n=0;const t=setInterval(()=>{n++;let ok=false;try{ok=cond();}catch(e){}if(ok){clearInterval(t);cb();}else if(n>(max||200))clearInterval(t);},150);};
+const toastM=t=>{try{if(window.alertMsg)window.alertMsg(t);}catch(e){}};
+
+/* ---- Terms: 4-5 tappable key points ---- */
+wait(()=>$('pane-pol')&&$('terms')&&typeof dash!=='undefined',()=>{
+ if($('terms-quick'))return;
+ const sec=el('section','card');sec.id='terms-quick';sec.appendChild(el('h2',null,'The short version'));sec.appendChild(el('p','note','Five things to know. Tap any to read the full clause.'));
+ const pts=[['Pay first, then we order','Your order is placed once payment is verified.','payment'],['Confirmation in 24–48 hours','We verify payment and availability, then confirm.','confirm'],['Cancellation & refunds','If a store cancels, we re-source the piece or refund you in full.','cancel'],['Delivery & ETA','Estimates start from hub receipt. Courier delays are out of our hands.','deliver'],['Customs & unboxing','All-inclusive price. Record an unboxing video for any claim.','unbox']];
+ pts.forEach(([h,s,kw])=>{const b=el('button','tqp');b.type='button';b.appendChild(el('span','tqh',h));b.appendChild(el('span','tqs',s));b.appendChild(el('span','tqa','›'));b.addEventListener('click',()=>{const q=$('pol-q');const w=$('terms');let hit=null;w.querySelectorAll('details.tsec').forEach(d=>{const sm=d.querySelector('summary');if(!hit&&sm&&(sm.textContent+' '+d.textContent.slice(0,400)).toLowerCase().includes(kw))hit=d;});if(hit){if(q){q.value='';q.dispatchEvent(new Event('input'));}hit.hidden=false;let p=hit;while(p&&p!==w){if(p.tagName==='DETAILS')p.open=true;p=p.parentElement;}setTimeout(()=>hit.scrollIntoView({behavior:'smooth',block:'start'}),60);hit.classList.add('tflash');setTimeout(()=>hit.classList.remove('tflash'),1800);}else if(q){q.value=kw;q.dispatchEvent(new Event('input'));w.scrollIntoView({behavior:'smooth'});}});sec.appendChild(b);});
+ const pane=$('pane-pol');pane.insertBefore(sec,pane.firstChild);
+});
+
+/* ---- Payments: Pay now card ---- */
+wait(()=>$('pane-pay')&&typeof dash!=='undefined'&&typeof photos!=='undefined',()=>{
+ if($('paynow'))return;
+ const sec=el('section','card');sec.id='paynow';const pane=$('pane-pay');pane.insertBefore(sec,pane.firstChild);
+ const paidOf=r=>{try{return typeof paidAmt==='function'?paidAmt(r):0;}catch(e){return 0;}};
+ const render=()=>{sec.textContent='';const o=dash.data('orders');const rows=o.status==='ok'?o.data:[];const due=rows.filter(r=>Number(r.payout||0)-paidOf(r)>0);const tot=due.reduce((s,r)=>s+Number(r.payout||0)-paidOf(r),0);const p=Object.assign({},photos.payinfo||{});if(!p.upi)p.upi='jeetnathavani37-1@okaxis';
+  sec.appendChild(el('h2',null,'Pay now'));
+  if(!due.length){sec.appendChild(el('p','note','Nothing due right now. Thank you.'));return;}
+  sec.appendChild(el('div','pn-tot',inr(tot)));sec.appendChild(el('p','note','Pay with your own GPay or any UPI app, or use the details below. Then submit the payment so we can verify it.'));
+  due.slice(0,5).forEach(r=>{const x=el('div','pn-row');x.appendChild(el('span',null,(r.order_no?r.order_no+' · ':'')+r.item));x.appendChild(el('b',null,inr(Number(r.payout||0)-paidOf(r))));sec.appendChild(x);});if(due.length>5)sec.appendChild(el('div','pn-row','+ '+(due.length-5)+' more in the statement below'));
+  if(p.upi){const note='Luxella payment';const am=Math.round(tot);const ios=/iPhone|iPad|iPod/i.test(navigator.userAgent);
+   const q='pa='+encodeURIComponent(p.upi)+'&pn=Luxella&am='+am+'&cu=INR&tn='+encodeURIComponent(note);
+   const row=el('div','pn-btns');
+   const g=el('a','btn','Pay with GPay');g.href=(ios?'gpay://upi/pay?':'tez://upi/pay?')+q;row.appendChild(g);
+   const u=el('a','btn2','Other UPI app');u.href='upi://pay?'+q;row.appendChild(u);sec.appendChild(row);
+   sec.appendChild(el('p','note pn-hint','In GPay, choose your bank account as the paying account (not UPI Lite) so the full payment goes through.'));}
+  const dt=el('details','pn-det');dt.appendChild(el('summary',null,'Payment details'));const body=el('div','pn-body');
+  if(p.upi){const im=el('img');im.src='assets/upi_qr.png';im.alt='Luxella UPI QR';body.appendChild(im);const c=el('div');c.appendChild(el('span','k','UPI ID'));const v=el('div','v',p.upi);c.appendChild(v);const cb=el('button','btn2','Copy UPI ID');cb.type='button';cb.addEventListener('click',async()=>{try{await navigator.clipboard.writeText(p.upi);toastM('UPI ID copied');}catch(e){}});c.appendChild(cb);body.appendChild(c);}
+  if(p.bank){const c=el('div','pn-bank');c.appendChild(el('span','k','Bank transfer'));const v=el('div','v',p.bank);v.style.whiteSpace='pre-wrap';c.appendChild(v);const cb=el('button','btn2','Copy bank details');cb.type='button';cb.addEventListener('click',async()=>{try{await navigator.clipboard.writeText(p.bank);toastM('Bank details copied');}catch(e){}});c.appendChild(cb);body.appendChild(c);}
+  if(!p.upi&&!p.bank)body.appendChild(el('span','lbl','Payment details will appear here once published.'));
+  dt.appendChild(body);sec.appendChild(dt);
+  const sub=el('button','btn2','Already paid? Submit payment');sub.type='button';sub.style.marginTop='12px';sub.addEventListener('click',()=>{const s=$('paysub');if(s)s.scrollIntoView({behavior:'smooth',block:'start'});});sec.appendChild(sub);};
+ let lk='';const tick=()=>{const o=dash.data('orders');const k=JSON.stringify(photos.payinfo||{})+'|'+(o.status==='ok'?o.data.map(r=>r.item+r.payout+paidOf(r)).join(','):o.status);if(k!==lk){lk=k;render();}};tick();try{dash.onData(tick);}catch(e){}setInterval(tick,2000);
+});
+
+/* ---- Address: add new / use saved, sticky save ---- */
+wait(()=>$('pane-ad')&&$('a-save')&&typeof photos!=='undefined',()=>{
+ if($('ad-quick'))return;
+ const form=$('a-addr').closest('.form');const bar=el('div','ad-quick');bar.id='ad-quick';
+ const add=el('button','btn2','+ Add a new address');add.type='button';
+ const sel=el('select');sel.id='ad-saved';sel.setAttribute('aria-label','Use a saved address');
+ const fill=()=>{const book=Object.values(photos.book||{});const k=book.map(b=>b.label+b.address).join('|');if(sel.dataset.k===k)return;sel.dataset.k=k;sel.textContent='';const o0=el('option',null,book.length?'Use a saved address':'No saved address yet');o0.value='';sel.appendChild(o0);book.forEach((b,i)=>{const o=el('option',null,(b.label||'Address')+(b.isDefault?' (default)':'')+' — '+String(b.address||'').slice(0,40));o.value=String(i);sel.appendChild(o);});};
+ sel.addEventListener('change',()=>{const book=Object.values(photos.book||{});const b=book[Number(sel.value)];if(!b)return;$('a-addr').value=b.address||'';if(b.phone)$('a-phone').value=b.phone;});
+ add.addEventListener('click',()=>{$('a-addr').value='';$('a-phone').value='';$('a-pref').value='';sel.value='';$('a-addr').focus();form.scrollIntoView({behavior:'smooth',block:'center'});});
+ bar.appendChild(add);bar.appendChild(sel);form.parentNode.insertBefore(bar,form);fill();
+ try{dash.onData(fill);}catch(e){}setInterval(fill,2500);
+ const sv=$('a-save').parentNode;sv.classList.add('ad-sticky');
+});
+
+/* ---- Tabs: stable horizontal scroll, centre active tab ---- */
+wait(()=>document.querySelector('.sw .tabs')&&$('tab-ov'),()=>{
+ const tabs=document.querySelector('.sw .tabs');
+ tabs.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{try{const l=t.offsetLeft-(tabs.clientWidth-t.offsetWidth)/2;tabs.scrollTo({left:Math.max(0,l),behavior:'smooth'});}catch(e){}setTimeout(()=>{try{const pn=$(t.id.replace('tab-','pane-'));if(!pn)return;const y=pn.getBoundingClientRect().top+window.scrollY-tabs.offsetHeight-12;if(window.scrollY>y+4)window.scrollTo({top:Math.max(0,y),behavior:'smooth'});}catch(e){}},40);}));
+});
+
+/* ---- Luxurious scroll reveal ---- */
+(function(){
+ if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+ if(!('IntersectionObserver' in window))return;
+ const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('rv-in');io.unobserve(e.target);}});},{threshold:.08,rootMargin:'0px 0px -6% 0px'});
+ const seen=new WeakSet();
+ const scan=()=>{document.querySelectorAll('.sw section.card, .sw .dep, .sw .ord, .sw .tiles .card, .sw .paytiles .card').forEach(e=>{if(seen.has(e)||e.closest('[hidden]'))return;seen.add(e);const r=e.getBoundingClientRect();if(r.top<window.innerHeight*.9&&r.bottom>0){return;}e.classList.add('rv');io.observe(e);});};
+ setInterval(scan,900);window.addEventListener('scroll',()=>{},{passive:true});
+})();
+})();
+
+/* Good to know: headings visible, text in a dropdown */
+(function(){const go=()=>{const ul=document.querySelector('.sw ul.gtk');if(!ul){return setTimeout(go,300);}if(ul.__g)return;ul.__g=1;
+ ul.querySelectorAll(':scope>li').forEach(li=>{const b=li.querySelector('b'),s=li.querySelector('span');if(!b||!s)return;const d=document.createElement('details');d.className='gtkd';const sm=document.createElement('summary');sm.textContent=b.textContent;const p=document.createElement('p');p.textContent=s.textContent;d.appendChild(sm);d.appendChild(p);li.textContent='';li.appendChild(d);});};go();})();
