@@ -1450,3 +1450,7 @@ html.nwo-lock,html.nwo-lock body{overflow:hidden}
 .nt-b{color:var(--muted,#A39C90);font-size:14px;line-height:1.6;margin:0 0 8px}
 .nt-d{font:500 9.5px 'Jost',sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#6F685E;margin-bottom:16px}
 .nt .ps-row>*{flex:1}
+/* view-only client preview */
+html.lx-ro .sw .owner,html.lx-ro .sw .mg-own,html.lx-ro #mg-toggle,html.lx-ro #hdrbtns,html.lx-ro .sw .xo-trk,html.lx-ro .sw .addph{display:none!important}
+.ro-toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:99;background:#E3C06A;color:#000;font:500 11px 'Jost',sans-serif;letter-spacing:.14em;text-transform:uppercase;padding:10px 16px}
+html.lx-ro #tb-switch,html.lx-ro #tb-out,html.lx-ro #top .who{display:none!important}

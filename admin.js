@@ -38,6 +38,10 @@ const css=document.createElement('style');css.textContent=`
 .ad-o small{color:#A39C90;display:block;font-size:11.5px}.ad-o select{width:auto;max-width:15rem;margin:0}
 .ad-mut{color:#A39C90;font-size:12.5px}
 .ad-toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:#C9A227;color:#0A0A0A;padding:10px 18px;font-size:13px;z-index:9}
+.ad-nav{display:flex;gap:4px}.ad-nb{background:transparent;border:1px solid #2A2724;color:#A39C90;padding:8px 16px;font:500 11px 'Jost',sans-serif;letter-spacing:.2em;text-transform:uppercase;cursor:pointer}.ad-nb.on{background:linear-gradient(180deg,#F4E1A0,#E3C06A 50%,#B8943F);color:#0A0A0A;border-color:#E3C06A}
+.ad-cv{padding:14px 18px}.ad-cv[hidden]{display:none}.ad-cvbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:8px}.ad-cc{background:#121214;border:1px solid #232120;color:#F3EEE6;padding:9px 14px;font:inherit;cursor:pointer}.ad-cc.on{border-color:#C9A227;background:#17150f;color:#E3C565}.ad-cvbar .ad-b{margin-left:auto}
+.ad-fr{display:block;width:100%;max-width:480px;height:calc(100vh - 170px);min-height:600px;border:1px solid #3A3222;background:#0B0B0C;margin:10px auto 0}
+.ad-wrap[hidden]{display:none!important}
 @media(max-width:760px){.ad-wrap{grid-template-columns:1fr}.ad-side{border-right:0;border-bottom:1px solid #232120}.ad-o{grid-template-columns:1fr}}
 `;document.head.appendChild(css);
 
@@ -202,7 +206,7 @@ async function saveOrderPatch(clientId,item,patch,stageTo){
 }
 function orderBoard(m,rows,name){
   const card=el('div','ad-card');card.appendChild(el('h2',null,'Order control'));
-  card.appendChild(el('p','ad-mut','Kisi bhi client ka order yahin se badlo: stage, tracking, ETA, payment. Stage badalte hi client ko mail aur push apne aap jaata hai.'));
+  card.appendChild(el('p','ad-mut','Kisi bhi client ka order yahin se badlo: stage, tracking, ETA, payment. Stage badalte hi client ko push jaata hai. Mail ke liye client page ke Tracker me 'Send email' dabao.'));
   const bar=el('div','row');bar.style.margin='0 0 12px';
   const fc=document.createElement('select');fc.innerHTML='<option value="">All clients</option>';clients.forEach(c=>{const o=document.createElement('option');o.value=c.id;o.textContent=c.name;fc.appendChild(o);});
   const fs=document.createElement('select');[['open','Open orders'],['all','All orders'],['late','Late vs ETA'],['unpaid','Payment pending'],['done','Delivered']].forEach(([v,t])=>{const o=document.createElement('option');o.value=v;o.textContent=t;fs.appendChild(o);});
@@ -468,5 +472,21 @@ async function renderDash(m){
   try{await loadClients();}catch(e){root.querySelector('#ad-main').textContent=e.message;return;}
   const h=decodeURIComponent((location.hash||'').slice(1));sel=clients.find(c=>c.slug===h)||null;
   renderList();renderClient();
+  clientsView();
 })();
+function clientsView(){
+  const top=root.querySelector('.ad-top');const wrap=root.querySelector('.ad-wrap');
+  const nav=el('div','ad-nav');const b1=el('button','ad-nb on','Admin');const b2=el('button','ad-nb','Clients');nav.append(b1,b2);top.insertBefore(nav,top.querySelector('.sp'));
+  const cv=el('div','ad-cv');cv.hidden=true;root.appendChild(cv);
+  const bar=el('div','ad-cvbar');const fr=document.createElement('iframe');fr.className='ad-fr';fr.title='Client view';
+  const note=el('span','ad-mut','View only. Exactly what the client sees. Nothing can be changed here.');
+  let cur=null;
+  const pick=c=>{cur=c;[...bar.querySelectorAll('.ad-cc')].forEach(x=>x.classList.toggle('on',x.dataset.s===c.slug));fr.src=base('./')+c.slug+'?asclient=1#ov';try{history.replaceState(null,'',location.pathname+'#clients:'+c.slug);}catch(e){}};
+  clients.forEach(c=>{const b=el('button','ad-cc',c.name);b.dataset.s=c.slug;b.onclick=()=>pick(c);bar.appendChild(b);});
+  const open=el('a','ad-b g','Open in new tab');open.target='_blank';open.rel='noopener';open.onclick=()=>{if(cur)open.href=base('./')+cur.slug+'?asclient=1#ov';};
+  bar.appendChild(open);cv.append(bar,note,fr);
+  const show=v=>{b1.classList.toggle('on',!v);b2.classList.toggle('on',v);wrap.hidden=v;cv.hidden=!v;if(v&&!cur&&clients.length){const h=(location.hash||'').match(/^#clients:(.+)$/);pick(clients.find(c=>h&&c.slug===decodeURIComponent(h[1]))||clients.find(c=>!/^zz/.test(c.slug))||clients[0]);}};
+  b1.onclick=()=>{show(false);try{history.replaceState(null,'',location.pathname+(sel?'#'+sel.slug:''));}catch(e){}};b2.onclick=()=>show(true);
+  if(/^#clients/.test(location.hash))show(true);
+}
 })();

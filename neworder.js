@@ -1,3 +1,17 @@
+/* View-only client preview (?asclient=1, used by the admin Clients tab) */
+(function(){
+ if(new URLSearchParams(location.search).get('asclient')!=='1')return;
+ window.__lxRO=true;document.documentElement.classList.add('lx-ro');
+ try{Object.defineProperty(photos,'canEdit',{get:()=>false,set:()=>{},configurable:true});}catch(e){}
+ let lastAct=0;document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('button,a,label,input[type=submit]');lastAct=(b&&!b.closest('.tabs')&&!b.classList.contains('tab'))?Date.now():0;},true);
+ const no=()=>{if(Date.now()-lastAct>1500)return Promise.reject(new Error('View only'));try{const t=document.createElement('div');t.className='ro-toast';t.textContent='View only: this is the client view';document.body.appendChild(t);setTimeout(()=>t.remove(),2200);}catch(e){}return Promise.reject(new Error('View only'));};
+ const wrapDb=()=>{if(!photos.db||photos.db.__ro)return false;const db=photos.db;const d0=db.doc.bind(db),c0=db.collection.bind(db);
+  db.doc=p=>{const d=d0(p);d.set=no;if(d.update)d.update=no;if(d.delete)d.delete=no;return d;};
+  db.collection=p=>{const c=c0(p);c.add=no;return c;};db.__ro=true;
+  if(photos.assets)photos.assets.upload=no;return true;};
+ const t=setInterval(()=>{try{if(window.lx&&!window.lx.__ro){window.lx.saveOrder=no;if(window.lx.deleteOrder)window.lx.deleteOrder=no;window.lx.__ro=true;}if(wrapDb())clearInterval(t);}catch(e){}},100);
+ setTimeout(()=>clearInterval(t),60000);
+})();
 /* Luxella portal — professional "Place a new order" checkout (Overview). Loaded after app.js. */
 (function(){
 'use strict';
@@ -367,7 +381,7 @@ const show=list=>{if(open||!list.length)return;open=true;let i=0;
   const nx=el('button','btn2',i<list.length-1?'Next':'Got it');nx.type='button';nx.addEventListener('click',()=>{if(i<list.length-1){i++;draw();}else close();});r2.appendChild(nx);bx.appendChild(r2);};
  draw();(document.querySelector('.sw')||document.body).appendChild(ov);requestAnimationFrame(()=>ov.classList.add('on'));};
 const go=()=>{try{if(typeof photos==='undefined'||!photos.db||typeof dash==='undefined')return setTimeout(go,500);}catch(e){return setTimeout(go,500);}
- if((window.lx&&window.lx.isOwner&&window.lx.isOwner())||photos.canEdit)return;
+ if(window.__lxRO||(window.lx&&window.lx.isOwner&&window.lx.isOwner())||photos.canEdit)return;
  photos.db.collection('notices').onSnapshot(s=>{const list=s.docs.filter(d=>d.exists).map(d=>({id:d.id,d:d.data()})).filter(n=>n.d&&!n.d.seen&&!shown.has(n.id)).sort((a,b)=>String(b.d.at).localeCompare(String(a.d.at))).slice(0,5);if(!list.length)return;list.forEach(n=>shown.add(n.id));setTimeout(()=>show(list),1200);},()=>{});};
 window.lxShowNotices=show;setTimeout(go,1500);
 })();
