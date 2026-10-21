@@ -962,3 +962,13 @@ img{max-width:100%}
 
 .lx-top .tlogo.hasc{margin-right:10px}
 .lx-top .tclogo{height:24px;width:auto;max-width:84px;object-fit:contain;border-radius:4px;margin-right:auto;flex:0 0 auto}
+.sw .chat .ci2{display:flex;flex-direction:column;gap:8px;padding:10px 14px;border-top:1px solid #2A2724}
+.sw .chat .ci2[hidden]{display:none}
+.sw .chat .ci2-r{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.sw .chat .ci2-p{display:flex;gap:6px;flex-wrap:wrap}
+.sw .chat .ci2 textarea{flex:1;min-width:0;width:100%;resize:none;background:#111;border:1px solid #2A2724;color:#EDE8DE;padding:8px 10px;font:300 14px 'Jost',sans-serif;min-height:56px}
+.sw .chat .ci2 .chip{cursor:pointer;text-decoration:none}
+.sw .chat .ci2 .chip.rec{background:#7a1f1f;color:#fff}
+.sw .chat .ibimg{display:block;max-width:100%;max-height:180px;margin-top:6px;cursor:pointer}
+.sw .chat .ibaud{display:block;width:100%;max-width:240px;margin-top:6px;height:34px}
+.sw .chat .ibt{font-size:10px;opacity:.5;margin-top:4px}

@@ -156,6 +156,17 @@ async function renderClient(){
     dd.onclick=async()=>{if(!confirm('Delete '+x.collection+'/'+x.doc_id+'?'))return;const u=await sb.from('lx_docs').delete().match({client_id:c.id,collection:x.collection,doc_id:x.doc_id});if(u.error){toast(u.error.message);return;}det.remove();toast('Deleted');};
     dl.appendChild(det);});
 
+  /* inbox */
+  const ib=el('div','ad-card');ib.appendChild(el('h2',null,'Inbox (client messages)'));m.appendChild(ib);
+  const th=el('div');th.style.cssText='max-height:340px;overflow:auto;display:flex;flex-direction:column;gap:8px;margin:8px 0';ib.appendChild(th);
+  const sg=async u=>{if(!u)return '';if(u.indexOf('lxp:')!==0)return u;const r=await sb.storage.from('lx-private').createSignedUrl(u.slice(4),3600);return r.data?r.data.signedUrl:'';};
+  async function loadInbox(){const r=await sb.from('lx_docs').select('data').eq('client_id',c.id).eq('collection','case_msgs').eq('data->>case','inbox');th.textContent='';const L=(r.data||[]).map(x=>x.data).filter(x=>x&&x.at).sort((a,b)=>a.at<b.at?-1:1);if(!L.length)th.appendChild(el('p','ad-mut','No messages yet.'));
+   for(const x of L){const b=el('div');b.style.cssText='padding:8px 10px;max-width:85%;font-size:13px;border:1px solid #2A2724;'+(x.from==='luxella'?'align-self:flex-end;background:#1C1A17':'align-self:flex-start');if(x.text)b.appendChild(el('div',null,x.text));for(const f of (x.files||[])){const u=await sg(f);if(u){const im=document.createElement('img');im.src=u;im.style.cssText='display:block;max-width:100%;max-height:200px;margin-top:6px';b.appendChild(im);}}if(x.voice){const u=await sg(x.voice);if(u){const a=document.createElement('audio');a.controls=true;a.src=u;a.style.cssText='display:block;margin-top:6px;max-width:240px';b.appendChild(a);}}b.appendChild(el('div','ad-mut',(x.from==='luxella'?'You':'Client')+' · '+new Date(x.at).toLocaleString('en-IN')));th.appendChild(b);}th.scrollTop=th.scrollHeight;}
+  loadInbox();
+  const rt=document.createElement('textarea');rt.placeholder='Reply to client…';rt.style.cssText='width:100%;min-height:56px;background:#0A0A0A;color:#F3EEE6;border:1px solid #2A2724;padding:8px';ib.appendChild(rt);
+  const rr=el('div','row');const rs=el('button','ad-b','Send reply');rs.type='button';const rf=el('button','ad-b','Refresh');rf.type='button';rr.append(rs,rf);ib.appendChild(rr);
+  rf.onclick=loadInbox;
+  rs.onclick=async()=>{const t=rt.value.trim();if(!t)return;const id='m'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);const w=await sb.from('lx_docs').insert({client_id:c.id,collection:'case_msgs',doc_id:id,data:{case:'inbox',ref:'',text:t,files:[],voice:'',from:'luxella',at:new Date().toISOString()}});if(w.error){toast(w.error.message);return;}rt.value='';toast('Sent');loadInbox();};
   /* audit */
   const ac=el('div','ad-card');ac.appendChild(el('h2',null,'Recent changes'));m.appendChild(ac);
   const au=await sb.from('lx_audit').select('at,actor,tbl,op,ref').eq('client_id',c.id).order('at',{ascending:false}).limit(25);
