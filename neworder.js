@@ -21,7 +21,7 @@ ready(()=>{
  panes.forEach(p=>root.appendChild(p));
  /* 1 piece */
  const f1=el('div','form');
- [['item','Item *','text',{placeholder:'e.g. Coach Tabby 26, Black'},1],['brand','Brand','text',{},0],['size','Size / colour','text',{},0],['qty','Qty','number',{value:'1',min:'1'},0],['link','Product link (optional)','url',{placeholder:'https://'},1],['notes','Notes','text',{placeholder:'Deadline, gift wrap, alternatives…'},1]].forEach(([k,lab,type,at,w])=>{const m=mk(lab,'input',Object.assign({type},at),w);F[k]=m.i;f1.appendChild(m.l);});
+ [['item','Item *','text',{placeholder:'e.g. Coach Tabby 26, Black'},1],['brand','Brand','text',{},0],['size','Size / colour','text',{},0],['qty','Qty','number',{value:'1',min:'1'},0],['link','Product link (optional)','url',{placeholder:'https://'},1],['notes','Notes','text',{placeholder:'Deadline, gift wrap, alternatives…'},1],['photo','Photo of the piece (optional)','file',{accept:'image/*'},1]].forEach(([k,lab,type,at,w])=>{const m=mk(lab,'input',Object.assign({type},at),w);F[k]=m.i;f1.appendChild(m.l);});
  panes[0].appendChild(f1);
  /* 2 delivery */
  const f2=el('div','form');
@@ -81,6 +81,7 @@ ready(()=>{
    if(!later())try{await photos.db.doc('addresses/'+pslug(name)).set({order:name,address,phone:val('phone'),pref:'',savedAt:today});}catch(e){}
    if(F.addr.value==='__new'){try{await photos.db.collection('addressbook').add({label:'Address '+(addrList().length+1),phone:val('phone'),address,isDefault:!addrList().length,at:today});}catch(e){}}
    if(paid){const id='ps-'+hash(name+'|'+paid+'|'+val('ref').toLowerCase());try{await photos.db.doc('paysub/'+id).set({id,order:name,amount:paid,method:F.pay.value,ref:val('ref'),proof,status:'Pending verification',at:new Date().toISOString()});}catch(e){say('Order placed, but the payment note did not save. Please submit it in Payments.');}}
+   const pf=F.photo.files&&F.photo.files[0];if(pf){try{if(pf.size>8*1024*1024)throw new Error('big');const a=await photos.assets.upload(pf);await photos.db.doc('photos/'+pslug(name)).set({order:name,id:a.id,url:a.url,at:today});}catch(e){say('Order placed, but the photo did not upload. Add it from the order.');}}
    S.done={no,name,paid,price};
    panes.forEach(p=>p.hidden=true);prog.hidden=nav.hidden=true;intro.hidden=true;
    doneBox.hidden=false;doneBox.textContent='';
@@ -90,6 +91,8 @@ ready(()=>{
    S.busy=false;
   }catch(e){msg.textContent='Could not place the order. Your details are kept, try again.';S.busy=false;next.disabled=false;}
  };
+ const owner=window.lx&&window.lx.isOwner&&window.lx.isOwner();
+ if(owner){const sh=el('button','btn2','Copy client link');sh.type='button';sh.addEventListener('click',async()=>{const q=new URLSearchParams();[['item','item'],['brand','brand'],['size','size'],['qty','qty'],['link','link'],['notes','notes'],['price','price']].forEach(([k,f])=>{const v=val(f);if(v&&!(k==='qty'&&v==='1'))q.set(k,v);});const u=location.origin+location.pathname+(q.toString()?'?'+q:'')+'#new';try{await navigator.clipboard.writeText(u);msg.textContent='Client link copied.';}catch(e){msg.textContent=u;}});nav.insertBefore(sh,msg);}
  next.addEventListener('click',()=>{if(S.step===3){place();return;}const e=check(S.step);if(e){msg.textContent=e;return;}S.step++;render();});
  /* prefill from shared link */
  const pf=(k,q)=>{const v=Q.get(q||k);if(v)F[k].value=v;};

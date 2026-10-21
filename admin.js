@@ -303,10 +303,12 @@ function newOrderCard(m,rows){
   [it,br,pr,eta].forEach(x=>x.style.cssText=sty);
   const ty=document.createElement('select');ty.style.cssText=sty;[['ETA','ETA (sourced)'],['In hand (Local)','In hand (Local)']].forEach(([v,t])=>{const o=document.createElement('option');o.value=v;o.textContent=t;ty.appendChild(o);});
   const ro=document.createElement('select');ro.style.cssText=sty;[['Direct to client','Direct to client'],['Indirect (via me)','Via reseller']].forEach(([v,t])=>{const o=document.createElement('option');o.value=v;o.textContent=t;ro.appendChild(o);});
+  const ph=document.createElement('input');ph.type='file';ph.accept='image/*';ph.style.cssText=sty;
   const sz=document.createElement('input'),qt=document.createElement('input'),lk=document.createElement('input'),nt=document.createElement('input');
   sz.placeholder='Size / colour';qt.type='number';qt.value='1';qt.min='1';lk.placeholder='Product link (optional)';nt.placeholder='Notes (optional)';[sz,qt,lk,nt].forEach(x=>x.style.cssText=sty);
-  g.append(mk('Client',cs),mk('Item',it),mk('Brand',br),mk('Size / colour',sz),mk('Qty',qt),mk('Price ₹',pr),mk('Type',ty),mk('Route',ro),mk('ETA (optional)',eta),mk('Product link',lk),mk('Notes',nt));card.appendChild(g);
-  const rw=el('div','row');const go=el('button','ad-b','Add order');go.type='button';rw.appendChild(go);card.appendChild(rw);
+  g.append(mk('Client',cs),mk('Item',it),mk('Brand',br),mk('Size / colour',sz),mk('Qty',qt),mk('Price ₹',pr),mk('Type',ty),mk('Route',ro),mk('ETA (optional)',eta),mk('Product link',lk),mk('Notes',nt),mk('Photo (optional)',ph));card.appendChild(g);
+  const rw=el('div','row');const go=el('button','ad-b','Add order');go.type='button';const sl=el('button','ad-b g','Copy client link');sl.type='button';rw.append(go,sl);card.appendChild(rw);
+  sl.onclick=async()=>{const q=new URLSearchParams();if(it.value.trim())q.set('item',it.value.trim());if(br.value.trim())q.set('brand',br.value.trim());if(sz.value.trim())q.set('size',sz.value.trim());if(qt.value&&qt.value!=='1')q.set('qty',qt.value);if(lk.value.trim())q.set('link',lk.value.trim());if(nt.value.trim())q.set('notes',nt.value.trim());if(pr.value)q.set('price',pr.value);const c=clients.find(x=>x.id===cs.value)||{};const u=location.origin+'/'+(c.slug||'')+(q.toString()?'?'+q:'')+'#new';try{await navigator.clipboard.writeText(u);toast('Client link copied.');}catch(e){toast(u);}};
   go.onclick=async()=>{
     const item=it.value.trim();if(!item){toast('Item ka naam daalo.');return;}
     if(rows.some(r=>r._c===cs.value&&r.item===item)){toast('Is client ke paas yahi item pehle se hai.');return;}
@@ -320,6 +322,8 @@ function newOrderCard(m,rows){
     const r=await sb.from('lx_orders').insert({client_id:cs.value,item,data});
     go.disabled=false;
     if(r.error){toast('Add nahi hua: '+r.error.message);return;}
+    const pf=ph.files&&ph.files[0];if(pf){try{const sl2=(clients.find(c=>c.id===cs.value)||{}).slug||'x';const path=sl2+'/'+Date.now()+'_'+(pf.name||'photo').replace(/[^a-zA-Z0-9._-]/g,'_');const up=await sb.storage.from('lx-assets').upload(path,pf,{upsert:false,contentType:pf.type||undefined});if(up.error)throw up.error;const pu=sb.storage.from('lx-assets').getPublicUrl(path).data.publicUrl;await sb.from('lx_docs').upsert({client_id:cs.value,collection:'photos',doc_id:pslugA(item),data:{order:item,id:path,url:pu,at:todayA()}},{onConflict:'client_id,collection,doc_id'});}catch(e){toast('Order add hua, photo upload nahi hua.');}}
+    ph.value='';sz.value=lk.value=nt.value='';
     rows.push(Object.assign({_c:cs.value,item},data));it.value=br.value=pr.value=eta.value='';toast('Added '+no+'. Order control me dikhega (refresh karo).');
   };
   m.appendChild(card);
