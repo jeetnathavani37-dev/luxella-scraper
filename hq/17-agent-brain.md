@@ -36,3 +36,12 @@ data-model doc ke field names hi. $ amount: `price_usd` = is order ka item price
 - `meta/patterns` refresh: learning-loop doc ki SQL se har stage ka med/p80 (overall + reshipper/store) nikaalo, `meta/patterns` = {at, stages:{key:{t,n,med,p80,by}}} (keys: buy_ship, ship_wh, wh_dwell, flight, india_km, km_mrn, mrn_conf, conf_pay).
 - Aaj Jeet ne jo correct kiya (notes, needs-jeet answers) → `lessons` me line.
 - Kal subah ke liye 3-line "focus" agent row summary me likho (Overview "Aaj ka focus" isko dikhata hai): sabse urgent 3 kaam + ₹ impact.
+
+## Client portal notes (scope='clients') — Oct 2026
+Admin panel (luxellaclients.duckdns.org/admin) ke "✦ Assistant" se notes aate hain: `kind='note'`, `data.scope='clients'`, `data.client` = slug (khaali ho to text se pehchaano: swayam / himanshu …), photo ho to `image_b64`.
+- Table: `lx_orders(id, client_id, data)` — client = `lx_clients.slug` → `client_id`. Order match: `data->>'item'` (ya order_no `#1001`, brand + item words). Do match ho to doubt → needs-jeet.
+- Fields: `status` / `stage` (sirf ye values: Order placed · Order confirmed · Shipped by retailer/outlet · Received at international hub · Shipped from international hub · Received at Indian warehouse · Address requested · Shipped from Indian warehouse · Delivered), `payout` (₹ price), `payout_status` ('Received' / 'Pending'), `payment_date`, `intl_tracking_no` + `intl_courier`, `local_tracking` + `local_courier`, `eta_date`, `shipping_date`, `order_date`, `order_type` (ETA / In hand (Local)), `direct`, `photo_url`, `size`, `qty`.
+- Update: `update lx_orders set data = data || '<json>'::jsonb where id = …` — sirf wahi fields jo note me clearly hain; stage kabhi peeche nahi; `status` aur `stage` dono same value. Price/payment change ho to `payment_date` bhi.
+- Client yeh page dekhta hai: koi internal baat (reshipper naam, cost, margin, KM, "Jeet") kisi field me mat likho. Client ko message bhejna = kabhi nahi (sirf Jeet).
+- Naya order banana ho / delete / client ka address-phone badalna → needs-jeet (proposal note.result me likho).
+- Note update: `status='done'`, `result='<short Hinglish: kya kiya, kaunsa order>'`.

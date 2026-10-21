@@ -592,3 +592,28 @@ function clientsView(){
   if(/^#clients/.test(location.hash))show(true);
 }
 })();
+
+/* ===== Admin assistant (Oct 2026): type / photo → Brain agent updates the right client & order ===== */
+(function(){
+const X=window.__lxAdmin;if(!X||!X.S.owner)return;const sb=X.sb;
+const el=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e;};
+const imgB64=f=>new Promise((res,rej)=>{const im=new Image();im.onload=()=>{const M=1600;let w=im.naturalWidth,h=im.naturalHeight;const k=Math.min(1,M/Math.max(w,h));w=Math.round(w*k);h=Math.round(h*k);const cv=document.createElement('canvas');cv.width=w;cv.height=h;cv.getContext('2d').drawImage(im,0,0,w,h);res(cv.toDataURL('image/jpeg',0.8).split(',')[1]);};im.onerror=rej;im.src=URL.createObjectURL(f);});
+let clients=[];
+async function mount(){const root=document.getElementById('admin-root');if(!root||!root.firstChild){setTimeout(mount,500);return;}if(document.getElementById('adm-ai'))return;
+ try{const r=await sb.from('lx_clients').select('slug,name');clients=(r.data||[]).filter(c=>!/^zz/.test(c.slug));}catch(e){}
+ const c=el('section','adm-ai');c.id='adm-ai';const h=el('div','adm-ai-h');h.appendChild(el('b',null,'✦ Assistant'));h.appendChild(el('small',null,'Bolo kya update karna hai — "Swayam ka Coach Bay Slides delivered, payment aa gaya" — ya photo daalo. Brain agent sahi client + order me daal deta hai (har ghante; client ko sirf "Luxella" dikhega).'));c.appendChild(h);
+ const row=el('div','adm-ai-f');const sel=document.createElement('select');[['','Client (auto)'],...clients.map(x=>[x.slug,x.name])].forEach(([v,t])=>{const o=el('option',null,t);o.value=v;sel.appendChild(o);});
+ const ta=document.createElement('textarea');ta.rows=2;ta.placeholder='Kya update karna hai…';const fi=document.createElement('input');fi.type='file';fi.accept='image/*';fi.hidden=true;const att=el('button','adm-ai-b','📷');att.type='button';att.onclick=()=>fi.click();
+ const send=el('button','adm-ai-go','Send');send.type='button';row.append(sel,ta,att,send,fi);c.appendChild(row);const fn=el('small','adm-ai-file','');c.appendChild(fn);fi.onchange=()=>{fn.textContent=fi.files[0]?'📷 '+fi.files[0].name:'';};
+ const log=el('div','adm-ai-log');c.appendChild(log);
+ const load=async()=>{const r=await sb.from('lx_b2b').select('id,data').eq('kind','note').order('id',{ascending:false}).limit(30);const L=(r.data||[]).filter(x=>x.data&&x.data.scope==='clients').slice(0,6);log.textContent='';L.forEach(x=>{const d=el('div','adm-ai-i '+(x.data.status||''));d.appendChild(el('span','s',x.data.status==='done'?'✓':x.data.status==='needs-jeet'?'?':'…'));const t=el('div');t.appendChild(el('b',null,(x.data.client?x.data.client+' · ':'')+String(x.data.text||'[photo]').slice(0,120)));if(x.data.result)t.appendChild(el('small',null,x.data.result));else t.appendChild(el('small',null,'Brain agent agle run me karega'));d.appendChild(t);log.appendChild(d);});};
+ send.onclick=async()=>{const text=ta.value.trim();const f=fi.files&&fi.files[0];if(!text&&!f)return;send.disabled=true;let client=sel.value;if(!client){const lt=text.toLowerCase();const m=clients.find(x=>lt.includes(x.slug)||lt.includes(String(x.name).toLowerCase().split(' ')[0]));if(m)client=m.slug;}
+  const data={scope:'clients',client:client||'',text,created_at:new Date().toISOString(),status:'new',by:'admin'};if(f){try{data.image_b64=await imgB64(f);}catch(e){}}
+  const r=await sb.from('lx_b2b').upsert({kind:'note',id:'c-'+Date.now().toString(36),data,updated_at:new Date().toISOString()},{onConflict:'kind,id'});send.disabled=false;if(r.error){alert('Save nahi hua: '+r.error.message);return;}ta.value='';fi.value='';fn.textContent='';load();};
+ const st=document.createElement('style');st.textContent=`.adm-ai{border:1px solid #4a3f22;background:linear-gradient(180deg,#14120d,#0E0E0F);padding:14px 16px;margin:14px 0}.adm-ai-h{display:grid;gap:4px;margin-bottom:10px}.adm-ai-h b{font:500 11px 'Jost',sans-serif;letter-spacing:.24em;text-transform:uppercase;color:#E3C565}.adm-ai-h small{color:#8d867a;font-size:12px;line-height:1.5}
+ .adm-ai-f{display:grid;grid-template-columns:150px 1fr auto auto;gap:6px}.adm-ai-f select,.adm-ai-f textarea{background:#0A0A0A;border:1px solid #2A2724;color:#F3EEE6;padding:9px;font:inherit;font-size:13px;resize:vertical}.adm-ai-b{background:none;border:1px solid #2A2724;color:#E3C565;padding:0 12px;cursor:pointer}.adm-ai-go{background:linear-gradient(135deg,#E3C565,#B8943F);color:#0A0A0A;border:0;padding:0 16px;font:500 11px 'Jost',sans-serif;letter-spacing:.18em;text-transform:uppercase;cursor:pointer}
+ .adm-ai-file{color:#8d867a;font-size:11.5px}.adm-ai-log{display:grid;gap:6px;margin-top:10px}.adm-ai-i{display:flex;gap:10px;font-size:12.5px;color:#C9C2B6;border-top:1px solid #1e1c19;padding-top:6px}.adm-ai-i .s{color:#C9A227;width:14px}.adm-ai-i.done .s{color:#86d39a}.adm-ai-i.needs-jeet .s{color:#f08f7c}.adm-ai-i b{display:block;font-weight:400}.adm-ai-i small{color:#8d867a}
+ @media(max-width:600px){.adm-ai-f{grid-template-columns:1fr auto auto}.adm-ai-f select{grid-column:1/-1}}`;document.head.appendChild(st);
+ const top=root.querySelector('.ad-top,header,.top');if(top&&top.nextSibling)root.insertBefore(c,top.nextSibling);else root.insertBefore(c,root.children[1]||null);load();setInterval(load,60000);}
+setTimeout(mount,800);
+})();
