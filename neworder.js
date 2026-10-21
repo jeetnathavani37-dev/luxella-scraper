@@ -124,11 +124,28 @@ function init(){
   rows.forEach(r=>{const st=Number(r.stage||1),local=String(r.order_type||'').indexOf('Local')>=0;
    const d=el('details','dep');d.dataset.k=r.item;if(open.has(r.item))d.open=true;d.addEventListener('toggle',()=>{d.open?open.add(r.item):open.delete(r.item);});
    const s=el('summary');const l=el('div','dl');l.appendChild(el('span','dno',r.order_no||'—'));l.appendChild(el('span','dit',r.item));
-   const rt=el('div','dr');rt.appendChild(el('span','dpr',r.payout?inr(r.payout):''));rt.appendChild(el('span','dst',STAGES[st-1]||r.status||''));
+   const rt=el('div','dr');rt.appendChild(el('span','dpr',r.payout?inr(r.payout):''));rt.appendChild(el('span','dst'+(r.placed_by==='client'&&st<=1?' wait':''),r.placed_by==='client'&&st<=1?'Awaiting confirmation':(STAGES[st-1]||r.status||'')));
    s.appendChild(l);s.appendChild(rt);d.appendChild(s);
    const b=el('div','db');const row=(k,v)=>{const x=el('div','dx');x.appendChild(el('span','k',k));x.appendChild(el('span','v',v));b.appendChild(x);};
    row('Step',st+' of 9');if(r.brand)row('Brand',r.brand);row('Origin',st>=3?'Shipped':'Pending');if(!local)row('Hub',st>=5?'Departed':(st>=4?'Received':'Awaiting'));row('India',st>=8?'Out for delivery':(st>=6?'Landed':'In transit'));row('ETA',r.eta_date&&typeof fd==='function'?fd(r.eta_date):'—');
    const bt=el('button','btn2','Open order');bt.type='button';bt.addEventListener('click',()=>{try{openDrawer(r);}catch(e){}});b.appendChild(bt);d.appendChild(b);box.appendChild(d);});};
+ render();dash.onData(render);
+}
+})();
+
+
+/* Awaiting-confirmation alert (Overview) */
+(function(){
+'use strict';
+const $=id=>document.getElementById(id);
+const el=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e;};
+const inr=v=>'₹'+Number(v||0).toLocaleString('en-IN');
+let k=0;const t=setInterval(()=>{k++;let ok=false;try{ok=typeof dash!=='undefined'&&$('neworder');}catch(e){}if(ok){clearInterval(t);init();}else if(k>200)clearInterval(t);},150);
+function init(){
+ if($('await-alert'))return;const sec=el('section','card');sec.id='await-alert';sec.hidden=true;$('neworder').parentNode.insertBefore(sec,$('neworder'));
+ const render=()=>{const o=dash.data('orders');sec.textContent='';const rows=o.status==='ok'?o.data.filter(r=>r.placed_by==='client'&&Number(r.stage||1)<=1):[];sec.hidden=!rows.length;if(!rows.length)return;
+  sec.appendChild(el('h2',null,'Awaiting confirmation'));sec.appendChild(el('p','note','Luxella is reviewing these orders. You will get an email the moment each one is confirmed.'));
+  rows.forEach(r=>{const d=el('div','awt');const l=el('div');l.appendChild(el('span','dno',r.order_no||'—'));l.appendChild(el('span','dit',r.item));d.appendChild(l);d.appendChild(el('span','awb','Awaiting confirmation'));sec.appendChild(d);});};
  render();dash.onData(render);
 }
 })();

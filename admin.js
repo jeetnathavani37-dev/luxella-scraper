@@ -333,9 +333,15 @@ function newOrderCard(m,rows){
 async function signedUrl(u){if(!u)return '';if(String(u).indexOf('lxp:')!==0)return u;const r=await sb.storage.from('lx-private').createSignedUrl(String(u).slice(4),3600);return r.data?r.data.signedUrl:'';}
 async function queueCard(m,name,rows){
   const card=el('div','ad-card');card.appendChild(el('h2',null,'Payments + Help queue'));m.appendChild(card);
-  const [ps,cs]=await Promise.all([
+  const [ps,cs,ao]=await Promise.all([
     sb.from('lx_docs').select('client_id,doc_id,data').eq('collection','paysub').eq('data->>status','Pending verification'),
-    sb.from('lx_docs').select('client_id,doc_id,data').eq('collection','cases').neq('data->>status','Resolved')]);
+    sb.from('lx_docs').select('client_id,doc_id,data').eq('collection','cases').neq('data->>status','Resolved'),
+    sb.from('lx_orders').select('client_id,item,data').eq('data->>placed_by','client').eq('data->>stage','1')]);
+  {const h=el('h3',null,'Orders awaiting your approval');h.style.cssText='font:500 11px Jost,sans-serif;letter-spacing:.2em;text-transform:uppercase;color:#E3C565;margin:14px 0 8px';card.appendChild(h);
+   const ol=el('div');card.appendChild(ol);const list=(ao&&ao.data)||[];
+   if(!list.length)ol.appendChild(el('p','ad-mut','Koi order approval ke liye pending nahi.'));
+   list.forEach(x=>{const d=x.data||{};const row=el('div','ad-o');row.style.gridTemplateColumns='1fr auto';const l=el('div');l.appendChild(el('span',null,(d.order_no||'')+' · '+x.item+(d.payout?' · '+inr(d.payout):'')));l.appendChild(el('small',null,name(x.client_id)+(d.delivery_later?' · address baad me':'')+(d.size?' · '+d.size:'')+(d.qty>1?' · qty '+d.qty:'')));row.appendChild(l);
+    const b=el('button','ad-b','Approve');b.type='button';b.onclick=async()=>{if(!confirm(name(x.client_id)+': '+x.item+' approve karun? Client ko "Order confirmed" mail jaayega.'))return;b.disabled=true;try{await saveOrderPatch(x.client_id,x.item,{stage:2,status:STAGES[1],confirmed_at:new Date().toISOString()},2);toast('Approved.');row.remove();}catch(e){b.disabled=false;toast('Approve nahi hua: '+(e.message||e));}};row.appendChild(b);ol.appendChild(row);});}
   card.appendChild(el('h3',null,'Payments to verify'));card.lastChild.style.cssText='font:500 11px Jost,sans-serif;letter-spacing:.2em;text-transform:uppercase;color:#A39C90;margin:14px 0 8px';
   const pl=el('div');card.appendChild(pl);
   if(ps.error)pl.appendChild(el('p','ad-mut',ps.error.message));
