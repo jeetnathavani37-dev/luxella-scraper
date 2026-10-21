@@ -90,6 +90,7 @@
 <div id="pane-al" hidden>
 <section class="card"><h2>All orders</h2>
 <p class="note">Every order, lifetime. Filter by date, brand or order type.</p>
+<details class="flt" id="flt"><summary>Filters &amp; search</summary>
 <div class="form" style="margin-bottom:var(--cds-gap-sm)">
 <label>From<input id="f-from" type="date"></label>
 <label>To<input id="f-to" type="date"></label>
@@ -97,6 +98,7 @@
 <label>Order type<select id="f-type"><option value="">All types</option></select></label>
 </div>
 <div class="tools"><input id="q" type="search" placeholder="Search, or try: late, due, this month"><span id="qsug"></span><span id="chips"></span><select id="f-group"><option value="">No grouping</option><option value="brand">Group by brand</option><option value="month">Group by month</option><option value="status">Group by status</option></select><button class="btn2" id="f-cols" type="button">Columns</button><button class="btn2" id="f-reset" type="button">Reset</button></div><div id="colpick" class="colpick" hidden></div>
+</details>
 <p class="lbl" id="f-sum" style="margin:0 0 var(--cds-gap-sm)"></p>
 <div class="scroll">
 <table id="ordT" data-source="orders" data-row-key="item"><thead><tr><th data-field="photo_url">Photo</th><th data-field="order_no" data-k="order_no">Order #</th><th data-field="item" data-k="item">Item</th><th data-field="brand" data-k="brand">Brand</th><th data-field="order_date" data-k="order_date">Date</th><th data-field="order_type" data-k="order_type">Order type</th><th data-field="direct" data-k="direct">Ships</th><th data-field="status" data-k="status">Status</th><th class="n" data-field="payout" data-k="payout">Amount (₹)</th><th data-field="payout_status" data-k="payout_status">Payment</th><th data-field="intl_tracking_no" data-k="intl_tracking_no">International tracking</th><th data-field="eta_date" data-k="eta_date">ETA</th><th data-field="shipping_date" data-k="shipping_date">Shipping date</th><th data-field="local_tracking" data-k="local_tracking">India tracking</th><th>Actions</th></tr></thead><tbody></tbody></table></div></section>
