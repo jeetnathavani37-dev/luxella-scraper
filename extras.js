@@ -528,3 +528,10 @@ ready(()=>{
  renderPaySub();renderRequests();
 });
 })();
+
+/* tab bar: show a clear 'more tabs' arrow when the bar scrolls */
+(function(){try{const tabs=document.querySelector('.sw .tabs');if(!tabs||tabs.querySelector('.tabs-next'))return;
+const b=document.createElement('button');b.type='button';b.className='tabs-next';b.setAttribute('aria-label','More tabs');b.textContent='›';tabs.appendChild(b);
+const upd=()=>{b.hidden=tabs.scrollWidth-tabs.clientWidth-tabs.scrollLeft<=6;};
+b.addEventListener('click',()=>tabs.scrollBy({left:Math.max(160,tabs.clientWidth*0.6),behavior:'smooth'}));
+tabs.addEventListener('scroll',upd,{passive:true});window.addEventListener('resize',upd);setTimeout(upd,300);setTimeout(upd,1500);}catch(e){}})();
