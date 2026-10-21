@@ -1065,3 +1065,6 @@ body::after{content:"";position:fixed;left:0;right:0;bottom:0;height:3px;backgro
 .sw .gtk li:first-child{border-top:0;padding-top:0}
 .sw .gtk b{font:500 10px 'Jost',sans-serif;letter-spacing:.24em;text-transform:uppercase;color:var(--gold-2,#E3C565)}
 .sw .gtk span{font-size:13.5px;line-height:1.6;color:var(--muted,#A39C90)}
+
+/* gold gradient line under the tab bar */
+.sw .tabs{background-image:linear-gradient(90deg,rgba(184,148,63,0),#B8943F 18%,#F4E1A0 50%,#B8943F 82%,rgba(184,148,63,0))!important;background-repeat:no-repeat!important;background-size:100% 2px!important;background-position:left bottom!important;border-bottom-color:transparent!important}
