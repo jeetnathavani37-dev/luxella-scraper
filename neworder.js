@@ -10,14 +10,12 @@ const hash=s=>{let h=5381;for(let i=0;i<s.length;i++)h=((h<<5)+h+s.charCodeAt(i)
 const pslug=s=>String(s).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,60);
 const ready=cb=>{let n=0;const t=setInterval(()=>{n++;let ok=false;try{ok=typeof photos!=='undefined'&&photos.db&&typeof dash!=='undefined'&&$('neworder');}catch(e){}if(ok){clearInterval(t);cb();}else if(n>200)clearInterval(t);},150);};
 ready(()=>{
- const root=$('neworder');if(root.dataset.b)return;root.dataset.b=1;
+ const card=$('neworder');if(card.dataset.b)return;card.dataset.b=1;const root=el('div','nwo-body');const fold=el('details','nwo-fold');const fs=el('summary');const ft=el('div','nwo-ft');ft.appendChild(el('h2',null,'Place a new order'));ft.appendChild(el('p','note','Share the piece, delivery and payment in 4 quick steps. We confirm by email.'));fs.appendChild(ft);fs.appendChild(el('span','nwo-chev','+'));fold.appendChild(fs);fold.appendChild(root);card.textContent='';card.appendChild(fold);
  const Q=new URLSearchParams(location.search);
  const S={step:0,busy:false,done:null};
  const F={};
  const mk=(label,tag,attrs,wide)=>{const l=el('label',wide?'wide':null);l.appendChild(document.createTextNode(label));const i=el(tag);Object.assign(i,attrs||{});l.appendChild(i);return {l,i};};
- root.textContent='';
- root.appendChild(el('h2',null,'Place a new order'));
- const intro=el('p','note','Fill in the piece, delivery and payment. Luxella confirms by email and the order shows in your Orders tab straight away.');root.appendChild(intro);
+  const intro=el('p','note','Fill in the piece, delivery and payment. Luxella confirms by email and the order shows in your Orders tab straight away.');intro.hidden=true;root.appendChild(intro);
  const prog=el('div','nwo-prog');['The piece','Delivery','Payment','Review'].forEach((n,i)=>{const s=el('span',null,(i+1)+'  '+n);prog.appendChild(s);});root.appendChild(prog);
  const panes=[el('div','nwo-pane'),el('div','nwo-pane'),el('div','nwo-pane'),el('div','nwo-pane')];
  panes.forEach(p=>root.appendChild(p));
@@ -48,8 +46,8 @@ ready(()=>{
  const doneBox=el('div','nwo-done');doneBox.hidden=true;root.appendChild(doneBox);
  /* helpers */
  const addrList=()=>Object.values(photos.book||{});
- const fillAddr=()=>{const sel=F.addr;const book=addrList();const k=book.map(b=>b.label+b.address).join('|');if(sel.dataset.k===k)return;sel.dataset.k=k;const cur=sel.value;sel.textContent='';book.forEach(b=>{const o=el('option',null,(b.label||'Address')+(b.isDefault?' (default)':'')+' — '+String(b.address||'').slice(0,50));o.value=b.address||'';o.dataset.phone=b.phone||'';if(b.isDefault)o.selected=true;sel.appendChild(o);});const on=el('option',null,'New address…');on.value='__new';sel.appendChild(on);if(!book.length)sel.value='__new';else if(cur)sel.value=cur;tog();};
- const tog=()=>{const nw=F.addr.value==='__new';F.newaddr.closest('label').hidden=!nw;if(!nw){const o=F.addr.selectedOptions[0];if(o&&o.dataset.phone&&!F.phone.value)F.phone.value=o.dataset.phone;}};
+ const fillAddr=()=>{const sel=F.addr;const book=addrList();const k=book.map(b=>b.label+b.address).join('|');if(sel.dataset.k===k)return;sel.dataset.k=k;const cur=sel.value;sel.textContent='';book.forEach(b=>{const o=el('option',null,(b.label||'Address')+(b.isDefault?' (default)':'')+' — '+String(b.address||'').slice(0,50));o.value=b.address||'';o.dataset.phone=b.phone||'';if(b.isDefault)o.selected=true;sel.appendChild(o);});const on=el('option',null,'New address…');on.value='__new';sel.appendChild(on);const ol=el('option',null,'Decide later — I will share it before dispatch');ol.value='__later';sel.appendChild(ol);if(!book.length&&!cur)sel.value='__later';else if(cur)sel.value=cur;tog();};
+ const tog=()=>{const nw=F.addr.value==='__new';F.newaddr.closest('label').hidden=!nw;F.phone.closest('label').hidden=F.addr.value==='__later';if(!nw){const o=F.addr.selectedOptions[0];if(o&&o.dataset.phone&&!F.phone.value)F.phone.value=o.dataset.phone;}};
  F.addr.addEventListener('change',tog);
  const payInfo=()=>{pi.textContent='';const p=photos.payinfo||{};if(!p.upi){pi.appendChild(el('span','lbl','Payment details will appear here once published.'));return;}const im=el('img');im.src='assets/upi_qr.png';im.alt='Luxella UPI QR';pi.appendChild(im);const d=el('div');d.appendChild(el('span','k','Pay to Luxella · UPI'));const v=el('div','v',p.upi);d.appendChild(v);if(p.bank){const k2=el('span','k','Bank');k2.style.marginTop='10px';d.appendChild(k2);const b=el('div','lbl',p.bank);b.style.whiteSpace='pre-wrap';d.appendChild(b);}pi.appendChild(d);};
  const paidMode=()=>F.pay.value!=='Pay after confirmation';
@@ -58,14 +56,14 @@ ready(()=>{
  const val=n=>String(F[n].value||'').trim();
  const check=s=>{
   if(s===0){if(!val('item'))return 'Enter the item name.';if(!(Number(val('qty')||1)>=1))return 'Quantity must be at least 1.';if(val('link')&&!/^https?:\/\//i.test(val('link')))return 'Product link should start with https://';}
-  if(s===1){if(F.addr.value==='__new'&&val('newaddr').length<15)return 'Enter the full delivery address with pincode.';if(F.addr.value==='__new'&&!/\b\d{6}\b/.test(val('newaddr')))return 'The address needs a 6-digit pincode.';const ph=val('phone').replace(/[\s-]/g,'');if(!/^(\+91)?[6-9]\d{9}$/.test(ph))return 'Enter a 10-digit Indian mobile number for delivery.';}
+  if(s===1&&F.addr.value!=='__later'){if(F.addr.value==='__new'&&val('newaddr').length<15)return 'Enter the full delivery address with pincode.';if(F.addr.value==='__new'&&!/\b\d{6}\b/.test(val('newaddr')))return 'The address needs a 6-digit pincode.';const ph=val('phone').replace(/[\s-]/g,'');if(!/^(\+91)?[6-9]\d{9}$/.test(ph))return 'Enter a 10-digit Indian mobile number for delivery.';}
   if(s===2){const pr=Number(val('price'));if(!(pr>0))return 'Enter the agreed price.';if(paidMode()){const pd=Number(val('paid'));if(!(pd>0))return 'Enter the amount you paid, or choose "Pay after confirmation".';if(pd>pr)return 'Paid amount is more than the price.';if(val('ref').length<6)return 'Add the transaction reference (at least 6 characters).';}}
   return '';};
- const addrText=()=>F.addr.value==='__new'?val('newaddr'):F.addr.value;
+ const later=()=>F.addr.value==='__later';const addrText=()=>later()?'To be shared later':(F.addr.value==='__new'?val('newaddr'):F.addr.value);
  const review=()=>{rv.textContent='';const row=(k,v)=>{const r=el('div','nwo-r');r.appendChild(el('span','k',k));r.appendChild(el('span','v',v));rv.appendChild(r);};
   const pr=Number(val('price')),pd=paidMode()?Number(val('paid')||0):0;
   row('Piece',val('item')+(val('brand')?' ('+val('brand')+')':''));row('Size / colour',val('size')||'—');row('Qty',val('qty')||'1');if(val('link'))row('Link',val('link'));if(val('notes'))row('Notes',val('notes'));
-  row('Deliver to',addrText()+' · '+val('phone'));row('Price',inr(pr));row('Paying by',F.pay.value);
+  row('Deliver to',later()?'Decide later (we will ask before dispatch)':addrText()+' · '+val('phone'));row('Price',inr(pr));row('Paying by',F.pay.value);
   if(pd){row('Paid now',inr(pd)+' · ref '+val('ref'));row('Balance',inr(Math.max(0,pr-pd)));}else row('Balance',inr(pr)+' (to pay after confirmation)');};
  const render=()=>{panes.forEach((p,i)=>p.hidden=i!==S.step);[...prog.children].forEach((s,i)=>{s.className=i===S.step?'on':i<S.step?'ok':'';});back.hidden=S.step===0;next.textContent=S.step===3?'Place order':'Continue';if(S.step===3)review();msg.textContent='';};
  back.addEventListener('click',()=>{if(S.step>0){S.step--;render();}});
@@ -79,8 +77,8 @@ ready(()=>{
    const no=orderNo(),price=Number(val('price')),paid=paidMode()?Number(val('paid')||0):0,today=new Date().toISOString().slice(0,10);
    let proof='';const f=F.file.files&&F.file.files[0];if(paid&&f){if(f.size>8*1024*1024)throw new Error('Screenshot is over 8 MB.');try{const a=await photos.assets.upload(f);proof=a.url;}catch(e){proof='';}}
    const address=addrText();
-   await window.lx.saveOrder(name,{item:name,order_no:no,order_date:today,brand:val('brand'),size:val('size'),qty:Number(val('qty')||1),product_link:val('link'),client_notes:val('notes'),delivery_address:address,delivery_phone:val('phone'),order_type:'ETA',direct:'Direct to client',payout:price,payout_status:'Pending',placed_by:'client',stage:1,status:'Order placed',eta_date:'',shipping_date:'',intl_tracking_no:'',intl_courier:'',intl_courier_slug:'',local_tracking:'',local_courier:'',local_courier_slug:''});
-   try{await photos.db.doc('addresses/'+pslug(name)).set({order:name,address,phone:val('phone'),pref:'',savedAt:today});}catch(e){}
+   await window.lx.saveOrder(name,{item:name,order_no:no,order_date:today,brand:val('brand'),size:val('size'),qty:Number(val('qty')||1),product_link:val('link'),client_notes:val('notes'),delivery_address:address,delivery_phone:later()?'':val('phone'),delivery_later:later(),order_type:'ETA',direct:'Direct to client',payout:price,payout_status:'Pending',placed_by:'client',stage:1,status:'Order placed',eta_date:'',shipping_date:'',intl_tracking_no:'',intl_courier:'',intl_courier_slug:'',local_tracking:'',local_courier:'',local_courier_slug:''});
+   if(!later())try{await photos.db.doc('addresses/'+pslug(name)).set({order:name,address,phone:val('phone'),pref:'',savedAt:today});}catch(e){}
    if(F.addr.value==='__new'){try{await photos.db.collection('addressbook').add({label:'Address '+(addrList().length+1),phone:val('phone'),address,isDefault:!addrList().length,at:today});}catch(e){}}
    if(paid){const id='ps-'+hash(name+'|'+paid+'|'+val('ref').toLowerCase());try{await photos.db.doc('paysub/'+id).set({id,order:name,amount:paid,method:F.pay.value,ref:val('ref'),proof,status:'Pending verification',at:new Date().toISOString()});}catch(e){say('Order placed, but the payment note did not save. Please submit it in Payments.');}}
    S.done={no,name,paid,price};
@@ -99,9 +97,8 @@ ready(()=>{
  if(Q.get('price')){F.price.value=Q.get('price');F.price.readOnly=true;F.price.title='Price fixed by Luxella for this order';}
  fillAddr();payInfo();syncPay();render();
  try{dash.onData(()=>{fillAddr();payInfo();});}catch(e){}
- const open=()=>{const t=$('tab-ov');if(t)t.click();setTimeout(()=>root.scrollIntoView({behavior:'smooth',block:'start'}),250);};
+ const open=()=>{const t=$('tab-ov');if(t)t.click();fold.open=true;setTimeout(()=>card.scrollIntoView({behavior:'smooth',block:'start'}),250);};
  if(location.hash==='#new'||Q.get('item'))setTimeout(open,600);
- const link=$('gtk-terms');
 });
 })();
 

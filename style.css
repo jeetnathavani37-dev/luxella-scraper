@@ -1129,3 +1129,11 @@ body::after{content:"";position:fixed;left:0;right:0;bottom:0;height:3px;backgro
 .dep .dx{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #1d1a12;font-size:13px}
 .dep .dx .k{color:#9a917c;font-size:11px;letter-spacing:.1em;text-transform:uppercase}
 .dep .db .btn2{margin-top:10px}
+
+/* place-order fold */
+.nwo-fold>summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:14px;cursor:pointer}
+.nwo-fold>summary::-webkit-details-marker{display:none}
+.nwo-ft h2{margin:0}.nwo-ft .note{margin:4px 0 0}
+.nwo-chev{flex:none;width:30px;height:30px;line-height:28px;text-align:center;border:1px solid #B8943F;border-radius:50%;color:#E3C06A;font-size:18px}
+.nwo-fold[open] .nwo-chev{transform:rotate(45deg)}
+.nwo-body{margin-top:14px;padding-top:14px;border-top:1px solid #3A3222}
