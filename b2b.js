@@ -149,10 +149,10 @@ window.lxB2B=async function(root,sb,toast){
   const dueP=km.filter(r=>r.status==='Delivered to KM'&&r.payout_status!=='Received');const got=km.filter(r=>r.payout_status==='Received');
   const sum=(a,k)=>a.reduce((t,r)=>t+(Number(r[k])||0),0);const low=km.filter(r=>r.margin_ok==='No');
   const TOOLS=['pipe','bulk','calc','add','export','orders','todo'];if(S.tab==='transit')S.tab='intl';if(S.tab==='reship')S.tab='wh';if(TOOLS.includes(S.tab)){S.tool=S.tab;S.tab='tools';}
-  const T=el('div','bb-tabs');[['overview','Overview'],['todos','To-dos'+(()=>{try{const n=todoCount();return n?' · '+n:'';}catch(e){return '';}})()],['bids','Bids'],['buys','Orders placed'],['intl','Intl transit'],['wh','Warehouse'],['rs','Reshippers'],['landed','Landed India'],['tokm','To KicksMachine'],['mrn','MRN'],['confirm','Confirmation'],['payouts','Payouts'],['money','Money'],['alerts','Alerts'],['checklist','Checklist'],['agents','HQ'],['tools','More']].forEach(([id,t])=>{const b=el('button','bb-tab'+(S.tab===id?' on':''),t);b.onclick=()=>{S.tab=id;draw();};T.appendChild(b);});wrap.appendChild(T);
+  const T=el('div','bb-tabs');[['overview','Overview'],['todos','To-dos'+(()=>{try{const n=todoCount();return n?' · '+n:'';}catch(e){return '';}})()],['bids','Bids'],['toplace','Not placed yet'+(()=>{try{const n=KMO().filter(r=>r.status==='To place').length;return n?' · '+n:'';}catch(e){return '';}})()],['buys','Orders placed'],['intl','Intl transit'],['wh','Warehouse'],['rs','Reshippers'],['landed','Landed India'],['tokm','To KicksMachine'],['mrn','MRN'],['confirm','Confirmation'],['payouts','Payouts'],['money','Money'],['alerts','Alerts'],['checklist','Checklist'],['agents','HQ'],['tools','More']].forEach(([id,t])=>{const b=el('button','bb-tab'+(S.tab===id?' on':''),t);b.onclick=()=>{S.tab=id;draw();};T.appendChild(b);});wrap.appendChild(T);
   const P=el('div');wrap.appendChild(P);
   if(S.tab==='tools'){S.tool=S.tool||'orders';const tc=el('div','bb-chips');[['orders','All orders'],['todo','To-do lists'],['pipe','Pipeline'],['bulk','Bulk upload'],['calc','Bid calculator'],['add','Add order'],['export','Export']].forEach(([id,t])=>{const b=el('button','bb-chip'+(S.tool===id?' on':''),t);b.onclick=()=>{S.tool=id;draw();};tc.appendChild(b);});P.appendChild(tc);const P2=el('div');P.appendChild(P2);({orders:orders,todo:todo,pipe:pipe,bulk:bulk,calc:calc,add:add,export:exp})[S.tool](P2);return;}
-  ({overview:overview,todos:todosT,transit:transit,intl:intlT,wh:whT,rs:rsT,landed:landedT,mrn:mrnT,alerts:alertsT,bids:bids,buys:buys,reship:reship,tokm:tokmT,confirm:confirmT,payouts:payouts,money:money,checklist:checklist,agents:agentsTab})[S.tab](P);};
+  ({overview:overview,todos:todosT,toplace:toplaceT,transit:transit,intl:intlT,wh:whT,rs:rsT,landed:landedT,mrn:mrnT,alerts:alertsT,bids:bids,buys:buys,reship:reship,tokm:tokmT,confirm:confirmT,payouts:payouts,money:money,checklist:checklist,agents:agentsTab})[S.tab](P);};
  function orders(P){const c=el('div','bb-card');P.appendChild(c);
   const bar=el('div','bb-bar');S.q='';
   const who=document.createElement('select');[['KicksMachine','KicksMachine'],['Sourcex','Sourcex'],['__wa','WhatsApp clients'],['','All']].forEach(([v,t])=>{const o=el('option',null,t);o.value=v;if(v===S.who)o.selected=true;who.appendChild(o);});
@@ -415,7 +415,7 @@ window.lxB2B=async function(root,sb,toast){
   chipRow(P,'bc',[['','All countries',BUYS.length],...CTRY.map(([c,f])=>[c,f+' '+c,cnt[c]||0])]);
   const st=b=>b.status||'ordered';const nk={};BUYS.forEach(b=>{nk[st(b)]=(nk[st(b)]||0)+1;});const unl=BUYS.filter(b=>!buyKM(b,m).length).length;
   chipRow(P,'uf',[['','All'],['ordered','Ordered',nk.ordered||0],['shipped','Shipped',nk.shipped||0],['delivered','At reshipper',nk.delivered||0],['cancelled','Cancelled',nk.cancelled||0],['__un','Not linked',unl]]);
-  const tp=KMO().filter(r=>r.status==='To place');if(tp.length&&!S.uf){const sc=el('div','bb-sech');sc.appendChild(el('span',null,'🛒 To place at store'));sc.appendChild(el('small',null,tp.length+' orders · '+inr(sumP(tp))));P.appendChild(sc);const g0=el('div','fc-grid');tp.forEach(r=>g0.appendChild(toPlaceCard(r)));P.appendChild(g0);const sc2=el('div','bb-sech');sc2.appendChild(el('span',null,'📦 Placed orders'));sc2.appendChild(el('small',null,BUYS.length+' store orders'));P.appendChild(sc2);}
+  const tp=KMO().filter(r=>r.status==='To place');if(false){const sc=el('div','bb-sech');sc.appendChild(el('span',null,'🛒 To place at store'));sc.appendChild(el('small',null,tp.length+' orders · '+inr(sumP(tp))));P.appendChild(sc);const g0=el('div','fc-grid');tp.forEach(r=>g0.appendChild(toPlaceCard(r)));P.appendChild(g0);const sc2=el('div','bb-sech');sc2.appendChild(el('span',null,'📦 Placed orders'));sc2.appendChild(el('small',null,BUYS.length+' store orders'));P.appendChild(sc2);}
   const f=BUYS.filter(b=>!S.bc||ctryOf(b)===S.bc).filter(b=>!S.uf?true:S.uf==='__un'?!buyKM(b,m).length:st(b)===S.uf).filter(b=>!qv||(JSON.stringify(b)+buyKM(b,m).map(r=>r.order_id).join(' ')).toLowerCase().includes(qv)).sort((a,b)=>String(b.order_date).localeCompare(String(a.order_date)));
   if(!f.length){P.appendChild(el('p','bb-meta','Kuch nahi mila.'));return;}
   const g=el('div','bb-grid');f.forEach(bu=>g.appendChild(buyCard(bu,m)));P.appendChild(g);}
@@ -475,7 +475,7 @@ window.lxB2B=async function(root,sb,toast){
  const go=t=>{S.tab=t;draw();window.scrollTo(0,0);};
  const STAGES=[
   ['bids','Bids won · not ordered',()=>{const by=new Set(all.map(r=>r.order_id||r._id));return BIDS.filter(b=>!b.dismissed&&!(b.km_order_ids||[]).every(i=>by.has(i)));},'bid'],
-  ['buys','To place at store',()=>KMO().filter(r=>r.status==='To place')],
+  ['toplace','To place at store',()=>KMO().filter(r=>r.status==='To place')],
   ['intl','Ordered · coming to warehouse',()=>KMO().filter(r=>['Ordered','In transit to reshipper'].includes(r.status))],
   ['wh','At warehouse',()=>KMO().filter(r=>r.status==='At reshipper')],
   ['landed','Flying to India',()=>KMO().filter(r=>r.status==='Shipped from hub')],
@@ -890,6 +890,11 @@ window.lxB2B=async function(root,sb,toast){
   meta:rows=>[tag(LBL[rows[0].status]||rows[0].status),...alertsOf(rows[0]).map(x=>tag(x,'bad'))],acts:()=>[],empty:'Koi alert nahi ✓'});}
 
  /* ---- Orders placed: compact "to place" cards ---- */
+ function toplaceT(P){const q=search(P,'q_tp','Search KM ID, item, brand…');let L=KMO().filter(r=>r.status==='To place').filter(r=>!q||vtxt(r).includes(q));
+  const acc=r=>String(gv(r,'km_accept_by')||gv(r,'accept_by')||gv(r,'sla_deadline')||'9999');L.sort((a,b)=>acc(a).localeCompare(acc(b)));
+  const by=v=>L.filter(r=>String((r.price_check||{}).verdict||'').toUpperCase()===v);const s=el('div','fl-stats');[['Total',L.length+' · '+inr(sumP(L))],['GO',by('GO').length],['TIGHT / CHECK',by('TIGHT').length+by('CHECK').length],['NO',by('NO').length],['Price check pending',L.filter(r=>!r.price_check).length]].forEach(([a,b])=>{const d=el('div');d.appendChild(el('b',null,a));d.appendChild(el('span',null,String(b)));s.appendChild(d);});P.appendChild(s);
+  P.appendChild(el('p','bb-meta fl-note','Accept-by / SLA ke order me. "✓ Order placed" dabao → store, store order no., country → order "Orders placed" tab me chala jaata hai.'));
+  if(!L.length){P.appendChild(el('p','bb-meta fl-empty','Sab orders place ho gaye ✓'));return;}const g=el('div','fc-grid');L.forEach(r=>{const c=toPlaceCard(r);const a=gv(r,'km_accept_by')||gv(r,'accept_by');if(a&&String(a).slice(0,10)<=today())c.classList.add('late');g.appendChild(c);});P.appendChild(g);}
  function toPlaceCard(r){const c=el('div','fc');const h=el('div','fc-h');const t=el('div','fc-t');t.appendChild(el('b',null,r.order_id||r._id));h.appendChild(t);h.appendChild(el('span','fc-amt',inr(r.payout)));c.appendChild(h);
   c.appendChild(el('div','fc-it',[r.item,gv(r,'size')].filter(Boolean).join(' · ').slice(0,90)));const p=r.price_check;const m=el('div','fc-m');
   if(p){const v=String(p.verdict||'').toUpperCase();m.appendChild(tag(v||'CHECKED',v==='GO'?'ok':v==='NO'?'bad':'go'));m.appendChild(el('span',null,[p.store,p.price_usd!=null?'$'+p.price_usd:'',p.margin_pct!=null?Math.round(p.margin_pct)+'%':''].filter(Boolean).join(' · ')));if(p.url){const a=el('a','fc-lnk','Open ↗');a.href=p.url;a.target='_blank';a.rel='noopener';m.appendChild(a);}}else m.appendChild(el('span',null,'price check pending'));
