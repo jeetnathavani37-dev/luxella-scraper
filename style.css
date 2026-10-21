@@ -980,3 +980,35 @@ img{max-width:100%}
 .sw .trkline{background:rgba(201,169,106,.09);border-left:2px solid var(--gold);padding:6px 10px}
 .sw .lx-guide{display:flex;align-items:center;justify-content:space-between;gap:12px;border:1px solid var(--line);border-top:1px solid var(--gold);padding:12px 14px;margin:0 0 14px}
 .sw .lx-guide a{color:var(--gold);letter-spacing:.14em;text-transform:uppercase;font-size:12px;text-decoration:none;border:1px solid var(--gold);padding:6px 12px}
+/* Orders as cards (no sideways scroll) */
+.sw #pane-al .scroll{overflow:visible}
+.sw #ordT,.sw #ordT tbody{display:block;width:100%;min-width:0}
+.sw #ordT thead,.sw #f-cols,.sw #colpick{display:none!important}
+.sw #ordT tbody tr{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:2px 12px;background:var(--card,#141311);border:1px solid var(--line);border-top:1px solid var(--gold);padding:14px;margin:0 0 12px;align-items:start}
+.sw #ordT tbody tr.grp{display:block;background:none;border:0;padding:6px 0;margin:6px 0}
+.sw #ordT tbody td{display:block;border:0!important;padding:4px 0!important;text-align:left!important;min-width:0;overflow-wrap:anywhere;font-size:13.5px}
+.sw #ordT tbody td[colspan]{grid-column:1/-1}
+.sw #ordT tbody td:nth-child(1){grid-column:1/3;grid-row:1/4}
+.sw #ordT tbody td:nth-child(1) img,.sw #ordT tbody td:nth-child(1) .ph,.sw #ordT tbody td:nth-child(1)>*{max-width:100%}
+.sw #ordT tbody td:nth-child(3){grid-column:3/7;grid-row:1;font:500 19px/1.25 'Cormorant Garamond',serif}
+.sw #ordT tbody td:nth-child(4){grid-column:3/5;grid-row:2}
+.sw #ordT tbody td:nth-child(2){grid-column:5/7;grid-row:2;color:var(--mut,#A39C90)}
+.sw #ordT tbody td:nth-child(8){grid-column:3/7;grid-row:3}
+.sw #ordT tbody td:nth-child(n+5):not(:nth-child(8)):not(:nth-child(15)){grid-column:span 3;padding:8px 10px!important;margin-top:8px;border-top:1px solid var(--line)!important}
+.sw #ordT tbody td:nth-child(n+5):not(:nth-child(8)):not(:nth-child(15))::before{display:block;font:400 10px 'Jost',sans-serif;letter-spacing:.18em;text-transform:uppercase;color:var(--mut,#A39C90);margin-bottom:2px;white-space:normal}
+.sw #ordT tbody td:nth-child(5)::before{content:'Date'}
+.sw #ordT tbody td:nth-child(6)::before{content:'Order type'}
+.sw #ordT tbody td:nth-child(7)::before{content:'Ships'}
+.sw #ordT tbody td:nth-child(9)::before{content:'Price'}
+.sw #ordT tbody td:nth-child(10)::before{content:'Payment'}
+.sw #ordT tbody td:nth-child(11)::before{content:'International tracking'}
+.sw #ordT tbody td:nth-child(12)::before{content:'ETA'}
+.sw #ordT tbody td:nth-child(13)::before{content:'Shipped'}
+.sw #ordT tbody td:nth-child(14)::before{content:'India tracking'}
+.sw #ordT tbody td:nth-child(9){font-size:18px}
+.sw #ordT tbody td:nth-child(15){grid-column:1/-1;margin-top:8px}
+.sw #ordT tbody td:nth-child(11),.sw #ordT tbody td:nth-child(14){white-space:normal}
+.sw .ord-sort{display:flex;align-items:center;gap:8px}
+.sw #ordT tbody td:nth-child(9){order:1}.sw #ordT tbody td:nth-child(10){order:2}.sw #ordT tbody td:nth-child(12){order:3}.sw #ordT tbody td:nth-child(13){order:4}.sw #ordT tbody td:nth-child(11){order:5}.sw #ordT tbody td:nth-child(14){order:6}.sw #ordT tbody td:nth-child(5){order:7}.sw #ordT tbody td:nth-child(6){order:8}.sw #ordT tbody td:nth-child(7){order:9}.sw #ordT tbody td:nth-child(15){order:10}
+.sw #ordT tbody td:nth-child(1),.sw #ordT tbody td:nth-child(2),.sw #ordT tbody td:nth-child(3),.sw #ordT tbody td:nth-child(4),.sw #ordT tbody td:nth-child(8){order:0}
+@media(min-width:900px){.sw #ordT tbody{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;align-items:start}.sw #ordT tbody tr{margin:0}.sw #ordT tbody tr.grp{grid-column:1/-1}}

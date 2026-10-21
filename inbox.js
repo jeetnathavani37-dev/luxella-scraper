@@ -37,4 +37,6 @@ function init(){
 const iv=setInterval(()=>{try{if(photos&&photos.db&&$('chat-form')){clearInterval(iv);init();}}catch(e){}},500);
 
 (function(){let t=setInterval(()=>{const p=document.getElementById('pane-help');if(!p)return;clearInterval(t);if(p.querySelector('.lx-guide'))return;const d=document.createElement('div');d.className='lx-guide';d.innerHTML='<span>New here? A 3-minute guide to your page.</span><a href="guide.html" target="_blank" rel="noopener">Open guide</a>';p.insertBefore(d,p.firstChild);},700);setTimeout(()=>clearInterval(t),30000);})();
+
+(function(){let t=setInterval(()=>{const tools=document.querySelector('#pane-al .tools'),T=document.getElementById('ordT');if(!tools||!T)return;clearInterval(t);if(document.getElementById('ord-sort'))return;const sel=document.createElement('select');sel.id='ord-sort';sel.title='Sort';[['','Sort by'],['order_date','Date'],['order_no','Order #'],['brand','Brand'],['status','Status'],['payout','Price']].forEach(([v,l])=>{const o=document.createElement('option');o.value=v;o.textContent=l;sel.appendChild(o);});sel.onchange=()=>{if(!sel.value)return;const th=T.querySelector('th[data-k="'+sel.value+'"]');if(th)th.click();};tools.appendChild(sel);},700);setTimeout(()=>clearInterval(t),30000);})();
 })();
