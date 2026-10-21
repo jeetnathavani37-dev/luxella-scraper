@@ -1047,3 +1047,10 @@ img{max-width:100%}
 .sw #board tbody td:nth-child(5)::before{content:'INDIA'}
 .sw #board tbody td:nth-child(7)::before{content:'ETA'}
 @media(min-width:900px){.sw #board tbody{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;align-items:start}.sw #board tbody tr{margin:0}}
+/* Scroll-to-end fixes: drawer and page bottoms were getting cut on phones */
+.sw .drawer{height:100vh;height:100dvh;bottom:auto}
+.sw .drawer .pan{height:100%;max-height:100dvh;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding-bottom:calc(140px + env(safe-area-inset-bottom,0px))!important}
+.sw .cm-back,.sw .lx-modal{height:100dvh}
+.sw{padding-bottom:calc(110px + env(safe-area-inset-bottom,0px))}
+.sw #pane-al .scroll,.sw #pane-ov{padding-bottom:0}
+.sw .drawer .pan{box-sizing:border-box}
