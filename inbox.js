@@ -35,4 +35,6 @@ function init(){
  photos.db.collection('case_msgs').onSnapshot(s=>{msgs=s.docs.filter(d=>d.exists).map(d=>d.data()).filter(x=>x&&x.at&&x.case==='inbox').sort((a,b)=>a.at<b.at?-1:1);render();},()=>{});
 }
 const iv=setInterval(()=>{try{if(photos&&photos.db&&$('chat-form')){clearInterval(iv);init();}}catch(e){}},500);
+
+(function(){let t=setInterval(()=>{const p=document.getElementById('pane-help');if(!p)return;clearInterval(t);if(p.querySelector('.lx-guide'))return;const d=document.createElement('div');d.className='lx-guide';d.innerHTML='<span>New here? A 3-minute guide to your page.</span><a href="guide.html" target="_blank" rel="noopener">Open guide</a>';p.insertBefore(d,p.firstChild);},700);setTimeout(()=>clearInterval(t),30000);})();
 })();
