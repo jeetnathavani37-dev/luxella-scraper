@@ -143,6 +143,7 @@ function payBtn(r,cls){const due=Number(r.payout||0)-paidAmt(r);if(due<=0)return
 function gpayUrl(amt,note){const p=photos.payinfo||{};if(!p.upi)return '';const ios=/iPhone|iPad|iPod/i.test(navigator.userAgent);return (ios?'gpay://upi/pay?':'tez://upi/pay?')+'pa='+encodeURIComponent(p.upi)+'&pn=Luxella&am='+Math.round(amt)+'&cu=INR&tn='+encodeURIComponent(String(note||'Luxella').slice(0,60));}
 function openPay(only){const o=dash.data('orders');let due=o.status==='ok'?o.data.filter(r=>paidAmt(r)<Number(r.payout||0)):[];if(only)due=due.filter(r=>r.item===only.item);
  const mobile=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);const p=photos.payinfo||{};
+ if(due.length&&window.lxPaySheet){const tot0=due.reduce((s,r)=>s+Number(r.payout||0)-paidAmt(r),0);return window.lxPaySheet(tot0,'Luxella '+(due.length===1?(due[0].order_no||due[0].item):due.length+' orders'),due);}
  if(!due.length||!mobile||!p.upi)return openPayDrawer(only);
  const tot=due.reduce((s,r)=>s+Number(r.payout||0)-paidAmt(r),0);const note='Luxella '+(due.length===1?(due[0].order_no||due[0].item):due.length+' orders');
  toast('Opening GPay · ₹'+fmt(tot));location.href=gpayUrl(tot,note);

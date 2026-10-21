@@ -110,7 +110,20 @@ ready(()=>{
  fillAddr();payInfo();syncPay();render();
  try{dash.onData(()=>{fillAddr();payInfo();});}catch(e){}
  const open=()=>{const t=$('tab-ov');if(t)t.click();fold.open=true;setTimeout(()=>card.scrollIntoView({behavior:'smooth',block:'start'}),250);};
- if(location.hash==='#new'||Q.get('item'))setTimeout(open,600);
+ if(Q.get('type')==='local'&&F.otype){F.otype.value='Local';F.otype.dispatchEvent(new Event('change'));}
+ {const im=Q.get('img');if(im&&/^https:\/\//.test(im))S.img=im;}
+ let pg=null,ph=null;
+ const focusOut=()=>{if(!pg)return;ph.parentNode.insertBefore(card,ph);ph.remove();pg.remove();pg=null;document.documentElement.classList.remove('nwo-lock');try{history.replaceState(null,'',location.pathname+'#ov');}catch(e){}};
+ const focusIn=()=>{if(pg)return;const t=$('tab-ov');if(t)t.click();ph=document.createComment('nwo');card.parentNode.insertBefore(ph,card);
+  pg=el('div','nwo-page');pg.id='nwo-page';const top=el('div','nwo-ptop');const lg=el('img');lg.src='assets/luxella_logo.png';lg.alt='Luxella';top.appendChild(lg);const bk=el('button','btn2','My page');bk.type='button';bk.addEventListener('click',focusOut);top.appendChild(bk);pg.appendChild(top);
+  const hero=el('div','nwo-phero');hero.appendChild(el('div','eb',Q.get('price')?'Prepared for you by Luxella':'New order'));hero.appendChild(el('h1',null,'Complete your order'));hero.appendChild(el('p',null,'Check the piece, add delivery and payment, and place it. Luxella confirms within 24–48 hours.'));pg.appendChild(hero);
+  const live=el('div','nwo-plive');pg.appendChild(live);pg.appendChild(card);fold.open=true;
+  const upd=()=>{live.textContent='';if(S.step===3||S.done||!doneBox.hidden)return;live.appendChild(ocard(null,Q.get('price')?'Price fixed':'Draft'));};upd();
+  ['input','change','click'].forEach(ev=>root.addEventListener(ev,()=>setTimeout(upd,0)));
+  (document.querySelector('.sw')||document.body).appendChild(pg);document.documentElement.classList.add('nwo-lock');pg.scrollTop=0;
+  document.querySelectorAll('.sw .tabs .tab').forEach(x=>x.addEventListener('click',focusOut));};
+ window.lxOrderPage=focusIn;
+ if(location.hash==='#new'||Q.get('item'))setTimeout(focusIn,600);
 });
 })();
 
@@ -197,7 +210,7 @@ wait(()=>$('pane-pay')&&typeof dash!=='undefined'&&typeof photos!=='undefined',(
   if(p.upi){const note='Luxella payment';const am=Math.round(tot);const ios=/iPhone|iPad|iPod/i.test(navigator.userAgent);
    const q='pa='+encodeURIComponent(p.upi)+'&pn=Luxella&am='+am+'&cu=INR&tn='+encodeURIComponent(note);
    const row=el('div','pn-btns');
-   const g=el('a','btn','Pay with GPay');g.href=(ios?'gpay://upi/pay?':'tez://upi/pay?')+q;row.appendChild(g);
+   const g=el('button','btn','Pay with GPay');g.type='button';g.addEventListener('click',()=>window.lxPaySheet(am,note,due));row.appendChild(g);
    const u=el('a','btn2','Other UPI app');u.href='upi://pay?'+q;row.appendChild(u);sec.appendChild(row);
    sec.appendChild(el('p','note pn-hint','In GPay, choose your bank account as the paying account (not UPI Lite) so the full payment goes through.'));}
   const dt=el('details','pn-det');dt.appendChild(el('summary',null,'Payment details'));const body=el('div','pn-body');
@@ -243,3 +256,31 @@ wait(()=>document.querySelector('.sw .tabs')&&$('tab-ov'),()=>{
 /* Good to know: headings visible, text in a dropdown */
 (function(){const go=()=>{const ul=document.querySelector('.sw ul.gtk');if(!ul){return setTimeout(go,300);}if(ul.__g)return;ul.__g=1;
  ul.querySelectorAll(':scope>li').forEach(li=>{const b=li.querySelector('b'),s=li.querySelector('span');if(!b||!s)return;const d=document.createElement('details');d.className='gtkd';const sm=document.createElement('summary');sm.textContent=b.textContent;const p=document.createElement('p');p.textContent=s.textContent;d.appendChild(sm);d.appendChild(p);li.textContent='';li.appendChild(d);});};go();})();
+
+/* GPay pay sheet: details first, then Open in GPay */
+(function(){
+const el=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e;};
+const inr=v=>'₹'+Number(v||0).toLocaleString('en-IN');
+window.lxPaySheet=function(amount,note,rows){
+ const pi=(typeof photos!=='undefined'&&photos.payinfo)||{};const upi=pi.upi||'jeetnathavani37-1@okaxis';const am=Math.max(0,Math.round(Number(amount)||0));
+ const ios=/iPhone|iPad|iPod/i.test(navigator.userAgent);const tn=String(note||'Luxella payment').slice(0,60);
+ const q='pa='+encodeURIComponent(upi)+'&pn=Luxella'+(am?'&am='+am:'')+'&cu=INR&tn='+encodeURIComponent(tn);
+ const old=document.getElementById('lx-paysheet');if(old)old.remove();
+ const ov=el('div','ps-ov');ov.id='lx-paysheet';const sh=el('div','ps');ov.appendChild(sh);
+ const close=()=>{ov.classList.remove('on');setTimeout(()=>ov.remove(),250);};
+ ov.addEventListener('click',e=>{if(e.target===ov)close();});
+ const x=el('button','ps-x','×');x.type='button';x.setAttribute('aria-label','Close');x.addEventListener('click',close);sh.appendChild(x);
+ sh.appendChild(el('div','ps-eb','Pay Luxella'));sh.appendChild(el('div','ps-am',am?inr(am):'Enter amount in GPay'));
+ const dl=el('div','ps-dl');const row=(k,v,cp)=>{const r=el('div','ps-r');r.appendChild(el('span','k',k));const vv=el('span','v',v);r.appendChild(vv);if(cp){const b=el('button','ps-cp','Copy');b.type='button';b.addEventListener('click',async()=>{try{await navigator.clipboard.writeText(cp);b.textContent='Copied';setTimeout(()=>b.textContent='Copy',1500);}catch(e){}});r.appendChild(b);}dl.appendChild(r);};
+ row('Pay to','Luxella');row('UPI ID',upi,upi);if(am)row('Amount',inr(am),String(am));row('Note',tn);
+ (rows||[]).slice(0,4).forEach(r=>row(r.order_no||'Order',r.item+' · '+inr(Number(r.payout||0)-((typeof paidAmt==='function')?paidAmt(r):0))));
+ sh.appendChild(dl);
+ const tip=el('div','ps-tip');tip.appendChild(el('b',null,'Choose your bank account'));tip.appendChild(el('p',null,'When GPay opens, tap the account shown above the Pay button and select your bank account. UPI Lite is only for small amounts, so pick your bank account to pay the full amount.'));sh.appendChild(tip);
+ const go=el('a','btn ps-go','Open in GPay');go.href=(ios?'gpay://upi/pay?':'tez://upi/pay?')+q;sh.appendChild(go);
+ const row2=el('div','ps-row');const any=el('a','btn2','Other UPI app');any.href='upi://pay?'+q;row2.appendChild(any);
+ const done=el('button','btn2','I have paid');done.type='button';done.addEventListener('click',()=>{close();const t=document.getElementById('tab-pay');if(t)t.click();setTimeout(()=>{const s=document.getElementById('paysub');if(s)s.scrollIntoView({behavior:'smooth',block:'start'});},300);});row2.appendChild(done);sh.appendChild(row2);
+ if(pi.bank){const d=el('details','ps-bank');d.appendChild(el('summary',null,'Pay by bank transfer instead'));const v=el('div','v',pi.bank);v.style.whiteSpace='pre-wrap';d.appendChild(v);const b=el('button','btn2','Copy bank details');b.type='button';b.addEventListener('click',async()=>{try{await navigator.clipboard.writeText(pi.bank);b.textContent='Copied';}catch(e){}});d.appendChild(b);sh.appendChild(d);}
+ (document.querySelector('.sw')||document.body).appendChild(ov);requestAnimationFrame(()=>ov.classList.add('on'));
+ const esc=e=>{if(e.key==='Escape'){close();document.removeEventListener('keydown',esc);}};document.addEventListener('keydown',esc);
+};
+})();
