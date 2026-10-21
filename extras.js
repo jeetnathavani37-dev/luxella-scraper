@@ -535,3 +535,6 @@ const b=document.createElement('button');b.type='button';b.className='tabs-next'
 const upd=()=>{b.hidden=tabs.scrollWidth-tabs.clientWidth-tabs.scrollLeft<=6;};
 b.addEventListener('click',()=>tabs.scrollBy({left:Math.max(160,tabs.clientWidth*0.6),behavior:'smooth'}));
 tabs.addEventListener('scroll',upd,{passive:true});window.addEventListener('resize',upd);setTimeout(upd,300);setTimeout(upd,1500);}catch(e){}})();
+
+/* Good to know -> open the Terms tab */
+document.addEventListener('click',function(ev){var b=ev.target.closest&&ev.target.closest('#gtk-terms');if(!b)return;var t=document.getElementById('tab-pol');if(t){t.click();try{t.scrollIntoView({block:'start'});}catch(_e){}window.scrollTo(0,0);}});

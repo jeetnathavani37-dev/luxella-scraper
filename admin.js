@@ -84,6 +84,7 @@ async function createClient(){
   if(['admin','index','assets','vendor','api'].includes(slug)){toast('That page link is reserved.');return;}
   const r=await sb.from('lx_clients').insert({slug,name,biz:biz||null}).select().single();
   if(r.error){toast(r.error.message);return;}
+  try{const tm=await sb.from('lx_docs').select('data').eq('collection','meta').eq('doc_id','terms').limit(1).maybeSingle();if(tm.data&&tm.data.data)await sb.from('lx_docs').insert({client_id:r.data.id,collection:'meta',doc_id:'terms',data:tm.data.data});}catch(_e){}
   if(email){const u=await sb.from('lx_client_users').insert({client_id:r.data.id,email});if(u.error)toast('Client created, login failed: '+u.error.message);}
   await loadClients();sel=clients.find(c=>c.id===r.data.id)||null;
   ['nc-name','nc-biz','nc-slug','nc-email'].forEach(i=>document.getElementById(i).value='');
