@@ -19,3 +19,6 @@ Final reply: Hinglish bullets per order (order · store price · margin · verdi
 - Same item ke purane orders (same brand+item) ka `price_check` / `landed` dekho — reference ke liye note me likho ("pichli baar $X me liya").
 - Combined bid (ek mail me 2 orders) → dono ka total margin bhi note me.
 - Accept window 4h se kam bacha aur verdict GO → ACTION "abhi order karo".
+
+## KM data
+`meta/km_bids.raw` aur `kind='km'` rows me KM ka exact item/size/payout ho sakta hai — mail se zyada reliable; mismatch ho to note karo.

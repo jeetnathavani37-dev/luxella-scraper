@@ -14,6 +14,7 @@ Luxella (founder: Jeet, Guwahati) US / UK / Canada ke official outlet stores se 
 | 📋 Operations | Ops agent | 8:41am + 7:41pm | Aaj ke kaam, reshipper/KM drafts |
 | 💸 Finance | Payout agent | Roz 10:52am | Confirmation + 7 din, overdue chase |
 | 🛡️ Audit | Auditor agent | Har 3 ghante | Sabki checking: kuch miss to nahi, data galat to nahi, koi agent ruka to nahi |
+| 🔗 KM link | `km-sync` (server, no AI) | Har ghante :07 | KicksMachine Nexus portal **read-only** padhta hai → orders, status, SLA, bids, notifications portal me |
 
 Founder (Jeet) = final decision maker. Agents **suggest + prepare**; paise, messages bhejna, orders place karna — sirf Jeet.
 
@@ -44,3 +45,8 @@ Founder (Jeet) = final decision maker. Agents **suggest + prepare**; paise, mess
 - Data: Supabase project `qzripzgbstvxkfobzhyv`, table `lx_b2b` (see `data-model` doc).
 - Gmail: KM + store + courier mails aate hain (connected inbox).
 - AfterShip: tracking (Jeet dashboard me shipments add karta hai; agents read-only).
+
+## KicksMachine Nexus link (read-only)
+- Server function `km-sync` har ghante KM vendor portal (nexus.kicksmachine.com) se **sirf padhta hai** — code me sirf login + GET allowed. Accept / reject / tracking / koi edit possible hi nahi.
+- KM ka data = **source of truth** for KM-side status, SLA, cancellations, new assigned orders. Mail = backup.
+- Agar `meta/kmsync.ok` false ya 2 ghante se purana → Auditor ACTION.

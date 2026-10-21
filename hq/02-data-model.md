@@ -31,3 +31,8 @@ store, store_order_no, order_date, recipient, ship_to, items[{name,size,colour,q
   `insert into lx_b2b(kind,id,data,updated_at) values('agent','<id>', jsonb_set('<json>'::jsonb,'{last_run}',to_jsonb(now())), now()) on conflict (kind,id) do update set data=excluded.data, updated_at=now();`
 - Aaj ki date / time: `select now() at time zone 'Asia/Kolkata';` — hamesha isse lo, andaza mat lagao.
 - JSON me single quote `'` ko `''` likho.
+
+## KM Nexus data (read-only mirror, written by km-sync)
+- kind='km', id = KM order no. → `{raw: <exact KM vendor-order object>, synced_at}` — KM ki har field yahin hai (status, SLA, tracking, payout, items…). Agents isse padh ke apne order se compare karein.
+- Orders pe km-sync ye fields update karta hai: km_status, km_tracking_status, sla_deadline, km_portal_tracking, km_synced; KM pe cancelled → status 'Cancelled'; KM pe naya order jo hamare paas nahi → order row 'To place' (source 'KM sync').
+- kind='meta': `kmsync {at, ok, error, km_orders, matched, updated, created, cancelled}` · `km_bids {at, raw}` · `km_notifications {at, list[]}` · `km_stats {at, stats, counts}`.

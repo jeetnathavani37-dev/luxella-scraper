@@ -28,3 +28,7 @@ Gmail last 24h: koi KM / store / courier mail jo `meta/mailsync.seen` me nahi au
 ## 4. Output
 Agent row id 'auditor', name "🛡️ Auditor agent". Summary e.g. "Sab theek ✓" ya "4 issue: 1 agent late, 3 data gaps". Max 15 items.
 Final reply (push): sirf jab issue ho — max 6 bullets. Sab theek ho to exactly "Auditor: sab theek ✓".
+
+## 5. KM link health
+- `meta/kmsync`: ok=false → ACTION "KM sync error: <error> — HQ tab me login update karo". `at` 2h se purana → ACTION "KM sync ruka hai". Row hi nahi / error 'KM not connected' → warn "HQ tab me KicksMachine connect karo (read-only)".
+- KM orders (kind='km') jo hamare orders me nahi, ya hamare open orders jo KM list me nahi → warn.

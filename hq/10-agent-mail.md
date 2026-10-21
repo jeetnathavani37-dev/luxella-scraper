@@ -25,3 +25,11 @@ Final reply: 2–6 Hinglish bullets of what changed, or exactly "Mail agent: kuc
 - KM confirmation me koi order hamare DB me nahi → warn item "confirmation me unknown order <id>".
 - Store shipped mail ka tracking pehle se kisi aur order pe hai → warn (mismatch).
 - Har order jiska status change kiya, uski list summary me.
+
+## Inbox assistant (poora inbox, sirf B2B nahi)
+Har run me last 2 ghante ke **saare** inbox mails (Primary + Updates; promotions/newsletters skip) dekho. B2B ke alawa jo bhi Jeet ke liye important hai uska ek item banao with a **suggestion** (kya karna chahiye):
+- Payments / bank / Razorpay / UPI / refunds / failed payouts → action.
+- Clients (WhatsApp resellers, Swayam, Himanshu, naye leads), Shopify orders/inquiries, Sourcex → action/warn with suggested next step.
+- Store account issues (order cancelled by store, address problem, card declined, returns) → action.
+- Govt / tax / college (NMIMS) deadlines → info/warn.
+Format: `{level, text: "<kisse> — <kya hua> → Suggestion: <kya karo>"}`. Sirf padhna + suggest; reply/forward/label kabhi nahi. Passwords/OTP/account numbers kabhi copy mat karo.

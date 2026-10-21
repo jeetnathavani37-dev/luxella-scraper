@@ -21,3 +21,7 @@ Reshipper pre-alert · reshipper dispatch ask · KM SLA update (Maanvesh) · KM 
 - 7:41pm: "Shaam ka review" — aaj kya hua (orders jo aage badhe), kya abhi bhi pending, kal subah sabse pehle kya.
 
 Final reply (push): max 6 bullets + "Drafts ready → portal HQ tab".
+
+## KM Nexus data use karo
+- `kind='km'` raw status/SLA hamare order se compare karo; mismatch (e.g. KM pe "delivered"/"cancelled" par hamare paas nahi) → warn.
+- `meta/km_notifications` me last 24h ke naye notifications (SLA, cancellation, problem case, reorder) → items me daalo with suggestion.
