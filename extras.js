@@ -112,7 +112,7 @@ function drawAccount(){
  const kv=(p,k,v)=>{const d=el('div','kv');d.appendChild(el('span','lbl',k));d.appendChild(el('span',null,v||'—'));p.appendChild(d);};
  // Profile
  const p1=card('Profile','Your details on file with Luxella');
- kv(p1,'Name',C.name);kv(p1,'Business',C.biz);kv(p1,'Sign-in email',email);kv(p1,'Reseller ID','LX-'+String(C.id||'').slice(0,8).toUpperCase());
+ kv(p1,'Name',C.name);kv(p1,'Business',C.biz);kv(p1,'Sign-in email',owner?'…':email);if(owner&&window.lx&&window.lx.listUsers){const sp=p1.lastChild.lastChild;window.lx.listUsers().then(u=>{sp.textContent=(u&&u.length)?u.map(x=>x.email).join(', '):'No login yet';}).catch(()=>{sp.textContent='—';});}kv(p1,'Reseller ID','LX-'+String(C.id||'').slice(0,8).toUpperCase());
  const o=dash.data('orders');if(o.status==='ok'&&o.data.length){const ds=o.data.map(r=>r.order_date).filter(Boolean).sort();if(ds[0])kv(p1,'Working with Luxella since',dstr(ds[0]));}
  const pr=el('p','xs-act');const ad=el('button','btn2','Manage delivery addresses');ad.type='button';ad.addEventListener('click',()=>$('tab-ad').click());pr.appendChild(ad);p1.appendChild(pr);
  // Notifications
