@@ -70,20 +70,30 @@ async function sync() {
     await upsert("km", no, { raw: o, synced_at: now });
     const st = String(pick(o, ["status", "orderStatus", "vendorStatus", "state"]) || "").toLowerCase();
     const trk = pick(o, ["trackingStatus", "tracking_status", "tracking.status"]);
-    const sla = isoDate(pick(o, ["slaDeadline", "sla_deadline", "sla", "deadline"]));
-    const payout = Number(pick(o, ["payoutAmount", "payout", "vendorPayout", "payout_amount"])) || null;
+    const sla = isoDate(pick(o, ["slaDeadlineAt", "slaDeadline", "sla_deadline"]));
+    const payout = Number(pick(o, ["payoutPrice", "payoutAmount", "payout"])) || null;
     const cur: any = mine.get(no);
     if (cur) {
       const p: any = { km_status: st || cur.km_status, km_synced: now };
       if (trk) p.km_tracking_status = String(trk);
       if (sla) p.sla_deadline = sla;
       if (!cur.payout && payout) p.payout = payout;
-      const kmTrk = pick(o, ["trackingId", "tracking_id", "trackingNumber", "awb"]); if (kmTrk) p.km_portal_tracking = String(kmTrk);
+      const eta = pick(o, ["etaStage"]); if (eta) p.km_eta_stage = String(eta);
+      const acc = isoDate(pick(o, ["acceptedAt"])); if (acc) p.km_accepted = acc;
+      const accBy = pick(o, ["acceptanceDeadlineAt"]); if (accBy) p.km_accept_by = String(accBy);
+      const origin = pick(o, ["etaInfo.originOrderId"]); if (origin) { p.km_portal_store_order = String(origin); if (!cur.retailer_order_id) p.retailer_order_id = String(origin); }
+      const vtrk = pick(o, ["etaInfo.vendorTrackingId"]); if (vtrk) { p.km_portal_tracking = String(vtrk); if (!cur.retailer_tracking && !cur.intl_tracking) { p.retailer_tracking = String(vtrk); p.intl_tracking = String(vtrk); } }
+      if (origin || vtrk) p.km_portal_updated = cur.km_portal_updated || now.slice(0, 10);
+      if (p.retailer_order_id && cur.status === "To place") p.status = "Ordered";
+      if (p.retailer_tracking && ["To place", "Ordered"].includes(cur.status)) p.status = "In transit to reshipper";
+      const prob = pick(o, ["problemSheet.active"]); p.km_problem = prob === true ? String(pick(o, ["problemSheet.note"]) || "problem case") : "";
+      const creq = pick(o, ["cancellationRequest.status"]); if (creq) p.km_cancel_request = String(creq);
+      const dtrk = pick(o, ["deliveryTracking.awb", "deliveryTracking.trackingNumber", "shiprocket.awbCode"]); if (dtrk) p.km_delivery_tracking = String(dtrk);
       if (st === "cancelled" && cur.status !== "Cancelled") { p.status = "Cancelled"; p.notes = [cur.notes, "Cancelled on KM portal (sync " + now.slice(0, 10) + ")"].filter(Boolean).join(" | "); cancelled++; }
       await db.from("lx_b2b").update({ data: { ...cur, ...p }, updated_at: now }).eq("kind", "order").eq("id", no); updated++;
     } else if (st !== "cancelled" && st !== "rejected") {
-      const item = pick(o, ["productName", "product_name", "title", "item", "items.0.name", "lineItems.0.title", "line_items.0.title"]);
-      await upsert("order", no, { client: "KicksMachine", order_id: no, item: item ? String(item) : no, size: pick(o, ["size", "variant", "items.0.size", "lineItems.0.variant_title"]), payout, order_date: isoDate(pick(o, ["createdAt", "created_at", "assignedAt"])) || now.slice(0, 10), status: "To place", payout_status: "Pending", km_status: st, sla_deadline: sla, source: "KM sync", km_synced: now });
+      const item = pick(o, ["items.0.productTitle", "productName", "title"]);
+      await upsert("order", no, { client: "KicksMachine", order_id: no, item: item ? String(item) : no, size: pick(o, ["items.0.variantTitle", "size"]), image: pick(o, ["items.0.productImage"]), km_accept_by: pick(o, ["acceptanceDeadlineAt"]), km_eta_stage: pick(o, ["etaStage"]), payout, order_date: isoDate(pick(o, ["createdAt", "created_at", "assignedAt"])) || now.slice(0, 10), status: "To place", payout_status: "Pending", km_status: st, sla_deadline: sla, source: "KM sync", km_synced: now });
       created++;
     }
   }
