@@ -497,6 +497,7 @@ window.__lxTrk=function(r,card){
   const w=el('div','xo-lbl xo-trkw');w.appendChild(el('span',null,label));const g=el('div','xo-row');g.appendChild(inp);g.appendChild(sel);w.appendChild(g);return w;};
  if(!local)f.appendChild(trk('International','intl_tracking_no','intl_courier_slug','intl_courier',detectIntl));
  if(local||stage>=6||r.local_tracking)f.appendChild(trk('India','local_tracking','local_courier_slug','local_courier',detectLocal));
+ {const tu=field('Paste AfterShip / tracking page link (optional)');tu.value=r.track_url||'';tu.addEventListener('change',()=>{const v=tu.value.trim();if(v&&!/^https:\/\//.test(v)){alert('Link https:// se start hona chahiye');return;}applyChange(item,{track_url:v},null,(r.order_no||item)+': tracking link '+(v?'set':'cleared'));});f.appendChild(lab('AfterShip link',tu));}
  box2.appendChild(f);
  const fr=el('div','xo-row');const more=el('button','xo-link','More: delay, parcels, costs, cancel →');more.type='button';more.addEventListener('click',()=>{if(typeof openDrawer==='function')openDrawer(curOrder(item)||r);});fr.appendChild(more);
  box2.appendChild(fr);card.appendChild(box2);
