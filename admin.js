@@ -175,6 +175,95 @@ async function renderClient(){
   (au.data||[]).forEach(a=>ac.appendChild(el('div','ad-mut',new Date(a.at).toLocaleString('en-IN')+' · '+(a.actor||'')+' · '+a.op+' '+a.tbl+' '+(a.ref||''))));
 }
 
+
+/* ---- order control board: change stage / tracking / ETA / payment for any client's order ---- */
+const pslugA=x=>String(x).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,60);
+const todayA=()=>new Date().toISOString().slice(0,10);
+async function saveOrderPatch(clientId,item,patch,stageTo){
+  const cur=await sb.from('lx_orders').select('data').match({client_id:clientId,item}).single();
+  if(cur.error)throw new Error(cur.error.message);
+  const old=cur.data.data||{};const next=Object.assign({},old,patch);
+  const u=await sb.from('lx_orders').update({data:next,updated_at:new Date().toISOString()}).match({client_id:clientId,item});
+  if(u.error)throw new Error(u.error.message);
+  if(stageTo){
+    const key=pslugA(item);
+    const nr=await sb.from('lx_docs').select('data').match({client_id:clientId,collection:'notes',doc_id:key}).maybeSingle();
+    const n=(nr.data&&nr.data.data)||{order:item,items:[]};const st=Object.assign({},n.stages||{});const prev=Number(old.stage)||1;
+    if(stageTo<prev){Object.keys(st).forEach(x=>{if(Number(x)>stageTo)delete st[x];});}
+    else{for(let x=prev+1;x<=stageTo;x++){if(!st[x])st[x]=todayA();}}
+    if(!st[stageTo])st[stageTo]=todayA();
+    const out=Object.assign({},n,{order:item,items:n.items||[],stages:st});
+    if(Number(out.stageOverride||0)>stageTo)out.stageOverride=stageTo;
+    const w=await sb.from('lx_docs').upsert({client_id:clientId,collection:'notes',doc_id:key,data:out},{onConflict:'client_id,collection,doc_id'});
+    if(w.error)throw new Error(w.error.message);
+  }
+  return next;
+}
+function orderBoard(m,rows,name){
+  const card=el('div','ad-card');card.appendChild(el('h2',null,'Order control'));
+  card.appendChild(el('p','ad-mut','Kisi bhi client ka order yahin se badlo: stage, tracking, ETA, payment. Stage badalte hi client ko mail aur push apne aap jaata hai.'));
+  const bar=el('div','row');bar.style.margin='0 0 12px';
+  const fc=document.createElement('select');fc.innerHTML='<option value="">All clients</option>';clients.forEach(c=>{const o=document.createElement('option');o.value=c.id;o.textContent=c.name;fc.appendChild(o);});
+  const fs=document.createElement('select');[['open','Open orders'],['all','All orders'],['late','Late vs ETA'],['unpaid','Payment pending'],['done','Delivered']].forEach(([v,t])=>{const o=document.createElement('option');o.value=v;o.textContent=t;fs.appendChild(o);});
+  const fq=document.createElement('input');fq.placeholder='Search item / order no.';fq.style.minWidth='180px';
+  [fc,fs,fq].forEach(x=>{x.style.cssText+=';background:#0A0A0A;color:#F3EEE6;border:1px solid #2A2724;padding:8px 10px;font:inherit;width:auto;flex:1 1 170px';});
+  bar.append(fc,fs,fq);card.appendChild(bar);
+  const list=el('div');card.appendChild(list);
+  const today=todayA();const isDone=r=>Number(r.stage)>=9;
+  const inp=(label,val,type)=>{const l=document.createElement('label');l.textContent=label;l.style.cssText='display:flex;flex-direction:column;gap:4px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#A39C90';const i=document.createElement('input');i.type=type||'text';i.value=val||'';i.style.cssText='background:#0A0A0A;color:#F3EEE6;border:1px solid #2A2724;padding:8px 10px;font:14px Jost,system-ui,sans-serif;text-transform:none;letter-spacing:0';l.appendChild(i);return [l,i];};
+  function draw(){
+    list.textContent='';
+    let f=rows.slice();
+    if(fc.value)f=f.filter(r=>r._c===fc.value);
+    const v=fs.value;
+    if(v==='open')f=f.filter(r=>!isDone(r));else if(v==='done')f=f.filter(isDone);else if(v==='late')f=f.filter(r=>!isDone(r)&&r.eta_date&&r.eta_date<today);else if(v==='unpaid')f=f.filter(r=>r.payout_status!=='Received');
+    const q=fq.value.trim().toLowerCase();if(q)f=f.filter(r=>((r.item||'')+' '+(r.order_no||'')+' '+(r.brand||'')).toLowerCase().includes(q));
+    f.sort((a,b)=>(Number(a.stage)||1)-(Number(b.stage)||1)||String(b.order_no||'').localeCompare(String(a.order_no||'')));
+    if(!f.length){list.appendChild(el('p','ad-mut','Koi order nahi mila.'));return;}
+    f.forEach(r=>{
+      const det=document.createElement('details');det.style.cssText='border-top:1px solid #232120;padding:10px 0';
+      const sm=document.createElement('summary');sm.style.cssText='cursor:pointer;display:flex;gap:10px;flex-wrap:wrap;align-items:baseline';
+      const st0=Number(r.stage)||1;
+      const t1=el('b',null,(r.order_no||'')+' '+(r.item||''));const t2=el('span','ad-mut',name(r._c)+' · Stage '+st0+' · '+STAGES[st0-1]);sm.append(t1,t2);det.appendChild(sm);
+      const body=el('div');body.style.cssText='display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:12px';
+      const sl=document.createElement('label');sl.textContent='Stage';sl.style.cssText='display:flex;flex-direction:column;gap:4px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#A39C90';
+      const ss=document.createElement('select');ss.style.cssText='background:#0A0A0A;color:#F3EEE6;border:1px solid #2A2724;padding:8px 10px;font:14px Jost,system-ui,sans-serif';
+      STAGES.forEach((t,i)=>{const o=document.createElement('option');o.value=String(i+1);o.textContent=(i+1)+' · '+t;if(i+1===st0)o.selected=true;ss.appendChild(o);});sl.appendChild(ss);
+      const [l2,iCour]=inp('Intl courier',r.intl_courier&&r.intl_courier!=='—'?r.intl_courier:'');
+      const [l3,iTrk]=inp('Intl tracking no. / link',r.intl_tracking_no);
+      const [l4,iLc]=inp('India courier',r.local_courier);
+      const [l5,iLt]=inp('India tracking no. / link',r.local_tracking);
+      const [l6,iEta]=inp('ETA (delivery date)',r.eta_date,'date');
+      const pl=document.createElement('label');pl.textContent='Payment';pl.style.cssText=sl.style.cssText;
+      const ps=document.createElement('select');ps.style.cssText=ss.style.cssText;['Pending','Received'].forEach(x=>{const o=document.createElement('option');o.value=x;o.textContent=x;if((r.payout_status||'Pending')===x)o.selected=true;ps.appendChild(o);});pl.appendChild(ps);
+      body.append(sl,l2,l3,l4,l5,l6,pl);det.appendChild(body);
+      const rw=el('div','row');rw.style.marginTop='12px';
+      const sv=el('button','ad-b','Save changes');sv.type='button';rw.appendChild(sv);
+      const op=el('a','ad-b g','Open client page');op.href=base((clients.find(c=>c.id===r._c)||{}).slug||'');op.target='_blank';op.rel='noopener';rw.appendChild(op);
+      det.appendChild(rw);
+      sv.onclick=async()=>{
+        const to=Number(ss.value);const patch={};
+        if(to!==st0){
+          if(to<st0&&!confirm('Stage peeche ('+st0+' → '+to+') jaa raha hai. Client ko mail/push jaa sakta hai. Pakka?'))return;
+          if(to>=st0+3&&!confirm('Stage '+st0+' se seedha '+to+' par jaa raha hai. Beech ke steps skip honge. Pakka?'))return;
+          patch.stage=to;patch.status=STAGES[to-1];
+        }
+        const cmp=(k,val)=>{if(String(val||'')!==String(r[k]||''))patch[k]=val;};
+        cmp('intl_courier',iCour.value.trim());cmp('intl_tracking_no',iTrk.value.trim());cmp('local_courier',iLc.value.trim());cmp('local_tracking',iLt.value.trim());
+        if(iEta.value!==(r.eta_date||'')){patch.eta_prev=r.eta_date||'';patch.eta_date=iEta.value;}
+        if(ps.value!==(r.payout_status||'Pending')){patch.payout_status=ps.value;if(ps.value==='Received'&&!r.payment_date)patch.payment_date=todayA();}
+        if(!Object.keys(patch).length){toast('Kuch badla nahi.');return;}
+        sv.disabled=true;
+        try{const next=await saveOrderPatch(r._c,r.item,patch,patch.stage);Object.assign(r,next);toast('Saved. Client ko update chala gaya.');draw();}
+        catch(e){toast('Save nahi hua: '+e.message);sv.disabled=false;}
+      };
+      list.appendChild(det);
+    });
+  }
+  [fc,fs].forEach(x=>x.onchange=draw);fq.oninput=draw;draw();
+  m.appendChild(card);
+}
+
 async function renderDash(m){
   m.appendChild(el('h2',null,'Dashboard'));
   const [o,a]=await Promise.all([sb.from('lx_orders').select('client_id,item,data'),sb.from('lx_audit').select('at,actor,tbl,op,ref,client_id').order('at',{ascending:false}).limit(15)]);
@@ -190,6 +279,7 @@ async function renderDash(m){
   const g=el('div');g.style.cssText='display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:16px';
   g.append(kpi('Clients',String(clients.length)),kpi('Orders',String(rows.length),open.length+' open · '+(rows.length-open.length)+' delivered'),kpi('Total value',inr(sum(rows))),kpi('Payment pending',inr(sum(pend)),pend.length+' orders'),kpi('Late vs ETA',String(late.length),'open orders past ETA'));
   m.appendChild(g);
+  orderBoard(m,rows,name);
   // per client
   const pc=el('div','ad-card');pc.appendChild(el('h2',null,'By client'));
   clients.forEach(c=>{const r=rows.filter(x=>x._c===c.id);const row=el('div','ad-o');row.style.gridTemplateColumns='1fr auto auto';
