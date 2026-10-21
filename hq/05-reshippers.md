@@ -16,10 +16,10 @@
 - **Payment:** parcel India pahunchne ke baad. Reshippers tab → "✓ Paid" → landed orders pe `reship_paid='Yes'`, `reship_paid_date`; ledger `meta/reshippers.ledger` me entry (amount, orders).
 - `reship_cost` = billed amount (reshipper ka bill aaye to bharo); khaali ho to estimate count hota hai.
 
-**Form (receiver / pre-alert)**
-- Store order ship hote hi (ya warehouse pahunchne pe) form bharna hai. Warehouse tab → "Copy form" ek ya selected orders ka ready text deta hai (item, KM ref, store + order no, inbound tracking, value $, qty, weight).
-- Format `meta/reshippers.form_template` me save hota hai — Reshippers tab me apne form ke fields ke hisaab se badlo ({{items}}, {{ids}}, {{count}}, {{value}}, {{date}}).
-- Form bharne ke baad "✓ Form filled" → `form_filled='Yes'`, `form_date`.
+**Form (reshipper ka shipment form)**
+- Har parcel ke liye sirf ye 5 cheezein: **Tracking No · Item · Company (kis store se aaya) · Courier (international carrier: UPS/FedEx/USPS/Amazon/OnTrac…) · Delivered date (warehouse pe) ya Expected delivery**.
+- Portal: Intl transit / Warehouse card pe "Copy form" (ya select karke bulk) → exactly isi format me text, ek tracking = ek block (combined parcel ke saare items ek block me). Copy karke reshipper ke form me paste.
+- Form bharne ke baad "✓ Form filled" → `form_filled='Yes'`, `form_date`. Warehouse pe pahunchne ke baad bhi form pending ho to Alerts/Warehouse me dikhta hai.
 
 **Dispatch**
 - Warehouse me 5+ din ya 1 kg+ stack → Warehouse tab ka "WhatsApp: dispatch bolo" (draft text). Ship hote hi "✈ Warehouse se nikla" (+AWB) → `shipped_reshipper`, `reship_awb`.
