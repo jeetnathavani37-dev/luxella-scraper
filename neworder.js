@@ -10,7 +10,7 @@ const hash=s=>{let h=5381;for(let i=0;i<s.length;i++)h=((h<<5)+h+s.charCodeAt(i)
 const pslug=s=>String(s).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,60);
 const ready=cb=>{let n=0;const t=setInterval(()=>{n++;let ok=false;try{ok=typeof photos!=='undefined'&&photos.db&&typeof dash!=='undefined'&&$('neworder');}catch(e){}if(ok){clearInterval(t);cb();}else if(n>200)clearInterval(t);},150);};
 ready(()=>{
- const card=$('neworder');if(card.dataset.b)return;card.dataset.b=1;const root=el('div','nwo-body');const fold=el('details','nwo-fold');const fs=el('summary');const ft=el('div','nwo-ft');ft.appendChild(el('h2',null,'Place a new order'));ft.appendChild(el('p','note','Share the piece, delivery and payment in 4 quick steps. We confirm by email.'));fs.appendChild(ft);fs.appendChild(el('span','nwo-chev','+'));fold.appendChild(fs);fold.appendChild(root);card.textContent='';card.appendChild(fold);
+ const card=$('neworder');if(card.dataset.b)return;card.dataset.b=1;const root=el('div','nwo-body');const fold=el('details','nwo-fold');const fs=el('summary');const ft=el('div','nwo-ft');ft.appendChild(el('h2',null,'Place a new order'));ft.appendChild(el('p','note','Share the piece, delivery and payment in 4 quick steps. Confirmation within 24–48 hours.'));fs.appendChild(ft);fs.appendChild(el('span','nwo-chev','+'));fold.appendChild(fs);fold.appendChild(root);card.textContent='';card.appendChild(fold);
  const Q=new URLSearchParams(location.search);
  const S={step:0,busy:false,done:null};
  const F={};
@@ -41,7 +41,7 @@ ready(()=>{
  const payNote=el('p','note','Pay using the details above, then enter the amount (reference is optional, but helps us confirm faster). Luxella verifies it against the account and confirms here. Until then it shows as pending.');panes[2].appendChild(payNote);
  /* 4 review */
  const rv=el('div','nwo-rev');panes[3].appendChild(rv);
- const trust=el('p','note','Luxella confirms your order after checking the price and payment. You can follow every step in your Orders tab.');panes[3].appendChild(trust);
+ const trust=el('p','note','After you place the order, Luxella verifies your payment and checks availability. You will get a confirmation within 24–48 hours, by email and in your Orders tab.');panes[3].appendChild(trust);
  const terms=el('label','nwo-terms');const tc=el('input');tc.type='checkbox';terms.appendChild(tc);terms.appendChild(document.createTextNode(' I have read the terms and want to place this order.'));panes[3].appendChild(terms);
  const nav=el('div','nwo-nav');const back=el('button','btn2','Back');back.type='button';const next=el('button','btn','Continue');next.type='button';const msg=el('span','lbl');nav.appendChild(back);nav.appendChild(next);nav.appendChild(msg);root.appendChild(nav);
  const doneBox=el('div','nwo-done');doneBox.hidden=true;root.appendChild(doneBox);
@@ -90,7 +90,7 @@ ready(()=>{
    panes.forEach(p=>p.hidden=true);prog.hidden=nav.hidden=true;intro.hidden=true;
    doneBox.hidden=false;doneBox.textContent='';
    doneBox.appendChild(el('div','nwo-tick','✓'));doneBox.appendChild(el('h3',null,'Order placed · '+no));
-   doneBox.appendChild(el('p','note',name+' · '+inr(price)+(paid?' · '+inr(paid)+' payment submitted, pending verification':' · payment pending')+'. A confirmation email is on its way to you.'));
+   doneBox.appendChild(el('p','note',name+' · '+inr(price)+(paid?' · '+inr(paid)+' payment submitted, pending verification':' · payment pending')+'. We will verify your payment and check availability, and confirm within 24–48 hours. A receipt email is on its way to you.'));
    const row=el('p','nwo-nav');const v=el('button','btn','View in Orders');v.type='button';v.addEventListener('click',()=>{const t=$('tab-al');if(t)t.click();window.scrollTo(0,0);});const again=el('button','btn2','Place another order');again.type='button';again.addEventListener('click',()=>{Object.keys(F).forEach(k=>{if(F[k].type==='file')F[k].value='';else if(F[k].tagName!=='SELECT')F[k].value='';});F.qty.value='1';tc.checked=false;S.step=0;S.done=null;doneBox.hidden=true;prog.hidden=nav.hidden=intro.hidden=false;next.disabled=false;S.busy=false;render();});row.appendChild(v);row.appendChild(waBtn(no));{const cp=el('button','btn2','Copy order link');cp.type='button';cp.addEventListener('click',async()=>{const u=location.origin+location.pathname+'#al';try{await navigator.clipboard.writeText(u);cp.textContent='Link copied';}catch(e){cp.textContent=u;}});row.appendChild(cp);}row.appendChild(again);doneBox.appendChild(row);
    S.busy=false;
   }catch(e){msg.textContent='Could not place the order. Your details are kept, try again.';S.busy=false;next.disabled=false;}
@@ -149,7 +149,7 @@ let k=0;const t=setInterval(()=>{k++;let ok=false;try{ok=typeof dash!=='undefine
 function init(){
  if($('await-alert'))return;const sec=el('section','card');sec.id='await-alert';sec.hidden=true;$('neworder').parentNode.insertBefore(sec,$('neworder'));
  const render=()=>{const o=dash.data('orders');sec.textContent='';const rows=o.status==='ok'?o.data.filter(r=>r.placed_by==='client'&&Number(r.stage||1)<=1):[];sec.hidden=!rows.length;if(!rows.length)return;
-  sec.appendChild(el('h2',null,'Awaiting confirmation'));sec.appendChild(el('p','note','Luxella is reviewing these orders. You will get an email the moment each one is confirmed.'));
+  sec.appendChild(el('h2',null,'Awaiting confirmation'));sec.appendChild(el('p','note','Luxella is verifying payment and availability. Expect confirmation within 24–48 hours, and an email the moment each one is confirmed.'));
   rows.forEach(r=>{const d=el('div','awt');const l=el('div');l.appendChild(el('span','dno',r.order_no||'—'));l.appendChild(el('span','dit',r.item));d.appendChild(l);d.appendChild(el('span','awb','Awaiting confirmation'));sec.appendChild(d);});};
  render();dash.onData(render);
 }
