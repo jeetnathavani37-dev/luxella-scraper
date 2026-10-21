@@ -959,3 +959,6 @@ img{max-width:100%}
 .sw .tabs .tabs-next[hidden]{display:none}
 @keyframes tabnudge{0%,100%{transform:translateX(0)}50%{transform:translateX(5px)}}
 .sw .notif .tl li[hidden]{display:none}
+
+.lx-top .tlogo.hasc{margin-right:10px}
+.lx-top .tclogo{height:24px;width:auto;max-width:84px;object-fit:contain;border-radius:4px;margin-right:auto;flex:0 0 auto}

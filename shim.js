@@ -98,7 +98,7 @@ window.lx={
 };
 
 /* ---- boot ---- */
-function topbar(){const t=g('top');t.hidden=false;t.innerHTML='<img class="tlogo" src="assets/luxella_logo.png" alt="Luxella"><span class="who">'+esc(S.email)+'</span>'+(S.owner?'<button id="tb-switch">← Admin</button>':'')+'<button id="tb-out">Sign out</button>';if(S.owner)g('tb-switch').onclick=()=>{location.href=new URL('admin',document.baseURI).href;};g('tb-out').onclick=()=>sb.auth.signOut().then(()=>{location.href=new URL('./',document.baseURI).href;});}
+function topbar(){const t=g('top');t.hidden=false;const cl=(S.docs&&S.docs.meta&&S.docs.meta.client_logo)||null;t.innerHTML='<img class="tlogo'+(cl&&cl.url?' hasc':'')+'" src="assets/luxella_logo.png" alt="Luxella">'+(cl&&cl.url?'<img class="tclogo" src="'+esc(cl.url)+'" alt="" onerror="this.remove()">':'')+'<span class="who">'+esc(S.email)+'</span>'+(S.owner?'<button id="tb-switch">← Admin</button>':'')+'<button id="tb-out">Sign out</button>';if(S.owner)g('tb-switch').onclick=()=>{location.href=new URL('admin',document.baseURI).href;};g('tb-out').onclick=()=>sb.auth.signOut().then(()=>{location.href=new URL('./',document.baseURI).href;});}
 window.__lxAdmin={sb,S,esc,adminCall:(b)=>adminCall(b)};
 async function start(){const {data:{session}}=await sb.auth.getSession();S.session=session;if(!session){gateLogin();return;}S.email=(session.user.email||'').toLowerCase();S.owner=['jeetnathavani37@gmail.com','jeetnatb@gmail.com'].includes(S.email);
  const basePath=new URL(document.baseURI).pathname;const rel=location.pathname.startsWith(basePath)?location.pathname.slice(basePath.length):'';const seg=rel.split('/').filter(Boolean)[0]||'';const slug=new URLSearchParams(location.search).get('c')||(seg==='index.html'?'':seg);
