@@ -8,7 +8,7 @@ Read first: central-brain, team-protocol, sops, data-model, pricing.
 - `cost(order)` = `landed` (>0) warna `price_usd × fx × (1 + tax_pct/100) + reship_cost`. fx = `meta/finance.fx` (default 95.5 = card rate incl. markup).
 - Invested (month M) = Σ cost of orders (not Cancelled, status ≠ To place) jinka `retailer_date` (warna `order_date`) M me.
 - Payout received (M) = Σ `payout` where `payout_status='Received'` and `payout_date` in M (client orders without date → `order_date`).
-- Realized profit = Σ (payout − cost) over received orders **jinka cost known hai**; cost-missing orders count alag batao.
+- Realized profit = Σ (payout − cost) over received orders **jinka cost known hai**; cost-missing orders count alag batao. **Margin % = profit ÷ cost (landed)** — Luxella ka 20–25% target landed cost pe hai.
 - Receivable = Σ payout of placed, not received, not cancelled. Confirmed-due = jinka `mrn_confirmed`/`payout_timer` set hai.
 - Committed = Σ cost (ya payout × 0.8 estimate) of `To place` orders.
 - Net position = bank + receivable − committed.
