@@ -111,7 +111,7 @@ new MutationObserver(()=>scheduleLinkify()).observe(document.getElementById('pan
 /* Overview: tidy dropdown sections */
 (function(){
  const pane=document.getElementById('pane-ov');if(!pane||pane.__acc)return;pane.__acc=1;
- const OPEN=['Next delivery','Your to-dos'];const FLAT=['At a glance','Featured piece','Departures','Contact','Good to know','Where things stand'];
+ const OPEN=['Next delivery','Your to-dos'];const FLAT=['At a glance','Featured piece','Departures','Contact','Good to know','Where things stand','Ready to ship'];
  pane.querySelectorAll('section.card').forEach(sec=>{
   const h=sec.querySelector(':scope > h2');if(!h)return;
   const t=h.textContent.trim();if(FLAT.includes(t))return;sec.classList.add('acc');
