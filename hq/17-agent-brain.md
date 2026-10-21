@@ -31,3 +31,8 @@ data-model doc ke field names hi. $ amount: `price_usd` = is order ka item price
 - "Ishaan ne bola sab land ho gaye" / "Yash ke saare ship ho gaye" / "Prabhmeet ke sab form bhar diye" type notes = us reshipper ke us stage ke **saare** orders: landed → `Shipped from hub` waale (`landed_india`), ship/dispatch → `At reshipper` waale (`shipped_reshipper`), delivered/pahunch → `In transit to reshipper` (`delivered_reshipper`), form → `At reshipper` (`form_filled`). Date = note ki date (IST).
 - Agar note me kuch IDs "except" / "chhod ke" likhe hain to unko chhodo. Doubt (kaunsa reshipper?) → needs-jeet.
 - Tracking list paste hui (multiple numbers) → har number ko order se match karo (retailer_tracking / reship_awb / km_tracking / store order no); naya number + clear order → sahi field me daalo.
+
+## Raat ka run (10:41pm) — learning
+- `meta/patterns` refresh: learning-loop doc ki SQL se har stage ka med/p80 (overall + reshipper/store) nikaalo, `meta/patterns` = {at, stages:{key:{t,n,med,p80,by}}} (keys: buy_ship, ship_wh, wh_dwell, flight, india_km, km_mrn, mrn_conf, conf_pay).
+- Aaj Jeet ne jo correct kiya (notes, needs-jeet answers) → `lessons` me line.
+- Kal subah ke liye 3-line "focus" agent row summary me likho (Overview "Aaj ka focus" isko dikhata hai): sabse urgent 3 kaam + ₹ impact.

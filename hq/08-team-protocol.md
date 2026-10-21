@@ -18,3 +18,10 @@ Sab agents ek hi office (table `lx_b2b`) me kaam karte hain. **Har run ki shurua
 **Push discipline:** final reply = Jeet ke phone pe push. Sirf naya/urgent. Pichhle run jaisa same → ek line.
 
 **Operating bar:** central-brain §2 (ownership, truth, no silent failures) aur §5 (confidence rule) har decision pe lagu. SOPs (`sops` doc) = har step ka done-definition.
+
+
+## Step 0b (har agent, har run — Oct 2026)
+- Docs `system-handbook`, `learning-loop`, `lessons` bhi padho: `select id, data->>'md' from lx_b2b where kind='doc' and id in ('system-handbook','learning-loop','lessons');`
+- `meta/patterns` padho — "late" decide karne ke liye p80 use karo.
+- Run ke end me: kuch naya seekha / galti pakdi → `lessons` doc ke end me ek dated line append karo (update lx_b2b set data=jsonb_set(data,'{md}',to_jsonb((data->>'md')||E'\n- <date> · <agent> · <lesson>')) where kind='doc' and id='lessons').
+- World-class bar: har output me "so what?" — sirf data nahi, next action + kaun + kab. Har number SQL se. Har claim ka proof (mail id / km row / photo).

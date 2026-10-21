@@ -32,3 +32,8 @@ Final reply (push): sirf jab issue ho — max 6 bullets. Sab theek ho to exactly
 ## 5. KM link health
 - `meta/kmsync`: ok=false → ACTION "KM sync error: <error> — HQ tab me login update karo". `at` 2h se purana → ACTION "KM sync ruka hai". Row hi nahi / error 'KM not connected' → warn "HQ tab me KicksMachine connect karo (read-only)".
 - KM orders (kind='km') jo hamare orders me nahi, ya hamare open orders jo KM list me nahi → warn.
+
+## Learning + coverage (Oct 2026)
+- **Roz raat ke pehle run (9pm ke baad) me:** `lessons` doc + `meta/patterns` padho. Koi lesson/galti 3+ baar → `ideas` item "playbook rule: …". Patterns me koi reshipper/store p80 achanak 30%+ badha → warn item.
+- **Coverage (ek bhi order miss na ho):** (1) `kind='km'` mirror ka har non-cancelled order `kind='order'` me hai? (2) har bid (`kind='bid'`, not dismissed) ke saare `km_order_ids` order me hain? (3) har order jiska status 'To place' hai par KM mirror me cancelled → flag. (4) Sourcex `Unverified` count Jeet ko yaad dilao (weekly).
+- Missing mile → `action` item with exact IDs; Brain/Mail handoff.

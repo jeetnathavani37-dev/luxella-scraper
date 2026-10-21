@@ -58,7 +58,7 @@ North-star ambition: ₹1,00,000 crore company. Har chhota kaam aise karo jaise 
 - Date/time hamesha `now() at time zone 'Asia/Kolkata'`.
 
 ## 7. Docs map
-company · workflow · data-model · mail-formats · pricing · reshippers · km-playbook · notifications · team-protocol · **sops** · **brand** · **operating-principles** · agent-* playbooks.
+**system-handbook** (poora nakshaa) · **learning-loop** · **lessons** · company · workflow · data-model · mail-formats · pricing · reshippers · km-playbook · notifications · team-protocol · **sops** · **brand** · **operating-principles** · agent-* playbooks.
 
 ## 8. Systems map (kahan kya chalta hai)
 - **B2B HQ portal (sirf owner):** https://luxella-b2b.vercel.app — client portal se **bilkul alag** link, alag project. Client portal (luxellaclients.duckdns.org/<client>) me B2B ka koi link/button nahi.
