@@ -1388,3 +1388,11 @@ html.nwo-lock,html.nwo-lock body{overflow:hidden}
 .ps-bank{margin-top:14px;border:1px solid #2A2724;padding:10px 12px}
 .ps-bank summary{cursor:pointer;font:500 10px 'Jost',sans-serif;letter-spacing:.18em;text-transform:uppercase;color:var(--gold-2,#E3C565)}
 .ps-bank .v{margin:10px 0;color:var(--ivory)}
+/* chat: photo + voice */
+.sw .chat .ci .ib-q{display:inline-flex;align-items:center;justify-content:center;width:40px;min-width:40px;height:40px;padding:0!important;border:1px solid #3A3222!important;color:var(--gold-2,#E3C565)!important;background:transparent!important;cursor:pointer}
+.sw .chat .ci .ib-q:hover{border-color:#B8943F!important}
+.sw .chat .ci2 .ib-ic{display:inline-flex;align-items:center;gap:6px;color:var(--gold-2,#E3C565)}
+.sw .chat .ci2 .ib-ic svg{flex:none}
+.sw .chat .ci2 .chip.rec{background:#5a1414!important;color:#fff!important;border-color:#a33!important}
+.sw .chat .recdot{display:inline-block;width:8px;height:8px;border-radius:50%!important;background:#ff4d4d;animation:recp 1s ease-in-out infinite}
+@keyframes recp{50%{opacity:.25}}
