@@ -22,7 +22,8 @@ ready(()=>{
  /* 1 piece */
  const f1=el('div','form');
  [['item','Item *','text',{placeholder:'e.g. Coach Tabby 26, Black'},1],['brand','Brand','text',{},0],['size','Size / colour','text',{},0],['qty','Qty','number',{value:'1',min:'1'},0],['link','Product link (optional)','url',{placeholder:'https://'},1],['notes','Notes','text',{placeholder:'Deadline, gift wrap, alternatives…'},1],['photo','Photo of the piece (optional)','file',{accept:'image/*'},1]].forEach(([k,lab,type,at,w])=>{const m=mk(lab,'input',Object.assign({type},at),w);F[k]=m.i;f1.appendChild(m.l);});
- panes[0].appendChild(f1);
+ {const mt=mk('Order type','select',{},1);[['ETA','International · sourced from abroad (2–4 weeks)'],['Local','Local · sourced in India (faster)']].forEach(([v,t])=>{const o=el('option',null,t);o.value=v;mt.i.appendChild(o);});F.otype=mt.i;f1.insertBefore(mt.l,f1.firstChild);const tn=el('p','note nwo-tnote');const upd=()=>{tn.textContent=F.otype.value==='Local'?'Local order: placed → confirmed → item secured → address → dispatched → delivered.':'International order: store → international hub → India → you. ETA shared once the store confirms.';};F.otype.addEventListener('change',upd);upd();f1.parentNode?0:0;S.tnote=tn;}
+ panes[0].appendChild(f1);if(S.tnote)panes[0].appendChild(S.tnote);
  /* 2 delivery */
  const f2=el('div','form');
  const ms=mk('Deliver to','select',{},1);F.addr=ms.i;f2.appendChild(ms.l);
@@ -65,7 +66,7 @@ ready(()=>{
  if(F.photo)F.photo.addEventListener('change',()=>{const fl=F.photo.files&&F.photo.files[0];S.img=null;if(fl&&/^image\//.test(fl.type)){try{S.img=URL.createObjectURL(fl);}catch(e){}}});
  const review=()=>{rv.textContent='';rv.appendChild(ocard(null,'Ready to place'));const row=(k,v)=>{const r=el('div','nwo-r');r.appendChild(el('span','k',k));r.appendChild(el('span','v',v));rv.appendChild(r);};
   const pr=Number(val('price')),pd=paidMode()?Number(val('paid')||0):0;
-  row('Piece',val('item')+(val('brand')?' ('+val('brand')+')':''));row('Size / colour',val('size')||'—');row('Qty',val('qty')||'1');if(val('link'))row('Link',val('link'));if(val('notes'))row('Notes',val('notes'));
+  row('Order type',F.otype&&F.otype.value==='Local'?'Local (India)':'International');row('Piece',val('item')+(val('brand')?' ('+val('brand')+')':''));row('Size / colour',val('size')||'—');row('Qty',val('qty')||'1');if(val('link'))row('Link',val('link'));if(val('notes'))row('Notes',val('notes'));
   row('Deliver to',later()?'Decide later (we will ask before dispatch)':addrText()+' · '+val('phone'));row('Price',inr(pr));row('Paying by',F.pay.value);
   if(pd){row('Paid now',inr(pd)+(val('ref')?' · ref '+val('ref'):''));row('Balance',inr(Math.max(0,pr-pd)));}else row('Balance',inr(pr)+' (to pay after confirmation)');};
  const waNum=()=>String((photos.contact&&photos.contact.phone)||'918724079056').replace(/[^0-9]/g,'');
@@ -83,7 +84,7 @@ ready(()=>{
    const no=orderNo(),price=Number(val('price')),paid=paidMode()?Number(val('paid')||0):0,today=new Date().toISOString().slice(0,10);
    let proof='';const f=F.file.files&&F.file.files[0];if(paid&&f){if(f.size>8*1024*1024)throw new Error('Screenshot is over 8 MB.');try{const a=await photos.assets.upload(f);proof=a.url;}catch(e){proof='';}}
    const address=addrText();
-   await window.lx.saveOrder(name,{item:name,order_no:no,order_date:today,brand:val('brand'),size:val('size'),qty:Number(val('qty')||1),product_link:val('link'),client_notes:val('notes'),delivery_address:address,delivery_phone:later()?'':val('phone'),delivery_later:later(),order_type:'ETA',direct:'Direct to client',payout:price,payout_status:'Pending',placed_by:(window.lx&&window.lx.isOwner&&window.lx.isOwner()?'owner':'client'),stage:1,status:'Order placed',eta_date:'',shipping_date:'',intl_tracking_no:'',intl_courier:'',intl_courier_slug:'',local_tracking:'',local_courier:'',local_courier_slug:''});
+   await window.lx.saveOrder(name,{item:name,order_no:no,order_date:today,brand:val('brand'),size:val('size'),qty:Number(val('qty')||1),product_link:val('link'),client_notes:val('notes'),delivery_address:address,delivery_phone:later()?'':val('phone'),delivery_later:later(),order_type:(F.otype&&F.otype.value==='Local')?'Local':'ETA',direct:'Direct to client',payout:price,payout_status:'Pending',placed_by:(window.lx&&window.lx.isOwner&&window.lx.isOwner()?'owner':'client'),stage:1,status:'Order placed',eta_date:'',shipping_date:'',intl_tracking_no:'',intl_courier:'',intl_courier_slug:'',local_tracking:'',local_courier:'',local_courier_slug:''});
    if(!later())try{await photos.db.doc('addresses/'+pslug(name)).set({order:name,address,phone:val('phone'),pref:'',savedAt:today});}catch(e){}
    if(F.addr.value==='__new'){try{await photos.db.collection('addressbook').add({label:'Address '+(addrList().length+1),phone:val('phone'),address,isDefault:!addrList().length,at:today});}catch(e){}}
    if(paid){const id='ps-'+hash(name+'|'+paid+'|'+val('ref').toLowerCase());try{await photos.db.doc('paysub/'+id).set({id,order:name,amount:paid,method:F.pay.value,ref:val('ref'),proof,status:'Pending verification',at:new Date().toISOString()});}catch(e){say('Order placed, but the payment note did not save. Please submit it in Payments.');}}
@@ -131,11 +132,11 @@ function init(){
   rows.forEach(r=>{const st=Number(r.stage||1),local=String(r.order_type||'').indexOf('Local')>=0;
    const d=el('details','dep');d.dataset.k=r.item;if(open.has(r.item))d.open=true;d.addEventListener('toggle',()=>{d.open?open.add(r.item):open.delete(r.item);});
    const s=el('summary');const th=el('div','dth');try{th.appendChild(photoEl(r,false));}catch(e){}const l=el('div','dl');l.appendChild(el('span','dno',r.order_no||'—'));l.appendChild(el('span','dit',r.item));
-   const bar=el('div','dbar');for(let i=1;i<=9;i++){bar.appendChild(el('i',i<st?'ok':(i===st?'now':'')));}l.appendChild(bar);
-   const rt=el('div','dr');rt.appendChild(el('span','dpr',r.payout?inr(r.payout):''));rt.appendChild(el('span','dst'+(r.placed_by==='client'&&st<=1?' wait':''),r.placed_by==='client'&&st<=1?'Awaiting confirmation':(STAGES[st-1]||r.status||'')));
+   const ks=local?[1,2,3,7,8,9]:[1,2,3,4,5,6,7,8,9];const bar=el('div','dbar'+(local?' local':''));ks.forEach(i=>{bar.appendChild(el('i',i<st?'ok':(i===st?'now':'')));});l.appendChild(bar);
+   const rt=el('div','dr');rt.appendChild(el('span','dpr',r.payout?inr(r.payout):''));rt.appendChild(el('span','dst'+(r.placed_by==='client'&&st<=1?' wait':''),r.placed_by==='client'&&st<=1?'Awaiting confirmation':((window.stName?window.stName(r,st):STAGES[st-1])||r.status||'')));
    s.appendChild(th);s.appendChild(l);s.appendChild(rt);d.appendChild(s);
    const b=el('div','db');const row=(k,v)=>{const x=el('div','dx');x.appendChild(el('span','k',k));x.appendChild(el('span','v',v));b.appendChild(x);};
-   row('Step',st+' of 9');if(r.brand)row('Brand',r.brand);row('Origin',st>=3?'Shipped':'Pending');if(!local)row('Hub',st>=5?'Departed':(st>=4?'Received':'Awaiting'));row('India',st>=8?'Out for delivery':(st>=6?'Landed':'In transit'));row('ETA',r.eta_date&&typeof fd==='function'?fd(r.eta_date):'—');
+   row('Type',local?'Local order':'International');row('Step',(local?(ks.indexOf(st)+1||ks.filter(x=>x<=st).length):st)+' of '+ks.length);if(r.brand)row('Brand',r.brand);if(!local)row('Origin',st>=3?'Shipped':'Pending');if(!local)row('Hub',st>=5?'Departed':(st>=4?'Received':'Awaiting'));if(local)row('Dispatch',st>=8?'Dispatched':(st>=3?'Item secured':'Pending'));else row('India',st>=8?'Out for delivery':(st>=6?'Landed':'In transit'));row('ETA',r.eta_date&&typeof fd==='function'?fd(r.eta_date):'—');
    const bt=el('button','btn2','Open order');bt.type='button';bt.addEventListener('click',()=>{try{openDrawer(r);}catch(e){}});b.appendChild(bt);d.appendChild(b);box.appendChild(d);});};
  render();dash.onData(render);
 }
@@ -232,10 +233,10 @@ wait(()=>document.querySelector('.sw .tabs')&&$('tab-ov'),()=>{
 (function(){
  if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
  if(!('IntersectionObserver' in window))return;
- const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('rv-in');io.unobserve(e.target);}});},{threshold:.08,rootMargin:'0px 0px -6% 0px'});
+ const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('rv-in');io.unobserve(e.target);}});},{threshold:0,rootMargin:'0px 0px -40px 0px'});
  const seen=new WeakSet();
- const scan=()=>{document.querySelectorAll('.sw section.card, .sw .dep, .sw .ord, .sw .tiles .card, .sw .paytiles .card').forEach(e=>{if(seen.has(e)||e.closest('[hidden]'))return;seen.add(e);const r=e.getBoundingClientRect();if(r.top<window.innerHeight*.9&&r.bottom>0){return;}e.classList.add('rv');io.observe(e);});};
- setInterval(scan,900);window.addEventListener('scroll',()=>{},{passive:true});
+ const scan=()=>{document.querySelectorAll('.sw section.card, .sw .dep, .sw .ord, .sw .tiles .card, .sw .paytiles .card').forEach(e=>{if(seen.has(e)||e.closest('[hidden]'))return;seen.add(e);const r=e.getBoundingClientRect();if((r.top<window.innerHeight*.9&&r.bottom>0)||r.height>window.innerHeight*1.2){return;}e.classList.add('rv');io.observe(e);});};
+ setInterval(scan,900);setInterval(()=>{document.querySelectorAll('.sw .rv:not(.rv-in)').forEach(e=>{const r=e.getBoundingClientRect();if(r.top<window.innerHeight&&r.bottom>0||r.height>window.innerHeight*1.5)e.classList.add('rv-in');});},1200);window.addEventListener('scroll',()=>{},{passive:true});
 })();
 })();
 

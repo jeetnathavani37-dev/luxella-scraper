@@ -301,7 +301,7 @@ function newOrderCard(m,rows){
   const it=document.createElement('input'),br=document.createElement('input'),pr=document.createElement('input'),eta=document.createElement('input');
   it.placeholder='Item (e.g. Coach Tabby 26, Black)';br.placeholder='Brand';pr.type='number';pr.placeholder='Price ₹';eta.type='date';
   [it,br,pr,eta].forEach(x=>x.style.cssText=sty);
-  const ty=document.createElement('select');ty.style.cssText=sty;[['ETA','ETA (sourced)'],['In hand (Local)','In hand (Local)']].forEach(([v,t])=>{const o=document.createElement('option');o.value=v;o.textContent=t;ty.appendChild(o);});
+  const ty=document.createElement('select');ty.style.cssText=sty;[['ETA','International (ETA)'],['Local','Local (sourced in India)'],['In hand (Local)','In hand (Local stock)']].forEach(([v,t])=>{const o=document.createElement('option');o.value=v;o.textContent=t;ty.appendChild(o);});
   const ro=document.createElement('select');ro.style.cssText=sty;[['Direct to client','Direct to client'],['Indirect (via me)','Via reseller']].forEach(([v,t])=>{const o=document.createElement('option');o.value=v;o.textContent=t;ro.appendChild(o);});
   const ph=document.createElement('input');ph.type='file';ph.accept='image/*';ph.style.cssText=sty;
   const sz=document.createElement('input'),qt=document.createElement('input'),lk=document.createElement('input'),nt=document.createElement('input');

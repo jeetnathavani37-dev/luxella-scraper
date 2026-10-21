@@ -458,12 +458,12 @@ function renderUndoBar(){
  bar.appendChild(el('span','note',undoStack.length?(' '+undoStack[undoStack.length-1].desc):' Nothing to undo yet. Every change you make here can be undone.'));
 }
 function buildUndoBar(){const pane=$('pane-tr');if(!pane||$('xo-undobar'))return;const bar=el('div','xo-undobar owner');bar.id='xo-undobar';pane.insertBefore(bar,pane.firstChild);renderUndoBar();}
-const isLocalO=r=>String(r.order_type).indexOf('Local')>=0;
+/* isLocalO comes from app.js */
 const nextStage=r=>{let s=Number(r.stage||1)+1;if(isLocalO(r)&&s>=4&&s<=6)s=7;return Math.min(9,s);};
 const prevStage=r=>{let s=Number(r.stage||1)-1;if(isLocalO(r)&&s>=4&&s<=6)s=3;return Math.max(1,s);};
 window.__lxSetStage=async function(r0,k){
  const r=curOrder(r0.item)||r0;const cur=Number(r.stage||1);if(k===cur)return;
- const name=STAGES[k-1];
+ const name=(window.stName?window.stName(r,k):STAGES[k-1]);
  const ok=await applyChange(r.item,{stage:k,status:name},n=>{const st=Object.assign({},n.stages||{});if(k<cur){Object.keys(st).forEach(x=>{if(Number(x)>k)delete st[x];});}else{for(let x=cur+1;x<=k;x++){if(x!==k&&isLocalO(r)&&x>=4&&x<=6)continue;if(!st[x])st[x]=todayS();}}if(!st[k])st[k]=todayS();const out=Object.assign(n,{order:r.item,items:n.items||[],stages:st});if(Number(out.stageOverride||0)>k)out.stageOverride=k;return out;},(r.order_no||r.item)+' → '+name);
  if(ok)say(name);
 };
@@ -476,7 +476,7 @@ window.__lxTrk=function(r,card){
  /* row 1: big stage buttons + paid */
  const row=el('div','xo-row xo-big');
  const back=el('button','btn2','◀');back.type='button';back.title='Go back one step';back.disabled=stage<=1;back.addEventListener('click',()=>window.__lxSetStage(r,prevStage(r)));
- const nxs=nextStage(r);const nx=el('button','btn',stage>=9?'Delivered ✓':'Next: '+STAGES[nxs-1]+' ▶');nx.type='button';nx.disabled=stage>=9;nx.addEventListener('click',()=>window.__lxSetStage(r,nxs));
+ const nxs=nextStage(r);const nx=el('button','btn',stage>=9?'Delivered ✓':'Next: '+(window.stName?window.stName(r,nxs):STAGES[nxs-1])+' ▶');nx.type='button';nx.disabled=stage>=9;nx.addEventListener('click',()=>window.__lxSetStage(r,nxs));
  const paid=r.payout_status==='Received';
  const pb=el('button','btn2',paid?'✓ Paid':'Mark paid');pb.type='button';pb.addEventListener('click',()=>applyChange(item,paid?{payout_status:'Pending',payment_date:''}:{payout_status:'Received',payment_date:todayS()},null,(r.order_no||item)+(paid?': marked unpaid':': marked paid')));
  row.appendChild(back);row.appendChild(nx);row.appendChild(pb);box2.appendChild(row);
