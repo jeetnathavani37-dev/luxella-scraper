@@ -1078,3 +1078,9 @@ body::after{content:"";position:fixed;left:0;right:0;bottom:0;height:3px;backgro
 .sw .flt[open]>summary{border-bottom:1px solid #2A2724}
 .sw .flt>.form,.sw .flt>.tools,.sw .flt>.colpick{padding:14px 16px 0}
 .sw .flt>.tools{padding-bottom:16px}
+
+/* hero: shorter block between the greeting and the tabs */
+.sw .hero .sub .sep,.sw #contact-line,.sw #season,.sw .lx-since{display:none!important}
+.sw .hero .sub{margin-top:10px}
+.sw .hero .rule-double{margin:14px 0 12px}
+.sw .tabs{margin-bottom:26px!important}
