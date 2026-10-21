@@ -66,7 +66,10 @@ ready(()=>{
   row('Piece',val('item')+(val('brand')?' ('+val('brand')+')':''));row('Size / colour',val('size')||'—');row('Qty',val('qty')||'1');if(val('link'))row('Link',val('link'));if(val('notes'))row('Notes',val('notes'));
   row('Deliver to',later()?'Decide later (we will ask before dispatch)':addrText()+' · '+val('phone'));row('Price',inr(pr));row('Paying by',F.pay.value);
   if(pd){row('Paid now',inr(pd)+(val('ref')?' · ref '+val('ref'):''));row('Balance',inr(Math.max(0,pr-pd)));}else row('Balance',inr(pr)+' (to pay after confirmation)');};
- const render=()=>{panes.forEach((p,i)=>p.hidden=i!==S.step);[...prog.children].forEach((s,i)=>{s.className=i===S.step?'on':i<S.step?'ok':'';});back.hidden=S.step===0;next.textContent=S.step===3?'Place order':'Continue';if(S.step===3)review();msg.textContent='';};
+ const waNum=()=>String((photos.contact&&photos.contact.phone)||'918724079056').replace(/[^0-9]/g,'');
+ const waText=(no)=>{const pr=Number(val('price')||0),pd=paidMode()?Number(val('paid')||0):0;const cn=(window.lx&&window.lx.client&&window.lx.client()&&window.lx.client().name)||'';return 'New order'+(no?' '+no:' request')+(cn?' — '+cn:'')+'\n\nItem: '+val('item')+(val('brand')?' ('+val('brand')+')':'')+'\nSize/colour: '+(val('size')||'—')+'\nQty: '+(val('qty')||'1')+(val('link')?'\nLink: '+val('link'):'')+(val('notes')?'\nNotes: '+val('notes'):'')+'\nDeliver to: '+(later()?'Will share later':addrText()+' · '+val('phone'))+'\nPrice: '+(pr?inr(pr):'—')+'\nPaying by: '+F.pay.value+(pd?'\nPaid: '+inr(pd)+(val('ref')?' (ref '+val('ref')+')':''):'')+'\n\nMy page: '+location.origin+location.pathname+'#al';};
+ const waBtn=(no,cls)=>{const a=el('a',cls||'btn2','Send on WhatsApp');a.target='_blank';a.rel='noopener';a.addEventListener('click',()=>{a.href='https://wa.me/'+waNum()+'?text='+encodeURIComponent(waText(no));});a.href='https://wa.me/'+waNum()+'?text='+encodeURIComponent(waText(no));return a;};
+ let render=()=>{panes.forEach((p,i)=>p.hidden=i!==S.step);[...prog.children].forEach((s,i)=>{s.className=i===S.step?'on':i<S.step?'ok':'';});back.hidden=S.step===0;next.textContent=S.step===3?'Place order':'Continue';if(S.step===3)review();msg.textContent='';};
  back.addEventListener('click',()=>{if(S.step>0){S.step--;render();}});
  const orderNo=()=>{const rows=dash.data('orders');const rs=rows.status==='ok'?rows.data:[];const m=String(new Date().getMonth()+1).padStart(2,'0');const nums=rs.map(r=>String(r.order_no||'')).filter(n=>n.startsWith('#'+m)).map(n=>Number(n.slice(3))||0);return '#'+m+String((nums.length?Math.max(...nums):0)+1).padStart(2,'0');};
  const place=async()=>{
@@ -88,12 +91,14 @@ ready(()=>{
    doneBox.hidden=false;doneBox.textContent='';
    doneBox.appendChild(el('div','nwo-tick','✓'));doneBox.appendChild(el('h3',null,'Order placed · '+no));
    doneBox.appendChild(el('p','note',name+' · '+inr(price)+(paid?' · '+inr(paid)+' payment submitted, pending verification':' · payment pending')+'. A confirmation email is on its way to you.'));
-   const row=el('p','nwo-nav');const v=el('button','btn','View in Orders');v.type='button';v.addEventListener('click',()=>{const t=$('tab-al');if(t)t.click();window.scrollTo(0,0);});const again=el('button','btn2','Place another order');again.type='button';again.addEventListener('click',()=>{Object.keys(F).forEach(k=>{if(F[k].type==='file')F[k].value='';else if(F[k].tagName!=='SELECT')F[k].value='';});F.qty.value='1';tc.checked=false;S.step=0;S.done=null;doneBox.hidden=true;prog.hidden=nav.hidden=intro.hidden=false;next.disabled=false;S.busy=false;render();});row.appendChild(v);row.appendChild(again);doneBox.appendChild(row);
+   const row=el('p','nwo-nav');const v=el('button','btn','View in Orders');v.type='button';v.addEventListener('click',()=>{const t=$('tab-al');if(t)t.click();window.scrollTo(0,0);});const again=el('button','btn2','Place another order');again.type='button';again.addEventListener('click',()=>{Object.keys(F).forEach(k=>{if(F[k].type==='file')F[k].value='';else if(F[k].tagName!=='SELECT')F[k].value='';});F.qty.value='1';tc.checked=false;S.step=0;S.done=null;doneBox.hidden=true;prog.hidden=nav.hidden=intro.hidden=false;next.disabled=false;S.busy=false;render();});row.appendChild(v);row.appendChild(waBtn(no));row.appendChild(again);doneBox.appendChild(row);
    S.busy=false;
   }catch(e){msg.textContent='Could not place the order. Your details are kept, try again.';S.busy=false;next.disabled=false;}
  };
+ const wab=waBtn('');wab.hidden=true;nav.insertBefore(wab,msg);const _r=render;
  const owner=window.lx&&window.lx.isOwner&&window.lx.isOwner();
  if(owner){const sh=el('button','btn2','Copy client link');sh.type='button';sh.addEventListener('click',async()=>{const q=new URLSearchParams();[['item','item'],['brand','brand'],['size','size'],['qty','qty'],['link','link'],['notes','notes'],['price','price']].forEach(([k,f])=>{const v=val(f);if(v&&!(k==='qty'&&v==='1'))q.set(k,v);});const u=location.origin+location.pathname+(q.toString()?'?'+q:'')+'#new';try{await navigator.clipboard.writeText(u);msg.textContent='Client link copied.';}catch(e){msg.textContent=u;}});nav.insertBefore(sh,msg);}
+ const _rend=render;render=()=>{_rend();wab.hidden=S.step!==3;wab.href='https://wa.me/'+waNum()+'?text='+encodeURIComponent(waText(''));};
  next.addEventListener('click',()=>{if(S.step===3){place();return;}const e=check(S.step);if(e){msg.textContent=e;return;}S.step++;render();});
  /* prefill from shared link */
  const pf=(k,q)=>{const v=Q.get(q||k);if(v)F[k].value=v;};
