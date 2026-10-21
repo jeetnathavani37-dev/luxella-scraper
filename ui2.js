@@ -38,9 +38,18 @@ if(typeof window.renderLedger==='function'){const orig=window.renderLedger;windo
 setTimeout(()=>{try{payCards();}catch(e){}},600);
 
 /* 3 · Orders: compact cards — empty fields hidden, whole card opens the full order */
+
+const SVG_SHARE='<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="2.6"/><circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/><path d="M8.3 10.8l7.4-4.4M8.3 13.2l7.4 4.4"/></svg>';
+const SVG_WA='<svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.8 11.9 11.9 0 0 0 4.6 4c1.7.7 2.4.8 3.2.7.5-.1 1.5-.6 1.7-1.2s.2-1.1.1-1.2-.2-.2-.4-.3z"/></svg>';
+function orderText(r){const L=['Luxella · Order '+(r.order_no||''),r.item||''];if(r.status)L.push('Status: '+r.status);if(r.eta_date)L.push('ETA: '+fdate(r.eta_date));if(r.payout)L.push('Amount: '+money(r.payout)+(r.payout_status==='Received'?' (paid)':' (due)'));const it=r.intl_tracking_no,lt=r.local_tracking;if(lt)L.push('Tracking: https://track.aftership.com/'+encodeURIComponent(String(lt).split(' ')[0]));else if(it)L.push('Tracking: https://track.aftership.com/'+encodeURIComponent(String(it).split(' ')[0]));L.push(location.origin+location.pathname);return L.filter(Boolean).join('\\n');}
+function addIcons(tr){if(tr.querySelector('.oc2-ic'))return;const name=(tr.children[2]&&tr.children[2].textContent||'').trim();const r=ORD().find(x=>String(x.item||'').trim()===name)||{item:name};
+ const box=el('div','oc2-ic');const sh=el('button','oc2-b');sh.type='button';sh.title='Share';sh.setAttribute('aria-label','Share order');sh.innerHTML=SVG_SHARE;
+ sh.onclick=async e=>{e.stopPropagation();const t=orderText(r);try{if(navigator.share){await navigator.share({title:'Luxella · '+(r.item||'Order'),text:t});return;}}catch(x){return;}try{await navigator.clipboard.writeText(t);sh.classList.add('ok');setTimeout(()=>sh.classList.remove('ok'),1200);}catch(x){}};
+ const wa=el('a','oc2-b wa');wa.target='_blank';wa.rel='noopener';wa.title='WhatsApp';wa.setAttribute('aria-label','WhatsApp');wa.innerHTML=SVG_WA;const ex=tr.querySelector('a.chip.wal');wa.href=ex?ex.href:'https://wa.me/?text='+encodeURIComponent(orderText(r));wa.onclick=e=>e.stopPropagation();
+ box.append(sh,wa);tr.appendChild(box);}
 function tidyOrders(){const tb=$('#ordT tbody');if(!tb)return;[...tb.querySelectorAll('tr:not(.grp)')].forEach(tr=>{if(tr.dataset.ui2)return;tr.dataset.ui2=1;tr.classList.add('oc2');
   [...tr.children].forEach((td,i)=>{const t=(td.textContent||'').trim();if((t===''||t==='—'||t==='-')&&i>3&&i!==7&&i!==14)td.classList.add('e2');if(i===10||i===13)td.style.setProperty('grid-column','1 / -1','important');});
-  tr.addEventListener('click',e=>{if(e.target.closest('a,button,input,select,label,.brand'))return;const name=(tr.children[2]&&tr.children[2].textContent||'').trim();const r=ORD().find(x=>String(x.item||'').trim()===name);if(r)openR(r);});});}
+  addIcons(tr);tr.addEventListener('click',e=>{if(e.target.closest('a,button,input,select,label,.brand,.oc2-ic'))return;const name=(tr.children[2]&&tr.children[2].textContent||'').trim();const r=ORD().find(x=>String(x.item||'').trim()===name);if(r)openR(r);});});}
 try{new MutationObserver(()=>tidyOrders()).observe(document.body,{childList:true,subtree:true});}catch(e){}
 tidyOrders();
 })();

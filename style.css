@@ -1503,3 +1503,10 @@ html.lx-ro #tb-switch,html.lx-ro #tb-out,html.lx-ro #top .who{display:none!impor
 .sw #ordT tbody tr.oc2 td:nth-child(11),.sw #ordT tbody tr.oc2 td:nth-child(14){grid-column:1/-1!important}
 .sw #ordT tbody td:nth-child(10) .pill{color:#86d39a!important;border-color:#2e4a33!important;background:rgba(80,160,100,.08)}
 .sw #ordT tbody td:nth-child(10) .pill.due{color:#f08f7c!important;border-color:#5a2a22!important;background:rgba(200,80,60,.08)}
+.sw #ordT tbody tr.oc2{position:relative}
+.sw .oc2-ic{position:absolute;top:12px;right:12px;display:flex;gap:6px;z-index:2}
+.sw .oc2-b{width:34px;height:34px;display:inline-flex;align-items:center;justify-content:center;background:#0E0E0F;border:1px solid #3a3322;color:#E3C565;cursor:pointer;padding:0;border-radius:50%;text-decoration:none}
+.sw .oc2-b.wa{color:#5fd07a;border-color:#2e4a33}.sw .oc2-b.ok{color:#86d39a;border-color:#2e4a33}
+.sw #ordT tbody tr.oc2 td:nth-child(3){padding-right:84px!important}
+.sw .oc2-ic .oc2-b{width:36px!important;height:36px!important;min-width:0!important;margin:0!important;padding:0!important;border-radius:50%!important;box-shadow:none!important;align-self:center}
+.sw #ordT tbody tr.oc2 .ordbtns a.chip.wal{display:none!important}
