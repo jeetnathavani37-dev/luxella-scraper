@@ -73,6 +73,12 @@ html.bb-compact .bb-row>summary{padding:5px 0}html.bb-compact .bb-qr{padding:5px
 .bb-act2{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
 .bb-qr .bb-b.g{border-color:transparent;color:#8C857A;padding:6px 7px}.bb-qr .bb-b.g:hover{color:#E3C565;border-color:#3A3222}
 @media(max-width:600px){.bb{padding:12px}.bb-grid{grid-template-columns:1fr}.bb-sum{grid-template-columns:1fr 1fr}.bb-top2{flex-direction:column}.bb-top2 .bb-b{width:100%}}
+.ov-flow{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-bottom:16px}.ov-st{position:relative;text-align:left;background:#121214;border:1px solid #262321;color:#F3EEE6;padding:12px 12px 10px;font:inherit;cursor:pointer;display:flex;flex-direction:column;gap:2px;min-height:96px}.ov-st:hover{border-color:#6B5A24}.ov-st i{position:absolute;top:8px;right:10px;font-style:normal;font-size:10px;color:#5d574e}.ov-st b{font-weight:400;font-size:24px;color:#E3C565}.ov-st span{font-size:12px;color:#C9C2B6;line-height:1.3}.ov-st small{color:#8C857A;font-size:11px;margin-top:auto}.ov-st.z{opacity:.45}.ov-st.z b{color:#8C857A}
+.ov-cols{display:grid;grid-template-columns:1.3fr 1fr;gap:14px}.ov-att{display:grid;grid-template-columns:44px 1fr;gap:0 10px;width:100%;text-align:left;background:none;border:0;border-top:1px solid #1E1C1A;color:#F3EEE6;padding:10px 0;font:inherit;cursor:pointer}.ov-att:hover span{color:#E3C565}.ov-att b{grid-row:1/3;font-weight:400;font-size:20px;color:#e0897c;align-self:center}.ov-att span{font-size:13.5px}.ov-att small{color:#8C857A;font-size:11.5px}.ov-note{margin:0 0 14px;padding:10px 12px;border-left:2px solid #6B5A24;background:#0E0E0F}
+.ph-in{width:100%;margin:8px 0;color:#A39C90;font-size:12px}.ph-act{display:flex;gap:8px;align-items:center;font-size:12.5px;color:#C9C2B6}.ph-act input{accent-color:#C9A227;width:16px;height:16px}.ph-d{margin-bottom:12px}.ph-d>summary{cursor:pointer;color:#E3C565;font-size:12.5px;padding:6px 0;list-style:none}.ph-d .bb-card{margin-top:8px}
+.ck-list{display:grid;gap:8px}.ck{background:#121214;border:1px solid #262321}.ck[open]{border-color:#4a3f22}.ck>summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;gap:16px;align-items:center;padding:12px 16px}.ck>summary::-webkit-details-marker{display:none}.ck-l{min-width:0;display:flex;flex-direction:column}.ck-l b{font-weight:400;color:#E3C565;font-size:13px}.ck-l span{color:#C9C2B6;font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ck-r{display:flex;align-items:center;gap:10px;flex-shrink:0}.ck-r small{color:#8C857A;font-size:11.5px;max-width:220px;text-align:right}.ck-r em{font-style:normal;color:#A39C90;font-size:12px;width:36px;text-align:right}.ck-bar{width:90px;height:4px;background:#1E1C1A}.ck-bar i{display:block;height:100%;background:#C9A227}
+.ck-body{padding:4px 16px 14px;border-top:1px solid #1E1C1A}.ck-step{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:8px 0;border-bottom:1px solid #1A1917}.ck-step label{flex:1 1 240px;display:flex;gap:10px;align-items:center;font-size:13px;color:#C9C2B6;cursor:pointer}.ck-step.ok label span{color:#7fc79c}.ck-step input[type=checkbox]{width:18px;height:18px;accent-color:#C9A227}.ck-step input:not([type=checkbox]),.ck-step select{background:#0A0A0A;border:1px solid #2A2724;color:#F3EEE6;padding:6px 8px;font:inherit;font-size:12px;width:150px}.ck-body .cd-add{margin-top:10px;width:100%}
+@media(max-width:820px){.ov-cols{grid-template-columns:1fr}.ck>summary{flex-direction:column;align-items:flex-start}.ck-r small{text-align:left}.ck-step input:not([type=checkbox]),.ck-step select{width:calc(50% - 6px)}.ov-flow{grid-template-columns:1fr 1fr}}
 @media print{.bp-top,.bb-tabs,.bb-vt,.bb-bar,.bb-bulk,button{display:none!important}#admin-root{background:#fff!important;color:#000!important}}
 @media(max-width:820px){.bb-tr{grid-template-columns:1fr 1.6fr 1fr}.bb-tr>span:nth-child(n+4){display:none}.bb-tick{grid-template-columns:22px 1fr auto}.bb-tick .i{grid-column:2/4}.bb-tick .s,.bb-tick .d{display:none}.bb-bid{grid-template-columns:1fr auto}.bb-bid .r{grid-column:1/-1}}
 @media(max-width:820px){.bb-row>summary,.bb-th{grid-template-columns:1fr 1fr}.bb-row>summary>:nth-child(n+5),.bb-th>:nth-child(n+3){display:none}.bb-row .it{grid-column:1/-1;order:-1}}
@@ -84,9 +90,9 @@ window.lxB2B=async function(root,sb,toast){
  const res=await sb.from('lx_b2b').select('kind,id,data,updated_at');
  if(res.error){wrap.textContent=res.error.message;return;}
  let all=(res.data||[]).filter(x=>x.kind==='order').map(x=>Object.assign({_id:x.id,_u:x.updated_at},x.data));
- let BIDS=(res.data||[]).filter(x=>x.kind==='bid').map(x=>Object.assign({_id:x.id,_u:x.updated_at},x.data));let BUYS=(res.data||[]).filter(x=>x.kind==='buy').map(x=>Object.assign({_id:x.id,_u:x.updated_at},x.data));
+ let BIDS=(res.data||[]).filter(x=>x.kind==='bid').map(x=>Object.assign({_id:x.id,_u:x.updated_at},x.data));const META={};(res.data||[]).filter(x=>x.kind==='meta').forEach(x=>{META[x.id]=x.data;});let BUYS=(res.data||[]).filter(x=>x.kind==='buy').map(x=>Object.assign({_id:x.id,_u:x.updated_at},x.data));
  const saveK=async(kind,r,patch)=>{const d=Object.assign({},r,patch);['_id','_u'].forEach(k=>delete d[k]);const r2=await sb.from('lx_b2b').upsert({kind,id:r._id,data:d,updated_at:new Date().toISOString()},{onConflict:'kind,id'});if(r2.error){toast('Save nahi hua: '+r2.error.message);return false;}Object.assign(r,d);toast('Saved');return true;};
- const S={tab:'todo',who:'KicksMachine',st:'',rs:'',q:''};
+ const S={tab:'overview',who:'KicksMachine',st:'',rs:'',q:''};
  const save=async(r,patch)=>{const d=Object.assign({},r,patch);['_id','_u'].forEach(k=>delete d[k]);
   const L=Number(d.landed),P=Number(d.payout);if(L&&P){d.profit=Math.round((P-L)*100)/100;d.profit_pct=(P-L)/L;d.margin_ok=(P-L)/L>=0.2?'Yes':'No';}
   const r2=await sb.from('lx_b2b').upsert({kind:'order',id:r._id,data:d,updated_at:new Date().toISOString()},{onConflict:'kind,id'});
@@ -96,18 +102,11 @@ window.lxB2B=async function(root,sb,toast){
   const atR=km.filter(r=>r.status==='At reshipper');const oldest=Math.max(0,...atR.map(r=>days(r.delivered_reshipper)||0));
   const dueP=km.filter(r=>r.status==='Delivered to KM'&&r.payout_status!=='Received');const got=km.filter(r=>r.payout_status==='Received');
   const sum=(a,k)=>a.reduce((t,r)=>t+(Number(r[k])||0),0);const low=km.filter(r=>r.margin_ok==='No');
-  const TOOLS=['pipe','bulk','calc','add','export'];if(TOOLS.includes(S.tab)){S.tool=S.tab;S.tab='tools';}
-  const mov=km.filter(r=>['In transit to reshipper','Shipped from hub','Landed India','Shipped to KM','Out for delivery'].includes(r.status));const runT=km.filter(r=>r.payout_status!=='Received'&&r.payout_timer);const overT=runT.filter(r=>days(r.payout_timer)>7);
-  const K=el('div','bb-sum');const k=(v,t,fn,bad)=>{const d=el('div',bad?'bad':'');d.appendChild(el('b',null,v));d.appendChild(el('small',null,t));if(fn)d.onclick=fn;K.appendChild(d);};
-  k(String(open.length),'open KM orders',()=>{S.tab='orders';S.st='';draw();});
-  k(String(mov.length),'in transit · '+inr(sum(mov,'payout')),()=>{S.tab='transit';draw();});
-  k(inr(sum(km.filter(r=>r.payout_status!=='Received'&&DONE(r.status)),'payout')),'payout due'+(overT.length?' · '+overT.length+' overdue':''),()=>{S.tab='payouts';draw();},overT.length);
-  k(inr(sum(costed,'profit')),'expected profit · '+pct(costed.length?sum(costed,'profit')/Math.max(1,sum(costed,'landed')):0));
-  wrap.appendChild(K);
-  const T=el('div','bb-tabs');[['todo','To-do'],['transit','In transit'],['buys','Orders placed'],['reship','Reshipper'],['payouts','Payouts'],['bids','Bids'],['orders','All orders'],['tools','Tools']].forEach(([id,t])=>{const b=el('button','bb-tab'+(S.tab===id?' on':''),t);b.onclick=()=>{S.tab=id;draw();};T.appendChild(b);});wrap.appendChild(T);
+  const TOOLS=['pipe','bulk','calc','add','export','orders','todo'];if(TOOLS.includes(S.tab)){S.tool=S.tab;S.tab='tools';}
+  const T=el('div','bb-tabs');[['overview','Overview'],['bids','Bids'],['buys','Orders placed'],['transit','In transit'],['reship','Reshipper'],['tokm','To KicksMachine'],['confirm','Confirmation'],['payouts','Payouts'],['checklist','Checklist'],['tools','More']].forEach(([id,t])=>{const b=el('button','bb-tab'+(S.tab===id?' on':''),t);b.onclick=()=>{S.tab=id;draw();};T.appendChild(b);});wrap.appendChild(T);
   const P=el('div');wrap.appendChild(P);
-  if(S.tab==='tools'){S.tool=S.tool||'pipe';const tc=el('div','bb-chips');[['pipe','Pipeline'],['bulk','Bulk upload'],['calc','Bid calculator'],['add','Add order'],['export','Export']].forEach(([id,t])=>{const b=el('button','bb-chip'+(S.tool===id?' on':''),t);b.onclick=()=>{S.tool=id;draw();};tc.appendChild(b);});P.appendChild(tc);const P2=el('div');P.appendChild(P2);({pipe:pipe,bulk:bulk,calc:calc,add:add,export:exp})[S.tool](P2);return;}
-  ({todo:todo,transit:transit,bids:bids,buys:buys,orders:orders,reship:reship,payouts:payouts})[S.tab](P);};
+  if(S.tab==='tools'){S.tool=S.tool||'orders';const tc=el('div','bb-chips');[['orders','All orders'],['todo','To-do lists'],['pipe','Pipeline'],['bulk','Bulk upload'],['calc','Bid calculator'],['add','Add order'],['export','Export']].forEach(([id,t])=>{const b=el('button','bb-chip'+(S.tool===id?' on':''),t);b.onclick=()=>{S.tool=id;draw();};tc.appendChild(b);});P.appendChild(tc);const P2=el('div');P.appendChild(P2);({orders:orders,todo:todo,pipe:pipe,bulk:bulk,calc:calc,add:add,export:exp})[S.tool](P2);return;}
+  ({overview:overview,transit:transit,bids:bids,buys:buys,reship:reship,tokm:tokm,confirm:confirmT,payouts:payouts,checklist:checklist})[S.tab](P);};
  function orders(P){const c=el('div','bb-card');P.appendChild(c);
   const bar=el('div','bb-bar');S.q='';
   const who=document.createElement('select');[['KicksMachine','KicksMachine'],['__wa','WhatsApp clients'],['','All']].forEach(([v,t])=>{const o=el('option',null,t);o.value=v;if(v===S.who)o.selected=true;who.appendChild(o);});
@@ -370,6 +369,11 @@ window.lxB2B=async function(root,sb,toast){
   chipRow(P,'bc',[['','All countries',BUYS.length],...CTRY.map(([c,f])=>[c,f+' '+c,cnt[c]||0])]);
   const st=b=>b.status||'ordered';const nk={};BUYS.forEach(b=>{nk[st(b)]=(nk[st(b)]||0)+1;});const unl=BUYS.filter(b=>!buyKM(b,m).length).length;
   chipRow(P,'uf',[['','All'],['ordered','Ordered',nk.ordered||0],['shipped','Shipped',nk.shipped||0],['delivered','At reshipper',nk.delivered||0],['cancelled','Cancelled',nk.cancelled||0],['__un','Not linked',unl]]);
+  const tp=KMO().filter(r=>r.status==='To place');if(tp.length&&!S.uf){const sc=el('div','bb-sech');sc.appendChild(el('span',null,'🛒 To place at store'));sc.appendChild(el('small',null,tp.length+' orders · '+inr(sumP(tp))));P.appendChild(sc);const g0=el('div','bb-grid');tp.forEach(r=>{const c=el('div','bb-cd');const h=el('div','cd-h');const hl=el('div');hl.appendChild(el('b',null,r.order_id||r._id));hl.appendChild(el('small',null,[r.brand,r.item,r.size].filter(Boolean).join(' · ')));h.appendChild(hl);h.appendChild(el('div','cd-amt',inr(r.payout)));c.appendChild(h);
+   const sl=gv(r,'sla_deadline');if(sl)c.appendChild(el('p','bb-meta','KM SLA '+sl+' · bid day '+(days(r.order_date)||0)));
+   const tr=el('div','cd-in');const ss=document.createElement('select');['',...STORES].forEach(v=>{const o=el('option',null,v||'Store');o.value=v;ss.appendChild(o);});const on=document.createElement('input');on.placeholder='Store order no.';tr.append(ss,on);c.appendChild(tr);
+   const ct=el('div','cd-ctry');let cc='USA';const cbs=CTRY.map(([n,fl])=>{const b=el('button','ct'+(n==='USA'?' on':''),fl+' '+n);b.onclick=()=>{cc=n;cbs.forEach(x=>x.classList.toggle('on',x===b));};ct.appendChild(b);return b;});c.appendChild(ct);
+   c.appendChild(btn('✓ Order placed',async()=>{if(!on.value.trim()){toast('Store order no. daalo');return;}const p={store:ss.value,retailer_order_id:on.value.trim(),retailer_date:today(),country:cc};p.status=derive(Object.assign({},r,p));if(!(await save(r,p)))return;let bu=BUYS.find(b=>b.store_order_no===p.retailer_order_id);if(bu){await saveK('buy',bu,{km_ids:[...new Set([...(bu.km_ids||[]),r.order_id||r._id])]});}else{bu={_id:'buy-'+Date.now().toString(36)};if(await saveK('buy',bu,{store:p.store,store_order_no:p.retailer_order_id,order_date:today(),status:'ordered',country:cc,items:[{name:r.item,size:r.size}],km_ids:[r.order_id||r._id]}))BUYS.push(bu);}draw();},'bb-b sm'));g0.appendChild(c);});P.appendChild(g0);const sc2=el('div','bb-sech');sc2.appendChild(el('span',null,'📦 Placed orders'));sc2.appendChild(el('small',null,BUYS.length+' store orders'));P.appendChild(sc2);}
   const f=BUYS.filter(b=>!S.bc||ctryOf(b)===S.bc).filter(b=>!S.uf?true:S.uf==='__un'?!buyKM(b,m).length:st(b)===S.uf).filter(b=>!qv||(JSON.stringify(b)+buyKM(b,m).map(r=>r.order_id).join(' ')).toLowerCase().includes(qv)).sort((a,b)=>String(b.order_date).localeCompare(String(a.order_date)));
   if(!f.length){P.appendChild(el('p','bb-meta','Kuch nahi mila.'));return;}
   const g=el('div','bb-grid');f.forEach(bu=>g.appendChild(buyCard(bu,m)));P.appendChild(g);}
@@ -400,11 +404,11 @@ window.lxB2B=async function(root,sb,toast){
  function transit(P){const km=all.filter(r=>r.client==='KicksMachine'&&!/cancel/i.test(r.status||''));
   const LEGS=[
    {k:'hub',t:'Store → Reshipper',ic:'🛍️',test:r=>['Ordered','In transit to reshipper'].includes(r.status)&&!!gv(r,'retailer_tracking'),key:r=>String(gv(r,'retailer_tracking')).split(' ')[0],trk:r=>String(gv(r,'retailer_tracking')).split(' ')[0],car:r=>gv(r,'retailer_carrier')||gv(r,'store'),since:r=>gv(r,'retailer_ship_date')||gv(r,'retailer_date'),eta:r=>gv(r,'eta_reshipper'),late:10,done:'✓ Reached reshipper',patch:()=>({delivered_reshipper:today()}),field:'retailer_tracking'},
-   {k:'india',t:'Reshipper → India',ic:'✈️',test:r=>r.status==='Shipped from hub',key:r=>gv(r,'reship_awb')||('nr-'+(r.reshipper||'')+'-'+gv(r,'shipped_reshipper')),trk:r=>gv(r,'reship_awb'),car:r=>r.reshipper,since:r=>gv(r,'shipped_reshipper'),eta:r=>gv(r,'eta_india'),late:8,done:'✓ Landed in India',patch:()=>({landed_india:today()}),field:'reship_awb'},
-   {k:'km',t:'India → KicksMachine',ic:'🚚',test:r=>['Landed India','Shipped to KM','Out for delivery'].includes(r.status),key:r=>gv(r,'km_tracking')||('nk-'+gv(r,'landed_india')),trk:r=>gv(r,'km_tracking'),car:r=>gv(r,'km_courier'),since:r=>gv(r,'shipped_km')||gv(r,'landed_india'),eta:r=>'',late:4,done:'✓ Reached KicksMachine',patch:()=>({delivered_km:today()}),field:'km_tracking'}];
+   {k:'india',t:'Reshipper → India',ic:'✈️',test:r=>r.status==='Shipped from hub',key:r=>gv(r,'reship_awb')||('nr-'+(r.reshipper||'')+'-'+gv(r,'shipped_reshipper')),trk:r=>gv(r,'reship_awb'),car:r=>r.reshipper,since:r=>gv(r,'shipped_reshipper'),eta:r=>gv(r,'eta_india'),late:8,done:'✓ Landed in India',patch:()=>({landed_india:today()}),field:'reship_awb'}];
   const waiting=km.filter(r=>['Ordered','In transit to reshipper'].includes(r.status)&&!gv(r,'retailer_tracking'));
   const groups=LEGS.map(L=>{const gm=new Map();km.filter(L.test).forEach(r=>{const k=L.key(r);gm.set(k,(gm.get(k)||[]).concat([r]));});return [L,[...gm.values()]];});
   const allRows=groups.flatMap(([L,gs])=>gs.flat());
+  {const pd=document.createElement('details');pd.className='ph-d';const ps=document.createElement('summary');ps.textContent='📷 Upload screenshot → tracking auto';pd.appendChild(ps);pd.appendChild(photoCard());P.appendChild(pd);}
   const sm=el('div','bb-sum');[[String(groups.reduce((t,[L,gs])=>t+gs.length,0)),'parcels moving'],[String(allRows.length),'KM orders inside'],[inr(sumP(allRows)),'payout value in transit'],[String(waiting.length),'ordered, no tracking yet']].forEach(([v,t])=>{const d=el('div');d.appendChild(el('b',null,v));d.appendChild(el('small',null,t));sm.appendChild(d);});P.appendChild(sm);
   const qv=search(P,'tq','Search tracking, KM ID, item…');
   chipRow(P,'tl',[['','All',groups.reduce((t,[L,gs])=>t+gs.length,0)],...groups.map(([L,gs])=>[L.k,L.ic+' '+L.t,gs.length]),['wait','⏳ No tracking yet',waiting.length]]);
@@ -422,34 +426,168 @@ window.lxB2B=async function(root,sb,toast){
     const tr=el('div','cd-in');const ti=document.createElement('input');ti.placeholder='Store tracking no.';const sv=btn('Save',async()=>{const t=ti.value.trim();if(!t)return;const p={retailer_tracking:t,intl_tracking:t,retailer_ship_date:today()};p.status=derive(Object.assign({},r,p));if(await save(r,p))draw();},'bb-b sm');tr.append(ti,sv);c.appendChild(tr);g.appendChild(c);});P.appendChild(g);}
   if(!allRows.length&&!waiting.length)P.appendChild(el('p','bb-meta','Abhi kuch transit me nahi.'));}
 
- /* ---------- Payouts: manual 7-day timer per order ---------- */
- function payouts(P){const km=all.filter(r=>r.client==='KicksMachine'&&!/cancel/i.test(r.status||'')&&r.status!=='To place');
-  const rec=r=>r.payout_status==='Received';const T=r=>r.payout_timer;const left=r=>7-(days(T(r))||0);
-  const run=km.filter(r=>!rec(r)&&T(r)),ready=km.filter(r=>!rec(r)&&!T(r)&&DONE(r.status)),moving=km.filter(r=>!rec(r)&&!T(r)&&!DONE(r.status)),got=km.filter(rec);const over=run.filter(r=>left(r)<0);
-  if(S.pf==null||!['run','ready','moving','got'].includes(S.pf))S.pf=run.length?'run':'ready';
-  const sm=el('div','bb-sum tabs');[['run','⏱ Timer running',run,over.length?over.length+' overdue':''],['ready','📦 At KM · start timer',ready,''],['moving','🚚 In transit',moving,'payout later'],['got','✓ Received',got,'']].forEach(([k,t,a,x])=>{const d=el('div',S.pf===k?'on':'');d.appendChild(el('b',null,inr(sumP(a))));d.appendChild(el('small',null,t+' · '+a.length+(x?' · '+x:'')));if(k==='run'&&over.length)d.classList.add('bad');d.onclick=()=>{S.pf=k;draw();};sm.appendChild(d);});P.appendChild(sm);
-  const qv=search(P,'pq','Search KM ID, item…');
-  const list=({run,ready,moving,got})[S.pf].filter(r=>!qv||vtxt(r).includes(qv));
-  const bar=el('div','bb-act2');
-  if(S.pf==='ready'&&list.length)bar.appendChild(btn('▶ Start timer for all '+list.length,async()=>{if(!confirm(list.length+' orders ka 7-day timer aaj se start?'))return;for(const r of list)await save(r,{payout_timer:today()});S.pf='run';draw();},'bb-b sm'));
-  if(S.pf==='run'&&over.length){const msg='Hi Maanvesh, payout pending for: '+over.map(r=>(r.order_id||r._id)+' ('+inr(r.payout)+')').join(', ')+'. Total '+inr(sumP(over))+'. Please check. Thanks!';bar.appendChild(lnk('WhatsApp KM · '+over.length+' overdue','https://wa.me/?text='+encodeURIComponent(msg),'bb-b sm'));}
-  if(list.length)bar.appendChild(btn('Copy statement',()=>copyT('Luxella × KicksMachine payouts ('+today()+')\n'+list.map(r=>(r.order_id||r._id)+' · '+r.item+' · '+inr(r.payout)+' · '+(rec(r)?'PAID '+(r.payout_date||''):T(r)?'timer day '+days(T(r)):'pending')).join('\n')+'\nTotal '+inr(sumP(list)))));
+ /* ---------- Workflow helpers ---------- */
+ const KMO=()=>all.filter(r=>r.client==='KicksMachine'&&!/cancel/i.test(r.status||''));
+ const confirmedOn=r=>r.payout_timer||gv(r,'mrn_confirmed');
+ const wa=(t,msg)=>lnk(t,'https://wa.me/?text='+encodeURIComponent(msg));
+ const go=t=>{S.tab=t;draw();window.scrollTo(0,0);};
+ const STAGES=[
+  ['bids','Bids won · not ordered',()=>{const by=new Set(all.map(r=>r.order_id||r._id));return BIDS.filter(b=>!b.dismissed&&!(b.km_order_ids||[]).every(i=>by.has(i)));},'bid'],
+  ['buys','To place at store',()=>KMO().filter(r=>r.status==='To place')],
+  ['transit','Ordered · coming to reshipper',()=>KMO().filter(r=>['Ordered','In transit to reshipper'].includes(r.status))],
+  ['reship','At reshipper',()=>KMO().filter(r=>r.status==='At reshipper')],
+  ['transit','Flying to India',()=>KMO().filter(r=>r.status==='Shipped from hub')],
+  ['tokm','To KicksMachine',()=>KMO().filter(r=>['Landed India','Shipped to KM','Out for delivery'].includes(r.status))],
+  ['confirm','Waiting KM confirmation',()=>KMO().filter(r=>DONE(r.status)&&!confirmedOn(r)&&r.payout_status!=='Received')],
+  ['payouts','Payout · 7-day timer',()=>KMO().filter(r=>confirmedOn(r)&&r.payout_status!=='Received'&&days(confirmedOn(r))<=7)],
+  ['payouts','Chase payout',()=>KMO().filter(r=>confirmedOn(r)&&r.payout_status!=='Received'&&days(confirmedOn(r))>7),'chase'],
+  ['payouts','Paid',()=>KMO().filter(r=>r.payout_status==='Received'),'got']];
+
+ /* ---------- Overview ---------- */
+ function overview(P){const km=KMO();
+  const fl=el('div','ov-flow');STAGES.forEach(([tab,t,fn,sub],i)=>{const a=fn();const d=el('button','ov-st'+(a.length?'':' z'));d.appendChild(el('i',null,String(i+1)));d.appendChild(el('b',null,String(a.length)));d.appendChild(el('span',null,t));if(sub!=='bid'&&a.length)d.appendChild(el('small',null,inr(sumP(a))));d.onclick=()=>{if(sub==='chase')S.pf='chase';if(sub==='got')S.pf='got';go(tab);};fl.appendChild(d);});P.appendChild(fl);
+  const cols=el('div','ov-cols');P.appendChild(cols);
+  const att=el('div','bb-card');att.appendChild(el('h2',null,'Needs attention'));cols.appendChild(att);
+  const slaX=km.filter(r=>{const s=gv(r,'sla_deadline');return s&&!DONE(r.status)&&days(s)>0;});
+  const lateP=km.filter(r=>['In transit to reshipper'].includes(r.status)&&(days(gv(r,'retailer_ship_date'))||0)>=10||r.status==='Shipped from hub'&&(days(gv(r,'shipped_reshipper'))||0)>=8);
+  const forms=km.filter(r=>['Ordered','In transit to reshipper'].includes(r.status)&&gv(r,'form_filled')!=='Yes');
+  const kmP=km.filter(r=>['Ordered','In transit to reshipper'].includes(r.status)&&!gv(r,'km_portal_updated'));
+  const mrn=km.filter(r=>DONE(r.status)&&!gv(r,'mrn_updated'));
+  const cf=km.filter(r=>DONE(r.status)&&gv(r,'mrn_updated')&&!confirmedOn(r)&&(days(gv(r,'mrn_updated'))||0)>=3);
+  const chase=km.filter(r=>confirmedOn(r)&&r.payout_status!=='Received'&&days(confirmedOn(r))>7);
+  const items=[[slaX,'KM SLA crossed — update KM','transit'],[lateP,'Parcels late in transit','transit'],[kmP,'KM portal update pending','checklist'],[forms,'Reshipper receiver form pending','reship'],[mrn,'MRN update pending','confirm'],[cf,'KM confirmation 3+ days late','confirm'],[chase,'Payout overdue — chase KM','payouts']].filter(x=>x[0].length);
+  if(!items.length)att.appendChild(el('p','bb-meta','Sab theek hai ✓'));
+  items.forEach(([a,t,tab])=>{const l=el('button','ov-att');l.appendChild(el('b',null,String(a.length)));l.appendChild(el('span',null,t));l.appendChild(el('small',null,a.slice(0,3).map(r=>r.order_id||r._id).join(', ')+(a.length>3?'…':'')));l.onclick=()=>{if(tab==='payouts')S.pf='chase';go(tab);};att.appendChild(l);});
+  const right=el('div');cols.appendChild(right);
+  const mo=el('div','bb-card');mo.appendChild(el('h2',null,'Money'));const pend=km.filter(r=>r.payout_status!=='Received');const costed=km.filter(r=>Number(r.landed)>0);
+  [['Payout pending (all)',inr(sumP(pend))],['At KM, not yet paid',inr(sumP(pend.filter(r=>DONE(r.status))))],['Received',inr(sumP(km.filter(r=>r.payout_status==='Received')))],['Expected profit',inr(costed.reduce((t,r)=>t+(Number(r.profit)||0),0))]].forEach(([a,b])=>{const l=el('div','bb-line');l.appendChild(el('span','m',a));l.appendChild(el('b',null,b));mo.appendChild(l);});right.appendChild(mo);
+  right.appendChild(photoCard());
+  const ms=META.mailsync;const mc=el('div','bb-card');mc.appendChild(el('h2',null,'Mail auto-sync'));mc.appendChild(el('p','bb-meta',ms&&ms.at?'Last sync '+String(ms.at).replace('T',' ').slice(0,16)+(ms.summary?' · '+ms.summary:''):'Har 2 ghante Gmail padh ke yahan update hota hai.'));right.appendChild(mc);}
+
+ /* ---------- Photo / screenshot → tracking (OCR in browser) ---------- */
+ function photoCard(){const c=el('div','bb-card');c.appendChild(el('h2',null,'📷 Upload screenshot'));c.appendChild(el('p','bb-meta','Store / courier mail ya tracking page ka screenshot daalo — tracking, order no. aur KM ID khud nikal lega.'));
+  const fi=document.createElement('input');fi.type='file';fi.accept='image/*';fi.multiple=true;fi.className='ph-in';c.appendChild(fi);const out=el('div');c.appendChild(out);
+  fi.onchange=async()=>{const fs=[...(fi.files||[])];if(!fs.length)return;out.textContent='';const st=el('p','bb-meta','Reading photo…');out.appendChild(st);
+   try{if(!window.Tesseract)await new Promise((res,rej)=>{const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js';s.onload=res;s.onerror=rej;document.head.appendChild(s);});
+    let txt='';for(const f of fs){const r=await Tesseract.recognize(f,'eng');txt+='\n'+r.data.text;}st.remove();ocrResult(out,txt);}catch(e){st.textContent='Photo read nahi hua: '+(e&&e.message||e);}};
+  return c;}
+ function ocrResult(out,txt){const T=txt.replace(/[|]/g,' ');const U=T.toUpperCase();const found=new Map();const addF=(v,kind)=>{v=v.replace(/\s/g,'');if(v.length<6||found.has(v))return;found.set(v,kind);};
+  (U.match(/\b1Z\s?[0-9A-Z]{3}\s?[0-9A-Z]{3}\s?[0-9A-Z]{2}\s?[0-9A-Z]{4}\s?[0-9A-Z]{4}\b/g)||[]).forEach(v=>addF(v,'UPS tracking'));
+  (U.match(/\bTBA\d{12}\b/g)||[]).forEach(v=>addF(v,'Amazon tracking'));
+  (U.match(/\bUS\d{6}(?:-[A-Z])?\b/g)||[]).forEach(v=>addF(v,'KM order'));
+  (U.match(/\b(?:WUP|WCP|ZUP|Z0)\d{6,10}\b/g)||[]).forEach(v=>addF(v,'Store order'));
+  (U.match(/\b\d{12,22}\b/g)||[]).forEach(v=>addF(v,'Tracking no.'));
+  const delivered=/\bDELIVERED\b/.test(U);const shipped=/SHIPPED|ON ITS WAY|IN TRANSIT|ON THE WAY/.test(U);
+  out.appendChild(el('p','bb-meta','Mila: '+(found.size?[...found].map(([v,k])=>k+' '+v).join(' · '):'kuch nahi')+(delivered?' · "Delivered" likha hai':shipped?' · "Shipped" likha hai':'')));
+  const norm=x=>String(x||'').toUpperCase().replace(/[^A-Z0-9]/g,'');
+  const hits=new Map();found.forEach((k,v)=>{all.forEach(r=>{const ids=[r.order_id,r._id,gv(r,'retailer_order_id'),String(gv(r,'retailer_tracking')).split(' ')[0],gv(r,'reship_awb'),gv(r,'km_tracking')].map(norm);if(ids.includes(norm(v)))hits.set(r._id,[r,v,k]);});});
+  const isTrk=k=>/tracking/i.test(k);const trkV=[...found].filter(([v,k])=>isTrk(k)).map(([v])=>v)[0];
+  if(!hits.size){out.appendChild(el('p','bb-meta','Koi order match nahi hua. Neeche se order chuno:'));}
+  const plan=[];const g=el('div','bb-grid');
+  const addRow=(r,why)=>{const c=el('div','bb-cd');const h=el('div','cd-h');const hl=el('div');hl.appendChild(el('b',null,r.order_id||r._id));hl.appendChild(el('small',null,r.item+' · '+(LBL[r.status]||r.status)));h.appendChild(hl);c.appendChild(h);c.appendChild(el('p','bb-meta','Match: '+why));
+   const acts=[];const hasT=gv(r,'retailer_tracking');
+   if(trkV&&!hasT&&['To place','Ordered'].includes(r.status))acts.push(['Store tracking '+trkV+' daalo (shipped)',{retailer_tracking:trkV,intl_tracking:trkV,retailer_ship_date:today()}]);
+   if(delivered&&['Ordered','In transit to reshipper'].includes(r.status))acts.push(['Reached reshipper (delivered)',{delivered_reshipper:today()}]);
+   if(delivered&&['Landed India','Shipped to KM','Out for delivery'].includes(r.status))acts.push(['Reached KicksMachine (delivered)',{delivered_km:today()}]);
+   if(trkV&&r.status==='At reshipper')acts.push(['AWB '+trkV+' daalo (left reshipper)',{reship_awb:trkV,shipped_reshipper:today()}]);
+   if(trkV&&r.status==='Landed India')acts.push(['Courier tracking '+trkV+' (shipped to KM)',{km_tracking:trkV,local_tracking:trkV,shipped_km:today()}]);
+   if(!acts.length)c.appendChild(el('p','bb-meta','Is order pe update karne layak kuch naya nahi.'));
+   acts.forEach(([t,p])=>{const l=el('label','ph-act');const cb=document.createElement('input');cb.type='checkbox';cb.checked=true;l.append(cb,document.createTextNode(' '+t));c.appendChild(l);plan.push({r,p,cb});});g.appendChild(c);};
+  hits.forEach(([r,v,k])=>addRow(r,k+' '+v));
+  if(!hits.size){const sel=document.createElement('select');sel.className='cd-add';[['','Order chuno…'],...KMO().filter(r=>!DONE(r.status)).map(r=>[r._id,(r.order_id||r._id)+' · '+String(r.item).slice(0,40)])].forEach(([v,t])=>{const o=el('option',null,t);o.value=v;sel.appendChild(o);});sel.onchange=()=>{const r=all.find(x=>x._id===sel.value);if(r){addRow(r,'manually chosen');ap.hidden=false;}};out.appendChild(sel);}
+  out.appendChild(g);const ap=btn('Apply updates',async()=>{const todo2=plan.filter(x=>x.cb.checked);if(!todo2.length)return;for(const x of todo2){const p=Object.assign({},x.p);p.status=derive(Object.assign({},x.r,p));await save(x.r,p);}toast(todo2.length+' updates saved');draw();},'bb-b sm');ap.hidden=!plan.length;out.appendChild(ap);}
+
+ /* ---------- To KicksMachine ---------- */
+ function tokm(P){const km=KMO();const landed=km.filter(r=>r.status==='Landed India'&&!gv(r,'km_tracking'));const moving=km.filter(r=>['Landed India','Shipped to KM','Out for delivery'].includes(r.status)&&gv(r,'km_tracking'));
+  const sec=(t,n)=>{const s=el('div','bb-sech');s.appendChild(el('span',null,t));s.appendChild(el('small',null,n));P.appendChild(s);};
+  sec('🛬 Landed in India · ship to KM',landed.length+' orders · '+inr(sumP(landed)));
+  if(landed.length){const g=el('div','bb-grid');landed.forEach(r=>{const c=el('div','bb-cd');const h=el('div','cd-h');const hl=el('div');hl.appendChild(el('b',null,r.order_id||r._id));hl.appendChild(el('small',null,r.item));h.appendChild(hl);h.appendChild(tag('Landed '+(gv(r,'landed_india')||''),'go'));c.appendChild(h);
+   const tr=el('div','cd-in');const cs=document.createElement('select');['',...DOM].forEach(v=>{const o=el('option',null,v||'Courier');o.value=v;cs.appendChild(o);});const ti=document.createElement('input');ti.placeholder='Courier tracking';tr.append(cs,ti);c.appendChild(tr);
+   c.appendChild(btn('Shipped to KicksMachine',async()=>{const p={km_courier:cs.value,km_tracking:ti.value.trim(),local_tracking:ti.value.trim(),shipped_km:today()};p.status=derive(Object.assign({},r,p));if(await save(r,p))draw();},'bb-b sm'));g.appendChild(c);});P.appendChild(g);}else P.appendChild(el('p','bb-meta','Kuch nahi.'));
+  const gm=new Map();moving.forEach(r=>{const k=gv(r,'km_tracking');gm.set(k,(gm.get(k)||[]).concat([r]));});
+  sec('🚚 On the way to KicksMachine',gm.size+' parcels · '+inr(sumP(moving)));
+  if(gm.size){const g=el('div','bb-grid');gm.forEach((rs,k)=>{const r0=rs[0];const d0=days(gv(r0,'shipped_km'));const c=el('div','bb-cd'+(d0>=4?' late':''));const h=el('div','cd-h');const hl=el('div');hl.appendChild(el('b',null,k));hl.appendChild(el('small',null,[gv(r0,'km_courier'),gv(r0,'shipped_km')?'shipped '+gv(r0,'shipped_km'):''].filter(Boolean).join(' · ')));h.appendChild(hl);h.appendChild(tag(d0!=null?'Day '+d0:'—',d0>=4?'bad':'go'));c.appendChild(h);
+   const kw=el('div','cd-sec');rs.forEach(r=>kw.appendChild(kmChip(r)));c.appendChild(kw);const ft=el('div','cd-f');ft.appendChild(el('b',null,inr(sumP(rs))));const fa=el('div','cd-act');fa.appendChild(btn('Copy',()=>copyT(k)));fa.appendChild(btn('✓ Reached KM',async()=>{for(const r of rs){const p={delivered_km:today()};p.status=derive(Object.assign({},r,p));await save(r,p);}draw();},'bb-b sm'));ft.appendChild(fa);c.appendChild(ft);g.appendChild(c);});P.appendChild(g);}else P.appendChild(el('p','bb-meta','Kuch nahi.'));}
+
+ /* ---------- Waiting KM confirmation ---------- */
+ function confirmT(P){const km=KMO().filter(r=>DONE(r.status)&&!confirmedOn(r)&&r.payout_status!=='Received');
+  const a=km.filter(r=>!gv(r,'mrn_updated')),b=km.filter(r=>gv(r,'mrn_updated'));
+  P.appendChild(el('p','bb-meta ov-note','Flow: KM pe pahuncha → hum KM portal pe MRN update karte hain → KM confirmation mail bhejta hai → uske 7 din baad payout.'));
+  const sec=(t,n)=>{const s=el('div','bb-sech');s.appendChild(el('span',null,t));s.appendChild(el('small',null,n));P.appendChild(s);};
+  const card=(r,step)=>{const w=step==='mrn'?days(gv(r,'delivered_km')):days(gv(r,'mrn_updated'));const late=step==='cf'&&w>=3;const c=el('div','bb-cd'+(late?' late':''));const h=el('div','cd-h');const hl=el('div');hl.appendChild(el('b',null,r.order_id||r._id));hl.appendChild(el('small',null,r.item));h.appendChild(hl);h.appendChild(el('div','cd-amt',inr(r.payout)));c.appendChild(h);
+   c.appendChild(el('p','bb-meta',step==='mrn'?'Reached KM '+(gv(r,'delivered_km')||'—')+(w!=null?' · '+w+' days':''):'MRN updated '+gv(r,'mrn_updated')+(w!=null?' · waiting '+w+' days':'')));
+   const fa=el('div','cd-act');
+   if(step==='mrn')fa.appendChild(btn('✓ MRN updated on KM portal',async()=>{if(await save(r,{mrn_updated:today()}))draw();},'bb-b sm'));
+   else{fa.appendChild(btn('✓ Confirmation received',async()=>{if(await save(r,{mrn_confirmed:today(),payout_timer:today()})){toast('7-day payout timer started');draw();}},'bb-b sm'));if(late)fa.appendChild(wa('WhatsApp KM','Hi Maanvesh, MRN for '+(r.order_id||r._id)+' ('+r.item+') was updated on '+gv(r,'mrn_updated')+'. Confirmation abhi tak nahi aaya, please check. Thanks!'));}
+   c.appendChild(fa);return c;};
+  sec('① MRN update baaki',a.length+' orders');if(a.length){const g=el('div','bb-grid');a.forEach(r=>g.appendChild(card(r,'mrn')));P.appendChild(g);}else P.appendChild(el('p','bb-meta','Kuch nahi.'));
+  sec('② MRN done · KM confirmation ka wait',b.length+' orders · '+inr(sumP(b)));
+  if(b.length){const all2=btn('✓ Confirmation received for all '+b.length,async()=>{if(!confirm(b.length+' orders: confirmation aaj aaya mark karein? (7-day timer start hoga)'))return;for(const r of b)await save(r,{mrn_confirmed:today(),payout_timer:today()});draw();});all2.style.marginBottom='10px';P.appendChild(all2);const g=el('div','bb-grid');b.sort((x,y)=>String(gv(x,'mrn_updated')).localeCompare(String(gv(y,'mrn_updated')))).forEach(r=>g.appendChild(card(r,'cf')));P.appendChild(g);}else P.appendChild(el('p','bb-meta','Kuch nahi.'));}
+
+ /* ---------- Payouts (after confirmation, 7 days) ---------- */
+ function payouts(P){const km=KMO().filter(r=>r.status!=='To place');const rec=r=>r.payout_status==='Received';const T=confirmedOn;const left=r=>7-(days(T(r))||0);
+  const run=km.filter(r=>!rec(r)&&T(r)&&left(r)>=0),chase=km.filter(r=>!rec(r)&&T(r)&&left(r)<0),wait=km.filter(r=>!rec(r)&&!T(r)),got=km.filter(rec);
+  if(!['run','chase','wait','got'].includes(S.pf))S.pf=chase.length?'chase':'run';
+  const sm=el('div','bb-sum tabs');[['run','⏱ 7-day timer',run],['chase','🔔 Chase payout',chase],['wait','⏳ Not confirmed yet',wait],['got','✓ Received',got]].forEach(([k,t,a])=>{const d=el('div',S.pf===k?'on':'');d.appendChild(el('b',null,inr(sumP(a))));d.appendChild(el('small',null,t+' · '+a.length));if(k==='chase'&&a.length)d.classList.add('bad');d.onclick=()=>{S.pf=k;draw();};sm.appendChild(d);});P.appendChild(sm);
+  const qv=search(P,'pq','Search KM ID, item…');const list=({run,chase,wait,got})[S.pf].filter(r=>!qv||vtxt(r).includes(qv));
+  const bar=el('div','bb-act2');if(S.pf==='chase'&&list.length)bar.appendChild(wa('WhatsApp KM · '+list.length+' overdue','Hi Maanvesh, payout pending for: '+list.map(r=>(r.order_id||r._id)+' ('+inr(r.payout)+', confirmed '+T(r)+')').join(', ')+'. Total '+inr(sumP(list))+'. Please check. Thanks!'));
+  if(list.length)bar.appendChild(btn('Copy statement',()=>copyT('Luxella × KicksMachine payouts ('+today()+')\n'+list.map(r=>(r.order_id||r._id)+' · '+r.item+' · '+inr(r.payout)+' · '+(rec(r)?'PAID '+(r.payout_date||''):T(r)?'confirmed '+T(r):'not confirmed')).join('\n')+'\nTotal '+inr(sumP(list)))));
   if(bar.children.length)P.appendChild(bar);
+  if(S.pf==='wait')P.appendChild(el('p','bb-meta ov-note','Ye orders abhi KM confirmation tak nahi pahunche. Confirmation aate hi 7-day timer khud chalu hota hai (Confirmation tab).'));
   if(!list.length){P.appendChild(el('p','bb-meta','Kuch nahi.'));return;}
-  const srt=S.pf==='run'?(a,b)=>left(a)-left(b):S.pf==='got'?(a,b)=>String(b.payout_date).localeCompare(String(a.payout_date)):(a,b)=>String(gv(a,'delivered_km')||a.order_date).localeCompare(String(gv(b,'delivered_km')||b.order_date));
-  const g=el('div','bb-grid');list.sort(srt).forEach(r=>{const L=T(r)?left(r):null;const c=el('div','bb-cd'+(L!=null&&L<0?' late':''));
+  const g=el('div','bb-grid');list.sort((a,b)=>S.pf==='got'?String(b.payout_date).localeCompare(String(a.payout_date)):S.pf==='wait'?ST.indexOf(b.status)-ST.indexOf(a.status):left(a)-left(b)).forEach(r=>{const L=T(r)?left(r):null;const c=el('div','bb-cd'+(S.pf==='chase'?' late':''));
    const h=el('div','cd-h');const hl=el('div');hl.appendChild(el('b',null,r.order_id||r._id));hl.appendChild(el('small',null,r.item));h.appendChild(hl);h.appendChild(el('div','cd-amt',inr(r.payout)));c.appendChild(h);
-   if(S.pf==='run'){const pr=el('div','cd-prog'+(L<0?' bad':L<=1?' warn':''));const pi=el('i');pi.style.width=Math.min(100,(days(T(r))/7)*100)+'%';pr.appendChild(pi);c.appendChild(pr);
-    c.appendChild(el('div','cd-timer',L<0?'Overdue by '+(-L)+' day'+(-L>1?'s':''):L===0?'Due today':L+' day'+(L>1?'s':'')+' left'));c.appendChild(el('p','bb-meta','Timer started '+T(r)+' · day '+days(T(r))+' of 7'));}
-   else if(S.pf==='ready'){const d=days(gv(r,'delivered_km'));c.appendChild(el('p','bb-meta','At KicksMachine'+(gv(r,'delivered_km')?' since '+gv(r,'delivered_km')+' ('+d+' days)':'')+(gv(r,'mrn_updated')?' · MRN updated':'')));}
-   else if(S.pf==='moving'){c.appendChild(tag(LBL[r.status]||r.status,'go'));c.appendChild(el('p','bb-meta',[r.reshipper,gv(r,'eta_india')?'ETA India '+gv(r,'eta_india'):''].filter(Boolean).join(' · ')||' '));}
+   if(L!=null&&!rec(r)){const pr=el('div','cd-prog'+(L<0?' bad':L<=1?' warn':''));const pi=el('i');pi.style.width=Math.min(100,(days(T(r))/7)*100)+'%';pr.appendChild(pi);c.appendChild(pr);c.appendChild(el('div','cd-timer',L<0?'Overdue by '+(-L)+' day'+(-L>1?'s':''):L===0?'Due today':L+' day'+(L>1?'s':'')+' left'));c.appendChild(el('p','bb-meta','Confirmation '+T(r)+(gv(r,'payout_chased')?' · chased '+gv(r,'payout_chased'):'')));}
+   else if(S.pf==='wait')c.appendChild(tag(LBL[r.status]||r.status,DONE(r.status)?'ok':'go'));
    else c.appendChild(el('p','bb-meta','Paid on '+(r.payout_date||'—')));
    const fa=el('div','cd-act');
-   if(!rec(r)){if(!T(r)){fa.appendChild(btn('▶ Start 7-day timer',async()=>{if(await save(r,{payout_timer:today()}))draw();},S.pf==='ready'?'bb-b sm':'bb-b g sm'));}
-    else fa.appendChild(btn('Reset timer',async()=>{if(await save(r,{payout_timer:''}))draw();}));
-    fa.appendChild(btn('✓ Received',async()=>{if(await save(r,{payout_status:'Received',payout_date:today()}))draw();},T(r)?'bb-b sm':'bb-b g sm'));}
+   if(!rec(r)){if(S.pf==='chase'){fa.appendChild(btn('Chased today',async()=>{if(await save(r,{payout_chased:today()}))draw();}));}
+    if(T(r))fa.appendChild(btn('✓ Payout received',async()=>{if(await save(r,{payout_status:'Received',payout_date:today()}))draw();},'bb-b sm'));
+    else fa.appendChild(btn('Mark received',async()=>{if(await save(r,{payout_status:'Received',payout_date:today()}))draw();}));}
    else fa.appendChild(btn('Undo',async()=>{if(await save(r,{payout_status:'Pending',payout_date:''}))draw();}));
    c.appendChild(fa);g.appendChild(c);});P.appendChild(g);}
+
+ /* ---------- Checklist: one dropdown per parcel / combined order ---------- */
+ const CK=[
+  ['order_date','Bid won',[]],
+  ['retailer_date','Ordered at store',[['store','Store','list',STORES],['retailer_order_id','Store order no.']]],
+  ['km_portal_updated','KM portal updated (order + retailer ID)',[]],
+  ['form_date','Reshipper receiver form filled',[['reshipper','Reshipper','list',RS]],{form_filled:'Yes'}],
+  ['retailer_ship_date','Store shipped',[['retailer_tracking','Tracking no.'],['retailer_carrier','Carrier','list',CARRIERS]]],
+  ['delivered_reshipper','Reached reshipper',[['actual_weight','Weight kg','number']]],
+  ['shipped_reshipper','Left reshipper → India',[['reship_awb','AWB']]],
+  ['landed_india','Landed in India',[]],
+  ['shipped_km','Shipped to KicksMachine',[['km_courier','Courier','list',DOM],['km_tracking','Courier tracking']]],
+  ['delivered_km','Reached KicksMachine',[]],
+  ['mrn_updated','MRN updated on KM portal',[]],
+  ['mrn_confirmed','KM confirmation received (7-day timer starts)',[],{}],
+  ['payout_chased','Payout chased',[]],
+  ['payout_date','Payout received',[],{payout_status:'Received'}]];
+ const gkey=r=>gv(r,'retailer_order_id')?'so:'+gv(r,'retailer_order_id'):gv(r,'retailer_tracking')?'t:'+String(gv(r,'retailer_tracking')).split(' ')[0]:'o:'+r._id;
+ function checklist(P){const km=KMO();const gm=new Map();km.forEach(r=>{const k=gkey(r);gm.set(k,(gm.get(k)||[]).concat([r]));});
+  const doneN=rs=>CK.filter(([k])=>rs.every(r=>gv(r,k))).length;
+  let groups=[...gm.values()];const isDone=rs=>rs.every(r=>r.payout_status==='Received');
+  const qv=search(P,'cq','Search KM ID, item, store order, tracking…');
+  chipRow(P,'cf',[['','Open',groups.filter(g=>!isDone(g)).length],['done','Completed',groups.filter(isDone).length],['multi','Combined orders',groups.filter(g=>g.length>1).length]]);
+  groups=groups.filter(g=>S.cf==='done'?isDone(g):S.cf==='multi'?g.length>1:!isDone(g)).filter(g=>!qv||g.map(vtxt).join(' ').includes(qv)).sort((a,b)=>doneN(a)-doneN(b)||String(a[0].order_date).localeCompare(String(b[0].order_date)));
+  if(!groups.length){P.appendChild(el('p','bb-meta','Kuch nahi.'));return;}
+  const wrapC=el('div','ck-list');P.appendChild(wrapC);
+  groups.forEach(rs=>{const key=gkey(rs[0]);const n=doneN(rs);const d=document.createElement('details');d.className='ck';if(S.ckOpen===key)d.open=true;d.addEventListener('toggle',()=>{if(d.open)S.ckOpen=key;});
+   const sm=document.createElement('summary');const l=el('div','ck-l');l.appendChild(el('b',null,rs.map(r=>r.order_id||r._id).join(' + ')));l.appendChild(el('span',null,rs.map(r=>String(r.item||'').slice(0,40)).join(' · ')));sm.appendChild(l);
+   const nx=CK.find(([k])=>!rs.every(r=>gv(r,k)));const rr=el('div','ck-r');rr.appendChild(el('small',null,nx?'Next: '+nx[1]:'All done ✓'));const pb=el('div','ck-bar');const pi=el('i');pi.style.width=Math.round(n/CK.length*100)+'%';pb.appendChild(pi);rr.appendChild(pb);rr.appendChild(el('em',null,n+'/'+CK.length));sm.appendChild(rr);d.appendChild(sm);
+   const body=el('div','ck-body');if(rs.length>1)body.appendChild(el('p','bb-meta','Combined: '+rs.length+' KM orders, ek store order / tracking. Tick karne se sab pe lagega.'));
+   CK.forEach(([k,label,fields,extra])=>{const ok=rs.every(r=>gv(r,k));const row=el('div','ck-step'+(ok?' ok':''));const cb=document.createElement('input');cb.type='checkbox';cb.checked=ok;
+    const lab=el('label');lab.appendChild(cb);lab.appendChild(el('span',null,label));row.appendChild(lab);const dt=document.createElement('input');dt.type='date';dt.value=String(gv(rs[0],k)||'').slice(0,10);row.appendChild(dt);
+    const F={};fields.forEach(([fk,fl,type,opts])=>{let i;const v=String(gv(rs[0],fk)||'');if(type==='list'){i=document.createElement('select');[...(v&&!opts.includes(v)?[v]:[]),'',...opts].forEach(o=>{const op=el('option',null,o||fl);op.value=o;if(o===v)op.selected=true;i.appendChild(op);});}else{i=document.createElement('input');i.placeholder=fl;if(type)i.type=type;i.value=v;}F[fk]=i;row.appendChild(i);});
+    const apply=async(on)=>{for(const r of rs){const p={};Object.entries(F).forEach(([fk,i])=>{let v=i.value;if(i.type==='number')v=v===''?null:Number(v);if(v!==''&&v!=null)p[fk]=v;});if(p.retailer_tracking)p.intl_tracking=p.retailer_tracking;if(p.km_tracking)p.local_tracking=p.km_tracking;
+      if(on){p[k]=dt.value||today();Object.assign(p,extra||{});if(k==='mrn_confirmed'&&!r.payout_timer)p.payout_timer=p[k];if(k==='payout_date')p.payout_status='Received';}else{p[k]='';if(k==='payout_date')p.payout_status='Pending';if(k==='mrn_confirmed')p.payout_timer='';if(k==='form_date')p.form_filled='';}
+      if(ALIAS[k])p[ALIAS[k]]=p[k];p.status=derive(Object.assign({},r,p));await save(r,p);}draw();};
+    cb.onchange=()=>apply(cb.checked);
+    if(fields.length){const sv=btn('Save',()=>apply(ok||cb.checked));row.appendChild(sv);}
+    body.appendChild(row);});
+   const ad=document.createElement('select');ad.className='cd-add';[['','+ Combine another KM order into this group'],...km.filter(r=>!rs.includes(r)&&!DONE(r.status)).map(r=>[r._id,(r.order_id||r._id)+' · '+String(r.item).slice(0,36)])].forEach(([v,t])=>{const o=el('option',null,t);o.value=v;ad.appendChild(o);});
+   ad.onchange=async()=>{const r=all.find(x=>x._id===ad.value);if(!r)return;const src=rs[0];const p={};['store','retailer_order_id','retailer_date','retailer_tracking','intl_tracking','retailer_carrier','retailer_ship_date','reshipper'].forEach(k=>{if(src[k])p[k]=src[k];});if(!p.retailer_order_id&&!p.retailer_tracking){toast('Pehle is group me store order no. ya tracking daalo');return;}p.status=derive(Object.assign({},r,p));if(await save(r,p))draw();};body.appendChild(ad);
+   d.appendChild(body);wrapC.appendChild(d);});}
 
  function bids(P){const byId={};all.forEach(r=>{byId[r.order_id||r._id]=r;});
   const stOf=bd=>{const ids=bd.km_order_ids||[bd._id];return ids.some(i=>byId[i])?'in':bd.dismissed?'dis':'new';};
