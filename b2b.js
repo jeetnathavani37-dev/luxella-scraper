@@ -130,4 +130,19 @@ window.lxB2B=async function(root,sb,toast){
  function exp(P){const c=el('div','bb-card');c.appendChild(el('h2',null,'Export'));const b=el('button','bb-b g','Download B2B sheet (CSV)');b.onclick=()=>{const cols=['client','order_id','item','brand','size','order_date','price_usd','reshipper','reship_cost','landed','payout','profit','profit_pct','margin_ok','status','payout_status','intl_tracking','local_tracking','delivered_reshipper','eta_india','landed_india','shipped_client','delivered_client','weight','notes'];const q=v=>'"'+String(v==null?'':v).replace(/"/g,'""')+'"';const csv=[cols.join(',')].concat(all.map(r=>cols.map(k=>q(r[k])).join(','))).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='luxella-b2b-'+today()+'.csv';a.click();};c.appendChild(b);P.appendChild(c);}
  draw();
 };
+
+/* Standalone B2B portal at /b2b */
+window.lxB2BApp=function(){
+ const X=window.__lxAdmin;if(!X)return;const {sb,S}=X;const root=document.getElementById('admin-root');root.textContent='';
+ const st=document.createElement('style');st.textContent=`#admin-root{min-height:100vh;background:#0A0A0A;color:#F3EEE6;font:300 14px 'Jost',system-ui,sans-serif}#admin-root *{box-sizing:border-box}
+ .bp-top{display:flex;align-items:center;gap:14px;padding:14px 20px;border-bottom:1px solid #232120;flex-wrap:wrap;position:sticky;top:0;background:#0A0A0A;z-index:5}.bp-top img{height:26px}.bp-top .t{letter-spacing:.3em;text-transform:uppercase;font-size:12px;color:#C9A227}.bp-top .sp{flex:1}.bp-top .who{color:#A39C90;font-size:12px}
+ .bp-top a,.bp-top button{background:transparent;color:#E3C565;border:1px solid #6B5A24;padding:8px 14px;font:500 11px 'Jost',sans-serif;letter-spacing:.16em;text-transform:uppercase;cursor:pointer;text-decoration:none}@media(max-width:600px){.bp-top .who{display:none}.bp-top .t{display:none}}
+ .bp-toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:#C9A227;color:#0A0A0A;padding:10px 18px;font-size:13px;z-index:9}`;document.head.appendChild(st);
+ const top=el('div','bp-top');const lg=document.createElement('img');lg.src='assets/luxella_logo.png';lg.alt='Luxella';top.appendChild(lg);top.appendChild(el('span','t','B2B Portal'));top.appendChild(el('span','sp'));top.appendChild(el('span','who',S.email||''));
+ const ad=el('a',null,'Client admin');ad.href=new URL('admin',document.baseURI).href;top.appendChild(ad);
+ const so=el('button',null,'Sign out');so.onclick=()=>sb.auth.signOut().then(()=>{location.href=new URL('b2b',document.baseURI).href;});top.appendChild(so);root.appendChild(top);
+ const body=el('div');root.appendChild(body);let tt;
+ const toast=t=>{let e=document.querySelector('.bp-toast');if(!e){e=el('div','bp-toast');document.body.appendChild(e);}e.textContent=t;e.hidden=false;clearTimeout(tt);tt=setTimeout(()=>{e.hidden=true;},2600);};
+ window.lxB2B(body,sb,toast);
+};
 })();
