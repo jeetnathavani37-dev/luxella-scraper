@@ -62,7 +62,7 @@ ready(()=>{
   if(s===2){const pr=Number(val('price'));if(!(pr>0))return 'Enter the agreed price.';if(paidMode()){const pd=Number(val('paid'));if(!(pd>0))return 'Enter the amount you paid, or choose "Pay after confirmation".';if(pd>pr)return 'Paid amount is more than the price.';}}
   return '';};
  const later=()=>F.addr.value==='__later';const addrText=()=>later()?'To be shared later':(F.addr.value==='__new'?val('newaddr'):F.addr.value);
- const ocard=(no,st)=>{const pr=Number(val('price')||0),pd=paidMode()?Number(val('paid')||0):0;const c=el('div','ocard');const th=el('div','oc-th');if(S.img){const im=el('img');im.src=S.img;im.alt='';th.appendChild(im);}else th.appendChild(el('span',null,(val('brand')||val('item')||'L').trim().charAt(0).toUpperCase()));c.appendChild(th);const m=el('div','oc-m');m.appendChild(el('div','oc-no',no||'Order preview'));m.appendChild(el('div','oc-it',val('item')||'—'));m.appendChild(el('div','oc-br',[val('brand'),val('size'),'Qty '+(val('qty')||'1')].filter(Boolean).join(' · ')));c.appendChild(m);const r=el('div','oc-r');r.appendChild(el('div','oc-pr',pr?inr(pr):'—'));r.appendChild(el('span','oc-st',st));c.appendChild(r);const f=el('div','oc-f');const cell=(k,v)=>{const d=el('div');d.appendChild(el('span','k',k));d.appendChild(el('span','v',v));f.appendChild(d);};cell('Delivery',later()?'Decide later':(addrText()||'—').split('\n')[0].slice(0,40));cell('Payment',pd?inr(pd)+' paid':'Pending');cell('Confirmation','24–48 hours');c.appendChild(f);return c;};
+ const ocard=(no,st)=>{const pr=Number(val('price')||0),pd=paidMode()?Number(val('paid')||0):0;const c=el('div','ocard');const th=el('div','oc-th');if(S.img){const im=el('img');im.src=S.img;im.alt='';th.appendChild(im);}else th.appendChild(el('span',null,(val('brand')||val('item')||'L').trim().charAt(0).toUpperCase()));c.appendChild(th);const m=el('div','oc-m');m.appendChild(el('div','oc-no',no||'Order preview'));m.appendChild(el('div','oc-it',val('item')||'—'));m.appendChild(el('div','oc-br',[val('brand'),val('size'),'Qty '+(val('qty')||'1')].filter(Boolean).join(' · ')));c.appendChild(m);const r=el('div','oc-r');r.appendChild(el('div','oc-pr',pr?inr(pr):'—'));r.appendChild(el('span','oc-st',st));c.appendChild(r);const f=el('div','oc-f');const cell=(k,v)=>{const d=el('div');d.appendChild(el('span','k',k));d.appendChild(el('span','v',v));f.appendChild(d);};cell('Delivery',later()?'Decide later':(addrText()||'—').split('\n')[0].slice(0,40));cell('Payment',pd?inr(pd)+' paid':'Pending');cell('Order type',F.otype&&F.otype.value==='Local'?'Local (India)':'International');cell('Confirmation','24–48 hours');c.appendChild(f);return c;};
  if(F.photo)F.photo.addEventListener('change',()=>{const fl=F.photo.files&&F.photo.files[0];S.img=null;if(fl&&/^image\//.test(fl.type)){try{S.img=URL.createObjectURL(fl);}catch(e){}}});
  const review=()=>{rv.textContent='';rv.appendChild(ocard(null,'Ready to place'));const row=(k,v)=>{const r=el('div','nwo-r');r.appendChild(el('span','k',k));r.appendChild(el('span','v',v));rv.appendChild(r);};
   const pr=Number(val('price')),pd=paidMode()?Number(val('paid')||0):0;
@@ -88,11 +88,11 @@ ready(()=>{
    if(!later())try{await photos.db.doc('addresses/'+pslug(name)).set({order:name,address,phone:val('phone'),pref:'',savedAt:today});}catch(e){}
    if(F.addr.value==='__new'){try{await photos.db.collection('addressbook').add({label:'Address '+(addrList().length+1),phone:val('phone'),address,isDefault:!addrList().length,at:today});}catch(e){}}
    if(paid){const id='ps-'+hash(name+'|'+paid+'|'+val('ref').toLowerCase());try{await photos.db.doc('paysub/'+id).set({id,order:name,amount:paid,method:F.pay.value,ref:val('ref'),proof,status:'Pending verification',at:new Date().toISOString()});}catch(e){say('Order placed, but the payment note did not save. Please submit it in Payments.');}}
-   const pf=F.photo.files&&F.photo.files[0];if(pf){try{if(pf.size>8*1024*1024)throw new Error('big');const a=await photos.assets.upload(pf);await photos.db.doc('photos/'+pslug(name)).set({order:name,id:a.id,url:a.url,at:today});}catch(e){say('Order placed, but the photo did not upload. Add it from the order.');}}
+   const pf=F.photo.files&&F.photo.files[0];if(!pf&&S.img&&/^https:\/\//.test(S.img)){try{await photos.db.doc('photos/'+pslug(name)).set({order:name,id:'',url:S.img,at:today});}catch(e){}}if(pf){try{if(pf.size>8*1024*1024)throw new Error('big');const a=await photos.assets.upload(pf);await photos.db.doc('photos/'+pslug(name)).set({order:name,id:a.id,url:a.url,at:today});}catch(e){say('Order placed, but the photo did not upload. Add it from the order.');}}
    S.done={no,name,paid,price};
    panes.forEach(p=>p.hidden=true);prog.hidden=nav.hidden=true;intro.hidden=true;
    doneBox.hidden=false;doneBox.textContent='';
-   doneBox.appendChild(el('div','nwo-tick','✓'));doneBox.appendChild(el('h3',null,'Order placed · '+no));doneBox.appendChild(ocard(no,'Awaiting confirmation'));
+   doneBox.appendChild(el('div','nwo-tick','✓'));doneBox.appendChild(el('h3',null,'Order placed · '+no));{const sv={item:name,order_no:no,order_date:today,brand:val('brand'),size:val('size'),qty:Number(val('qty')||1),product_link:val('link'),client_notes:val('notes'),delivery_address:address,delivery_phone:later()?'':val('phone'),delivery_later:later(),order_type:(F.otype&&F.otype.value==='Local')?'Local':'ETA',payout:price,payout_status:'Pending',placed_by:'client',stage:1};let im=S.img||'';const pf2=F.photo.files&&F.photo.files[0];if(!im&&pf2){try{im=URL.createObjectURL(pf2);}catch(e){}}doneBox.appendChild(window.lxOrderCard?window.lxOrderCard(sv,im,'Awaiting confirmation'):ocard(no,'Awaiting confirmation'));}
    doneBox.appendChild(el('p','note',name+' · '+inr(price)+(paid?' · '+inr(paid)+' payment submitted, pending verification':' · payment pending')+'. We will verify your payment and check availability, and confirm within 24–48 hours. A receipt email is on its way to you.'));
    const row=el('p','nwo-nav');const v=el('button','btn','View in Orders');v.type='button';v.addEventListener('click',()=>{const t=$('tab-al');if(t)t.click();window.scrollTo(0,0);});const again=el('button','btn2','Place another order');again.type='button';again.addEventListener('click',()=>{Object.keys(F).forEach(k=>{if(F[k].type==='file')F[k].value='';else if(F[k].tagName!=='SELECT')F[k].value='';});F.qty.value='1';tc.checked=false;S.step=0;S.done=null;doneBox.hidden=true;prog.hidden=nav.hidden=intro.hidden=false;next.disabled=false;S.busy=false;render();});row.appendChild(v);row.appendChild(waBtn(no));{const cp=el('button','btn2','Copy order link');cp.type='button';cp.addEventListener('click',async()=>{const u=location.origin+location.pathname+'#al';try{await navigator.clipboard.writeText(u);cp.textContent='Link copied';}catch(e){cp.textContent=u;}});row.appendChild(cp);}row.appendChild(again);doneBox.appendChild(row);
    S.busy=false;
@@ -167,7 +167,7 @@ function init(){
  if($('await-alert'))return;const sec=el('section','card');sec.id='await-alert';sec.hidden=true;$('neworder').parentNode.insertBefore(sec,$('neworder'));
  const render=()=>{const o=dash.data('orders');sec.textContent='';const rows=o.status==='ok'?o.data.filter(r=>r.placed_by==='client'&&Number(r.stage||1)<=1&&!/cancel/i.test(String(r.status||''))):[];sec.hidden=!rows.length;if(!rows.length)return;
   sec.appendChild(el('h2',null,'Awaiting confirmation'));sec.appendChild(el('p','note','Luxella is verifying payment and availability. Expect confirmation within 24–48 hours, and an email the moment each one is confirmed.'));
-  rows.forEach(r=>{const d=el('div','awt');const l=el('div');l.appendChild(el('span','dno',r.order_no||'—'));l.appendChild(el('span','dit',r.item));d.appendChild(l);d.appendChild(el('span','awb','Awaiting confirmation'));sec.appendChild(d);});};
+  rows.forEach(r=>{if(window.lxOrderCard){sec.appendChild(window.lxOrderCard(r,'','Awaiting confirmation'));return;}const d=el('div','awt');const l=el('div');l.appendChild(el('span','dno',r.order_no||'—'));l.appendChild(el('span','dit',r.item));d.appendChild(l);d.appendChild(el('span','awb','Awaiting confirmation'));sec.appendChild(d);});};
  render();dash.onData(render);
 }
 })();
@@ -323,4 +323,29 @@ window.lxCancelSheet=function(r){
  sh.appendChild(go);const keep=el('button','btn2 cx-keep','Keep my order');keep.type='button';keep.addEventListener('click',close);sh.appendChild(keep);sh.appendChild(msg);
  (document.querySelector('.sw')||document.body).appendChild(ov);requestAnimationFrame(()=>ov.classList.add('on'));
 };
+})();
+
+/* Full order card (after placing, and in Awaiting confirmation) */
+(function(){
+const el=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e;};
+const inr=v=>'₹'+Number(v||0).toLocaleString('en-IN');
+const fdt=d=>{try{return new Date(d).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});}catch(e){return d||'';}};
+window.lxOrderCard=function(r,img,status){
+ const c=el('div','ocard ocf');
+ const th=el('div','oc-th');let u=img;if(!u){try{u=(typeof photoUrl==='function')?photoUrl(r):'';}catch(e){u='';}}
+ if(u){const im=el('img');im.src=u;im.alt=r.item||'';th.appendChild(im);}else th.appendChild(el('span',null,String(r.brand||r.item||'L').trim().charAt(0).toUpperCase()));c.appendChild(th);
+ const m=el('div','oc-m');m.appendChild(el('div','oc-no',(r.order_no||'Order')+(r.order_date?' · '+fdt(r.order_date):'')));m.appendChild(el('div','oc-it',r.item||'—'));m.appendChild(el('div','oc-br',[r.brand,r.size,'Qty '+(r.qty||1)].filter(Boolean).join(' · ')));c.appendChild(m);
+ const rt=el('div','oc-r');rt.appendChild(el('div','oc-pr',r.payout?inr(r.payout):'—'));rt.appendChild(el('span','oc-st',status||(r.placed_by==='client'&&Number(r.stage||1)<=1?'Awaiting confirmation':(r.status||''))));c.appendChild(rt);
+ const f=el('div','oc-f');const cell=(k,v)=>{if(!v)return;const d=el('div');d.appendChild(el('span','k',k));d.appendChild(el('span','v',v));f.appendChild(d);};
+ const local=String(r.order_type||'').indexOf('Local')>=0;
+ cell('Type',local?'Local (India)':'International');
+ cell('Delivery',r.delivery_later?'Decide later':String(r.delivery_address||'—').split('\n')[0].slice(0,48));
+ if(r.delivery_phone)cell('Phone',r.delivery_phone);
+ const paid=(typeof paidAmt==='function')?paidAmt(r):0;cell('Payment',r.payout_status==='Received'?'Received':(paid>0?inr(paid)+' paid':'Pending'));
+ cell('Confirmation',Number(r.stage||1)<=1?'Within 24–48 hours':'Confirmed');
+ if(r.client_notes)cell('Notes',String(r.client_notes).slice(0,60));
+ c.appendChild(f);
+ if(r.product_link&&/^https?:\/\//.test(r.product_link)){const a=el('a','oc-lk','View product page ↗');a.href=r.product_link;a.target='_blank';a.rel='noopener';c.appendChild(a);}
+ const go=el('button','btn2 oc-open','Track this order');go.type='button';go.addEventListener('click',()=>{try{const nr=(dash.data('orders').data||[]).find(x=>x.item===r.item)||r;openDrawer(nr);}catch(e){const t=document.getElementById('tab-tr');if(t)t.click();}});c.appendChild(go);
+ return c;};
 })();
