@@ -140,7 +140,7 @@ function init(){
  const note=wrap.parentNode.querySelector('.note');if(note)note.textContent='Open orders at a glance. Tap one for details.';
  const open=new Set();
  const render=()=>{const o=dash.data('orders');box.textContent='';if(o.status!=='ok')return;
-  const rows=o.data.filter(r=>r.status!=='Delivered'&&Number(r.stage||1)<9).sort((a,b)=>Number(b.stage||1)-Number(a.stage||1));
+  const rows=o.data.filter(r=>r.status!=='Delivered'&&Number(r.stage||1)<9&&!/cancel/i.test(String(r.status||''))).sort((a,b)=>Number(b.stage||1)-Number(a.stage||1));
   if(!rows.length){box.appendChild(el('p','lbl','No open orders.'));return;}
   rows.forEach(r=>{const st=Number(r.stage||1),local=String(r.order_type||'').indexOf('Local')>=0;
    const d=el('details','dep');d.dataset.k=r.item;if(open.has(r.item))d.open=true;d.addEventListener('toggle',()=>{d.open?open.add(r.item):open.delete(r.item);});
@@ -165,7 +165,7 @@ const inr=v=>'₹'+Number(v||0).toLocaleString('en-IN');
 let k=0;const t=setInterval(()=>{k++;let ok=false;try{ok=typeof dash!=='undefined'&&$('neworder');}catch(e){}if(ok){clearInterval(t);init();}else if(k>200)clearInterval(t);},150);
 function init(){
  if($('await-alert'))return;const sec=el('section','card');sec.id='await-alert';sec.hidden=true;$('neworder').parentNode.insertBefore(sec,$('neworder'));
- const render=()=>{const o=dash.data('orders');sec.textContent='';const rows=o.status==='ok'?o.data.filter(r=>r.placed_by==='client'&&Number(r.stage||1)<=1):[];sec.hidden=!rows.length;if(!rows.length)return;
+ const render=()=>{const o=dash.data('orders');sec.textContent='';const rows=o.status==='ok'?o.data.filter(r=>r.placed_by==='client'&&Number(r.stage||1)<=1&&!/cancel/i.test(String(r.status||''))):[];sec.hidden=!rows.length;if(!rows.length)return;
   sec.appendChild(el('h2',null,'Awaiting confirmation'));sec.appendChild(el('p','note','Luxella is verifying payment and availability. Expect confirmation within 24–48 hours, and an email the moment each one is confirmed.'));
   rows.forEach(r=>{const d=el('div','awt');const l=el('div');l.appendChild(el('span','dno',r.order_no||'—'));l.appendChild(el('span','dit',r.item));d.appendChild(l);d.appendChild(el('span','awb','Awaiting confirmation'));sec.appendChild(d);});};
  render();dash.onData(render);
@@ -202,7 +202,7 @@ wait(()=>$('pane-pay')&&typeof dash!=='undefined'&&typeof photos!=='undefined',(
  if($('paynow'))return;
  const sec=el('section','card');sec.id='paynow';const pane=$('pane-pay');pane.insertBefore(sec,pane.firstChild);
  const paidOf=r=>{try{return typeof paidAmt==='function'?paidAmt(r):0;}catch(e){return 0;}};
- const render=()=>{sec.textContent='';const o=dash.data('orders');const rows=o.status==='ok'?o.data:[];const due=rows.filter(r=>Number(r.payout||0)-paidOf(r)>0);const tot=due.reduce((s,r)=>s+Number(r.payout||0)-paidOf(r),0);const p=Object.assign({},photos.payinfo||{});if(!p.upi)p.upi='jeetnathavani37-1@okaxis';
+ const render=()=>{sec.textContent='';const o=dash.data('orders');const rows=o.status==='ok'?o.data.filter(r=>!/cancel/i.test(String(r.status||''))):[];const due=rows.filter(r=>Number(r.payout||0)-paidOf(r)>0);const tot=due.reduce((s,r)=>s+Number(r.payout||0)-paidOf(r),0);const p=Object.assign({},photos.payinfo||{});if(!p.upi)p.upi='jeetnathavani37-1@okaxis';
   sec.appendChild(el('h2',null,'Pay now'));
   if(!due.length){sec.appendChild(el('p','note','Nothing due right now. Thank you.'));return;}
   sec.appendChild(el('div','pn-tot',inr(tot)));sec.appendChild(el('p','note','Pay with your own GPay or any UPI app, or use the details below. Then submit the payment so we can verify it.'));
@@ -291,5 +291,36 @@ window.lxPaySheet=function(amount,note,rows){
  if(pi.bank){const d=el('details','ps-bank');d.appendChild(el('summary',null,'Pay by bank transfer instead'));const v=el('div','v',pi.bank);v.style.whiteSpace='pre-wrap';d.appendChild(v);const b=el('button','btn2','Copy bank details');b.type='button';b.addEventListener('click',async()=>{try{await navigator.clipboard.writeText(pi.bank);b.textContent='Copied';}catch(e){}});d.appendChild(b);sh.appendChild(d);}
  (document.querySelector('.sw')||document.body).appendChild(ov);requestAnimationFrame(()=>ov.classList.add('on'));
  const esc=e=>{if(e.key==='Escape'){close();document.removeEventListener('keydown',esc);}};document.addEventListener('keydown',esc);
+};
+})();
+
+/* Cancel order (client): direct before confirmation, request after */
+(function(){
+const el=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e;};
+const inr=v=>'₹'+Number(v||0).toLocaleString('en-IN');
+window.lxCancelSheet=function(r){
+ const st=Number(r.stage||1);const direct=st<=1;const paid=(typeof paidAmt==='function')?paidAmt(r):0;
+ const old=document.getElementById('lx-cxsheet');if(old)old.remove();
+ const ov=el('div','ps-ov');ov.id='lx-cxsheet';const sh=el('div','ps');ov.appendChild(sh);const close=()=>{ov.classList.remove('on');setTimeout(()=>ov.remove(),250);};ov.addEventListener('click',e=>{if(e.target===ov)close();});
+ const x=el('button','ps-x','×');x.type='button';x.addEventListener('click',close);sh.appendChild(x);
+ sh.appendChild(el('div','ps-eb',direct?'Cancel order':'Request cancellation'));sh.appendChild(el('div','ps-am cx-t',(r.order_no?r.order_no+' · ':'')+r.item));
+ const tip=el('div','ps-tip');tip.appendChild(el('b',null,direct?'Not confirmed yet':'Already confirmed with the store'));tip.appendChild(el('p',null,direct?('This order has not been confirmed yet, so it is cancelled straight away.'+(paid>0?' Your payment of '+inr(paid)+' is refunded in full within 5–7 working days.':'')):'The store has already accepted this order, so cancellation depends on the store. Luxella will check and reply within 24 hours. A cancellation or restocking fee may apply as per the terms.'));sh.appendChild(tip);
+ const lab=el('label','cx-l','Reason');const sel=el('select','cx-s');['Changed my mind','Found it elsewhere','Wrong size or colour','Price','Delivery time','Other'].forEach(t=>{const o=el('option',null,t);o.value=t;sel.appendChild(o);});lab.appendChild(sel);sh.appendChild(lab);
+ const ta=el('textarea','cx-n');ta.rows=2;ta.placeholder='Anything else we should know (optional)';sh.appendChild(ta);
+ const msg=el('p','lbl cx-m');
+ const go=el('button','btn ps-go cx-go',direct?'Cancel this order':'Send cancellation request');go.type='button';
+ go.addEventListener('click',async()=>{if(go.disabled)return;go.disabled=true;msg.textContent='Please wait…';const reason=sel.value+(ta.value.trim()?' — '+ta.value.trim():'');const t=new Date().toISOString();
+  try{const d=Object.assign({},r);delete d.item;
+   if(direct)Object.assign(d,{status:'Cancelled',cancelled_by:'client',cancel_reason:reason,cancelled_at:t});else Object.assign(d,{cancel_request:'pending',cancel_reason:reason,cancel_requested_at:t});
+   await window.lx.saveOrder(r.item,d);
+   const ref='CX'+Date.now().toString(36).toUpperCase().slice(-5);
+   try{await photos.db.doc('cases/'+ref).set({ref,order:r.item,type:direct?'Order cancelled':'Cancellation request',desc:reason+(paid>0?' · paid '+inr(paid)+(direct?' · refund due':''):''),status:'Submitted',at:t,updated:t,files:[]});}catch(e){}
+   sh.textContent='';const x2=el('button','ps-x','×');x2.type='button';x2.addEventListener('click',close);sh.appendChild(x2);
+   sh.appendChild(el('div','ps-eb',direct?'Order cancelled':'Request sent'));sh.appendChild(el('div','ps-am cx-t',(r.order_no?r.order_no+' · ':'')+r.item));
+   sh.appendChild(el('p','cx-done',direct?('Your order is cancelled.'+(paid>0?' The refund of '+inr(paid)+' will reach you within 5–7 working days.':'')+' Reference '+ref+'.'):'Luxella has your request (reference '+ref+') and will reply within 24 hours. You can follow it in the Help tab.'));
+   const ok=el('button','btn ps-go','Done');ok.type='button';ok.addEventListener('click',close);sh.appendChild(ok);
+  }catch(e){go.disabled=false;msg.textContent='Could not cancel right now. Please try again or message Luxella.';}});
+ sh.appendChild(go);const keep=el('button','btn2 cx-keep','Keep my order');keep.type='button';keep.addEventListener('click',close);sh.appendChild(keep);sh.appendChild(msg);
+ (document.querySelector('.sw')||document.body).appendChild(ov);requestAnimationFrame(()=>ov.classList.add('on'));
 };
 })();

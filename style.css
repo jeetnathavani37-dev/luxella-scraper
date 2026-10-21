@@ -1396,3 +1396,15 @@ html.nwo-lock,html.nwo-lock body{overflow:hidden}
 .sw .chat .ci2 .chip.rec{background:#5a1414!important;color:#fff!important;border-color:#a33!important}
 .sw .chat .recdot{display:inline-block;width:8px;height:8px;border-radius:50%!important;background:#ff4d4d;animation:recp 1s ease-in-out infinite}
 @keyframes recp{50%{opacity:.25}}
+/* cancel order */
+.sw .ordbtns .cx-btn{border-color:#5a2a2a!important;color:#d9a3a3!important;background:transparent!important}
+.sw .ordbtns .cx-btn:hover{border-color:#a33!important;color:#fff!important}
+.sw .ordbtns .cx-badge{border-color:#5a2a2a!important;color:#d9a3a3!important}
+.ps .cx-t{font-size:28px!important;line-height:1.2!important}
+.ps .cx-l{display:block;margin:6px 0 8px;font:500 9.5px 'Jost',sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#8C857A}
+.ps .cx-s{display:block;width:100%;margin-top:6px}
+.ps .cx-n{width:100%;box-sizing:border-box;background:#111;border:1px solid #2A2724;color:#EDE8DE;padding:10px;font:300 14px 'Jost',sans-serif;margin-bottom:14px;resize:vertical}
+.ps .cx-go{background:linear-gradient(180deg,#7a2a2a,#4e1717)!important;color:#fff!important;border-color:#8a3a3a!important}
+.ps .cx-keep{display:block;width:100%;margin-top:10px;text-align:center}
+.ps .cx-done{color:var(--ivory,#F3EEE6);font-size:14.5px;line-height:1.6;margin:14px 0 18px}
+.ps .ps-go{width:100%;box-sizing:border-box}
