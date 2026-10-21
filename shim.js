@@ -107,7 +107,7 @@ async function start(){const {data:{session}}=await sb.auth.getSession();S.sessi
  if(error){gate('<img class="logo" src="assets/luxella_logo.png" alt="Luxella"><p>'+esc(error.message)+'</p>');return;}
  if(!clients||!clients.length){if(S.owner){location.replace(new URL('admin',document.baseURI).href);return;}gateNoAccess();return;}
  if(!slug&&S.owner){location.replace(new URL('admin',document.baseURI).href);return;}
- S.client=clients[0];if(!S.owner){const st=document.createElement('style');st.textContent='#tab-msg,#pane-msg,.card:has(#couriers),#ordT th:first-child,#ordT td:first-child,.sw .ph,.sw .ph.none{display:none!important}';document.head.appendChild(st);}window.LX_CLIENT={name:S.client.name,biz:S.client.biz||''};document.title=S.client.name.split(' ')[0]+' · Luxella';
+ S.client=clients[0];if(!S.owner){const st=document.createElement('style');st.textContent='#tab-msg,#pane-msg,.card:has(#couriers){display:none!important}';document.head.appendChild(st);}window.LX_CLIENT={name:S.client.name,biz:S.client.biz||''};document.title=S.client.name.split(' ')[0]+' · Luxella';
  await loadAll();subscribe();g('gate').hidden=true;topbar();g('dash-root').hidden=false;
  if(!window.__pageLoaded){window.__pageLoaded=true;const s=document.createElement('script');s.src='app.js';s.onload=()=>{fire();{const q=document.createElement('script');q.src='polish.js';document.body.appendChild(q);}{const x=document.createElement('script');x.src='extras.js';document.body.appendChild(x);}};document.body.appendChild(s);}else fire();}
 sb.auth.onAuthStateChange((ev)=>{if(ev==='SIGNED_IN'||ev==='TOKEN_REFRESHED'){if(!S.client)start();}if(ev==='SIGNED_OUT'){location.reload();}});
