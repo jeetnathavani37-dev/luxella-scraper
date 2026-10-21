@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>Luxella · B2B HQ</title>
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<meta name="theme-color" content="#0A0A0A">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Luxella B2B">
+<style>
+@font-face{font-family:'Jost';font-style:normal;font-weight:200 600;font-display:swap;src:url(assets/jost.woff2) format('woff2')}
+@font-face{font-family:'Cormorant Garamond';font-style:normal;font-weight:300 700;font-display:swap;src:url(assets/cormorant.woff2) format('woff2')}
+html,body{margin:0;background:#0A0A0A;color:#F3EEE6;font:300 14px 'Jost',system-ui,sans-serif;-webkit-text-size-adjust:100%}
+.gate{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+.gate .box{width:100%;max-width:360px;text-align:center}.gate img{height:42px;margin-bottom:18px}
+.gate h1{font-weight:300;font-size:13px;letter-spacing:.34em;text-transform:uppercase;color:#C9A227;margin:0 0 22px}
+.gate input{width:100%;box-sizing:border-box;background:#0E0E0F;border:1px solid #2A2724;color:#F3EEE6;padding:13px 14px;font:inherit;margin-bottom:10px}
+.gate button{width:100%;background:linear-gradient(135deg,#E3C565,#B8943F);color:#0A0A0A;border:0;padding:13px;font:500 12px 'Jost',sans-serif;letter-spacing:.2em;text-transform:uppercase;cursor:pointer}
+.gate p{color:#A39C90;font-size:13px;min-height:18px}
+#admin-root[hidden],.gate[hidden]{display:none}
+</style>
+</head>
+<body>
+<div class="gate" id="gate" hidden><div class="box"><img src="assets/luxella_logo.png" alt="Luxella"><h1>B2B HQ · Owner only</h1>
+<input id="em" type="email" placeholder="Email" autocomplete="username"><input id="pw" type="password" placeholder="Password" autocomplete="current-password"><button id="go">Sign in</button><p id="m"></p></div></div>
+<div id="admin-root" hidden></div>
+<script src="vendor/supabase.js"></script>
+<script>
+(function(){
+const OWNERS=['jeetnathavani37@gmail.com','jeetnatb@gmail.com'];
+const sb=window.supabase.createClient('https://qzripzgbstvxkfobzhyv.supabase.co','sb_publishable_-EA-q_dacUuWovbrCW5XVw_pPZ2vK_O',{auth:{persistSession:true,autoRefreshToken:true,storageKey:'lx-b2b-auth'}});
+const $=id=>document.getElementById(id);let started=false;
+async function boot(){const {data}=await sb.auth.getSession();const s=data&&data.session;
+ if(!s){$('gate').hidden=false;$('admin-root').hidden=true;return;}
+ const email=String(s.user.email||'').toLowerCase();
+ if(!OWNERS.includes(email)){await sb.auth.signOut();$('gate').hidden=false;$('m').textContent='Ye page sirf owner ke liye hai.';return;}
+ if(started)return;started=true;$('gate').hidden=true;$('admin-root').hidden=false;
+ window.__lxAdmin={sb,S:{email,owner:true}};const a=document.createElement('script');a.src='b2b.js?v='+(window.__V||Date.now());a.onload=()=>window.lxB2BApp&&window.lxB2BApp();document.body.appendChild(a);}
+$('go').onclick=async()=>{const e=$('em').value.trim().toLowerCase(),p=$('pw').value;if(!e||!p){$('m').textContent='Email aur password daalo.';return;}$('m').textContent='Signing in…';const {error}=await sb.auth.signInWithPassword({email:e,password:p});if(error){$('m').textContent='Galat email ya password.';return;}boot();};
+['em','pw'].forEach(i=>$(i).addEventListener('keydown',e=>{if(e.key==='Enter')$('go').click();}));
+boot();})();
+</script>
+</body>
+</html>

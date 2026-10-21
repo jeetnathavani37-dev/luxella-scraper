@@ -45,7 +45,7 @@ Founder (Jeet) = final decision maker. Agents **suggest + prepare**; paise, mess
 - Reshipper ko payment parcel India pahunchne ke baad.
 
 ## Where things live
-- Portal: https://luxellaclients.duckdns.org/b2b (owner-only). Tabs: Overview, Bids, Orders placed, In transit, Reshipper, To KicksMachine, Confirmation, Payouts, Checklist, HQ, More.
+- B2B HQ portal: https://luxella-b2b.vercel.app (owner-only, client portal se alag). Tabs: Overview, Bids, Orders placed, Intl transit, Warehouse, Reshippers, Landed India, To KicksMachine, MRN, Confirmation, Payouts, Money, Alerts, Checklist, HQ, More.
 - Data: Supabase project `qzripzgbstvxkfobzhyv`, table `lx_b2b` (see `data-model` doc).
 - Gmail: KM + store + courier mails aate hain (connected inbox).
 - AfterShip: tracking (Jeet dashboard me shipments add karta hai; agents read-only).

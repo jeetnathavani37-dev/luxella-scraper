@@ -574,7 +574,7 @@ async function renderDash(m){
 })();
 function clientsView(){
   const top=root.querySelector('.ad-top');const wrap=root.querySelector('.ad-wrap');
-  const nav=el('div','ad-nav');const b1=el('button','ad-nb on','Admin');const b2=el('button','ad-nb','Clients');const b3=el('button','ad-nb','B2B');nav.append(b1,b2,b3);top.insertBefore(nav,top.querySelector('.sp'));
+  const nav=el('div','ad-nav');const b1=el('button','ad-nb on','Admin');const b2=el('button','ad-nb','Clients');const b3=el('button','ad-nb','B2B');b3.hidden=true;nav.append(b1,b2);top.insertBefore(nav,top.querySelector('.sp'));
   const cv=el('div','ad-cv');cv.hidden=true;root.appendChild(cv);
   const bar=el('div','ad-cvbar');const fr=document.createElement('iframe');fr.className='ad-fr';fr.title='Client view';
   const note=el('span','ad-mut','View only. Exactly what the client sees. Nothing can be changed here.');
@@ -586,9 +586,9 @@ function clientsView(){
   const bbp=el('div','ad-bb');bbp.hidden=true;root.appendChild(bbp);let bbLoaded=false;
   const showB=()=>{[b1,b2].forEach(x=>x.classList.remove('on'));b3.classList.add('on');wrap.hidden=true;cv.hidden=true;bbp.hidden=false;try{history.replaceState(null,'',location.pathname+'#b2b');}catch(e){}
     const go=()=>window.lxB2B(bbp,sb,toast);if(window.lxB2B){if(!bbLoaded){bbLoaded=true;go();}return;}const sc=document.createElement('script');sc.src=base('./')+'b2b.js?v='+Date.now();sc.onload=()=>{bbLoaded=true;go();};document.head.appendChild(sc);};
-  b3.onclick=()=>{location.href=base('./')+'b2b';};
+  b3.onclick=()=>{};
   const show=v=>{b3.classList.remove('on');bbp.hidden=true;b1.classList.toggle('on',!v);b2.classList.toggle('on',v);wrap.hidden=v;cv.hidden=!v;if(v&&!cur&&clients.length){const h=(location.hash||'').match(/^#clients:(.+)$/);pick(clients.find(c=>h&&c.slug===decodeURIComponent(h[1]))||clients.find(c=>!/^zz/.test(c.slug))||clients[0]);}};
   b1.onclick=()=>{show(false);try{history.replaceState(null,'',location.pathname+(sel?'#'+sel.slug:''));}catch(e){}};b2.onclick=()=>show(true);
-  if(/^#clients/.test(location.hash))show(true);if(/^#b2b/.test(location.hash))location.replace(base('./')+'b2b');
+  if(/^#clients/.test(location.hash))show(true);
 }
 })();

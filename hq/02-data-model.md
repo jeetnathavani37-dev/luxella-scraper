@@ -39,3 +39,11 @@ store, store_order_no, order_date, recipient, ship_to, items[{name,size,colour,q
 
 ## kind='note' (portal chat box se)
 `{text, created_at, status: 'new'|'done'|'needs-jeet', result, by}` — Mail agent har run me 'new' notes padhta hai, jo samajh aaye wo orders pe apply karta hai (normal rules), note ko `status='done', result='<kya kiya>'` karta hai; samajh na aaye to `needs-jeet` + item.
+
+## New fields / tables (Oct 2026)
+- `trk` (object on order): `{ "<tracking no>": {tag, label, eta, last, at, delivered, india, leg: store|intl|dom, synced} }` — lx-aftership har ghante bharta hai. Agents sirf padhein.
+- `reship_paid` ('Yes'), `reship_paid_date` — reshipper ko payment ho gaya.
+- `meta/reshippers` = `{rates:{<name>:{rate,min,round}}, ledger:[{at,who,amount,orders}], form_template}`.
+- `meta/aftership` = last sync summary (numbers, known, advanced, errors).
+- `lx_b2b_snap` table = daily backup (30 din). `lx_secrets.aftership_key` = AfterShip key (sirf server; kabhi print mat karo).
+- KM sync: KM status `delivered` → `delivered_km` (agar khaali) + status 'Delivered to KM'.

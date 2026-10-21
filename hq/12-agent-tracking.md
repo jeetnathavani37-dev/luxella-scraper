@@ -14,3 +14,8 @@ Final reply: Hinglish bullets for changes/exceptions only, or "Tracking agent: s
 - Combined parcel: ek tracking ke saare orders same stage pe hone chahiye; nahi hain to sabko aage le aao (forward only) aur info item.
 - AfterShip "Delivered" lekin portal me abhi bhi pichla stage → update (yahi sabse common miss hai).
 - ETA nikal gaya aur delivered nahi → warn.
+
+## AfterShip (Oct 2026)
+- Server function `lx-aftership` har ghante saare open tracking numbers AfterShip me daalta hai aur status `r.trk[no]` me likhta hai; delivered/India checkpoint pe dates khud bharta hai (forward-only, sirf khaali field). Tum **dobara same kaam mat karo**.
+- Tumhara kaam: `meta/aftership` padho (errors? key missing? → Jeet ke liye action item "HQ → AfterShip key daalo"), `trk` me `Exception/AttemptFail/Expired` → warn item, aur jo numbers AfterShip pe "Pending" 4+ din se hain unko mails se cross-check karo.
+- AfterShip connector (read-only) se bhi detail dekh sakte ho; create/delete mat karo.

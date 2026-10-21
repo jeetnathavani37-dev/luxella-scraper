@@ -55,3 +55,14 @@
 ## SOP-12 · Incident (kuch toota)
 - QA agent detect → `meta/health.status='down'` + push alert → kya toota, kab se, impact, suggested fix.
 - Data galat mila → kabhi delete nahi; correct value likho + `notes` me "corrected by <agent> <date>: old → new".
+
+## SOP — har stage pe kya karna hai (Oct 2026 tabs)
+1. **Orders placed:** GO wale order karo → card pe "✓ Order placed" → store, store order no., country. Combined order = same store order no. sab KM IDs pe.
+2. **Intl transit:** tracking aaye → "+ Tracking" (ek card = ek tracking, multiple KM IDs). AfterShip delivered dikhaye ya reshipper bole → "✓ Warehouse pahuncha".
+3. **Warehouse:** turant "Copy form" → reshipper form bharo → "✓ Form filled". 5+ din / 1 kg+ → dispatch bolo. Nikla → "✈ Warehouse se nikla" (+AWB).
+4. **Reshippers:** India land hone ke baad payment → "✓ Paid" (amount). Rate change → "Rate edit".
+5. **Landed India:** reshipper ka message / AfterShip India checkpoint → "✓ India landed" (bulk ya "Sab <reshipper> landed").
+6. **To KicksMachine:** courier tracking → "+ Courier tracking" → KM pahunche → "✓ KM pahuncha" (KM sync bhi khud karta hai).
+7. **MRN:** KM pe pahuncha → MRN sheet Jeet update karta hai (agents kabhi nahi) → portal me "✓ MRN updated" → confirmation mail → "✓ Confirmation aaya" (7-day timer).
+8. **Payouts → Money:** 7 din ke baad chase; CFO roz numbers update karta hai.
+9. **Alerts tab** roz ek baar dekho — khaali hona chahiye.

@@ -25,7 +25,7 @@ North-star ambition: ₹1,00,000 crore company. Har chhota kaam aise karo jaise 
 | Confirmation | operations@kicksmachine.com MRN mails | Mail + Payout + Reconciler |
 | MRN / received | KM MRN Google Sheets (READ-ONLY) | Reconciler |
 | Store order, $ paid, tracking | Store mails, Jeet ki photos/notes | Mail + Brain |
-| Parcel position | Courier mails, AfterShip (read-only) | Tracking |
+| Parcel position | AfterShip auto-sync `lx-aftership` (har ghante, `r.trk[number]`) + courier mails | server + Tracking |
 | Paisa (invested, profit, bank, receivable) | `meta/finance` + order fields | CFO |
 | Jeet ke instructions | portal chat notes `kind='note'` | Brain |
 | Health of the system | `meta/health` | QA |
@@ -47,7 +47,8 @@ North-star ambition: ₹1,00,000 crore company. Har chhota kaam aise karo jaise 
 
 ## 5. Decision rights
 - **Agents khud kar sakte hain:** clear proof wale data updates (forward-only), findings, drafts, proposals, summaries.
-- **Sirf Jeet:** paisa bhejna, order place / accept / reject, kisi ko message/mail, MRN sheet, KM portal pe kuch bhi, price/margin policy change.
+- **Sirf Jeet:** paisa bhejna, order place / accept / reject, kisi ko message/mail, price/margin policy change.
+- **KABHI EDIT NAHI (koi agent, koi bhi reason):** KicksMachine MRN Google Sheets aur KicksMachine Nexus portal — sirf padhna. Baaki apna sab (portal data, docs, notes, apne meta) agents update kar sakte hain.
 - Confidence rule: **≥ 0.85 aur proof DB/mail/photo me dikh raha** → apply + log. **0.5–0.85** → proposal (Jeet Apply karega). **< 0.5** → question item.
 
 ## 6. Quality bar — "19-20 bhi nahi chalega"
@@ -58,3 +59,9 @@ North-star ambition: ₹1,00,000 crore company. Har chhota kaam aise karo jaise 
 
 ## 7. Docs map
 company · workflow · data-model · mail-formats · pricing · reshippers · km-playbook · notifications · team-protocol · **sops** · **brand** · **operating-principles** · agent-* playbooks.
+
+## 8. Systems map (kahan kya chalta hai)
+- **B2B HQ portal (sirf owner):** https://luxella-b2b.vercel.app — client portal se **bilkul alag** link, alag project. Client portal (luxellaclients.duckdns.org/<client>) me B2B ka koi link/button nahi.
+- **Tabs (flow order):** Overview → Bids → Orders placed → Intl transit (store → warehouse) → Warehouse (reshipper pe pada, form, dispatch) → Reshippers (rates, kaun kitna leta hai, payment) → Landed India → To KicksMachine → MRN → Confirmation → Payouts → Money → Alerts → Checklist → HQ → More.
+- **Server jobs (har ghante :07, pg_cron `km-sync-hourly`):** KM Nexus read-only sync → AfterShip sync (`lx-aftership`) → raat 3 baje backup (`lx_b2b_snap`, 30 din).
+- **Backup:** `lx_b2b_snap(snap_date, kind, id, data)` — roz ka snapshot, 30 din. Kuch galat hua to yahan se purani value wapas lo (sirf Jeet ke bolne pe restore).

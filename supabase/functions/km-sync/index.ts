@@ -89,6 +89,7 @@ async function sync() {
       const prob = pick(o, ["problemSheet.active"]); p.km_problem = prob === true ? String(pick(o, ["problemSheet.note"]) || "problem case") : "";
       const creq = pick(o, ["cancellationRequest.status"]); if (creq) p.km_cancel_request = String(creq);
       const dtrk = pick(o, ["deliveryTracking.awb", "deliveryTracking.trackingNumber", "shiprocket.awbCode"]); if (dtrk) p.km_delivery_tracking = String(dtrk);
+      if (st === "delivered" && !cur.delivered_km) { p.delivered_km = isoDate(pick(o, ["deliveredAt", "delivered_at", "milestones.deliveredAt", "updatedAt"])) || now.slice(0, 10); if (!["Delivered to KM", "Cancelled"].includes(cur.status)) p.status = "Delivered to KM"; }
       if (st === "cancelled" && cur.status !== "Cancelled") { p.status = "Cancelled"; p.notes = [cur.notes, "Cancelled on KM portal (sync " + now.slice(0, 10) + ")"].filter(Boolean).join(" | "); cancelled++; }
       await db.from("lx_b2b").update({ data: { ...cur, ...p }, updated_at: now }).eq("kind", "order").eq("id", no); updated++;
     } else if (st !== "cancelled" && st !== "rejected") {
@@ -127,6 +128,10 @@ Deno.serve(async (req) => {
     if (body.action === "disconnect") { if (!owner) return J({ ok: false }, 403); await db.from("lx_km_vault").delete().eq("id", "km"); return J({ ok: true }); }
     if (body.action === "sync") {
       if (!owner && !cronOk) return J({ ok: false, error: "unauthorized" }, 401);
+      // nightly backup (03:xx IST run) + AfterShip tracking sync — each isolated so one failure never blocks the other
+      const istH = new Date(Date.now() + 5.5 * 3600e3).getUTCHours();
+      if (cronOk && istH === 3) { try { await db.rpc("lx_b2b_snapshot"); } catch (_) { /* ignore */ } }
+      if (cronOk) { try { await fetch(SB_URL + "/functions/v1/lx-aftership", { method: "POST", headers: { "Content-Type": "application/json", "x-sync-key": key! }, body: JSON.stringify({ action: "sync" }) }); } catch (_) { /* ignore */ } }
       try { return J(await sync()); } catch (e) { const s = { at: new Date().toISOString(), ok: false, error: String((e as Error).message || e) }; await upsert("meta", "kmsync", s); return J(s, 500); }
     }
     if (body.action === "status") { if (!owner) return J({ ok: false }, 403); const c = await getCred(); return J({ ok: true, connected: !!c?.email, email: c?.email || null }); }

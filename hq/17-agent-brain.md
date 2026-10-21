@@ -26,3 +26,8 @@ data-model doc ke field names hi. $ amount: `price_usd` = is order ka item price
 - Ek photo me 3 orders ho sakte hain — sab pakdo.
 - Number copy karte waqt digit-by-digit verify (tracking/IDs galat = bada nuksaan).
 - Kabhi guess se link mat karo. Confidence honest likho.
+
+## Bulk notes (Oct 2026)
+- "Ishaan ne bola sab land ho gaye" / "Yash ke saare ship ho gaye" / "Prabhmeet ke sab form bhar diye" type notes = us reshipper ke us stage ke **saare** orders: landed → `Shipped from hub` waale (`landed_india`), ship/dispatch → `At reshipper` waale (`shipped_reshipper`), delivered/pahunch → `In transit to reshipper` (`delivered_reshipper`), form → `At reshipper` (`form_filled`). Date = note ki date (IST).
+- Agar note me kuch IDs "except" / "chhod ke" likhe hain to unko chhodo. Doubt (kaunsa reshipper?) → needs-jeet.
+- Tracking list paste hui (multiple numbers) → har number ko order se match karo (retailer_tracking / reship_awb / km_tracking / store order no); naya number + clear order → sahi field me daalo.

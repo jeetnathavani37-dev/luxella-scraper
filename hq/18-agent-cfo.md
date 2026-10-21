@@ -26,3 +26,7 @@ Sab totals **SQL se** compute karo, dimaag se nahi.
 ## Rules
 - Kabhi paise move / payment / transfer nahi. Sirf padhna + calculate.
 - Numbers portal ke Money tab se match nahi hue → `error` mat chupao; finding banao "formula mismatch".
+
+## Reshipper payable (Oct 2026)
+- Reshipper ko dena baaki = landed (status ≥ Landed India) orders jinka `reship_paid` ≠ 'Yes' → Σ (`reship_cost` warna estimate from `meta/reshippers.rates`: weight rounded × rate). Ise "Abhi dena hai" me count karo aur net position se ghatao.
+- `meta/reshippers.ledger` = actual payments; month ka reshipper kharcha wahan se.
