@@ -41,6 +41,11 @@ const css=document.createElement('style');css.textContent=`
 .bb-k.on{border-color:#C9A227}.bb-tick{display:grid;grid-template-columns:24px 1fr 2.4fr 1.2fr 1.4fr auto;gap:10px;align-items:center;padding:10px 0;border-top:1px solid #1E1C1A;font-size:13px;cursor:pointer}.bb-tick input{width:18px;height:18px;accent-color:#C9A227}.bb-tick .o{color:#E3C565;font-size:12px}.bb-tick .s,.bb-tick .d{color:#8C857A;font-size:12px}.bb-tick.late .d{color:#d98a7f}
 .bb-bid{display:grid;grid-template-columns:1fr auto auto;gap:14px;align-items:center;padding:12px 0;border-top:1px solid #1E1C1A}.bb-bid .o{color:#E3C565;font-size:12px}.bb-bid .i{color:#F3EEE6;margin:2px 0}.bb-bid small{color:#8C857A;font-size:11.5px}.bb-bid b{font-weight:400;color:#F3EEE6}
 .bb-row>summary.bb-buy{grid-template-columns:1.2fr 3fr 1fr .8fr 1.4fr}
+.bb-tl{display:flex;gap:0;overflow-x:auto;padding:12px 0 14px;scrollbar-width:thin}.bb-tc{flex:0 0 96px;position:relative;padding-top:14px;font-size:11px}.bb-tc i{position:absolute;top:0;left:0;right:0;height:3px;background:#2A2724}.bb-tc.ok i{background:#C9A227}.bb-tc i:after{content:"";position:absolute;left:0;top:-3px;width:9px;height:9px;background:#2A2724;transform:rotate(45deg)}.bb-tc.ok i:after{background:#F4E1A0}.bb-tc b{display:block;font-weight:400;color:#A39C90;margin-top:4px}.bb-tc.ok b{color:#F3EEE6}.bb-tc small{color:#8C857A}
+.bb-q{display:grid;gap:8px}.bb-qc{background:#121214;border:1px solid #232120}.bb-qc>summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:1fr auto;gap:2px 10px;padding:12px 16px}.bb-qc>summary::-webkit-details-marker{display:none}.bb-qc>summary span{color:#F3EEE6;font-size:14px}.bb-qc>summary b{color:#E3C565;font-weight:400;font-size:18px;grid-row:1/3;grid-column:2;align-self:center}.bb-qc>summary small{color:#8C857A;font-size:11.5px}
+.bb-qr{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:10px 16px;border-top:1px solid #1E1C1A}.bb-qr .qi{flex:1 1 260px;display:flex;flex-direction:column}.bb-qr .qi .o{color:#E3C565;font-size:11.5px}.bb-qr .qi small{color:#8C857A;font-size:11px}.bb-qr input,.bb-qr select{background:#0A0A0A;border:1px solid #2A2724;color:#F3EEE6;padding:7px 9px;font:inherit;font-size:12.5px;width:150px}
+.bb-maph{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.bb-maph label{display:flex;flex-direction:column;gap:4px;font-size:11px;color:#A39C90}.bb-maph select{background:#0A0A0A;border:1px solid #2A2724;color:#F3EEE6;padding:6px}
+.bb-mr{display:grid;grid-template-columns:2fr 2fr 1fr;gap:10px;align-items:center;padding:6px 0;border-top:1px solid #1E1C1A;font-size:12px}.bb-mr .c{color:#A39C90;font-family:monospace;font-size:11.5px}.bb-mr select{background:#0A0A0A;border:1px solid #2A2724;color:#F3EEE6;padding:6px;font-size:12px}.bb-mr small{color:#7fc79c}
 @media(max-width:820px){.bb-tr{grid-template-columns:1fr 1.6fr 1fr}.bb-tr>span:nth-child(n+4){display:none}.bb-tick{grid-template-columns:22px 1fr auto}.bb-tick .i{grid-column:2/4}.bb-tick .s,.bb-tick .d{display:none}.bb-bid{grid-template-columns:1fr auto}.bb-bid .r{grid-column:1/-1}}
 @media(max-width:820px){.bb-row>summary,.bb-th{grid-template-columns:1fr 1fr}.bb-row>summary>:nth-child(n+5),.bb-th>:nth-child(n+3){display:none}.bb-row .it{grid-column:1/-1;order:-1}}
 `;document.head.appendChild(css);
@@ -53,7 +58,7 @@ window.lxB2B=async function(root,sb,toast){
  let all=(res.data||[]).filter(x=>x.kind==='order').map(x=>Object.assign({_id:x.id,_u:x.updated_at},x.data));
  let BIDS=(res.data||[]).filter(x=>x.kind==='bid').map(x=>Object.assign({_id:x.id,_u:x.updated_at},x.data));let BUYS=(res.data||[]).filter(x=>x.kind==='buy').map(x=>Object.assign({_id:x.id,_u:x.updated_at},x.data));
  const saveK=async(kind,r,patch)=>{const d=Object.assign({},r,patch);['_id','_u'].forEach(k=>delete d[k]);const r2=await sb.from('lx_b2b').upsert({kind,id:r._id,data:d,updated_at:new Date().toISOString()},{onConflict:'kind,id'});if(r2.error){toast('Save nahi hua: '+r2.error.message);return false;}Object.assign(r,d);toast('Saved');return true;};
- const S={tab:'pipe',who:'KicksMachine',st:'',rs:'',q:''};
+ const S={tab:'todo',who:'KicksMachine',st:'',rs:'',q:''};
  const save=async(r,patch)=>{const d=Object.assign({},r,patch);['_id','_u'].forEach(k=>delete d[k]);
   const L=Number(d.landed),P=Number(d.payout);if(L&&P){d.profit=Math.round((P-L)*100)/100;d.profit_pct=(P-L)/L;d.margin_ok=(P-L)/L>=0.2?'Yes':'No';}
   const r2=await sb.from('lx_b2b').upsert({kind:'order',id:r._id,data:d,updated_at:new Date().toISOString()},{onConflict:'kind,id'});
@@ -73,9 +78,9 @@ window.lxB2B=async function(root,sb,toast){
   k('Expected profit (KM)',inr(sum(costed,'profit')),'avg '+pct(costed.length?sum(costed,'profit')/Math.max(1,sum(costed,'landed')):0)+' on '+costed.length+' costed orders');
   k('Below 20% margin',String(low.length),'orders',()=>{S.tab='orders';S.st='__low';draw();});
   wrap.appendChild(K);
-  const T=el('div','bb-tabs');[['pipe','Pipeline'],['bids','Bids accepted'],['buys','Orders placed (USA)'],['orders','All orders'],['reship','Reshipper'],['payouts','Payouts'],['calc','Bid calculator'],['add','Add order'],['export','Export']].forEach(([id,t])=>{const b=el('button','bb-tab'+(S.tab===id?' on':''),t);b.onclick=()=>{S.tab=id;draw();};T.appendChild(b);});wrap.appendChild(T);
+  const T=el('div','bb-tabs');[['todo','To-do'],['pipe','Pipeline'],['bulk','Bulk upload'],['bids','Bids accepted'],['buys','Orders placed (USA)'],['orders','All orders'],['reship','Reshipper'],['payouts','Payouts'],['calc','Bid calculator'],['add','Add order'],['export','Export']].forEach(([id,t])=>{const b=el('button','bb-tab'+(S.tab===id?' on':''),t);b.onclick=()=>{S.tab=id;draw();};T.appendChild(b);});wrap.appendChild(T);
   const P=el('div');wrap.appendChild(P);
-  ({pipe:pipe,bids:bids,buys:buys,orders:orders,reship:reship,payouts:payouts,calc:calc,add:add,export:exp})[S.tab](P);};
+  ({todo:todo,bulk:bulk,pipe:pipe,bids:bids,buys:buys,orders:orders,reship:reship,payouts:payouts,calc:calc,add:add,export:exp})[S.tab](P);};
  function orders(P){const c=el('div','bb-card');P.appendChild(c);
   const bar=el('div','bb-bar');const q=document.createElement('input');q.placeholder='Search order id, item, brand, tracking…';q.value=S.q;
   const who=document.createElement('select');[['KicksMachine','KicksMachine'],['__wa','WhatsApp clients'],['','All']].forEach(([v,t])=>{const o=el('option',null,t);o.value=v;if(v===S.who)o.selected=true;who.appendChild(o);});
@@ -98,12 +103,12 @@ window.lxB2B=async function(root,sb,toast){
  const ALIAS={retailer_tracking:'intl_tracking',est_weight:'weight',km_tracking:'local_tracking',shipped_km:'shipped_client',delivered_km:'delivered_client'};
  const gv=(r,k)=>r[k]!=null&&r[k]!==''?r[k]:(ALIAS[k]?r[ALIAS[k]]:'');
  const SECS=[
-  ['1 · KicksMachine bid',[['order_id','KM order ID'],['order_date','Bid won on','date'],['accept_by','Accept by','date'],['payout','KM payout ₹','number'],['size','Size / colour']]],
+  ['1 · KicksMachine bid',[['order_id','KM order ID'],['order_date','Bid won on','date'],['accept_by','Accept by','date'],['payout','KM payout ₹','number'],['size','Size / colour'],['km_portal_updated','Updated on KM portal','date']]],
   ['2 · Purchase from store',[['store','Bought from (store)','list',STORES],['retailer_order_id','Store order no.'],['retailer_date','Ordered on','date'],['buy_email','Account email used'],['price_usd','Paid $ (after discount)','number'],['discount','Discount / code used'],['tax_pct','Sales tax %','number'],['cashback','Cashback $','number'],['card','Card used']]],
   ['3 · Store → reshipper',[['retailer_ship_date','Store shipped on','date'],['retailer_carrier','Carrier','list',CARRIERS],['retailer_tracking','Tracking no.'],['eta_reshipper','Expected at reshipper','date'],['delivered_reshipper','Reached reshipper','date']]],
-  ['4 · Reshipper',[['reshipper','Reshipper','list',RS],['est_weight','Estimated weight kg','number'],['actual_weight','Actual weight kg','number'],['reship_cost','Reship cost ₹ (estimate/billed)','number'],['reship_billed','Billed by reshipper?','list',['','Estimate','Billed']],['form_filled','Shipping form filled?','list',['','Yes','No']],['form_date','Form filled on','date'],['shipped_reshipper','Shipped from reshipper','date'],['reship_awb','Reshipper AWB / tracking'],['parcel_with','Clubbed with (order IDs)']]],
+  ['4 · Reshipper',[['reshipper','Reshipper','list',RS],['est_weight','Estimated weight kg','number'],['actual_weight','Actual weight kg','number'],['reship_cost','Reship cost ₹ (estimate/billed)','number'],['reship_billed','Billed by reshipper?','list',['','Estimate','Billed']],['form_filled','Receiver form filled?','list',['','Yes','No']],['form_date','Form filled on','date'],['shipped_reshipper','Shipped from reshipper','date'],['reship_awb','Reshipper AWB / tracking'],['parcel_with','Clubbed with (order IDs)']]],
   ['5 · India',[['eta_india','ETA India','date'],['landed_india','Landed in India','date'],['customs_note','Customs / delay note']]],
-  ['6 · To KicksMachine',[['km_courier','Courier','list',DOM],['km_tracking','Courier tracking'],['shipped_km','Shipped to KM','date'],['delivered_km','Reached KM','date'],['mrn','MRN received?','list',['','Yes','No']]]],
+  ['6 · To KicksMachine',[['km_courier','Courier','list',DOM],['km_tracking','Courier tracking'],['shipped_km','Shipped to KM','date'],['delivered_km','Reached KM','date'],['mrn','MRN received?','list',['','Yes','No']],['mrn_updated','MRN updated on','date'],['mrn_confirmed','MRN confirmation mail on','date'],['payout_chased','Payout chased on','date']]],
   ['7 · Payout & profit',[['payout_status','Payout','list',['Pending','Received']],['payout_date','Payout received on','date'],['landed','Landed cost ₹','number'],['notes','Notes','area']]]];
  /* status from the furthest filled step */
  const derive=d=>{if(d.client!=='KicksMachine')return d.status;const has=k=>!!gv(d,k);
@@ -127,7 +132,7 @@ window.lxB2B=async function(root,sb,toast){
      l.appendChild(i);f.appendChild(l);F[k]=i;});
     sec.appendChild(f);wrapS.appendChild(sec);});
    const auto=el('div','bb-meta','Status dates se apne aap update hota hai (jaise "Reached reshipper" bharo toh status At reshipper). Profit = payout − landed.');
-   d.appendChild(wrapS);d.appendChild(auto);
+   d.appendChild(timeline(r));d.appendChild(wrapS);d.appendChild(auto);
    const row=el('div','bb-bar');const sv=el('button','bb-b','Save');
    sv.onclick=async()=>{const p={};Object.entries(F).forEach(([k,i])=>{let v=i.value;if(i.type==='number')v=v===''?null:Number(v);p[k]=v;});
     Object.entries(ALIAS).forEach(([n,o])=>{if(p[n]!==undefined)p[o]=p[n];});p.weight=p.actual_weight||p.est_weight||null;p.status=derive(Object.assign({},r,p));
@@ -141,6 +146,74 @@ window.lxB2B=async function(root,sb,toast){
    const col=el('div','bb-col');const h=el('div','bb-ch');h.appendChild(el('span',null,st==='__paid'?'Paid':(LBL[st]||st)));h.appendChild(el('b',null,String(rows.length)));col.appendChild(h);
    rows.sort((a,b)=>String(a.order_date).localeCompare(String(b.order_date))).forEach(r=>{const c=el('div','bb-mini');c.appendChild(el('div','id',r.order_id||r._id));c.appendChild(el('div',null,r.item));c.appendChild(el('small',null,[r.reshipper,nextHint(r)].filter(Boolean).join(' · ')));c.onclick=()=>{S.tab='orders';S.st=st==='__paid'?'':st;S.q=r.order_id||'';draw();setTimeout(()=>{const x=document.querySelector('.bb-row');if(x)x.open=true;},50);};col.appendChild(c);});
    bd.appendChild(col);});P.appendChild(bd);}
+ const TL=[['order_date','Bid won'],['retailer_date','Ordered at store'],['km_portal_updated','KM portal updated'],['form_date','Receiver form'],['retailer_ship_date','Store shipped'],['delivered_reshipper','Reached hub'],['shipped_reshipper','Left hub'],['landed_india','Landed India'],['shipped_km','Shipped to KM'],['delivered_km','Reached KM'],['mrn_updated','MRN updated'],['mrn_confirmed','MRN confirmed'],['payout_chased','Payout chased'],['payout_date','Paid']];
+ function timeline(r){const w=el('div','bb-tl');TL.forEach(([k,t])=>{const v=gv(r,k);const c=el('div','bb-tc'+(v?' ok':''));c.appendChild(el('i'));c.appendChild(el('b',null,t));c.appendChild(el('small',null,v?String(v).slice(0,10):'—'));w.appendChild(c);});return w;}
+ /* ---------- To-do: one queue per step; an order leaves the queue when the step is done ---------- */
+ function todo(P){const km=all.filter(r=>r.client==='KicksMachine'&&!/cancel/i.test(String(r.status||'')));const g=k=>gv;
+  const has=(r,k)=>!!gv(r,k);const id=r=>r.order_id||r._id;
+  const Q=[
+   ['Place order with store',r=>r.status==='To place','Bid jeeta, store pe order karna baaki',[['store','Store','list',STORES],['retailer_order_id','Store order no.'],['price_usd','Paid $','number']],p=>Object.assign(p,{retailer_date:today()})],
+   ['Update KicksMachine portal',r=>['Ordered','In transit to reshipper'].includes(r.status)&&!has(r,'km_portal_updated'),'Order ID + retailer ID KM portal pe daalo',[],p=>Object.assign(p,{km_portal_updated:today()})],
+   ['Fill reshipper receiver form',r=>gv(r,'form_filled')!=='Yes'&&['Ordered','In transit to reshipper'].includes(r.status),'Reshipper ka pre-alert / receiver form',[['reshipper','Reshipper','list',RS]],p=>Object.assign(p,{form_filled:'Yes',form_date:today()})],
+   ['Store tracking pending',r=>r.status==='Ordered'&&!has(r,'retailer_tracking'),'Store ne ship kiya? Tracking daalo',[['retailer_carrier','Carrier','list',CARRIERS],['retailer_tracking','Tracking no.'],['eta_reshipper','Expected at hub','date']],p=>Object.assign(p,{retailer_ship_date:today()})],
+   ['Coming to hub',r=>r.status==='In transit to reshipper','Hub pe pahunchne ka wait (bulk upload se apne aap hatega)',[['actual_weight','Actual kg','number']],p=>Object.assign(p,{delivered_reshipper:today()}),'Arrived at hub'],
+   ['At hub, waiting dispatch',r=>r.status==='At reshipper','Reshipper se nikalna baaki',[['reship_awb','AWB / tracking'],['eta_india','ETA India','date']],p=>Object.assign(p,{shipped_reshipper:today()}),'Left hub'],
+   ['On the way to India',r=>r.status==='Shipped from hub','India me receive hona baaki',[],p=>Object.assign(p,{landed_india:today()}),'Received in India'],
+   ['Add local tracking',r=>r.status==='Landed India','KM ko courier karo, local tracking daalo',[['km_courier','Courier','list',DOM],['km_tracking','Tracking']],p=>Object.assign(p,{shipped_km:today()}),'Shipped to KM'],
+   ['Waiting KM to receive',r=>r.status==='Shipped to KM','KM warehouse pe pahunchna baaki',[],p=>Object.assign(p,{delivered_km:today()}),'KM received'],
+   ['Update MRN',r=>r.status==='Delivered to KM'&&!has(r,'mrn_updated'),'KM MRN sheet me update',[],p=>Object.assign(p,{mrn_updated:today(),mrn:'Yes'}),'MRN updated'],
+   ['Awaiting MRN confirmation mail',r=>r.status==='Delivered to KM'&&has(r,'mrn_updated')&&!has(r,'mrn_confirmed'),'KM ka MRN confirmation mail aana baaki',[],p=>Object.assign(p,{mrn_confirmed:today()}),'Mail received'],
+   ['Chase payout (7+ days after MRN)',r=>r.status==='Delivered to KM'&&r.payout_status!=='Received'&&has(r,'mrn_confirmed')&&days(gv(r,'mrn_confirmed'))>=7,'Payout follow up',[],p=>Object.assign(p,{payout_chased:today()}),'Chased'],
+   ['Payout pending',r=>r.status==='Delivered to KM'&&r.payout_status!=='Received','Paisa aate hi tick karo',[],p=>Object.assign(p,{payout_status:'Received',payout_date:today()}),'Payout received']];
+  const wrapQ=el('div','bb-q');P.appendChild(el('p','bb-meta','Har kaam ki list. Kaam hote hi order us list se hat ke agle step pe chala jaata hai. Date apne aap aaj ki lagti hai.'));
+  Q.forEach(([title,test,hint,fields,apply,btn])=>{const rows=km.filter(test);const c=document.createElement('details');c.className='bb-qc';if(rows.length&&S.qopen!==false)c.open=rows.length<=12;
+   const sm=document.createElement('summary');sm.appendChild(el('span',null,title));sm.appendChild(el('b',null,String(rows.length)));sm.appendChild(el('small',null,hint));c.appendChild(sm);
+   rows.sort((a,b)=>String(a.order_date).localeCompare(String(b.order_date))).forEach(r=>{const l=el('div','bb-qr');const info=el('div','qi');info.appendChild(el('span','o',id(r)));info.appendChild(el('span',null,r.item));
+    const age=days(r.order_date);info.appendChild(el('small',null,[r.reshipper,gv(r,'store'),gv(r,'retailer_order_id')?'#'+gv(r,'retailer_order_id'):'',age!=null?'day '+age:''].filter(Boolean).join(' · ')));l.appendChild(info);
+    const F={};fields.forEach(([k,lab,type,opts])=>{let i;if(type==='list'){i=document.createElement('select');['',...opts].forEach(v=>{const o=el('option',null,v||lab);o.value=v;if(String(gv(r,k)||'')===v)o.selected=true;i.appendChild(o);});}else{i=document.createElement('input');i.placeholder=lab;if(type)i.type=type;if(type==='number')i.step='any';i.value=gv(r,k)||'';}F[k]=i;l.appendChild(i);});
+    const b=el('button','bb-b',btn||'Done');b.onclick=async()=>{const p={};Object.entries(F).forEach(([k,i])=>{let v=i.value;if(i.type==='number')v=v===''?null:Number(v);if(v!==''&&v!=null)p[k]=v;});if(p.retailer_tracking)p.intl_tracking=p.retailer_tracking;if(p.km_tracking)p.local_tracking=p.km_tracking;if(p.actual_weight)p.weight=p.actual_weight;apply(p);p.status=derive(Object.assign({},r,p));b.disabled=true;if(await save(r,p))draw();b.disabled=false;};l.appendChild(b);
+    if(title.startsWith('Chase')||title==='Payout pending'){const a=el('a','bb-b g','WhatsApp');a.href='https://wa.me/?text='+encodeURIComponent('Hi Maanvesh, payout status for '+id(r)+' ('+r.item+', '+inr(r.payout)+')? MRN done on '+(gv(r,'mrn_confirmed')||gv(r,'delivered_km'))+'. Thanks!');a.target='_blank';a.rel='noopener';a.style.textDecoration='none';l.appendChild(a);}
+    c.appendChild(l);});
+   if(!rows.length)c.appendChild(el('p','bb-meta','Sab done.'));wrapQ.appendChild(c);});
+  P.appendChild(wrapQ);}
+ /* ---------- Bulk upload: paste or upload a reshipper sheet, auto-match rows to orders ---------- */
+ function bulk(P){const c=el('div','bb-card');P.appendChild(c);c.appendChild(el('h2',null,'Bulk upload · reshipper sheet'));
+  c.appendChild(el('p','bb-meta','Ishaan / Yash / Prabhmeet ki sheet ka data copy karke yahan paste karo (Google Sheet / Excel se seedha), ya CSV/XLSX file daalo. Columns apne aap pehchaane jaate hain, galat ho toh har column ka type badal do. Har row tracking no. / order ID / item naam se order se match hoti hai.'));
+  const top=el('div','bb-bar');const rsel=document.createElement('select');['',...RS].forEach(v=>{const o=el('option',null,v||'Reshipper (optional)');o.value=v;rsel.appendChild(o);});
+  const act=document.createElement('select');[['arrived','Items reached the hub (warehouse)'],['shipped','Items shipped from hub to India'],['landed','Items received in India']].forEach(([v,t])=>{const o=el('option',null,t);o.value=v;act.appendChild(o);});
+  const fi=document.createElement('input');fi.type='file';fi.accept='.csv,.tsv,.txt,.xlsx,.xls';top.append(act,rsel,fi);c.appendChild(top);
+  const ta=document.createElement('textarea');ta.placeholder='Yahan paste karo…';ta.rows=7;ta.style.cssText='width:100%;background:#0A0A0A;border:1px solid #2A2724;color:#F3EEE6;padding:10px;font:12.5px monospace';c.appendChild(ta);
+  const go=el('button','bb-b','Read sheet');go.style.marginTop='8px';c.appendChild(go);const out=el('div');c.appendChild(out);
+  const TYPES=[['','Ignore'],['tracking','Store tracking'],['awb','Reshipper AWB'],['order','KM order ID'],['item','Item'],['weight','Weight kg'],['date','Date'],['cost','Charge ₹'],['note','Note']];
+  const guess=h=>{h=String(h||'').toLowerCase();if(/awb|outbound|ship(ped)? to india|india track|mawb|hawb/.test(h))return 'awb';if(/track|inbound|tracking|ups|fedex|usps/.test(h))return 'tracking';if(/order|ref|km/.test(h))return 'order';if(/item|product|desc|name|content/.test(h))return 'item';if(/weight|kg|wt|lbs/.test(h))return 'weight';if(/date|received|arriv|deliver/.test(h))return 'date';if(/charge|cost|amount|rs|inr|bill/.test(h))return 'cost';return '';};
+  const parse=txt=>{const lines=txt.replace(/\r/g,'').split('\n').filter(x=>x.trim());if(!lines.length)return [];const sep=lines[0].includes('\t')?'\t':',';const split=l=>{if(sep==='\t')return l.split('\t');const o=[];let cur='',q=false;for(const ch of l){if(ch==='"'){q=!q;continue;}if(ch===','&&!q){o.push(cur);cur='';continue;}cur+=ch;}o.push(cur);return o;};return lines.map(split).map(r=>r.map(x=>x.trim()));};
+  const toDate=v=>{if(!v)return '';const m=String(v).match(/(\d{4})-(\d{1,2})-(\d{1,2})/);if(m)return m[1]+'-'+m[2].padStart(2,'0')+'-'+m[3].padStart(2,'0');const d=new Date(v);if(!isNaN(d))return d.toISOString().slice(0,10);const m2=String(v).match(/(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{2,4})/);if(m2){const y=m2[3].length===2?'20'+m2[3]:m2[3];return y+'-'+m2[2].padStart(2,'0')+'-'+m2[1].padStart(2,'0');}return '';};
+  const norm=x=>String(x||'').toUpperCase().replace(/[^A-Z0-9]/g,'');
+  const match=(cells,map)=>{const val=t=>cells.filter((_,i)=>map[i]===t).join(' ');const tr=norm(val('tracking')),aw=norm(val('awb')),od=norm(val('order')),it=val('item').toLowerCase(),all1=norm(cells.join(' '));
+   let hit=all.find(r=>{const t=norm(String(gv(r,'retailer_tracking')||'').split(' ')[0]);return t&&t.length>=8&&(tr.includes(t)||all1.includes(t));});if(hit)return [hit,'tracking'];
+   hit=all.find(r=>{const o=norm(r.order_id||r._id);return o&&o.length>=6&&(od.includes(o)||all1.includes(o));});if(hit)return [hit,'order id'];
+   if(aw)hit=all.find(r=>{const t=norm(gv(r,'reship_awb'));return t&&t.length>=6&&aw.includes(t);});if(hit)return [hit,'AWB'];
+   if(it){const words=it.split(/\W+/).filter(w=>w.length>3);let best=null,sc=0;all.filter(r=>!rsel.value||r.reshipper===rsel.value).forEach(r=>{const n=String(r.item||'').toLowerCase();const s=words.filter(w=>n.includes(w)).length/Math.max(1,words.length);if(s>sc){sc=s;best=r;}});if(best&&sc>=0.5)return [best,'item name ~'+Math.round(sc*100)+'%'];}
+   return [null,''];};
+  const run=rows=>{out.textContent='';if(rows.length<2){out.appendChild(el('p','bb-meta','Kam se kam header + 1 row chahiye.'));return;}
+   const head=rows[0];const map=head.map(guess);const body=rows.slice(1);
+   const mh=el('div','bb-maph');head.forEach((h,i)=>{const w=el('label',null,h||('Col '+(i+1)));const s2=document.createElement('select');TYPES.forEach(([v,t])=>{const o=el('option',null,t);o.value=v;if(map[i]===v)o.selected=true;s2.appendChild(o);});s2.onchange=()=>{map[i]=s2.value;draw2();};w.appendChild(s2);mh.appendChild(w);});out.appendChild(mh);
+   const tbl=el('div');out.appendChild(tbl);const apply=el('button','bb-b','Apply to matched orders');apply.style.marginTop='10px';out.appendChild(apply);let plan=[];
+   const draw2=()=>{tbl.textContent='';plan=[];const opts=all.map(r=>[r.order_id||r._id,(r.order_id||r._id)+' · '+r.item]);
+    body.forEach(cells=>{const [r,how]=match(cells,map);const row=el('div','bb-mr');row.appendChild(el('span','c',cells.filter(Boolean).slice(0,5).join(' | ').slice(0,140)));
+     const s3=document.createElement('select');[['','— no match —'],...opts].forEach(([v,t])=>{const o=el('option',null,t);o.value=v;if(r&&(r.order_id||r._id)===v)o.selected=true;s3.appendChild(o);});row.appendChild(s3);row.appendChild(el('small',null,how||''));
+     const pl={cells,sel:s3};plan.push(pl);tbl.appendChild(row);});
+    apply.textContent='Apply to '+plan.filter(x=>x.sel.value).length+' matched orders';};
+   draw2();
+   apply.onclick=async()=>{const todo2=plan.filter(x=>x.sel.value);if(!todo2.length)return;if(!confirm(todo2.length+' orders update honge ('+act.options[act.selectedIndex].text+'). Pakka?'))return;apply.disabled=true;let n=0;
+    for(const x of todo2){const r=all.find(o=>(o.order_id||o._id)===x.sel.value);if(!r)continue;const val=t=>x.cells.filter((_,i)=>map[i]===t).join(' ').trim();const p={};
+     const w=parseFloat(val('weight'));if(!isNaN(w))p.actual_weight=w;const dt=toDate(val('date'))||today();const cost=parseFloat(String(val('cost')).replace(/[^0-9.]/g,''));if(!isNaN(cost)){p.reship_cost=cost;p.reship_billed='Billed';}
+     if(rsel.value)p.reshipper=rsel.value;if(val('awb'))p.reship_awb=val('awb');if(val('note'))p.notes=[r.notes,val('note')].filter(Boolean).join(' | ');
+     if(act.value==='arrived')p.delivered_reshipper=gv(r,'delivered_reshipper')||dt;if(act.value==='shipped'){p.shipped_reshipper=dt;if(!gv(r,'delivered_reshipper'))p.delivered_reshipper=dt;}if(act.value==='landed')p.landed_india=dt;
+     if(p.actual_weight)p.weight=p.actual_weight;p.status=derive(Object.assign({},r,p));if(await save(r,p))n++;}
+    toast(n+' orders updated');apply.disabled=false;S.tab='todo';draw();};};
+  go.onclick=()=>run(parse(ta.value));
+  fi.onchange=async()=>{const f=fi.files&&fi.files[0];if(!f)return;if(/\.xlsx?$/i.test(f.name)){const load=()=>new Promise((res,rej)=>{if(window.XLSX)return res();const sc=document.createElement('script');sc.src='https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js';sc.onload=res;sc.onerror=rej;document.head.appendChild(sc);});try{await load();const wb=XLSX.read(await f.arrayBuffer(),{type:'array',cellDates:true});const ws=wb.Sheets[wb.SheetNames[0]];const rows=XLSX.utils.sheet_to_json(ws,{header:1,raw:false,defval:''});ta.value=rows.map(r=>r.join('\t')).join('\n');run(rows.filter(r=>r.some(Boolean)).map(r=>r.map(x=>String(x).trim())));}catch(e){toast('File nahi padh paya');}}else{ta.value=await f.text();run(parse(ta.value));}};}
  function reship(P){
   const tb=el('div','bb-chips');const groups={};all.filter(r=>r.reshipper).forEach(r=>{(groups[r.reshipper]=groups[r.reshipper]||[]).push(r);});
   const names=Object.keys(groups).sort((a,b)=>groups[b].length-groups[a].length);if(!names.length){P.appendChild(el('p','bb-meta','Koi reshipper data nahi.'));return;}
