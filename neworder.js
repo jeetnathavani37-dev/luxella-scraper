@@ -356,9 +356,9 @@ const el=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=nu
 let shown=new Set(),open=false;
 const show=list=>{if(open||!list.length)return;open=true;let i=0;
  const ov=el('div','nt-ov');const bx=el('div','nt');ov.appendChild(bx);
- const close=async()=>{ov.classList.remove('on');setTimeout(()=>ov.remove(),300);open=false;for(const n of list){try{await photos.db.doc('notices/'+n.id).set(Object.assign({},n.d,{seen:true,seen_at:new Date().toISOString()}));}catch(e){}}};
+ const close=async()=>{ov.classList.remove('on');setTimeout(()=>ov.remove(),300);open=false;for(const n of list){if(n.preview)continue;try{await photos.db.doc('notices/'+n.id).set(Object.assign({},n.d,{seen:true,seen_at:new Date().toISOString()}));}catch(e){}}};
  const draw=()=>{const n=list[i];bx.textContent='';const x=el('button','ps-x','×');x.type='button';x.addEventListener('click',close);bx.appendChild(x);
-  bx.appendChild(el('div','nt-eb','Update from Luxella'+(list.length>1?' · '+(i+1)+' of '+list.length:'')));
+  bx.appendChild(el('div','nt-eb',(n.preview?'Preview · ':'')+'Update from Luxella'+(list.length>1?' · '+(i+1)+' of '+list.length:'')));
   let row=null;try{row=(dash.data('orders').data||[]).find(o=>o.item===n.d.item);}catch(e){}
   if(row&&typeof photoEl==='function'){const th=el('div','nt-th');try{th.appendChild(photoEl(row,true));}catch(e){}bx.appendChild(th);}
   bx.appendChild(el('h3','nt-t',n.d.title||'Update'));bx.appendChild(el('p','nt-b',n.d.body||''));
