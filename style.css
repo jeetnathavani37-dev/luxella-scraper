@@ -1026,3 +1026,24 @@ img{max-width:100%}
 .sw .feat .pw>img.ph,.sw .drawer .pw>img.ph{width:100%;height:100%}
 .sw .pw>img{filter:brightness(1.07) contrast(1.12)}
 .sw #ordT tbody td:nth-child(1){padding-right:6px!important}
+/* Departures as cards */
+.sw #board .scroll,.sw #board{overflow:visible}
+.sw #board,.sw #board tbody{display:block;width:100%;min-width:0}
+.sw #board thead{display:none}
+.sw #board tbody tr{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:2px 10px;background:var(--card,#141311);border:1px solid var(--line);border-top:1px solid var(--gold);padding:14px;margin:0 0 12px;align-items:start}
+.sw #board tbody td{display:block;border:0!important;padding:4px 0!important;min-width:0;overflow-wrap:anywhere}
+.sw #board tbody td[colspan]{grid-column:1/-1}
+.sw #board tbody td.piece{grid-column:1/-1;order:0;display:flex;align-items:center;gap:12px;font-size:18px;line-height:1.25;padding-bottom:8px!important}
+.sw #board tbody td.piece .pw{flex:none;width:64px;height:64px}
+.sw #board tbody td.piece .pw>img.ph{width:100%;height:100%}
+.sw #board tbody td.st{grid-column:1/-1;order:1;font-size:12px}
+.sw #board tbody td:nth-child(1){grid-column:span 3;order:2}
+.sw #board tbody td:nth-child(7){grid-column:span 3;order:3}
+.sw #board tbody td:nth-child(3),.sw #board tbody td:nth-child(4),.sw #board tbody td:nth-child(5){grid-column:span 2;order:4;margin-top:8px;border-top:1px solid var(--line)!important;padding-top:8px!important}
+.sw #board tbody td:not(.piece):not(.st):not([colspan])::before{display:block;font:400 10px 'Jost',sans-serif;letter-spacing:.18em;color:var(--mut,#A39C90);margin-bottom:2px}
+.sw #board tbody td:nth-child(1)::before{content:'REF'}
+.sw #board tbody td:nth-child(3)::before{content:'ORIGIN'}
+.sw #board tbody td:nth-child(4)::before{content:'HUB'}
+.sw #board tbody td:nth-child(5)::before{content:'INDIA'}
+.sw #board tbody td:nth-child(7)::before{content:'ETA'}
+@media(min-width:900px){.sw #board tbody{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;align-items:start}.sw #board tbody tr{margin:0}}
