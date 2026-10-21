@@ -164,7 +164,7 @@ new MutationObserver(()=>scheduleLinkify()).observe(document.getElementById('pan
 (function(){
  const sw=document.querySelector('.sw');if(!sw||window.__cmdk)return;window.__cmdk=1;
  const el=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e;};
- const TABS=[['ov','Overview'],['tr','Tracker'],['al','Orders'],['pay','Payments'],['ad','Address'],['msg','Messages'],['st','Stats'],['pol','Terms & order procedure'],['help','Help']];
+ const TABS=[['ov','Overview'],['rts','Ready to ship'],['tr','Tracker'],['al','Orders'],['pay','Payments'],['ad','Address'],['msg','Messages'],['st','Stats'],['pol','Terms & order procedure'],['help','Help']];
  const openPolicy=n=>{goTab('pol');setTimeout(()=>{const d=[...document.querySelectorAll('#terms details.tsec')].find(x=>{const k=x.querySelector('.tnum');return k&&k.textContent===String(n);});if(d){let p=d.parentElement;while(p&&p.id!=='terms'){if(p.tagName==='DETAILS')p.open=true;p=p.parentElement;}d.open=true;d.scrollIntoView({behavior:'smooth',block:'center'});}},150);};
  const build=()=>{const items=[];const o=window.dash.data('orders');const rows=o.status==='ok'?o.data:[];
   const due=rows.filter(r=>paidAmt(r)<Number(r.payout||0));

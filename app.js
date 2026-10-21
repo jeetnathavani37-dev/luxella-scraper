@@ -62,6 +62,7 @@ document.getElementById('qc-file').addEventListener('change',async e=>{const f=e
 const stockState={cat:'All'};
 function renderStock(){const w=document.getElementById('stock');if(!w)return;w.textContent='';const list=Object.entries(photos.stock).map(([id,v])=>Object.assign({id},v)).filter(x=>!x.hidden&&(Number(x.qty||0)>0||photos.canEdit));
  const ORDER=['Footwear','Bags','Apparel','Accessories'];
+ {const t=document.getElementById('tab-rts');if(t){const n=list.filter(x=>Number(x.qty||0)>0).length;let b=t.querySelector('.bdg');if(!n){if(b)b.remove();}else{if(!b){b=document.createElement('span');b.className='bdg';t.appendChild(b);}b.textContent=n;}}}
  if(!list.length){const s=document.createElement('span');s.className='lbl';s.textContent='Nothing ready to ship right now. New pieces land here first.';w.appendChild(s);}
  else{const cats=['All'].concat(ORDER.filter(c=>list.some(x=>(x.cat||'Other')===c))).concat([...new Set(list.map(x=>x.cat||'Other'))].filter(c=>!ORDER.includes(c)));if(!cats.includes(stockState.cat))stockState.cat='All';
   const fb=document.createElement('div');fb.className='rts-f';cats.forEach(c=>{const n=c==='All'?list.length:list.filter(x=>(x.cat||'Other')===c).length;const b=document.createElement('button');b.type='button';b.className='rts-c'+(stockState.cat===c?' on':'');b.textContent=c+' '+n;b.addEventListener('click',()=>{stockState.cat=c;renderStock();});fb.appendChild(b);});w.appendChild(fb);
@@ -628,7 +629,7 @@ document.getElementById('f-reset').addEventListener('click',()=>{state.from=stat
  ['f-from','f-to','f-brand','f-type','q'].forEach(id=>document.getElementById(id).value='');
  [...document.getElementById('chips').children].forEach(c=>c.setAttribute('aria-pressed',String(c.textContent==='All')));render();});
 document.querySelectorAll('#ordT th').forEach(th=>th.addEventListener('click',()=>{const k=th.getAttribute('data-k');state.asc=state.k===k?!state.asc:true;state.k=k;render();}));
-function tabs(){const ids=['ov','tr','al','pay','ad','msg','st','pol','help'];
+function tabs(){const ids=['ov','rts','tr','al','pay','ad','msg','st','pol','help'];
  const sel=(x)=>{ids.forEach(k=>{document.getElementById('tab-'+k).setAttribute('aria-selected',String(k===x));document.getElementById('pane-'+k).hidden=k!==x;});};
  ids.forEach(k=>document.getElementById('tab-'+k).addEventListener('click',()=>sel(k)));}
 tabs();

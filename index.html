@@ -35,7 +35,7 @@
 <div class="rule-double"></div>
 <p class="sub"><span class="fresh" id="fresh"><span class="dot"></span><span id="fresh-t">Updated on 19th October</span></span><span class="sep">·</span><span id="contact-line">Questions? Message Luxella on WhatsApp.</span><span class="sep">·</span><span id="season">Autumn 2026</span></p>
 </div>
-<div class="tabs" role="tablist"><button class="tab" id="tab-ov" role="tab" aria-selected="true">Overview</button><button class="tab" id="tab-tr" role="tab" aria-selected="false">Tracker</button><button class="tab" id="tab-al" role="tab" aria-selected="false">Orders</button><button class="tab" id="tab-pay" role="tab" aria-selected="false">Payments</button><button class="tab" id="tab-ad" role="tab" aria-selected="false">Address</button><button class="tab" id="tab-msg" role="tab" aria-selected="false">Messages</button><button class="tab" id="tab-st" role="tab" aria-selected="false">Stats</button><button class="tab" id="tab-pol" role="tab" aria-selected="false">Terms</button><button class="tab" id="tab-help" role="tab" aria-selected="false">Help</button></div>
+<div class="tabs" role="tablist"><button class="tab" id="tab-ov" role="tab" aria-selected="true">Overview</button><button class="tab" id="tab-rts" role="tab" aria-selected="false">Ready to ship</button><button class="tab" id="tab-tr" role="tab" aria-selected="false">Tracker</button><button class="tab" id="tab-al" role="tab" aria-selected="false">Orders</button><button class="tab" id="tab-pay" role="tab" aria-selected="false">Payments</button><button class="tab" id="tab-ad" role="tab" aria-selected="false">Address</button><button class="tab" id="tab-msg" role="tab" aria-selected="false">Messages</button><button class="tab" id="tab-st" role="tab" aria-selected="false">Stats</button><button class="tab" id="tab-pol" role="tab" aria-selected="false">Terms</button><button class="tab" id="tab-help" role="tab" aria-selected="false">Help</button></div>
 <div class="mini" id="mini"></div>
 <div id="pane-ov">
 <div id="banner" hidden class="banner"><span class="pulse"></span><div><p class="big" id="bn-t"></p><p class="lbl" id="bn-s" style="margin:0"></p></div></div>
@@ -50,7 +50,7 @@
 <section class="card"><h2>From Luxella</h2><div id="pinned" class="pinned"><span class="lbl">No note right now.</span></div></section>
 <section class="card"><h2>Timeline</h2><p class="note">Open orders from order date to ETA, on one calendar</p><div id="gantt" class="gantt"></div></section>
 <div class="grid">
-<section class="card" id="rts-sec"><h2>Ready to ship</h2><p class="note">In hand in India. Order now and it ships within a day of payment.</p><div id="stock" class="act"></div></section>
+
 <section class="card" id="neworder"></section>
 <section class="card"><h2>Quotes & wishlist</h2><p class="note">Pieces you asked about. Accept a quote to start an order.</p><div id="quotes" class="act"></div></section>
 </div>
@@ -71,6 +71,9 @@
 <section class="card"><h2>Good to know</h2><p class="note">Three short notes</p><ul class="gtk"><li><b>Delivery dates</b><span>Dates are estimates. Delays from customs or couriers are out of our hands, but we update your page the moment a date changes.</span></li><li><b>Payments</b><span>Pay only to the details shown on your page, then add the reference in the Payments tab. We confirm it and your balance updates.</span></li><li><b>Your items</b><span>Please record an unboxing video before opening your parcel. It lets us raise a claim if something is not right.</span></li></ul><p style="margin:14px 0 0"><button class="chip" id="gtk-terms" type="button">Read the full terms</button></p></section>
 <section class="card"><h2>Contact</h2><p class="note">Reach Luxella directly</p><div id="contact"></div></section>
 </div>
+</div>
+<div id="pane-rts" hidden>
+<section class="card" id="rts-sec"><h2>Ready to ship</h2><p class="note">In hand in India. Order now and it ships within a day of payment.</p><div id="stock" class="act"></div></section>
 </div>
 <div id="pane-tr" hidden>
 <div class="grid">

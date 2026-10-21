@@ -175,7 +175,7 @@ function init(){
 /* open the right tab from mail / push links (#tr, #pay, #ad, #al, #help, #ov, #msg, #st, #pol) */
 (function(){
 'use strict';
-const go=()=>{const h=(location.hash||'').slice(1);if(!/^(ov|tr|al|pay|ad|msg|st|pol|help)$/.test(h))return false;const t=document.getElementById('tab-'+h);if(!t)return false;t.click();window.scrollTo(0,0);return true;};
+const go=()=>{const h=(location.hash||'').slice(1);if(!/^(ov|rts|tr|al|pay|ad|msg|st|pol|help)$/.test(h))return false;const t=document.getElementById('tab-'+h);if(!t)return false;t.click();window.scrollTo(0,0);return true;};
 let n=0;const t=setInterval(()=>{n++;let ok=false;try{ok=typeof dash!=='undefined'&&document.getElementById('tab-tr');}catch(e){}if(ok){clearInterval(t);setTimeout(go,500);window.addEventListener('hashchange',go);}else if(n>200)clearInterval(t);},150);
 })();
 
