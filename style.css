@@ -1084,3 +1084,9 @@ body::after{content:"";position:fixed;left:0;right:0;bottom:0;height:3px;backgro
 .sw .hero .sub{margin-top:10px}
 .sw .hero .rule-double{margin:14px 0 12px}
 .sw .tabs{margin-bottom:26px!important}
+
+/* premium tab labels: Cormorant Garamond, small caps */
+.sw .tab{font-family:'Cormorant Garamond','Didot','Bodoni MT',Georgia,serif!important;font-size:15px!important;font-weight:500!important;letter-spacing:.14em!important;text-transform:none!important;font-variant:small-caps;padding:16px 16px 14px!important;white-space:nowrap}
+.sw .tab[aria-selected=true]{font-weight:600!important;color:var(--gold-2,#F4E1A0)!important;border-bottom:0!important}
+.sw .tab .bdg{font-family:'Jost',sans-serif!important;letter-spacing:0!important;font-variant:normal;font-size:9px!important}
+@media (max-width:640px){.sw .tab{font-size:14.5px!important;padding:14px 12px 12px!important;letter-spacing:.12em!important}}
