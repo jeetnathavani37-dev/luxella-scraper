@@ -1012,3 +1012,7 @@ img{max-width:100%}
 .sw #ordT tbody td:nth-child(9){order:1}.sw #ordT tbody td:nth-child(10){order:2}.sw #ordT tbody td:nth-child(12){order:3}.sw #ordT tbody td:nth-child(13){order:4}.sw #ordT tbody td:nth-child(11){order:5}.sw #ordT tbody td:nth-child(14){order:6}.sw #ordT tbody td:nth-child(5){order:7}.sw #ordT tbody td:nth-child(6){order:8}.sw #ordT tbody td:nth-child(7){order:9}.sw #ordT tbody td:nth-child(15){order:10}
 .sw #ordT tbody td:nth-child(1),.sw #ordT tbody td:nth-child(2),.sw #ordT tbody td:nth-child(3),.sw #ordT tbody td:nth-child(4),.sw #ordT tbody td:nth-child(8){order:0}
 @media(min-width:900px){.sw #ordT tbody{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;align-items:start}.sw #ordT tbody tr{margin:0}.sw #ordT tbody tr.grp{grid-column:1/-1}}
+/* Product photos: never crop, always show the whole product */
+.sw img.ph,.sw .ss,.sw .qcg img,.sw .xc-th img{object-fit:contain!important;background:#fff!important}
+.sw .drawer img.ph,.sw .feat img.ph{object-position:center}
+.sw #ordT tbody td:nth-child(1) img.ph{width:100%;height:auto;aspect-ratio:1/1;max-height:150px}
