@@ -84,6 +84,12 @@ html.bb-compact .bb-row>summary{padding:5px 0}html.bb-compact .bb-qr{padding:5px
 .ag-it{display:flex;gap:12px;align-items:center;padding:10px 12px;border:1px solid #1F1D1B;background:#111113;margin-bottom:6px}.ag-it>i{font-style:normal;width:22px;height:22px;display:grid;place-items:center;border:1px solid #3A3222;color:#C9A227;font-size:12px;flex-shrink:0}.ag-it.action>i{border-color:#5a2a2a;color:#e0897c}.ag-it>div{flex:1;min-width:0;display:flex;flex-direction:column}.ag-it span{font-size:13px;color:#F3EEE6}.ag-it small{font-size:11px;color:#8C857A}
 .ag-pre{white-space:pre-wrap;font:12.5px/1.5 'Jost',sans-serif;color:#C9C2B6;background:#0C0C0D;border:1px solid #1F1D1B;padding:10px;margin:0;max-height:220px;overflow:auto}
 .md{font-size:13.5px;line-height:1.6;color:#C9C2B6}.md h3{font:500 15px 'Jost',sans-serif;color:#E3C565;margin:14px 0 6px;letter-spacing:.02em;text-transform:none}.md h4,.md h5{font:500 12px 'Jost',sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#E3C565;margin:16px 0 6px}.md p{margin:6px 0}.md ul,.md ol{margin:6px 0;padding-left:20px}.md code{background:#1A1917;padding:1px 5px;font-size:12px;color:#F4E1A0;overflow-wrap:anywhere}.md b{color:#F3EEE6;font-weight:500}.md table{width:100%;border-collapse:collapse;margin:8px 0;font-size:12.5px;display:block;overflow-x:auto}.md th,.md td{border:1px solid #2A2724;padding:6px 8px;text-align:left;vertical-align:top}.md th{color:#E3C565;font-weight:500;background:#0E0E0F}.md blockquote{border-left:2px solid #6B5A24;margin:8px 0;padding:4px 12px;color:#A39C90}
+.lx-chat-fab{position:fixed;right:18px;bottom:18px;width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,#E3C565,#B8943F);color:#0A0A0A;border:0;font-size:22px;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,.5);z-index:50}
+.lx-chat{position:fixed;right:18px;bottom:84px;width:380px;max-width:calc(100vw - 24px);height:520px;max-height:calc(100vh - 110px);background:#0E0E0F;border:1px solid #4a3f22;display:flex;flex-direction:column;z-index:50;box-shadow:0 16px 40px rgba(0,0,0,.6)}.lx-chat[hidden]{display:none}
+.lx-ch-h{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:1px solid #232120}.lx-ch-h b{font:500 11px 'Jost',sans-serif;letter-spacing:.2em;text-transform:uppercase;color:#E3C565}.lx-ch-h button{background:none;border:0;color:#A39C90;font-size:20px;cursor:pointer}
+.lx-ch-log{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px}.lx-msg{max-width:90%;padding:9px 11px;font-size:13px;line-height:1.45;white-space:pre-wrap;word-break:break-word}.lx-msg.bot{background:#161512;border:1px solid #2A2724;color:#C9C2B6;align-self:flex-start}.lx-msg.me{background:#2a2410;color:#F4E1A0;align-self:flex-end}
+.lx-plan{display:flex;gap:8px;align-items:flex-start;padding:6px 0;border-top:1px solid #232120;font-size:12.5px}.lx-plan input{accent-color:#C9A227;margin-top:3px}.lx-plan b{color:#E3C565;font-weight:400}.lx-msg .cd-act{margin-top:8px}
+.lx-ch-f{display:flex;gap:6px;align-items:flex-end;padding:10px;border-top:1px solid #232120}.lx-ch-f textarea{flex:1;background:#0A0A0A;border:1px solid #2A2724;color:#F3EEE6;padding:8px;font:inherit;font-size:13px;resize:none}.lx-att{background:none;border:1px solid #2A2724;color:#E3C565;padding:8px;cursor:pointer}
 @media print{.bp-top,.bb-tabs,.bb-vt,.bb-bar,.bb-bulk,button{display:none!important}#admin-root{background:#fff!important;color:#000!important}}
 @media(max-width:820px){.bb-tr{grid-template-columns:1fr 1.6fr 1fr}.bb-tr>span:nth-child(n+4){display:none}.bb-tick{grid-template-columns:22px 1fr auto}.bb-tick .i{grid-column:2/4}.bb-tick .s,.bb-tick .d{display:none}.bb-bid{grid-template-columns:1fr auto}.bb-bid .r{grid-column:1/-1}}
 @media(max-width:820px){.bb-row>summary,.bb-th{grid-template-columns:1fr 1fr}.bb-row>summary>:nth-child(n+5),.bb-th>:nth-child(n+3){display:none}.bb-row .it{grid-column:1/-1;order:-1}}
@@ -554,7 +560,7 @@ window.lxB2B=async function(root,sb,toast){
    c.appendChild(fa);g.appendChild(c);});P.appendChild(g);}
 
  /* ---------- Agents ---------- */
- const AG=[['mail','📬','Mail agent','Har 2 ghante · Gmail → portal'],['pricing','💰','Bid pricing agent','Har 2 ghante · naye bids ka store price + margin'],['tracking','🚚','Tracking agent','Har 4 ghante · saare tracking check'],['ops','📋','Ops agent','8:41am + 7:41pm · aaj ke kaam + drafts'],['payout','💸','Payout agent','Roz 10:52 · confirmation + 7 din, chase'],['auditor','🛡️','Auditor agent','Har 3 ghante · kuch miss to nahi']];
+ const AG=[['mail','📬','Mail agent','Har 2 ghante · Gmail → portal'],['pricing','💰','Bid pricing agent','Har 2 ghante · naye bids ka store price + margin'],['tracking','🚚','Tracking agent','Har 4 ghante · saare tracking check'],['ops','📋','Ops agent','8:41am + 7:41pm · aaj ke kaam + drafts'],['payout','💸','Payout agent','Roz 10:52 · confirmation + 7 din, chase'],['auditor','🛡️','Auditor agent','Har 3 ghante · kuch miss to nahi'],['reconciler','🔍','KM Reconciler','9:23am + 9:23pm · KM All Orders vs portal (cancel, payout, US IDs)']];
  const agoT=t=>{if(!t)return 'abhi tak nahi chala';const m=Math.round((Date.now()-new Date(t))/6e4);return m<60?m+' min pehle':m<1440?Math.round(m/60)+' ghante pehle':Math.round(m/1440)+' din pehle';};
  const pcLine=r=>{const p=r.price_check;if(!p)return null;const w=el('div','pc');const v=String(p.verdict||'').toUpperCase();w.appendChild(tag(v||'CHECKED',v==='GO'?'ok':v==='NO'?'bad':'go'));w.appendChild(el('span',null,[p.store,p.price_usd!=null?(p.currency==='GBP'?'£':p.currency==='CAD'?'C$':'$')+p.price_usd:'',p.landed_inr?'landed '+inr(p.landed_inr):'',p.margin_pct!=null?Math.round(p.margin_pct)+'% margin':''].filter(Boolean).join(' · ')));if(p.url){const a=el('a',null,'Open');a.href=p.url;a.target='_blank';a.rel='noopener';w.appendChild(a);}if(p.note)w.appendChild(el('small',null,p.note));return w;};
  const mdHtml=src=>{const esc=t=>t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');const inl=t=>esc(t).replace(/`([^`]+)`/g,'<code>$1</code>').replace(/\*\*([^*]+)\*\*/g,'<b>$1</b>');const L=src.split('\n');let h='',i=0;
@@ -585,6 +591,52 @@ window.lxB2B=async function(root,sb,toast){
   sec('✉️ Messages ready (tum bhejo)',drafts.length+' drafts');
   if(drafts.length){const g=el('div','bb-grid');drafts.forEach(x=>{const c=el('div','bb-cd');const h=el('div','cd-h');const hl=el('div');hl.appendChild(el('b',null,x.label||('To '+(x.to||''))));hl.appendChild(el('small',null,x.ag));h.appendChild(hl);c.appendChild(h);const pre=el('pre','ag-pre',x.text);c.appendChild(pre);const fa=el('div','cd-act');fa.appendChild(wa('WhatsApp',x.text));fa.appendChild(btn('Copy',()=>copyT(x.text)));c.appendChild(fa);g.appendChild(c);});P.appendChild(g);}else P.appendChild(el('p','bb-meta','Abhi koi draft nahi.'));
   const priced=all.filter(r=>r.price_check&&['To place'].includes(r.status));if(priced.length){sec('💰 Bid price checks',priced.length+' orders');const g=el('div','bb-grid');priced.forEach(r=>{const c=el('div','bb-cd');const h=el('div','cd-h');const hl=el('div');hl.appendChild(el('b',null,r.order_id||r._id));hl.appendChild(el('small',null,r.item));h.appendChild(hl);h.appendChild(el('div','cd-amt',inr(r.payout)));c.appendChild(h);c.appendChild(pcLine(r));g.appendChild(c);});P.appendChild(g);}playbooks(P);}
+ /* ---------- Smart chat box: paste anything, it figures out where it goes ---------- */
+ const ACT=[
+  [/cancel/i,()=>({status:'Cancelled'}),'Cancelled'],
+  [/\bmrn\b(?!.*confirm)/i,()=>({mrn_updated:today()}),'MRN updated'],
+  [/confirm/i,()=>({mrn_confirmed:today(),payout_timer:today()}),'KM confirmation received (7-day timer)'],
+  [/payout|paid|payment (aa|recei)|paisa aa/i,()=>({payout_status:'Received',payout_date:today()}),'Payout received'],
+  [/\bform\b/i,()=>({form_filled:'Yes',form_date:today()}),'Receiver form filled'],
+  [/landed|india (pahunch|aa gaya|reach)|reached india/i,()=>({landed_india:today()}),'Landed India'],
+  [/km (pe|ko) (deliver|pahunch)|reached km|delivered to km/i,()=>({delivered_km:today()}),'Reached KicksMachine'],
+  [/(reshipper|hub|warehouse|ishaan|yash|prabhmeet).*(deliver|pahunch|aa gaya|received)|(deliver|pahunch|received).*(reshipper|hub|warehouse|ishaan|yash|prabhmeet)/i,()=>({delivered_reshipper:today()}),'Reached reshipper'],
+  [/(left|ship(ped)?|dispatch(ed)?|nikal).*(india|hub se|reshipper se)|awb/i,()=>({shipped_reshipper:today()}),'Left reshipper → India'],
+  [/km portal|portal update/i,()=>({km_portal_updated:today()}),'KM portal updated']];
+ const RSN=[['ishaan','Ishaan-USA'],['yash','Yash'],['prabhmeet','Prabhmeet'],['dev gandhi','Dev Gandhi']];
+ function smartParse(txt){const lines=txt.split(/\n+/).map(x=>x.trim()).filter(Boolean);const norm=x=>String(x||'').toUpperCase().replace(/[^A-Z0-9]/g,'');const out=new Map();let lastIds=[];
+  const find=tok=>all.filter(r=>[r.order_id,r._id,gv(r,'retailer_order_id'),String(gv(r,'retailer_tracking')).split(' ')[0],gv(r,'reship_awb'),gv(r,'km_tracking')].map(norm).includes(norm(tok)));
+  lines.forEach(line=>{const U=line.toUpperCase();const ids=[...new Set((U.match(/\bUS\d{6}(?:-[A-Z])?\b/g)||[]))];const codes=(U.match(/\b(?:1Z[0-9A-Z]{16}|TBA\d{12}|(?:WUP|WCP|ZUP|Z0)\d{6,10}|\d{12,22})\b/g)||[]);
+   let rows=ids.flatMap(i=>all.filter(r=>(r.order_id||r._id)===i));codes.forEach(c=>find(c).forEach(r=>{if(!rows.includes(r))rows.push(r);}));
+   if(!rows.length&&!ids.length&&!codes.length&&lastIds.length)rows=lastIds;if(rows.length)lastIds=rows;
+   rows.forEach(r=>{const e=out.get(r._id)||{r,p:{},why:[]};
+    ACT.forEach(([re,fn,lab])=>{if(re.test(line)){Object.assign(e.p,fn());if(!e.why.includes(lab))e.why.push(lab);}});
+    const trk=codes.find(c=>/^(1Z|TBA)|^\d{12,22}$/.test(c)&&!find(c).length);
+    if(trk){if(/awb|india/i.test(line)||r.status==='At reshipper'){e.p.reship_awb=trk;e.p.shipped_reshipper=e.p.shipped_reshipper||today();e.why.push('AWB '+trk);}else if(['Landed India'].includes(r.status)||/courier|tirupati|delhivery|bluedart|dtdc/i.test(line)){e.p.km_tracking=e.p.local_tracking=trk;e.p.shipped_km=today();e.why.push('KM courier '+trk);}else{e.p.retailer_tracking=e.p.intl_tracking=trk;e.p.retailer_ship_date=gv(r,'retailer_ship_date')||today();e.why.push('Store tracking '+trk);}}
+    const so=codes.find(c=>/^(WUP|WCP|ZUP|Z0)/.test(c)&&!find(c).length);if(so){e.p.retailer_order_id=so;e.p.retailer_date=gv(r,'retailer_date')||today();e.why.push('Store order '+so);}
+    const kg=line.match(/(\d+(?:\.\d+)?)\s*kg/i);if(kg){e.p.actual_weight=Number(kg[1]);e.why.push(kg[1]+' kg');}
+    const rs=RSN.find(([k])=>line.toLowerCase().includes(k));if(rs&&!gv(r,'reshipper')){e.p.reshipper=rs[1];e.why.push('Reshipper '+rs[1]);}
+    const amt=line.match(/(?:₹|rs\.?|inr)\s*([\d,]+)/i);if(amt&&/payout|bid|price/i.test(line)&&!e.p.payout_status){e.p.payout=Number(amt[1].replace(/,/g,''));e.why.push('Payout ₹'+amt[1]);}
+    out.set(r._id,e);});});
+  return [...out.values()].filter(e=>Object.keys(e.p).length);}
+ function chatBox(){if(document.querySelector('.lx-chat-fab'))return;const fab=el('button','lx-chat-fab','💬');fab.title='Kuch bhi paste karo';document.body.appendChild(fab);
+  const pane=el('div','lx-chat');pane.hidden=true;document.body.appendChild(pane);fab.onclick=()=>{pane.hidden=!pane.hidden;if(!pane.hidden)ta.focus();};
+  const hd=el('div','lx-ch-h');hd.appendChild(el('b',null,'Luxella assistant'));const x=el('button',null,'×');x.onclick=()=>pane.hidden=true;hd.appendChild(x);pane.appendChild(hd);
+  const log=el('div','lx-ch-log');pane.appendChild(log);
+  const bot=(node)=>{const m=el('div','lx-msg bot');if(typeof node==='string')m.textContent=node;else m.appendChild(node);log.appendChild(m);log.scrollTop=log.scrollHeight;return m;};
+  const me=t=>{const m=el('div','lx-msg me',t.length>400?t.slice(0,400)+'…':t);log.appendChild(m);log.scrollTop=log.scrollHeight;};
+  bot('Kuch bhi paste karo — WhatsApp message, mail ka text, tracking list, "US109009 delivered at Ishaan 0.8kg", screenshot… Main samajh ke sahi jagah daal dunga. Jo na samjhun wo agents ko bhej dunga.');
+  const ft=el('div','lx-ch-f');const ta=document.createElement('textarea');ta.rows=3;ta.placeholder='Paste / type…';const fi=document.createElement('input');fi.type='file';fi.accept='image/*';fi.hidden=true;const att=el('button','lx-att','📎');att.title='Screenshot';att.onclick=()=>fi.click();const send=el('button','bb-b sm','Send');ft.append(att,ta,send,fi);pane.appendChild(ft);
+  const saveNote=async(text,status,result)=>{const id='n-'+Date.now().toString(36);await sb.from('lx_b2b').upsert({kind:'note',id,data:{text,created_at:new Date().toISOString(),status,result:result||'',by:'portal'},updated_at:new Date().toISOString()},{onConflict:'kind,id'});};
+  const handle=async(text)=>{const res=smartParse(text);
+   if(!res.length){await saveNote(text,'new');bot('Isme koi order seedha match nahi hua — note agents ko bhej diya ✓ (Mail agent agle run me padh ke sahi jagah daalega, HQ tab me result dikhega).');return;}
+   const w=el('div');w.appendChild(el('div',null,res.length+' order(s) samajh aaye — check karke Apply dabao:'));const plan=[];
+   res.forEach(e=>{const c=el('label','lx-plan');const cb=document.createElement('input');cb.type='checkbox';cb.checked=true;c.appendChild(cb);const t=el('span');t.appendChild(el('b',null,(e.r.order_id||e.r._id)+' '));t.appendChild(document.createTextNode(e.why.join(' · ')));c.appendChild(t);w.appendChild(c);plan.push({e,cb});});
+   const row=el('div','cd-act');const ap=btn('Apply',async()=>{ap.disabled=true;let n=0;for(const {e,cb} of plan){if(!cb.checked)continue;const p=Object.assign({},e.p);if(p.status!=='Cancelled')p.status=derive(Object.assign({},e.r,p));if(await save(e.r,p))n++;}await saveNote(text,'done','Portal ne apply kiya: '+plan.filter(x=>x.cb.checked).map(x=>(x.e.r.order_id||x.e.r._id)+' '+x.e.why.join('/')).join('; '));bot('✓ '+n+' order(s) update ho gaye.');draw();},'bb-b sm');
+   const ag=btn('Agents ko bhejo',async()=>{await saveNote(text,'new');bot('Agents ko bhej diya ✓');});row.append(ap,ag);w.appendChild(row);bot(w);};
+  send.onclick=async()=>{const t=ta.value.trim();if(!t)return;me(t);ta.value='';await handle(t);};
+  ta.addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.metaKey||e.ctrlKey))send.click();});
+  fi.onchange=async()=>{const f=fi.files&&fi.files[0];if(!f)return;me('📷 '+f.name);const m=bot('Photo padh raha hoon…');try{if(!window.Tesseract)await new Promise((res,rej)=>{const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js';s.onload=res;s.onerror=rej;document.head.appendChild(s);});const r=await Tesseract.recognize(f,'eng');m.remove();const box=el('div');ocrResult(box,r.data.text);bot(box);}catch(e){m.textContent='Photo read nahi hua.';}fi.value='';};}
  /* ---------- Checklist: one dropdown per parcel / combined order ---------- */
  const CK=[
   ['order_date','Bid won',[]],
@@ -699,7 +751,7 @@ window.lxB2B=async function(root,sb,toast){
   btn('Copy summary for WhatsApp','Aaj ka status ek message me',async()=>{const open=km.filter(r=>!DONE(r.status));const pen=km.filter(r=>r.payout_status!=='Received');const t='Luxella B2B · '+today()+'\nOpen orders: '+open.length+'\nAt hub: '+km.filter(r=>r.status==='At reshipper').length+'\nTo India: '+km.filter(r=>r.status==='Shipped from hub').length+'\nPayout pending: '+inr(pen.reduce((t2,r)=>t2+(Number(r.payout)||0),0))+' ('+pen.length+')';try{await navigator.clipboard.writeText(t);toast('Copied');}catch(e){}});
   btn('Print current view','Browser print / PDF',()=>window.print());
   P.appendChild(c);}
- draw();
+ draw();chatBox();
 };
 
 /* Standalone B2B portal at /b2b */

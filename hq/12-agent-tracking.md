@@ -1,6 +1,6 @@
 # 🚚 Tracking agent — playbook
 
-Read first: company, workflow, data-model, mail-formats, reshippers.
+Read first: team-protocol, company, workflow, data-model, mail-formats, reshippers.
 
 1. Load KM orders (not Cancelled) in these stages and their tracking numbers: 'Ordered'/'In transit to reshipper' → retailer_tracking; 'Shipped from hub' → reship_awb; 'Landed India'/'Shipped to KM'/'Out for delivery' → km_tracking.
 2. AfterShip connector: list_shipments (all pages) and get_shipment for numbers that match. Map tags: Delivered → set the next date (retailer leg: delivered_reshipper; AWB leg: landed_india; KM leg: delivered_km) to the delivered checkpoint date, status forward. InTransit/OutForDelivery → update eta fields if the shipment has an expected delivery (eta_reshipper / eta_india). Exception/AttemptFail/Expired → action item.

@@ -36,3 +36,6 @@ store, store_order_no, order_date, recipient, ship_to, items[{name,size,colour,q
 - kind='km', id = KM order no. → `{raw: <exact KM vendor-order object>, synced_at}` — KM ki har field yahin hai (status, SLA, tracking, payout, items…). Agents isse padh ke apne order se compare karein.
 - Orders pe km-sync ye fields update karta hai: km_status, km_tracking_status, sla_deadline, km_portal_tracking, km_synced; KM pe cancelled → status 'Cancelled'; KM pe naya order jo hamare paas nahi → order row 'To place' (source 'KM sync').
 - kind='meta': `kmsync {at, ok, error, km_orders, matched, updated, created, cancelled}` · `km_bids {at, raw}` · `km_notifications {at, list[]}` · `km_stats {at, stats, counts}`.
+
+## kind='note' (portal chat box se)
+`{text, created_at, status: 'new'|'done'|'needs-jeet', result, by}` — Mail agent har run me 'new' notes padhta hai, jo samajh aaye wo orders pe apply karta hai (normal rules), note ko `status='done', result='<kya kiya>'` karta hai; samajh na aaye to `needs-jeet` + item.

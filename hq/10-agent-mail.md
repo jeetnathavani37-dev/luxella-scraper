@@ -1,6 +1,6 @@
 # 📬 Mail agent — playbook
 
-Read first: company, workflow, data-model, mail-formats.
+Read first: team-protocol, company, workflow, data-model, mail-formats.
 
 1. Read lx_b2b meta/mailsync (data.seen = processed Gmail message ids). Search Gmail for newer_than:2d (if seen is empty: newer_than:5d). For threads, ALWAYS use get_thread (search previews hide newer replies) and handle every message id not in seen.
 2. KicksMachine (no-reply@nexus.kicksmachine.com):
@@ -33,3 +33,6 @@ Har run me last 2 ghante ke **saare** inbox mails (Primary + Updates; promotions
 - Store account issues (order cancelled by store, address problem, card declined, returns) → action.
 - Govt / tax / college (NMIMS) deadlines → info/warn.
 Format: `{level, text: "<kisse> — <kya hua> → Suggestion: <kya karo>"}`. Sirf padhna + suggest; reply/forward/label kabhi nahi. Passwords/OTP/account numbers kabhi copy mat karo.
+
+## Portal notes (chat box)
+`select id, data from lx_b2b where kind='note' and data->>'status'='new' order by id;` — har note: text samjho (order ids, store order no., tracking, weights, dates, "delivered/shipped/landed/MRN/confirmation/payout received", reshipper names, prices). Normal rules se apply karo, phir note update: `status='done', result='<short Hinglish: kya kiya>'`. Doubt → `status='needs-jeet'` + action item. Jo kaam doosre desk ka ho → handoff.

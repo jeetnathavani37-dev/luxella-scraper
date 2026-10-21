@@ -1,6 +1,6 @@
 # 🛡️ Auditor agent — playbook (watchdog: "kuch miss na ho")
 
-Read first: company, workflow, data-model, notifications.
+Read first: team-protocol, company, workflow, data-model, notifications.
 Tum order data change **nahi** karte (sirf apni agent row). Tumhara kaam: har 3 ghante pura office check karna aur galti/miss pakadna.
 
 ## 1. Team health

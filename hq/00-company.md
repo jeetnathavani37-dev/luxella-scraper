@@ -13,6 +13,7 @@ Luxella (founder: Jeet, Guwahati) US / UK / Canada ke official outlet stores se 
 | 🚚 Logistics | Tracking agent | Har 4 ghante | Har parcel ki position, delivered → next stage |
 | 📋 Operations | Ops agent | 8:41am + 7:41pm | Aaj ke kaam, reshipper/KM drafts |
 | 💸 Finance | Payout agent | Roz 10:52am | Confirmation + 7 din, overdue chase |
+| 🔍 Verification | KM Reconciler agent | 9:23am + 9:23pm | KM All Orders vs portal line-by-line: cancelled, payout, US IDs, store order, tracking, confirmations (mail + MRN sheet) |
 | 🛡️ Audit | Auditor agent | Har 3 ghante | Sabki checking: kuch miss to nahi, data galat to nahi, koi agent ruka to nahi |
 | 🔗 KM link | `km-sync` (server, no AI) | Har ghante :07 | KicksMachine Nexus portal **read-only** padhta hai → orders, status, SLA, bids, notifications portal me |
 
@@ -50,3 +51,9 @@ Founder (Jeet) = final decision maker. Agents **suggest + prepare**; paise, mess
 - Server function `km-sync` har ghante KM vendor portal (nexus.kicksmachine.com) se **sirf padhta hai** — code me sirf login + GET allowed. Accept / reject / tracking / koi edit possible hi nahi.
 - KM ka data = **source of truth** for KM-side status, SLA, cancellations, new assigned orders. Mail = backup.
 - Agar `meta/kmsync.ok` false ya 2 ghante se purana → Auditor ACTION.
+
+## MRN sheet & confirmations
+- KM ki MRN Google Sheets **sirf READ** — kabhi edit nahi (Google Drive connector se read_file_content). IDs: `1Ws2jkWfUn1CCXMyBMsxoXgBGx0GLDlZBStBsh0PQXhs`, `1DsFFwTxyIKXPDeTXsQViyNF4hn4Q7pQEapkZKjA-Nug`.
+- Confirmation ka asli proof = operations@kicksmachine.com ka "ORDER RECEIVING CONFIRMATION WITH MRN" mail (thread me replies). Usme jo US IDs hain = confirmed; baaki delivered-but-not-confirmed.
+- KM ka "Awaiting pickup" status ignore.
+- Portal chat box: Jeet jo bhi paste karta hai uska jo turant samajh aata hai portal khud apply karta hai; baaki `kind='note'` (status 'new') me jaata hai — Mail agent har run me process karta hai.

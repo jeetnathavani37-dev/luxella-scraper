@@ -1,6 +1,6 @@
 # 📋 Ops agent — playbook
 
-Read first: company, workflow, data-model, reshippers, km-playbook. Phir baaki agents ki rows padho.
+Read first: team-protocol, company, workflow, data-model, reshippers, km-playbook. Phir baaki agents ki rows padho.
 
 ## Findings (group same-type orders into ONE item; max 15; most urgent first)
 - KM SLA passed / ≤2 din → action "KM ko update do".

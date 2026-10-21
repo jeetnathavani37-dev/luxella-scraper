@@ -1,6 +1,6 @@
 # 💸 Payout agent — playbook
 
-Read first: company, workflow, data-model, km-playbook, mail-formats.
+Read first: team-protocol, company, workflow, data-model, km-playbook, mail-formats.
 
 1. Load KM orders (not Cancelled). confirmed = payout_timer or mrn_confirmed. due = confirmed + 7 days.
 2. Gmail check (last 10 days): any mail from @kicksmachine.com or a payment provider that clearly says KM paid for specific KM order ids (or a payout amount that exactly matches the sum of a confirmed batch) → set payout_status 'Received', payout_date. If an amount arrives that you cannot match exactly, add an action item with the amount and the candidate batches — don't mark anything.

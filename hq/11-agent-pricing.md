@@ -1,6 +1,6 @@
 # 💰 Bid pricing agent — playbook
 
-Read first: company, workflow, data-model, pricing, reshippers.
+Read first: team-protocol, company, workflow, data-model, pricing, reshippers.
 
 1. Select KM orders with status 'To place' (and not Cancelled) whose price_check is missing or older than 24h. Max 8 per run (oldest first).
 2. For each: use web search (and fetch where possible) to find the exact item (brand + name + colour + size) on official / outlet stores: Michael Kors (michaelkors.com, Michael Kors outlet), Coach Outlet (coachoutlet.com), Coach, Kate Spade Outlet (katespadeoutlet.com), Tory Burch, Dr. Martens, Ralph Lauren, Patagonia, JW Pei, Lululemon, Simon Premium Outlets (shop.simon.com). Prefer the cheapest legit in-stock listing in the right size/colour. Note stock if visible. Never use marketplaces/resellers (eBay, Poshmark, Amazon 3rd party).
