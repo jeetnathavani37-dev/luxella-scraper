@@ -1173,3 +1173,9 @@ body::after{content:"";position:fixed;left:0;right:0;bottom:0;height:3px;backgro
 #neworder .nwo-ft .note{font-size:16px;color:var(--ivory)}
 #neworder .nwo-chev{background:linear-gradient(180deg,#F4E1A0,#B8943F);color:#000;border-color:#F4E1A0;font-weight:700}
 #neworder .nwo-ft h2::before{content:"NEW";display:inline-block;margin-right:10px;padding:3px 7px;font-size:8.5px;letter-spacing:.2em;background:linear-gradient(180deg,#F4E1A0,#B8943F);color:#000;font-weight:700;vertical-align:middle}
+
+/* golden dropdowns */
+.sw select{appearance:none;-webkit-appearance:none;background-color:#0B0B0C!important;color:#E3C565!important;border:1px solid #8C6E16!important;padding-right:34px!important;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%23E3C06A' stroke-width='1.6'/%3E%3C/svg%3E")!important;background-repeat:no-repeat!important;background-position:right 12px center!important;background-size:12px 8px!important}
+.sw select:focus,.sw select:hover{border-color:#E3C06A!important;outline:none;box-shadow:0 0 0 1px rgba(227,192,106,.35)}
+.sw select option{background:#0B0B0C;color:#E3C565}
+.sw select option:checked{background:#B8943F;color:#000}
