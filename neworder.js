@@ -349,3 +349,25 @@ window.lxOrderCard=function(r,img,status){
  const go=el('button','btn2 oc-open','Track this order');go.type='button';go.addEventListener('click',()=>{try{const nr=(dash.data('orders').data||[]).find(x=>x.item===r.item)||r;openDrawer(nr);}catch(e){const t=document.getElementById('tab-tr');if(t)t.click();}});c.appendChild(go);
  return c;};
 })();
+
+/* Client: notices popup on open / live */
+(function(){
+const el=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e;};
+let shown=new Set(),open=false;
+const show=list=>{if(open||!list.length)return;open=true;let i=0;
+ const ov=el('div','nt-ov');const bx=el('div','nt');ov.appendChild(bx);
+ const close=async()=>{ov.classList.remove('on');setTimeout(()=>ov.remove(),300);open=false;for(const n of list){try{await photos.db.doc('notices/'+n.id).set(Object.assign({},n.d,{seen:true,seen_at:new Date().toISOString()}));}catch(e){}}};
+ const draw=()=>{const n=list[i];bx.textContent='';const x=el('button','ps-x','×');x.type='button';x.addEventListener('click',close);bx.appendChild(x);
+  bx.appendChild(el('div','nt-eb','Update from Luxella'+(list.length>1?' · '+(i+1)+' of '+list.length:'')));
+  let row=null;try{row=(dash.data('orders').data||[]).find(o=>o.item===n.d.item);}catch(e){}
+  if(row&&typeof photoEl==='function'){const th=el('div','nt-th');try{th.appendChild(photoEl(row,true));}catch(e){}bx.appendChild(th);}
+  bx.appendChild(el('h3','nt-t',n.d.title||'Update'));bx.appendChild(el('p','nt-b',n.d.body||''));
+  if(n.d.at){bx.appendChild(el('div','nt-d',new Date(n.d.at).toLocaleString('en-IN',{day:'numeric',month:'short',hour:'numeric',minute:'2-digit'})));}
+  const r2=el('div','ps-row');const v=el('button','btn','View order');v.type='button';v.addEventListener('click',()=>{close();const t=document.getElementById('tab-'+(n.d.url||'tr'));if(t)t.click();setTimeout(()=>{try{if(row)openDrawer(row);}catch(e){}},300);});r2.appendChild(v);
+  const nx=el('button','btn2',i<list.length-1?'Next':'Got it');nx.type='button';nx.addEventListener('click',()=>{if(i<list.length-1){i++;draw();}else close();});r2.appendChild(nx);bx.appendChild(r2);};
+ draw();(document.querySelector('.sw')||document.body).appendChild(ov);requestAnimationFrame(()=>ov.classList.add('on'));};
+const go=()=>{try{if(typeof photos==='undefined'||!photos.db||typeof dash==='undefined')return setTimeout(go,500);}catch(e){return setTimeout(go,500);}
+ if((window.lx&&window.lx.isOwner&&window.lx.isOwner())||photos.canEdit)return;
+ photos.db.collection('notices').onSnapshot(s=>{const list=s.docs.filter(d=>d.exists).map(d=>({id:d.id,d:d.data()})).filter(n=>n.d&&!n.d.seen&&!shown.has(n.id)).sort((a,b)=>String(b.d.at).localeCompare(String(a.d.at))).slice(0,5);if(!list.length)return;list.forEach(n=>shown.add(n.id));setTimeout(()=>show(list),1200);},()=>{});};
+window.lxShowNotices=show;setTimeout(go,1500);
+})();

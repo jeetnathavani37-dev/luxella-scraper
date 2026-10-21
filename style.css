@@ -1434,3 +1434,19 @@ html.nwo-lock,html.nwo-lock body{overflow:hidden}
 .ocard.ocf .oc-f{grid-template-columns:repeat(2,1fr)}
 @media (min-width:640px){.ocard.ocf .oc-f{grid-template-columns:repeat(3,1fr)}}
 #await-alert .ocard{margin-top:12px}
+/* owner confirm row */
+.sw .xo-conf{align-items:center;flex-wrap:wrap;gap:8px;margin-top:10px;padding-top:10px;border-top:1px dashed #3A3222}
+.sw .xo-conf .xo-cl{flex-basis:100%;font:500 9.5px 'Jost',sans-serif;letter-spacing:.16em;text-transform:uppercase;color:var(--gold-2,#E3C565)}
+.sw .xo-conf .btn,.sw .xo-conf .btn2{flex:1 1 140px}
+/* client notice popup */
+.nt-ov{position:fixed;inset:0;z-index:85;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;transition:opacity .3s}
+.nt-ov.on{opacity:1}
+.nt{position:relative;width:100%;max-width:420px;background:linear-gradient(180deg,#17140E,#0B0B0C 45%);border:1px solid #3A3222;padding:28px 22px 22px;transform:translateY(16px) scale(.97);transition:transform .45s cubic-bezier(.16,.84,.24,1);box-shadow:0 30px 60px -20px rgba(0,0,0,.9),0 0 40px -10px rgba(201,162,39,.25)}
+.nt-ov.on .nt{transform:none}
+.nt:before{content:"";position:absolute;left:0;right:0;top:0;height:2px;background:linear-gradient(90deg,rgba(184,148,63,0),#B8943F 20%,#F4E1A0 50%,#B8943F 80%,rgba(184,148,63,0))}
+.nt-eb{font:500 10px 'Jost',sans-serif;letter-spacing:.28em;text-transform:uppercase;color:var(--gold-2,#E3C565)}
+.nt-th{margin:16px 0 4px;max-width:120px}.nt-th img{width:100%;height:auto;display:block;border:1px solid #2A2724}
+.nt-t{font-family:var(--font-anthropic-serif,'Cormorant Garamond',serif)!important;font-weight:400!important;font-size:30px!important;line-height:1.15;color:var(--ivory,#F3EEE6);margin:12px 0 8px!important;letter-spacing:0!important;text-transform:none!important}
+.nt-b{color:var(--muted,#A39C90);font-size:14px;line-height:1.6;margin:0 0 8px}
+.nt-d{font:500 9.5px 'Jost',sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#6F685E;margin-bottom:16px}
+.nt .ps-row>*{flex:1}

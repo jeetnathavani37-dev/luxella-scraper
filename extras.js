@@ -480,6 +480,14 @@ window.__lxTrk=function(r,card){
  const paid=r.payout_status==='Received';
  const pb=el('button','btn2',paid?'✓ Paid':'Mark paid');pb.type='button';pb.addEventListener('click',()=>applyChange(item,paid?{payout_status:'Pending',payment_date:''}:{payout_status:'Received',payment_date:todayS()},null,(r.order_no||item)+(paid?': marked unpaid':': marked paid')));
  row.appendChild(back);row.appendChild(nx);row.appendChild(pb);box2.appendChild(row);
+ /* row 1b: confirmations for the current stage */
+ {const cr=el('div','xo-row xo-conf');const cur=(window.stName?window.stName(r,stage):STAGES[stage-1]);
+  cr.appendChild(el('span','xo-cl','Confirm "'+cur+'" to client'));
+  const em=el('button','btn','Send email');em.type='button';
+  em.addEventListener('click',async()=>{if(!confirm('Email "'+cur+'" update for '+(r.order_no||item)+' to the client?'))return;em.disabled=true;em.textContent='Sending…';try{const tok=await window.lx.authToken();const cid=window.lx.client().id;const res=await fetch('https://qzripzgbstvxkfobzhyv.supabase.co/functions/v1/lx-push',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+tok},body:JSON.stringify({manual_stage:{client_id:cid,item}})});const j=await res.json();if(j.sent>0){em.textContent='Email sent ✓';say('Email sent: '+(j.subject||cur));}else{em.textContent='Send email';em.disabled=false;say('Email not sent'+(j.err?': '+j.err:j.error?': '+j.error:''));}}catch(e){em.textContent='Send email';em.disabled=false;say('Could not send email');}});
+  const wn=el('button','btn2','Notify on website');wn.type='button';
+  wn.addEventListener('click',async()=>{wn.disabled=true;wn.textContent='Posting…';try{const desc=(typeof stepDesc==='function')?stepDesc(r,stage):'';await photos.db.collection('notices').add({title:cur,body:(r.order_no?r.order_no+' · ':'')+item+(desc?' — '+desc:''),item,stage,order_no:r.order_no||'',url:stage===7?'ad':'tr',at:nowIso(),seen:false});wn.textContent='Notified ✓';say('Client will see a popup: '+cur);}catch(e){wn.textContent='Notify on website';wn.disabled=false;say('Could not post the notification');}});
+  cr.appendChild(em);cr.appendChild(wn);box2.appendChild(cr);}
  /* row 2: tap-to-edit fields, auto-save */
  const f=el('div','xo-form');
  const lab=(t,i)=>{const l=el('label','xo-lbl');l.appendChild(el('span',null,t));l.appendChild(i);return l;};
