@@ -101,6 +101,8 @@ html.bb-compact .bb-row>summary{padding:5px 0}html.bb-compact .bb-qr{padding:5px
 .bb-meta.warn{color:#d9a54a}.bb-sum>div span{display:block;font-size:12px;color:#C9C2B6;margin-top:2px}
 @media(max-width:600px){.mn-row{grid-template-columns:1fr}}
 .lx-pend{font-size:11px;color:#A39C90;padding:0 12px 6px}.lx-pend:empty{display:none}
+.ck,.ck-body,.ck-step,.ck-list,.bb-cd{min-width:0;max-width:100%;box-sizing:border-box}.ck-step input,.ck-step select{min-width:0;max-width:100%;box-sizing:border-box}.bb{padding-bottom:96px!important;overflow-x:clip}
+@media(max-width:600px){.ck-step input:not([type=checkbox]),.ck-step select{width:100%!important;flex:1 1 100%}.ck-step label{flex:1 1 100%}.ck>summary{min-width:0}.ck-l,.ck-r{max-width:100%;min-width:0}.ck-l span{word-break:break-word}}
 .lx-ch-f{display:flex;gap:6px;align-items:flex-end;padding:10px;border-top:1px solid #232120}.lx-ch-f textarea{flex:1;background:#0A0A0A;border:1px solid #2A2724;color:#F3EEE6;padding:8px;font:inherit;font-size:13px;resize:none}.lx-att{background:none;border:1px solid #2A2724;color:#E3C565;padding:8px;cursor:pointer}
 @media print{.bp-top,.bb-tabs,.bb-vt,.bb-bar,.bb-bulk,button{display:none!important}#admin-root{background:#fff!important;color:#000!important}}
 @media(max-width:820px){.bb-tr{grid-template-columns:1fr 1.6fr 1fr}.bb-tr>span:nth-child(n+4){display:none}.bb-tick{grid-template-columns:22px 1fr auto}.bb-tick .i{grid-column:2/4}.bb-tick .s,.bb-tick .d{display:none}.bb-bid{grid-template-columns:1fr auto}.bb-bid .r{grid-column:1/-1}}
@@ -136,11 +138,11 @@ window.lxB2B=async function(root,sb,toast){
   const rs=document.createElement('select');[''].concat(RS).forEach(v=>{const o=el('option',null,v||'All reshippers');o.value=v;if(v===S.rs)o.selected=true;rs.appendChild(o);});
   const bt=el('button','bb-b g sm'+(S.bulk?' on':''),S.bulk?'Done selecting':'Select / bulk edit');bt.onclick=()=>{S.bulk=!S.bulk;if(!S.bulk)S.sel=new Set();draw();};bar.append(who,bt);c.appendChild(bar);
   const base=viewTools(P,all).filter(r=>S.who===''?true:S.who==='__wa'?r.client!=='KicksMachine':r.client===S.who);
-  const ch=el('div','bb-chips');[['','All'],...ST.map(s=>[s,s]),['__unpaid','Payout pending'],['__low','<20% margin']].forEach(([v,t])=>{const n=base.filter(r=>v===''?true:v==='__unpaid'?r.payout_status!=='Received':v==='__low'?r.margin_ok==='No':r.status===v).length;if(!n&&v!==''&&S.st!==v)return;const b=el('button','bb-chip'+(S.st===v?' on':''),t);b.appendChild(el('b',null,String(n)));b.onclick=()=>{S.st=v;draw();};ch.appendChild(b);});c.appendChild(ch);
+  const ch=el('div','bb-chips');[['','All'],...ST.map(s=>[s,s]),['__unpaid','Payout pending'],['__low','<20% margin']].forEach(([v,t])=>{const n=base.filter(r=>v===''?true:v==='__unpaid'?(r.payout_status!=='Received'&&!['Cancelled','To place'].includes(r.status)):v==='__low'?r.margin_ok==='No':r.status===v).length;if(!n&&v!==''&&S.st!==v)return;const b=el('button','bb-chip'+(S.st===v?' on':''),t);b.appendChild(el('b',null,String(n)));b.onclick=()=>{S.st=v;draw();};ch.appendChild(b);});c.appendChild(ch);
   const list=el('div');c.appendChild(list);
   const th=el('div','bb-th');['KM order','Item / store','Stage · next','Reshipper · weight','Landed','Payout','Margin'].forEach(t=>th.appendChild(el('span',null,t)));list.appendChild(th);
   const render=()=>{[...list.querySelectorAll('.bb-row,.bb-meta')].forEach(x=>x.remove());const qq=S.q.toLowerCase();
-   const f=base.filter(r=>S.st===''?true:S.st==='__unpaid'?r.payout_status!=='Received':S.st==='__low'?r.margin_ok==='No':r.status===S.st).filter(r=>!qq||[r.order_id,r.item,r.brand,r.intl_tracking,r.local_tracking,r.client].join(' ').toLowerCase().includes(qq))
+   const f=base.filter(r=>S.st===''?true:S.st==='__unpaid'?(r.payout_status!=='Received'&&!['Cancelled','To place'].includes(r.status)):S.st==='__low'?r.margin_ok==='No':r.status===S.st).filter(r=>!qq||[r.order_id,r.item,r.brand,r.intl_tracking,r.local_tracking,r.client].join(' ').toLowerCase().includes(qq))
     .sort((a,b)=>ST.indexOf(a.status)-ST.indexOf(b.status)||String(b.order_date).localeCompare(String(a.order_date)));
    if(!f.length){list.appendChild(el('p','bb-meta','Koi order nahi.'));return;}
    f.forEach(r=>{const row=rowEl(r);if(!S.bulk){list.appendChild(row);return;}const cb=document.createElement('input');cb.type='checkbox';cb.className='bb-sel';cb.checked=SEL.has(r._id);cb.onclick=e=>e.stopPropagation();cb.onchange=()=>{cb.checked?SEL.add(r._id):SEL.delete(r._id);upd();};{const sm=row.querySelector('summary');(sm.firstElementChild||sm).prepend(cb);}list.appendChild(row);});};
@@ -338,10 +340,10 @@ window.lxB2B=async function(root,sb,toast){
   go.onclick=()=>run(parse(ta.value));
   fi.onchange=async()=>{const f=fi.files&&fi.files[0];if(!f)return;if(/\.xlsx?$/i.test(f.name)){const load=()=>new Promise((res,rej)=>{if(window.XLSX)return res();const sc=document.createElement('script');sc.src='https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js';sc.onload=res;sc.onerror=rej;document.head.appendChild(sc);});try{await load();const wb=XLSX.read(await f.arrayBuffer(),{type:'array',cellDates:true});const ws=wb.Sheets[wb.SheetNames[0]];const rows=XLSX.utils.sheet_to_json(ws,{header:1,raw:false,defval:''});ta.value=rows.map(r=>r.join('\t')).join('\n');run(rows.filter(r=>r.some(Boolean)).map(r=>r.map(x=>String(x).trim())));}catch(e){toast('File nahi padh paya');}}else{ta.value=await f.text();run(parse(ta.value));}};}
  function reship(P){
-  const ALLV=viewTools(P,all.filter(r=>r.reshipper),{date:'delivered_reshipper'});const tb=el('div','bb-chips');const groups={};ALLV.forEach(r=>{(groups[r.reshipper]=groups[r.reshipper]||[]).push(r);});
+  const ALLV=viewTools(P,all.filter(r=>r.reshipper&&r.status!=='Cancelled'),{date:'delivered_reshipper'});const tb=el('div','bb-chips');const groups={};ALLV.forEach(r=>{(groups[r.reshipper]=groups[r.reshipper]||[]).push(r);});
   const names=Object.keys(groups).sort((a,b)=>groups[b].length-groups[a].length);if(!names.length){P.appendChild(el('p','bb-meta','Koi reshipper data nahi.'));return;}
   if(!S.rsel||!groups[S.rsel])S.rsel=names[0];
-  names.forEach(n=>{const live=groups[n].filter(r=>['In transit to reshipper','At reshipper','Shipped from hub'].includes(r.status)).length;const b=el('button','bb-chip'+(S.rsel===n?' on':''),n);b.appendChild(el('b',null,String(live)));b.onclick=()=>{S.rsel=n;draw();};tb.appendChild(b);});P.appendChild(tb);
+  names.forEach(n=>{const live=groups[n].filter(r=>['Ordered','In transit to reshipper','At reshipper','Shipped from hub'].includes(r.status)).length;const b=el('button','bb-chip'+(S.rsel===n?' on':''),n);b.appendChild(el('b',null,String(live)));b.onclick=()=>{S.rsel=n;draw();};tb.appendChild(b);});P.appendChild(tb);
   const rows=groups[S.rsel];const W=(a,k)=>a.reduce((t,r)=>t+(Number(gv(r,k))||0),0);
   const inc=rows.filter(r=>r.status==='In transit to reshipper'||r.status==='Ordered'),at=rows.filter(r=>r.status==='At reshipper'),out=rows.filter(r=>r.status==='Shipped from hub'),done=rows.filter(r=>['Landed India','Shipped to KM','Delivered to KM','Out for delivery','Delivered to client'].includes(r.status));
   const K=el('div','bb-kpis');const k=(t,v,sub)=>{const d=el('div','bb-k');d.style.cursor='default';d.append(el('small',null,t),el('div','v',v),el('small',null,sub||''));K.appendChild(d);};
@@ -483,7 +485,7 @@ window.lxB2B=async function(root,sb,toast){
   if(!items.length)att.appendChild(el('p','bb-meta','Sab theek hai ✓'));
   items.forEach(([a,t,tab])=>{const l=el('button','ov-att');l.appendChild(el('b',null,String(a.length)));l.appendChild(el('span',null,t));l.appendChild(el('small',null,a.slice(0,3).map(r=>r.order_id||r._id).join(', ')+(a.length>3?'…':'')));l.onclick=()=>{if(tab==='payouts')S.pf='chase';go(tab);};att.appendChild(l);});
   const right=el('div');cols.appendChild(right);
-  const mo=el('div','bb-card');mo.appendChild(el('h2',null,'Money'));const pend=km.filter(r=>r.payout_status!=='Received');const costed=km.filter(r=>Number(r.landed)>0);
+  const mo=el('div','bb-card');mo.appendChild(el('h2',null,'Money'));const pend=km.filter(r=>r.payout_status!=='Received'&&!['Cancelled','To place'].includes(r.status));const costed=km.filter(r=>Number(r.landed)>0);
   [['Payout pending (all)',inr(sumP(pend))],['At KM, not yet paid',inr(sumP(pend.filter(r=>DONE(r.status))))],['Received',inr(sumP(km.filter(r=>r.payout_status==='Received')))],['Expected profit',inr(costed.reduce((t,r)=>t+(Number(r.profit)||0),0))]].forEach(([a,b])=>{const l=el('div','bb-line');l.appendChild(el('span','m',a));l.appendChild(el('b',null,b));mo.appendChild(l);});right.appendChild(mo);
   right.appendChild(photoCard());
   const ac=el('div','bb-card');ac.appendChild(el('h2',null,'🤖 Agents'));{let k=META.kmsync||{};if(k.error==='KM not connected')k={};const l=el('button','ov-att');l.style.gridTemplateColumns='34px 1fr';l.appendChild(el('b',null,'🔗'));l.querySelector('b').style.color='inherit';l.appendChild(el('span',null,'KicksMachine sync · '+(k.at?agoT(k.at):'connect karo')));l.appendChild(el('small',null,k.at?(k.ok?(k.km_orders+' KM orders read'):('error: '+(k.error||''))):'HQ tab me KM login daalo (read-only)'));l.onclick=()=>go('agents');ac.appendChild(l);}AG.forEach(([id,em,nm])=>{const x=AGENTS[id]||{};const l=el('button','ov-att');l.style.gridTemplateColumns='34px 1fr';l.appendChild(el('b',null,em));l.querySelector('b').style.color='inherit';l.appendChild(el('span',null,nm+' · '+agoT(x.last_run)));l.appendChild(el('small',null,x.summary||'—'));l.onclick=()=>go('agents');ac.appendChild(l);});right.appendChild(ac);}
@@ -755,19 +757,22 @@ window.lxB2B=async function(root,sb,toast){
   ['payout_chased','Payout chased',[]],
   ['payout_date','Payout received',[],{payout_status:'Received'}]];
  const gkey=r=>gv(r,'retailer_order_id')?'so:'+gv(r,'retailer_order_id'):gv(r,'retailer_tracking')?'t:'+String(gv(r,'retailer_tracking')).split(' ')[0]:'o:'+r._id;
+ const ST2CK={'Ordered':1,'In transit to reshipper':4,'At reshipper':5,'Shipped from hub':6,'Landed India':7,'Shipped to KM':8,'Delivered to KM':9};
+ const ckReach=r=>{let m=ST2CK[r.status]||0;CK.forEach(([k],i)=>{if(i>m&&![2,3,10,12].includes(i)&&gv(r,k))m=i;});return m;};
+ const ckDone=(r,i)=>!!gv(r,CK[i][0])||i<=ckReach(r)&&!(i===10&&ckReach(r)===9)&&(i!==12||!!gv(r,'payout_date'));
  function checklist(P){const km=KMO();const gm=new Map();km.forEach(r=>{const k=gkey(r);gm.set(k,(gm.get(k)||[]).concat([r]));});
-  const doneN=rs=>CK.filter(([k])=>rs.every(r=>gv(r,k))).length;
+  const doneN=rs=>CK.filter((c,i)=>rs.every(r=>ckDone(r,i))).length;
   let groups=[...gm.values()];const isDone=rs=>rs.every(r=>r.payout_status==='Received');
   const qv=search(P,'cq','Search KM ID, item, store order, tracking…');
-  chipRow(P,'cf',[['','Open',groups.filter(g=>!isDone(g)).length],['done','Completed',groups.filter(isDone).length],['multi','Combined orders',groups.filter(g=>g.length>1).length]]);
+  chipRow(P,'cf',[['','Open',groups.filter(g=>!isDone(g)).length],['done','Paid ✓',groups.filter(isDone).length],['multi','Combined orders',groups.filter(g=>g.length>1).length]]);
   groups=groups.filter(g=>S.cf==='done'?isDone(g):S.cf==='multi'?g.length>1:!isDone(g)).filter(g=>!qv||g.map(vtxt).join(' ').includes(qv)).sort((a,b)=>doneN(a)-doneN(b)||String(a[0].order_date).localeCompare(String(b[0].order_date)));
   if(!groups.length){P.appendChild(el('p','bb-meta','Kuch nahi.'));return;}
   const wrapC=el('div','ck-list');P.appendChild(wrapC);
   groups.forEach(rs=>{const key=gkey(rs[0]);const n=doneN(rs);const d=document.createElement('details');d.className='ck';if(S.ckOpen===key)d.open=true;d.addEventListener('toggle',()=>{if(d.open)S.ckOpen=key;});
    const sm=document.createElement('summary');const l=el('div','ck-l');l.appendChild(el('b',null,rs.map(r=>r.order_id||r._id).join(' + ')));l.appendChild(el('span',null,rs.map(r=>String(r.item||'').slice(0,40)).join(' · ')));sm.appendChild(l);
-   const nx=CK.find(([k])=>!rs.every(r=>gv(r,k)));const rr=el('div','ck-r');rr.appendChild(el('small',null,nx?'Next: '+nx[1]:'All done ✓'));const pb=el('div','ck-bar');const pi=el('i');pi.style.width=Math.round(n/CK.length*100)+'%';pb.appendChild(pi);rr.appendChild(pb);rr.appendChild(el('em',null,n+'/'+CK.length));sm.appendChild(rr);d.appendChild(sm);
+   const nx=CK.find((c,i)=>!rs.every(r=>ckDone(r,i)));const rr=el('div','ck-r');rr.appendChild(el('small',null,nx?'Next: '+nx[1]:'All done ✓'));const pb=el('div','ck-bar');const pi=el('i');pi.style.width=Math.round(n/CK.length*100)+'%';pb.appendChild(pi);rr.appendChild(pb);rr.appendChild(el('em',null,n+'/'+CK.length));sm.appendChild(rr);d.appendChild(sm);
    const body=el('div','ck-body');if(rs.length>1)body.appendChild(el('p','bb-meta','Combined: '+rs.length+' KM orders, ek store order / tracking. Tick karne se sab pe lagega.'));
-   CK.forEach(([k,label,fields,extra])=>{const ok=rs.every(r=>gv(r,k));const row=el('div','ck-step'+(ok?' ok':''));const cb=document.createElement('input');cb.type='checkbox';cb.checked=ok;
+   CK.forEach(([k,label,fields,extra],ci)=>{const ok=rs.every(r=>ckDone(r,ci));const row=el('div','ck-step'+(ok?' ok':''));const cb=document.createElement('input');cb.type='checkbox';cb.checked=ok;
     const lab=el('label');lab.appendChild(cb);lab.appendChild(el('span',null,label));row.appendChild(lab);const dt=document.createElement('input');dt.type='date';dt.value=String(gv(rs[0],k)||'').slice(0,10);row.appendChild(dt);
     const F={};fields.forEach(([fk,fl,type,opts])=>{let i;const v=String(gv(rs[0],fk)||'');if(type==='list'){i=document.createElement('select');[...(v&&!opts.includes(v)?[v]:[]),'',...opts].forEach(o=>{const op=el('option',null,o||fl);op.value=o;if(o===v)op.selected=true;i.appendChild(op);});}else{i=document.createElement('input');i.placeholder=fl;if(type)i.type=type;i.value=v;}F[fk]=i;row.appendChild(i);});
     const apply=async(on)=>{for(const r of rs){const p={};Object.entries(F).forEach(([fk,i])=>{let v=i.value;if(i.type==='number')v=v===''?null:Number(v);if(v!==''&&v!=null)p[fk]=v;});if(p.retailer_tracking)p.intl_tracking=p.retailer_tracking;if(p.km_tracking)p.local_tracking=p.km_tracking;
