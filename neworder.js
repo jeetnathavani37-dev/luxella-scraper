@@ -34,13 +34,14 @@ ready(()=>{
  const mpr=mk('Agreed price ₹ *','input',{type:'number',inputMode:'numeric',placeholder:'as quoted'},0);F.price=mpr.i;f3.appendChild(mpr.l);
  const mpy=mk('Paying by','select',{},0);F.pay=mpy.i;['UPI','Bank transfer','Pay after confirmation'].forEach(v=>{const o=el('option',null,v);o.value=v;mpy.i.appendChild(o);});f3.appendChild(mpy.l);
  const mpd=mk('Amount paid ₹','input',{type:'number',inputMode:'numeric'},0);F.paid=mpd.i;f3.appendChild(mpd.l);
- const mrf=mk('Reference / UTR','input',{type:'text',placeholder:'Transaction ID',autocomplete:'off'},0);F.ref=mrf.i;f3.appendChild(mrf.l);
+ const mrf=mk('Reference / UTR (optional)','input',{type:'text',placeholder:'Transaction ID',autocomplete:'off'},0);F.ref=mrf.i;f3.appendChild(mrf.l);
  const msc=mk('Payment screenshot (optional)','input',{type:'file',accept:'image/*'},1);F.file=msc.i;f3.appendChild(msc.l);
  panes[2].appendChild(f3);
  const pi=el('div','payinline');panes[2].appendChild(pi);
- const payNote=el('p','note','Pay first using the details above, then enter the amount and reference. Luxella verifies it against the account and confirms here. Until then it shows as pending.');panes[2].appendChild(payNote);
+ const payNote=el('p','note','Pay using the details above, then enter the amount (reference is optional, but helps us confirm faster). Luxella verifies it against the account and confirms here. Until then it shows as pending.');panes[2].appendChild(payNote);
  /* 4 review */
  const rv=el('div','nwo-rev');panes[3].appendChild(rv);
+ const trust=el('p','note','Luxella confirms your order after checking the price and payment. You can follow every step in your Orders tab.');panes[3].appendChild(trust);
  const terms=el('label','nwo-terms');const tc=el('input');tc.type='checkbox';terms.appendChild(tc);terms.appendChild(document.createTextNode(' I have read the terms and want to place this order.'));panes[3].appendChild(terms);
  const nav=el('div','nwo-nav');const back=el('button','btn2','Back');back.type='button';const next=el('button','btn','Continue');next.type='button';const msg=el('span','lbl');nav.appendChild(back);nav.appendChild(next);nav.appendChild(msg);root.appendChild(nav);
  const doneBox=el('div','nwo-done');doneBox.hidden=true;root.appendChild(doneBox);
@@ -57,14 +58,14 @@ ready(()=>{
  const check=s=>{
   if(s===0){if(!val('item'))return 'Enter the item name.';if(!(Number(val('qty')||1)>=1))return 'Quantity must be at least 1.';if(val('link')&&!/^https?:\/\//i.test(val('link')))return 'Product link should start with https://';}
   if(s===1&&F.addr.value!=='__later'){if(F.addr.value==='__new'&&val('newaddr').length<15)return 'Enter the full delivery address with pincode.';if(F.addr.value==='__new'&&!/\b\d{6}\b/.test(val('newaddr')))return 'The address needs a 6-digit pincode.';const ph=val('phone').replace(/[\s-]/g,'');if(!/^(\+91)?[6-9]\d{9}$/.test(ph))return 'Enter a 10-digit Indian mobile number for delivery.';}
-  if(s===2){const pr=Number(val('price'));if(!(pr>0))return 'Enter the agreed price.';if(paidMode()){const pd=Number(val('paid'));if(!(pd>0))return 'Enter the amount you paid, or choose "Pay after confirmation".';if(pd>pr)return 'Paid amount is more than the price.';if(val('ref').length<6)return 'Add the transaction reference (at least 6 characters).';}}
+  if(s===2){const pr=Number(val('price'));if(!(pr>0))return 'Enter the agreed price.';if(paidMode()){const pd=Number(val('paid'));if(!(pd>0))return 'Enter the amount you paid, or choose "Pay after confirmation".';if(pd>pr)return 'Paid amount is more than the price.';}}
   return '';};
  const later=()=>F.addr.value==='__later';const addrText=()=>later()?'To be shared later':(F.addr.value==='__new'?val('newaddr'):F.addr.value);
  const review=()=>{rv.textContent='';const row=(k,v)=>{const r=el('div','nwo-r');r.appendChild(el('span','k',k));r.appendChild(el('span','v',v));rv.appendChild(r);};
   const pr=Number(val('price')),pd=paidMode()?Number(val('paid')||0):0;
   row('Piece',val('item')+(val('brand')?' ('+val('brand')+')':''));row('Size / colour',val('size')||'—');row('Qty',val('qty')||'1');if(val('link'))row('Link',val('link'));if(val('notes'))row('Notes',val('notes'));
   row('Deliver to',later()?'Decide later (we will ask before dispatch)':addrText()+' · '+val('phone'));row('Price',inr(pr));row('Paying by',F.pay.value);
-  if(pd){row('Paid now',inr(pd)+' · ref '+val('ref'));row('Balance',inr(Math.max(0,pr-pd)));}else row('Balance',inr(pr)+' (to pay after confirmation)');};
+  if(pd){row('Paid now',inr(pd)+(val('ref')?' · ref '+val('ref'):''));row('Balance',inr(Math.max(0,pr-pd)));}else row('Balance',inr(pr)+' (to pay after confirmation)');};
  const render=()=>{panes.forEach((p,i)=>p.hidden=i!==S.step);[...prog.children].forEach((s,i)=>{s.className=i===S.step?'on':i<S.step?'ok':'';});back.hidden=S.step===0;next.textContent=S.step===3?'Place order':'Continue';if(S.step===3)review();msg.textContent='';};
  back.addEventListener('click',()=>{if(S.step>0){S.step--;render();}});
  const orderNo=()=>{const rows=dash.data('orders');const rs=rows.status==='ok'?rows.data:[];const m=String(new Date().getMonth()+1).padStart(2,'0');const nums=rs.map(r=>String(r.order_no||'')).filter(n=>n.startsWith('#'+m)).map(n=>Number(n.slice(3))||0);return '#'+m+String((nums.length?Math.max(...nums):0)+1).padStart(2,'0');};
