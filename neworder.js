@@ -104,3 +104,30 @@ ready(()=>{
  const link=$('gtk-terms');
 });
 })();
+
+/* Departures as compact cards (tap to expand) */
+(function(){
+'use strict';
+const $=id=>document.getElementById(id);
+const el=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e;};
+const inr=n=>'₹'+Number(n||0).toLocaleString('en-IN');
+let n=0;const t=setInterval(()=>{n++;let ok=false;try{ok=typeof dash!=='undefined'&&$('board')&&typeof STAGES!=='undefined';}catch(e){}if(ok){clearInterval(t);init();}else if(n>200)clearInterval(t);},150);
+function init(){
+ const tbl=$('board'),wrap=tbl.closest('.scroll');if(!wrap||$('dep-cards'))return;
+ wrap.hidden=true;const box=el('div','dep-cards');box.id='dep-cards';wrap.parentNode.insertBefore(box,wrap);
+ const note=wrap.parentNode.querySelector('.note');if(note)note.textContent='Open orders at a glance. Tap one for details.';
+ const open=new Set();
+ const render=()=>{const o=dash.data('orders');box.textContent='';if(o.status!=='ok')return;
+  const rows=o.data.filter(r=>r.status!=='Delivered'&&Number(r.stage||1)<9).sort((a,b)=>Number(b.stage||1)-Number(a.stage||1));
+  if(!rows.length){box.appendChild(el('p','lbl','No open orders.'));return;}
+  rows.forEach(r=>{const st=Number(r.stage||1),local=String(r.order_type||'').indexOf('Local')>=0;
+   const d=el('details','dep');d.dataset.k=r.item;if(open.has(r.item))d.open=true;d.addEventListener('toggle',()=>{d.open?open.add(r.item):open.delete(r.item);});
+   const s=el('summary');const l=el('div','dl');l.appendChild(el('span','dno',r.order_no||'—'));l.appendChild(el('span','dit',r.item));
+   const rt=el('div','dr');rt.appendChild(el('span','dpr',r.payout?inr(r.payout):''));rt.appendChild(el('span','dst',STAGES[st-1]||r.status||''));
+   s.appendChild(l);s.appendChild(rt);d.appendChild(s);
+   const b=el('div','db');const row=(k,v)=>{const x=el('div','dx');x.appendChild(el('span','k',k));x.appendChild(el('span','v',v));b.appendChild(x);};
+   row('Step',st+' of 9');if(r.brand)row('Brand',r.brand);row('Origin',st>=3?'Shipped':'Pending');if(!local)row('Hub',st>=5?'Departed':(st>=4?'Received':'Awaiting'));row('India',st>=8?'Out for delivery':(st>=6?'Landed':'In transit'));row('ETA',r.eta_date&&typeof fd==='function'?fd(r.eta_date):'—');
+   const bt=el('button','btn2','Open order');bt.type='button';bt.addEventListener('click',()=>{try{openDrawer(r);}catch(e){}});b.appendChild(bt);d.appendChild(b);box.appendChild(d);});};
+ render();dash.onData(render);
+}
+})();
