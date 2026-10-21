@@ -1454,3 +1454,16 @@ html.nwo-lock,html.nwo-lock body{overflow:hidden}
 html.lx-ro .sw .owner,html.lx-ro .sw .mg-own,html.lx-ro #mg-toggle,html.lx-ro #hdrbtns,html.lx-ro .sw .xo-trk,html.lx-ro .sw .addph{display:none!important}
 .ro-toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:99;background:#E3C06A;color:#000;font:500 11px 'Jost',sans-serif;letter-spacing:.14em;text-transform:uppercase;padding:10px 16px}
 html.lx-ro #tb-switch,html.lx-ro #tb-out,html.lx-ro #top .who{display:none!important}
+/* touch devices: lighter effects (iOS Safari stability) */
+@media (hover:none),(max-width:760px){
+.sw .rv-up,.sw .rv-zoom,.sw .rv-slide,.sw .rv-fade{filter:none!important}
+.sw .rv-up{transform:translate3d(0,18px,0)}
+.sw .rv-zoom{transform:scale(.96)}
+.sw .rv{transition:opacity .7s ease,transform .8s cubic-bezier(.16,.84,.24,1)!important}
+.sw .rv-slide.rv-in img,.sw .rv-slide.rv-in .ph,.sw .rv-zoom.rv-in .big{animation:none!important}
+.sw .hero-main,.sw .hlogo{will-change:auto!important;transform:none!important;opacity:1!important}
+.sw .tabs{contain:none!important}
+.sw .btn:after{display:none!important}
+.sw #h1:after{animation:goldgrow 1.1s cubic-bezier(.2,.7,.2,1) both!important;box-shadow:none!important}
+.sw .rts-im img{transition:none}
+}
