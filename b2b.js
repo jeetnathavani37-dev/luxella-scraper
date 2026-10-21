@@ -152,10 +152,10 @@ window.lxB2B=async function(root,sb,toast){
   ({overview:overview,transit:transit,intl:intlT,wh:whT,rs:rsT,landed:landedT,mrn:mrnT,alerts:alertsT,bids:bids,buys:buys,reship:reship,tokm:tokmT,confirm:confirmT,payouts:payouts,money:money,checklist:checklist,agents:agentsTab})[S.tab](P);};
  function orders(P){const c=el('div','bb-card');P.appendChild(c);
   const bar=el('div','bb-bar');S.q='';
-  const who=document.createElement('select');[['KicksMachine','KicksMachine'],['__wa','WhatsApp clients'],['','All']].forEach(([v,t])=>{const o=el('option',null,t);o.value=v;if(v===S.who)o.selected=true;who.appendChild(o);});
+  const who=document.createElement('select');[['KicksMachine','KicksMachine'],['Sourcex','Sourcex'],['__wa','WhatsApp clients'],['','All']].forEach(([v,t])=>{const o=el('option',null,t);o.value=v;if(v===S.who)o.selected=true;who.appendChild(o);});
   const rs=document.createElement('select');[''].concat(RS).forEach(v=>{const o=el('option',null,v||'All reshippers');o.value=v;if(v===S.rs)o.selected=true;rs.appendChild(o);});
   const bt=el('button','bb-b g sm'+(S.bulk?' on':''),S.bulk?'Done selecting':'Select / bulk edit');bt.onclick=()=>{S.bulk=!S.bulk;if(!S.bulk)S.sel=new Set();draw();};bar.append(who,bt);c.appendChild(bar);
-  const base=viewTools(P,all).filter(r=>S.who===''?true:S.who==='__wa'?r.client!=='KicksMachine':r.client===S.who);
+  const base=viewTools(P,all).filter(r=>S.who===''?true:S.who==='__wa'?(r.client!=='KicksMachine'&&r.client!=='Sourcex'):r.client===S.who);
   const ch=el('div','bb-chips');[['','All'],...ST.map(s=>[s,s]),['__unpaid','Payout pending'],['__low','<20% margin']].forEach(([v,t])=>{const n=base.filter(r=>v===''?true:v==='__unpaid'?(r.payout_status!=='Received'&&!['Cancelled','To place'].includes(r.status)):v==='__low'?r.margin_ok==='No':r.status===v).length;if(!n&&v!==''&&S.st!==v)return;const b=el('button','bb-chip'+(S.st===v?' on':''),t);b.appendChild(el('b',null,String(n)));b.onclick=()=>{S.st=v;draw();};ch.appendChild(b);});c.appendChild(ch);
   const list=el('div');c.appendChild(list);
   const th=el('div','bb-th');['KM order','Item / store','Stage · next','Reshipper · weight','Landed','Payout','Margin'].forEach(t=>th.appendChild(el('span',null,t)));list.appendChild(th);
@@ -576,7 +576,7 @@ window.lxB2B=async function(root,sb,toast){
   ms.forEach(m=>{const b=el('button','bb-chip'+(m===M?' on':''),new Date(m+'-01T00:00:00').toLocaleDateString('en-IN',{month:'short',year:'2-digit'}));b.onclick=()=>{S.mon=m;draw();};mc.appendChild(b);});P.appendChild(mc);
   const inv=placed.filter(r=>inM(placedOn(r)));const invested=sumF(inv,costOf);const noCost=inv.filter(r=>!costOf(r));
   const payOn=r=>gv(r,'payout_date')||(r.client!=='KicksMachine'?gv(r,'order_date'):'');const rec=live.filter(r=>r.payout_status==='Received'&&inM(payOn(r)));const received=sumF(rec,r=>gv(r,'payout'));const recC=rec.filter(r=>costOf(r)>0);const realized=sumF(recC,r=>gv(r,'payout'))-sumF(recC,costOf);const recNoC=rec.length-recC.length;
-  const recvList=placed.filter(r=>r.payout_status!=='Received');const receivable=sumF(recvList,r=>gv(r,'payout'));const rlC=recvList.filter(r=>costOf(r)>0);const expProfit=sumF(rlC,r=>gv(r,'payout'))-sumF(rlC,costOf);
+  const recvList=placed.filter(r=>r.payout_status!=='Received'&&r.payout_status!=='Unverified'&&r.payout_status!=='—');const unver=placed.filter(r=>r.payout_status==='Unverified');const receivable=sumF(recvList,r=>gv(r,'payout'));const rlC=recvList.filter(r=>costOf(r)>0);const expProfit=sumF(rlC,r=>gv(r,'payout'))-sumF(rlC,costOf);
   const conf=recvList.filter(r=>confirmedOn(r));const dueSoon=sumF(conf,r=>gv(r,'payout'));const overdue=conf.filter(r=>(days(confirmedOn(r))||0)>9);
   const toPlace=live.filter(r=>r.status==='To place');const committed=sumF(toPlace,r=>costOf(r)||Number(gv(r,'payout'))*0.8);
   const bank=F.bank&&F.bank.amount!=null?Number(F.bank.amount):null;const net=bank==null?null:bank+receivable-committed;
@@ -585,6 +585,7 @@ window.lxB2B=async function(root,sb,toast){
    [bank==null?'—':inr(bank),'Bank me abhi',F.bank&&F.bank.at?('as of '+F.bank.at+(F.bank.source?' · '+F.bank.source:'')):'neeche daalo'],[inr(receivable),'Payout milna baaki (sab)',recvList.length+' orders · exp. profit '+inr(expProfit)],
    [inr(dueSoon),'Confirmed — 7 din me aana chahiye',conf.length+' orders'+(overdue.length?' · '+overdue.length+' overdue':'')],[inr(committed),'Abhi lagana hai (To place)',toPlace.length+' orders'],[net==null?'—':inr(net),'Net position','bank + receivable − to place']];
   const sm=el('div','bb-sum');tiles.forEach(([v,l,s])=>{const d=el('div');d.appendChild(el('b',null,v));d.appendChild(el('span',null,l));d.appendChild(el('small',null,s));sm.appendChild(d);});P.appendChild(sm);
+  if(unver.length){P.appendChild(el('p','bb-meta warn','⚠ '+unver.length+' Sourcex order(s) ka payout '+inr(sumF(unver,r=>gv(r,'payout')))+' — mila ya nahi, sheet me nahi likha tha. Ise "milna baaki" me count nahi kiya. More → All orders me Sourcex ke orders Received / Pending mark karo.'));}
   if(noCost.length){P.appendChild(el('p','bb-meta warn','⚠ '+noCost.length+' order(s) ka cost missing ('+noCost.map(r=>r.order_id||r._id).slice(0,8).join(', ')+') — "lagaya" total adhoora hai. Order me $ price ya landed bharo.'));}
   const tc=el('div','bb-card');tc.appendChild(el('h2',null,'🎯 Target · '+M));const bar=(lab,v,t)=>{const r=el('div','mn-row');r.appendChild(el('span',null,lab));const b=el('div','mn-bar');const f=el('i');const pct=t?Math.min(100,Math.round(v/t*100)):0;f.style.width=pct+'%';if(t&&v>=t)f.className='ok';b.appendChild(f);r.appendChild(b);r.appendChild(el('small',null,t?inr(v)+' / '+inr(t)+' · '+pct+'%':inr(v)+' · target set karo'));tc.appendChild(r);};
   bar('Invest',invested,T.invest);bar('Payout received',received,T.payout);bar('Profit',realized,T.profit);
