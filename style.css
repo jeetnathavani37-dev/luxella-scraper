@@ -1016,3 +1016,13 @@ img{max-width:100%}
 .sw img.ph,.sw .ss,.sw .qcg img,.sw .xc-th img{object-fit:contain!important;background:#fff!important}
 .sw .drawer img.ph,.sw .feat img.ph{object-position:center}
 .sw #ordT tbody td:nth-child(1) img.ph{width:100%;height:auto;aspect-ratio:1/1;max-height:150px}
+/* Product photo tile: white photo backgrounds melt into a themed ivory tile */
+.sw .pw{display:inline-block;vertical-align:middle;background:radial-gradient(circle at 50% 30%,#FBF7EE 0%,#EFE7D6 100%);border:1px solid rgba(201,169,106,.55);padding:5px;line-height:0;overflow:hidden;flex:none;box-shadow:0 6px 18px rgba(0,0,0,.35)}
+.sw .pw>img{mix-blend-mode:multiply;background:transparent!important;border:0!important;display:block;border-radius:0!important}
+.sw .pw>img.ph{width:100%;height:100%}
+.sw .pw.pw-f{display:block}
+.sw #ordT tbody td:nth-child(1) .pw{display:block;width:100%;max-width:150px}
+.sw #ordT tbody td:nth-child(1) .pw>img.ph{height:auto;aspect-ratio:1/1;max-height:none}
+.sw .feat .pw>img.ph,.sw .drawer .pw>img.ph{width:100%;height:100%}
+.sw .pw>img{filter:brightness(1.07) contrast(1.12)}
+.sw #ordT tbody td:nth-child(1){padding-right:6px!important}
