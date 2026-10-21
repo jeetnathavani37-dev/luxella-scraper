@@ -109,7 +109,7 @@ async function start(){const {data:{session}}=await sb.auth.getSession();S.sessi
  if(!slug&&S.owner){location.replace(new URL('admin',document.baseURI).href);return;}
  S.client=clients[0];if(!S.owner){const st=document.createElement('style');st.textContent='#tab-msg,#pane-msg,.card:has(#couriers){display:none!important}';document.head.appendChild(st);}window.LX_CLIENT={name:S.client.name,biz:S.client.biz||''};document.title=S.client.name.split(' ')[0]+' · Luxella';
  await loadAll();subscribe();g('gate').hidden=true;topbar();g('dash-root').hidden=false;
- if(!window.__pageLoaded){window.__pageLoaded=true;const s=document.createElement('script');s.src='app.js';s.onload=()=>{fire();{const q=document.createElement('script');q.src='polish.js';document.body.appendChild(q);}{const x=document.createElement('script');x.src='extras.js';document.body.appendChild(x);}{const y=document.createElement('script');y.src='inbox.js';document.body.appendChild(y);}};document.body.appendChild(s);}else fire();}
+ if(!window.__pageLoaded){window.__pageLoaded=true;const s=document.createElement('script');s.src='app.js';s.onload=()=>{fire();{const q=document.createElement('script');q.src='polish.js';document.body.appendChild(q);}{const x=document.createElement('script');x.src='extras.js';document.body.appendChild(x);}{const y=document.createElement('script');y.src='inbox.js';document.body.appendChild(y);}{const z=document.createElement('script');z.src='neworder.js';document.body.appendChild(z);}};document.body.appendChild(s);}else fire();}
 sb.auth.onAuthStateChange((ev)=>{if(ev==='SIGNED_IN'||ev==='TOKEN_REFRESHED'){if(!S.client)start();}if(ev==='SIGNED_OUT'){location.reload();}});
 start();
 })();

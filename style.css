@@ -1090,3 +1090,22 @@ body::after{content:"";position:fixed;left:0;right:0;bottom:0;height:3px;backgro
 .sw .tab[aria-selected=true]{font-weight:600!important;color:var(--gold-2,#F4E1A0)!important;border-bottom:0!important}
 .sw .tab .bdg{font-family:'Jost',sans-serif!important;letter-spacing:0!important;font-variant:normal;font-size:9px!important}
 @media (max-width:640px){.sw .tab{font-size:14.5px!important;padding:14px 12px 12px!important;letter-spacing:.12em!important}}
+
+/* ---- hidden Overview sections ---- */
+.sw section.card:has(#gantt),.sw section.card:has(#stock),.sw section.card:has(#quotes),.sw #rq,.sw section.card:has(#rq-list){display:none!important}
+/* ---- checkout ---- */
+.nwo-prog{display:flex;gap:6px;margin:12px 0 14px;flex-wrap:wrap}
+.nwo-prog span{flex:1;min-width:70px;text-align:center;font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:8px 4px;border-bottom:2px solid #3A3222;color:#9a917c}
+.nwo-prog span.on{color:#F4E1A0;border-bottom-color:#E3C06A}
+.nwo-prog span.ok{color:#E3C06A;border-bottom-color:#B8943F}
+.nwo-nav{display:flex;gap:10px;align-items:center;margin-top:14px;flex-wrap:wrap}
+.nwo-rev{border:1px solid #3A3222;border-radius:10px;padding:6px 14px}
+.nwo-r{display:flex;justify-content:space-between;gap:14px;padding:9px 0;border-bottom:1px solid #2a2418}
+.nwo-r:last-child{border-bottom:0}
+.nwo-r .k{color:#9a917c;font-size:12px;text-transform:uppercase;letter-spacing:.08em}
+.nwo-r .v{text-align:right;word-break:break-word}
+.nwo-terms{display:block;margin-top:12px;font-size:13px}
+.nwo-done{text-align:center;padding:18px 6px}
+.nwo-done .nwo-tick{width:54px;height:54px;line-height:54px;border-radius:50%;margin:0 auto 10px;background:linear-gradient(135deg,#B8943F,#F4E1A0);color:#000;font-size:26px}
+.nwo-done .nwo-nav{justify-content:center}
+.sw [hidden]{display:none!important}

@@ -374,6 +374,18 @@ async function queueCard(m,name,rows){
 }
 
 /* ---- message / pinned note to a client ---- */
+function linkCard(m){
+  const card=el('div','ad-card');card.appendChild(el('h2',null,'Order link (client ko bhejo)'));
+  card.appendChild(el('p','ad-mut','Item/price bharo, link copy karke client ko WhatsApp karo. Client login karke seedha order form pe aayega, details prefilled. Price daalne par wo lock rehta hai.'));
+  const sty='background:#0A0A0A;color:#F3EEE6;border:1px solid #2A2724;padding:8px 10px;font:14px Jost,system-ui,sans-serif;width:100%;margin-bottom:8px';
+  const cs=document.createElement('select');cs.style.cssText=sty;clients.forEach(c=>{const o=document.createElement('option');o.value=c.slug;o.textContent=c.name;cs.appendChild(o);});
+  const mk=(ph,t)=>{const i=document.createElement('input');i.type=t||'text';i.placeholder=ph;i.style.cssText=sty;return i;};
+  const it=mk('Item (optional)'),br=mk('Brand (optional)'),sz=mk('Size / colour (optional)'),pr=mk('Price ₹ (optional, lock hoga)','number');
+  const out=document.createElement('textarea');out.readOnly=true;out.style.cssText=sty+';min-height:70px';
+  const gen=()=>{const q=new URLSearchParams();if(it.value.trim())q.set('item',it.value.trim());if(br.value.trim())q.set('brand',br.value.trim());if(sz.value.trim())q.set('size',sz.value.trim());if(pr.value)q.set('price',pr.value);const qs=q.toString();out.value=location.origin+'/'+cs.value+(qs?'?'+qs:'')+'#new';};
+  [cs,it,br,sz,pr].forEach(x=>x.addEventListener('input',gen));
+  const cp=el('button','ad-b g','Copy link');cp.type='button';cp.onclick=async()=>{try{await navigator.clipboard.writeText(out.value);toast('Link copied.');}catch(e){out.select();toast('Select + copy karo.');}};
+  card.append(cs,it,br,sz,pr,out,cp);gen();return card;}
 function composeCard(m){
   const card=el('div','ad-card');card.appendChild(el('h2',null,'Client ko message / note'));
   card.appendChild(el('p','ad-mut','Message client ke chat inbox me jaata hai (mail + push ke saath). Pinned note unke page ke upar dikhta hai, aur naya note aate hi mail jaata hai.'));
@@ -411,6 +423,7 @@ async function renderDash(m){
   await queueCard(m,name,rows);
   orderBoard(m,rows,name);
   newOrderCard(m,rows);
+  m.appendChild(linkCard(m));
   composeCard(m);
   // per client
   const pc=el('div','ad-card');pc.appendChild(el('h2',null,'By client'));

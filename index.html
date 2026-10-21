@@ -51,16 +51,7 @@
 <section class="card"><h2>Timeline</h2><p class="note">Open orders from order date to ETA, on one calendar</p><div id="gantt" class="gantt"></div></section>
 <div class="grid">
 <section class="card"><h2>Ready now in India</h2><p class="note">Pieces Luxella has in hand. Reserve and it ships within a day of payment.</p><div id="stock" class="act"></div></section>
-<section class="card"><h2>Place a new order</h2><p class="note">Three steps. Nothing gets missed, and payment details are right here.</p>
-<div class="step"><span class="sn">1</span>The piece</div>
-<div class="form"><label>Item<input id="no-item" type="text" placeholder="e.g. Coach Tabby 26"></label><label>Brand<input id="no-brand" type="text"></label><label>Size / colour<input id="no-size" type="text"></label><label>Qty<input id="no-qty" type="number" value="1" min="1"></label><label class="wide">Product link (optional)<input id="no-link" type="url" placeholder="https://"></label><label class="wide">Notes<input id="no-notes" type="text" placeholder="Deadline, gift wrap, alternatives…"></label></div>
-<div class="step"><span class="sn">2</span>Delivery</div>
-<div class="form"><label class="wide">Deliver to<select id="no-addr"></select></label><label class="wide">New address (if not on file)<input id="no-newaddr" type="text" placeholder="Full address with pincode and phone"></label></div>
-<div class="step"><span class="sn">3</span>Payment</div>
-<div class="form"><label>Agreed price ₹<input id="no-price" type="number" inputmode="numeric" placeholder="as quoted"></label><label>Paying by<select id="no-pay"><option>UPI</option><option>Bank transfer</option><option>Will pay after confirmation</option></select></label><label>Paid amount ₹ (if already paid)<input id="no-paid" type="number" inputmode="numeric"></label></div>
-<div id="no-payinfo" class="payinline"></div>
-<textarea id="no-text" class="msgbox" readonly rows="8"></textarea>
-<div class="row" style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap"><button class="btn" id="no-copy" type="button">Copy request</button><a class="btn2" id="no-wa" href="#" target="_blank" rel="noopener">Send on WhatsApp</a><span class="lbl" id="no-msg"></span></div></section>
+<section class="card" id="neworder"></section>
 <section class="card"><h2>Quotes & wishlist</h2><p class="note">Pieces you asked about. Accept a quote to start an order.</p><div id="quotes" class="act"></div></section>
 </div>
 <section class="card"><h2>Departures</h2><p class="note">Every open reference, as a board</p><div class="scroll"><table class="board" id="board"><thead><tr><th>Ref.</th><th>Piece</th><th>Origin</th><th>Hub</th><th>India</th><th>Status</th><th>ETA</th></tr></thead><tbody></tbody></table></div></section>
