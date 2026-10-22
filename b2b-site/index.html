@@ -39,7 +39,7 @@ async function boot(){const {data}=await sb.auth.getSession();const s=data&&data
  if(!OWNERS.includes(email)){await sb.auth.signOut();$('gate').hidden=false;$('m').textContent='Ye page sirf owner ke liye hai.';return;}
  if(started)return;started=true;$('gate').hidden=true;$('admin-root').hidden=false;
  window.__lxAdmin={sb,S:{email,owner:true}};const a=document.createElement('script');a.src='b2b.js?v='+(window.__V||Date.now());a.onload=()=>window.lxB2BApp&&window.lxB2BApp();document.body.appendChild(a);}
-$('go').onclick=async()=>{const e=$('em').value.trim().toLowerCase(),p=$('pw').value;if(!e||!p){$('m').textContent='Email aur password daalo.';return;}$('m').textContent='Signing in…';const {error}=await sb.auth.signInWithPassword({email:e,password:p});if(error){$('m').textContent='Galat email ya password.';return;}boot();};
+$('go').onclick=async()=>{const e=$('em').value.trim().toLowerCase(),p=$('pw').value;if(!e||!p){$('m').textContent='Enter email and password.';return;}$('m').textContent='Signing in…';const {error}=await sb.auth.signInWithPassword({email:e,password:p});if(error){$('m').textContent='Galat email ya password.';return;}boot();};
 ['em','pw'].forEach(i=>$(i).addEventListener('keydown',e=>{if(e.key==='Enter')$('go').click();}));
 boot();})();
 </script>
