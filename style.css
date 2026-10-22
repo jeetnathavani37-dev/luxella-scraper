@@ -1529,3 +1529,4 @@ html.lx-ro #tb-switch,html.lx-ro #tb-out,html.lx-ro #top .who{display:none!impor
 .sw .sdesc .lx-addr-b{display:block;width:100%;margin-top:12px;padding:15px 16px!important;font-size:11px!important;letter-spacing:.26em;box-shadow:0 8px 24px -12px rgba(201,162,39,.7)}
 .sw #board .lx-addr-b{margin-top:6px;padding:9px 12px!important;font-size:9.5px!important}
 .st-share{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}.st-share .btn2{padding:8px 12px!important;font-size:9px!important;text-decoration:none}
+.lx-modal .lxrow{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}

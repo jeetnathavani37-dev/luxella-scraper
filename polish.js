@@ -52,9 +52,16 @@ function welcome(rows){if(sheetShown||owner||!rows.length)return;sheetShown=true
  else if(changes.length){const ul=el('ul','lxul');changes.slice(0,5).forEach(c=>{const li=el('li');li.appendChild(el('b',null,c.t));li.appendChild(el('span',null,c.d));ul.appendChild(li);});sh.appendChild(ul);if(changes.length>5)sh.appendChild(el('p','lbl','+'+(changes.length-5)+' more on the Tracker'));}
  else sh.appendChild(el('p','lxp','No movement on your orders since you were last here.'));
  const row=el('div','lxrow');
- if(due){const b=el('button','btn','Pay '+inr(due));b.type='button';b.addEventListener('click',()=>{close();if(window.openPay)window.openPay();else document.getElementById('tab-pay').click();});row.appendChild(b);}
- if(nextEta){const b=el('button','btn2','Next arrival · '+new Date(nextEta.eta_date).toLocaleString('en-GB',{day:'numeric',month:'short'}));b.type='button';b.addEventListener('click',()=>{close();document.getElementById('tab-tr').click();});row.appendChild(b);}
- const x=el('button','btn2',changes.length?'See tracker':'Close');x.type='button';x.addEventListener('click',()=>{close();if(changes.length)document.getElementById('tab-tr').click();});row.appendChild(x);
+ const changed=changes.length?rows.filter(r=>changes.some(c=>c.d===r.item)):[];const cand=(changed.length?changed:rows).filter(r=>Number(r.stage)<9);
+ const needAddr=cand.find(r=>{const st=Number(r.stage)||1;return st>=5&&st<8&&!r.local_tracking&&!(typeof addrFor==='function'&&addrFor(r));});
+ const inTransit=cand.find(r=>Number(r.stage)===8);
+ const focus=changed[0]||needAddr||inTransit||cand[0];
+ /* golden stage action: what this stage needs from the client */
+ if(needAddr){const b=el('button','btn','📍 Add delivery address');b.type='button';b.addEventListener('click',()=>{close();if(typeof goAddr==='function')goAddr(needAddr);else document.getElementById('tab-ad').click();});row.appendChild(b);}
+ else if(inTransit){const b=el('button','btn','Track your parcel');b.type='button';b.addEventListener('click',()=>{close();document.getElementById('tab-tr').click();if(window.openDrawer)try{openDrawer(inTransit);}catch(e){}});row.appendChild(b);}
+ else if(due){const b=el('button','btn','Pay '+inr(due));b.type='button';b.addEventListener('click',()=>{close();if(window.openPay)window.openPay();else document.getElementById('tab-pay').click();});row.appendChild(b);}
+ if(focus){const v=el('button','btn2','View order');v.type='button';v.addEventListener('click',()=>{close();document.getElementById('tab-tr').click();if(window.openDrawer)try{openDrawer(focus);}catch(e){}});row.appendChild(v);}
+ const x=el('button','btn2','Got it');x.type='button';x.addEventListener('click',()=>close());row.appendChild(x);
  sh.appendChild(row);
  function close(){back.classList.remove('on');setTimeout(()=>back.remove(),RMQ?0:260);}
  back.addEventListener('click',e=>{if(e.target===back)close();});
