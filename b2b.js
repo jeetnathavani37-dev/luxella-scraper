@@ -233,11 +233,11 @@ window.lxB2B=async function(root,sb,toast){
   const dueP=km.filter(r=>r.status==='Delivered to KM'&&r.payout_status!=='Received');const got=km.filter(r=>r.payout_status==='Received');
   const sum=(a,k)=>a.reduce((t,r)=>t+(Number(r[k])||0),0);const low=km.filter(r=>r.margin_ok==='No');
   if(S.tab==='payouts')S.tab=S.pf==='chase'?'pay_chase':S.pf==='got'?'pay_got':'pay_run';if(S.tab==='pay_run'||S.tab==='pay_chase'||S.tab==='pay_got'){if(S._pt!==S.tab){S.pf={pay_run:'run',pay_chase:'chase',pay_got:'got'}[S.tab];S._pt=S.tab;}}else S._pt='';
-  const TOOLS=['pipe','bulk','calc','add','export','orders','todo'];if(S.tab==='transit')S.tab='intl';if(S.tab==='reship')S.tab='wh';if(TOOLS.includes(S.tab)){S.tool=S.tab;S.tab='tools';}
+  const TOOLS=['pipe','bulk','calc','add','export','orders','todo'];if(S.tab==='reship')S.tab='wh';if(TOOLS.includes(S.tab)){S.tool=S.tab;S.tab='tools';}
   navBar(wrap);
   const P=el('div','bp-main');wrap.appendChild(P);
   if(S.tab==='tools'){S.tool=S.tool||'orders';const tc=el('div','bb-chips');[['orders','All orders'],['todo','To-do lists'],['pipe','Pipeline'],['bulk','Bulk upload'],['calc','Bid calculator'],['add','Add order'],['export','Export']].forEach(([id,t])=>{const b=el('button','bb-chip'+(S.tool===id?' on':''),t);b.onclick=()=>{S.tool=id;draw();};tc.appendChild(b);});P.appendChild(tc);const P2=el('div');P.appendChild(P2);({orders:orders,todo:todo,pipe:pipe,bulk:bulk,calc:calc,add:add,export:exp})[S.tool](P2);return;}
-  ({overview:overview,stats:statsT,msgs:msgsT,inbox:inboxT,sx:sxT,todos:todosT,toplace:toplaceT,transit:transit,intl:intlT,wh:whT,rs:P=>{rsRenameCard(P);rsT(P);},landed:landedT,mrn:mrnT,alerts:alertsT,bids:bids,buys:buys,reship:reship,tokm:tokmT,confirm:confirmT,payouts:payouts,pay_run:payouts,pay_chase:payouts,pay_got:payouts,money:money,cashback:cashbackT,boxes:boxesT,checklist:checklist,agents:agentsTab,org:orgT})[S.tab](P);try{tidy(P,S.tab);}catch(e){}};
+  ({overview:overview,stats:statsT,msgs:msgsT,inbox:inboxT,sx:sxT,todos:todosT,toplace:toplaceT,transit:transitT,intl:intlT,wh:whT,rs:P=>{rsRenameCard(P);rsT(P);},landed:landedT,mrn:mrnT,alerts:alertsT,bids:bids,buys:buys,reship:reship,tokm:tokmT,confirm:confirmT,payouts:payouts,pay_run:payouts,pay_chase:payouts,pay_got:payouts,money:money,cashback:cashbackT,boxes:boxesT,checklist:checklist,agents:agentsTab,org:orgT})[S.tab](P);try{tidy(P,S.tab);}catch(e){}};
  function orders(P){const c=el('div','bb-card');P.appendChild(c);
   const bar=el('div','bb-bar');S.q='';
   const who=document.createElement('select');[['KicksMachine','KicksMachine'],['Sourcex','Sourcex'],['__wa','WhatsApp clients'],['','All']].forEach(([v,t])=>{const o=el('option',null,t);o.value=v;if(v===S.who)o.selected=true;who.appendChild(o);});
@@ -284,7 +284,7 @@ window.lxB2B=async function(root,sb,toast){
  const derive=d=>{if(d.client!=='KicksMachine')return d.status;const has=k=>!!gv(d,k);
   if(has('delivered_km'))return 'Delivered to KM';if(has('shipped_km'))return 'Shipped to KM';if(has('landed_india'))return 'Landed India';if(has('shipped_reshipper'))return 'Shipped from hub';if(has('delivered_reshipper'))return 'At reshipper';if(has('retailer_ship_date')||has('retailer_tracking'))return 'In transit to reshipper';if(has('retailer_order_id')||has('retailer_date'))return 'Ordered';return d.status||'To place';};
  const STEP=['To place','Ordered','In transit to reshipper','At reshipper','Shipped from hub','Landed India','Shipped to KM','Delivered to KM'];
- const LBL={'In transit to reshipper':'Store shipped','Shipped from hub':'Left reshipper'};
+ const LBL={'In transit to reshipper':'In transit','At reshipper':'At international hub','Shipped from hub':'Flying to India'};
  const nextHint=r=>{const st=r.status;const d=k=>gv(r,k);
   if(st==='To place')return 'Place order with store';if(st==='Ordered')return 'Waiting for store to ship';if(st==='In transit to reshipper')return d('eta_reshipper')?'At reshipper by '+d('eta_reshipper'):'Add ETA at reshipper';
   if(st==='At reshipper'){const n=days(d('delivered_reshipper'));return (n!=null?n+'d at reshipper · ':'')+(d('form_filled')==='Yes'?'form done':'form pending');}
@@ -454,7 +454,7 @@ window.lxB2B=async function(root,sb,toast){
   const rows=groups[S.rsel];const W=(a,k)=>a.reduce((t,r)=>t+(Number(gv(r,k))||0),0);
   const inc=rows.filter(r=>r.status==='In transit to reshipper'||r.status==='Ordered'),at=rows.filter(r=>r.status==='At reshipper'),out=rows.filter(r=>r.status==='Shipped from hub'),done=rows.filter(r=>['Landed India','Shipped to KM','Delivered to KM','Out for delivery','Delivered to client'].includes(r.status));
   const K=el('div','bb-kpis');const k=(t,v,sub)=>{const d=el('div','bb-k');d.style.cursor='default';d.append(el('small',null,t),el('div','v',v),el('small',null,sub||''));K.appendChild(d);};
-  k('Coming to warehouse',String(inc.length),'from stores');k('At warehouse',String(at.length),'est '+W(at,'est_weight').toFixed(2)+' kg · actual '+W(at,'actual_weight').toFixed(2)+' kg');k('Shipped to India',String(out.length),'in transit');k('Reship cost (all)',inr(W(rows,'reship_cost')),rows.filter(r=>r.reship_billed==='Billed').length+' billed · '+rows.filter(r=>r.reship_billed!=='Billed').length+' estimate');
+  k('Coming to hub',String(inc.length),'from stores');k('At international hub',String(at.length),'est '+W(at,'est_weight').toFixed(2)+' kg · actual '+W(at,'actual_weight').toFixed(2)+' kg');k('Shipped to India',String(out.length),'in transit');k('Reship cost (all)',inr(W(rows,'reship_cost')),rows.filter(r=>r.reship_billed==='Billed').length+' billed · '+rows.filter(r=>r.reship_billed!=='Billed').length+' estimate');
   k('Forms pending',String(at.concat(out).filter(r=>r.form_filled!=='Yes').length),'at warehouse / shipped');P.appendChild(K);
   if(/Ishaan/.test(S.rsel)&&W(at,'est_weight')<1&&at.length)P.appendChild(el('p','bb-meta','Under 1 kg at the warehouse — Ishaan bills a 1 kg minimum. Stack more items.'));
   const sec=(title,list,cols)=>{const c=el('div','bb-card');c.appendChild(el('h2',null,title+' · '+list.length));if(!list.length){c.appendChild(el('p','bb-meta','—'));P.appendChild(c);return;}
@@ -562,9 +562,10 @@ window.lxB2B=async function(root,sb,toast){
  const STAGES=[
   ['bids','Bids won · not ordered',()=>{const by=new Set(all.map(r=>r.order_id||r._id));return BIDS.filter(b=>!b.dismissed&&!(b.km_order_ids||[]).every(i=>by.has(i)));},'bid'],
   ['toplace','To place at store',()=>KMO().filter(r=>r.status==='To place')],
-  ['intl','Ordered · coming to warehouse',()=>KMO().filter(r=>['Ordered','In transit to reshipper'].includes(r.status))],
-  ['wh','At warehouse',()=>KMO().filter(r=>r.status==='At reshipper')],
-  ['landed','Flying to India',()=>KMO().filter(r=>r.status==='Shipped from hub')],
+  ['intl','Ordered · store not shipped yet',()=>KMO().filter(r=>r.status==='Ordered')],
+  ['transit','In transit · store → international hub',()=>KMO().filter(r=>r.status==='In transit to reshipper')],
+  ['wh','At international hub',()=>KMO().filter(r=>r.status==='At reshipper')],
+  ['landed','Flying to India',()=>KMO().filter(r=>['At reshipper','Shipped from hub'].includes(r.status))],
   ['tokm','To KicksMachine',()=>KMO().filter(r=>['Landed India','Shipped to KM','Out for delivery'].includes(r.status))],
   ['mrn','MRN update pending',()=>KMO().filter(r=>DONE(r.status)&&!gv(r,'mrn_updated')&&!confirmedOn(r)&&r.payout_status!=='Received')],
   ['confirm','Waiting KM confirmation',()=>KMO().filter(r=>DONE(r.status)&&gv(r,'mrn_updated')&&!confirmedOn(r)&&r.payout_status!=='Received')],
@@ -763,7 +764,7 @@ window.lxB2B=async function(root,sb,toast){
   const find=tok=>all.filter(r=>[r.order_id,r._id,gv(r,'retailer_order_id'),String(gv(r,'retailer_tracking')).split(' ')[0],gv(r,'reship_awb'),gv(r,'km_tracking')].map(norm).includes(norm(tok)));
   lines.forEach(line=>{const U=line.toUpperCase();const ids=[...new Set((U.match(/\bUS\d{6}(?:-[A-Z])?\b/g)||[]))];const codes=(U.match(/\b(?:1Z[0-9A-Z]{16}|TBA\d{12}|(?:WUP|WCP|ZUP|Z0)\d{6,10}|\d{12,22})\b/g)||[]);
    let rows=ids.flatMap(i=>all.filter(r=>(r.order_id||r._id)===i));codes.forEach(c=>find(c).forEach(r=>{if(!rows.includes(r))rows.push(r);}));
-   if(!rows.length&&!ids.length&&!codes.length&&/\b(sab|saare|sare|saari|all|everything|poora|pura|sabhi)\b/i.test(line)){const rsn=RSN.find(([k])=>line.toLowerCase().includes(k));const L2=line.toLowerCase();const plan=/land|india (pahunch|aa|reach)|reached india/.test(L2)?['Shipped from hub',{landed_india:today()},'India landed']:/(ship|dispatch|nikal|bhej|left)/.test(L2)?['At reshipper',{shipped_reshipper:today()},'Left warehouse']:/(deliver|pahunch|received|aa gaya|aa gaye|reach)/.test(L2)?['In transit to reshipper',{delivered_reshipper:today()},'Reached warehouse']:/form/.test(L2)?['At reshipper',{form_filled:'Yes',form_date:today()},'Form filled']:null;
+   if(!rows.length&&!ids.length&&!codes.length&&/\b(sab|saare|sare|saari|all|everything|poora|pura|sabhi)\b/i.test(line)){const rsn=RSN.find(([k])=>line.toLowerCase().includes(k));const L2=line.toLowerCase();const plan=/land|india (pahunch|aa|reach)|reached india/.test(L2)?['Shipped from hub',{landed_india:today()},'India landed']:/(ship|dispatch|nikal|bhej|left)/.test(L2)?['At reshipper',{shipped_reshipper:today()},'Left warehouse']:/(deliver|pahunch|received|aa gaya|aa gaye|reach)/.test(L2)?['In transit to reshipper',{delivered_reshipper:today()},'Reached hub']:/form/.test(L2)?['At reshipper',{form_filled:'Yes',form_date:today()},'Form filled']:null;
     if(plan){all.filter(r=>isKM(r)&&r.status===plan[0]&&(!rsn||String(gv(r,'reshipper')).toLowerCase().startsWith(rsn[0]))).forEach(r=>{const e=out.get(r._id)||{r,p:{},why:[]};Object.assign(e.p,plan[1]);e.why.push('Bulk: '+plan[2]+(rsn?' ('+rsn[1].split('-')[0]+')':''));out.set(r._id,e);});lastIds=[];return;}}
    if(!rows.length&&!ids.length&&lastIds.length)rows=lastIds;if(rows.length)lastIds=rows;
    rows.forEach(r=>{const e=out.get(r._id)||{r,p:{},why:[]};
@@ -906,14 +907,16 @@ window.lxB2B=async function(root,sb,toast){
    blocks.push(['Tracking No: '+tk,'Item: '+g.map(o=>[o.brand&&!String(o.item||'').startsWith(o.brand)?o.brand:'',o.item].filter(Boolean).join(' ')+(gv(o,'size')&&!/^OS$|\/ OS$/.test(gv(o,'size'))?' ('+gv(o,'size')+')':'')).join(' + '),'Company: '+(gv(r,'store')||r.brand||'—'),'Courier: '+(gv(r,'retailer_carrier')||(x.slug?String(x.slug).toUpperCase():carrierOf(tk))),del?'Delivered: '+del:'Expected delivery: '+(exp||'—')].join('\n'));});
   const T=(META.reshippers||{}).form_template;const body=blocks.join('\n\n');if(T)return T.replace(/\{\{items\}\}/g,body).replace(/\{\{count\}\}/g,String(gm.size)).replace(/\{\{ids\}\}/g,rs.map(r=>r.order_id||r._id).join(', ')).replace(/\{\{date\}\}/g,today());return body;};
  /* ---- 4 · International in transit (store → warehouse) ---- */
- function intlT(P){lane(P,{key:'intl',list:()=>KMA(['Ordered','In transit to reshipper']),chip:r=>gv(r,'reshipper')||'Reshipper?',
+ function intlT(P){intlLane(P,'intl',['Ordered'],'Nothing ordered that the store has not shipped yet.');}
+ function transitT(P){intlLane(P,'transit',['In transit to reshipper'],'No parcels on the way to the hub.');}
+ function intlLane(P,key,sts,emptyT){lane(P,{key,list:()=>KMA(sts),chip:r=>gv(r,'reshipper')||'Reshipper?',
   group:r=>String(gv(r,'retailer_tracking')||'').split(' ')[0]||(gv(r,'retailer_order_id')?'so:'+gv(r,'retailer_order_id'):''),
   sort:(a,b)=>String(gv(a,'retailer_date')).localeCompare(String(gv(b,'retailer_date'))),
-  sections:[['No tracking yet',r=>!gv(r,'retailer_tracking'),'Store has not shipped or the mail was missed — check the store after 5+ days.'],['Heading to warehouse',r=>true]],
+  sections:[['No tracking yet',r=>!gv(r,'retailer_tracking'),'Store has not shipped or the mail was missed — check the store after 5+ days.'],['Heading to the international hub',r=>true]],
   title:rows=>rows.length>1?rows.map(x=>x.order_id||x._id).join(' + '):(rows[0].order_id||rows[0]._id),
   meta:rows=>{const r=rows[0];const t=gv(r,'retailer_tracking');return [gv(r,'store')?(flag(r.country||'USA')+' '+gv(r,'store')):'Store?',gv(r,'retailer_order_id')?'#'+gv(r,'retailer_order_id'):'',t?trkChip(t):(gv(r,'retailer_date')?'ordered '+ageD(gv(r,'retailer_date'))+' ago':'order date?'),gv(r,'reshipper')||'',rows.length>1?rows.length+' orders · 1 parcel':''];},
-  acts:rows=>[gv(rows[0],'retailer_tracking')?btn('✓ Reached warehouse',async()=>{await putAll(rows,{delivered_reshipper:bdate()});draw();},'bb-b sm'):btn('+ Tracking',()=>askTrk(rows,'retailer_tracking','Store → warehouse',{retailer_ship_date:gv(rows[0],'retailer_ship_date')||bdate()}),'bb-b sm'),gv(rows[0],'retailer_tracking')?btn('Copy form',()=>copyT(formTxt(rows))):null],
-  bulk:[['✓ Reached warehouse',rs=>putAll(rs,{delivered_reshipper:bdate()})],['Copy form',async rs=>{await copyT(formTxt(rs));}]],empty:'No parcels on the way.'});}
+  acts:rows=>[gv(rows[0],'retailer_tracking')?btn('✓ Reached hub',async()=>{await putAll(rows,{delivered_reshipper:bdate()});draw();},'bb-b sm'):btn('+ Tracking',()=>askTrk(rows,'retailer_tracking','Store → international hub',{retailer_ship_date:gv(rows[0],'retailer_ship_date')||bdate()}),'bb-b sm'),gv(rows[0],'retailer_tracking')?btn('Copy form',()=>copyT(formTxt(rows))):null],
+  bulk:[['✓ Reached hub',rs=>putAll(rs,{delivered_reshipper:bdate()})],['Copy form',async rs=>{await copyT(formTxt(rs));}]],empty:emptyT});}
 
  /* ---- 5 · Warehouse received (at reshipper) + form + ship out ---- */
  function whT(P){lane(P,{key:'wh',list:()=>KMA('At reshipper'),chip:r=>gv(r,'reshipper')||'Reshipper?',
@@ -923,9 +926,9 @@ window.lxB2B=async function(root,sb,toast){
   cls:rows=>(days(gv(rows[0],'delivered_reshipper'))||0)>10?'late':'',
   meta:rows=>{const r=rows[0];const w=gv(r,'actual_weight')?gv(r,'actual_weight')+' kg':gv(r,'est_weight')?'~'+gv(r,'est_weight')+' kg':'kg?';const e=rsEst(r);return [gv(r,'reshipper')||'Reshipper?',ageD(gv(r,'delivered_reshipper'))+' at hub',w,e?'~'+inr(e):'',gv(r,'form_filled')==='Yes'?tag('form ✓','ok'):tag('form pending','bad')];},
   acts:rows=>[gv(rows[0],'form_filled')==='Yes'?null:btn('✓ Form filled',async()=>{await putAll(rows,{form_filled:'Yes',form_date:bdate()});draw();},'bb-b sm'),btn('Copy form',()=>copyT(formTxt(rows)))],
-  bulk:[['Copy form',async rs=>{await copyT(formTxt(rs));}],['✓ Form filled',rs=>putAll(rs,{form_filled:'Yes',form_date:bdate()})],['✈ Left warehouse',async rs=>{const a=prompt('Reshipper AWB / tracking (can be left empty):','');if(a==null)return;await putAll(rs,Object.assign({shipped_reshipper:bdate()},a.trim()?{reship_awb:a.trim()}:{}));}]],
+  bulk:[['Copy form',async rs=>{await copyT(formTxt(rs));}],['✓ Form filled',rs=>putAll(rs,{form_filled:'Yes',form_date:bdate()})],['✈ Left the hub · flying to India',async rs=>{const a=prompt('Reshipper AWB / tracking (can be left empty):','');if(a==null)return;await putAll(rs,Object.assign({shipped_reshipper:bdate()},a.trim()?{reship_awb:a.trim()}:{}));}]],
   extra:(bar,L)=>{const late=L.filter(r=>(days(gv(r,'delivered_reshipper'))||0)>=5);if(late.length)bar.appendChild(wa('WhatsApp: ask to dispatch ('+late.length+')','Hi, please ship these together to India: '+late.map(r=>(r.order_id||r._id)+' ('+String(r.item||'').slice(0,30)+')').join(', ')+'. Thanks!'));},
-  empty:'Nothing sitting at the warehouse.'});}
+  empty:'Nothing at the international hub.'});}
 
  /* ---- 6 · Reshipper accounts: rates, kaun kitna leta hai, bills, payments ---- */
  function rsT(P){const C=RSCFG();const ks=KMA(ST);const names=[...new Set([...Object.keys(C).filter(k=>ks.some(r=>gv(r,'reshipper')===k)||RSCFG_DEF[k]),...ks.map(r=>gv(r,'reshipper')).filter(Boolean)])].filter(k=>k!=='Direct');
@@ -942,11 +945,13 @@ window.lxB2B=async function(root,sb,toast){
   const fc=el('div','bb-card');fc.appendChild(el('h2',null,'📝 Form format (copy-paste)'));fc.appendChild(el('p','bb-meta','"Copy form" gives, per parcel: Tracking No · Item · Company (store) · Courier · Delivered / Expected date (one tracking = one block, combined items together). Add anything extra above/below here — the blocks go where {{items}} is.'));const ta=document.createElement('textarea');ta.className='fl-ta';ta.rows=8;ta.value=(META.reshippers||{}).form_template||'';ta.placeholder=formTxt(KMA('At reshipper').slice(0,1).concat([]).length?KMA('At reshipper').slice(0,1):[{order_id:'US000000',item:'Example bag',qty:1}]);fc.appendChild(ta);fc.appendChild(btn('Save format',async()=>{if(await saveMeta('reshippers',{form_template:ta.value.trim()}))toast('Format saved');},'bb-b sm'));P.appendChild(fc);}
 
  /* ---- 7 · Landed India (flying → landed) ---- */
- function landedT(P){lane(P,{key:'land',list:()=>KMA('Shipped from hub'),chip:r=>gv(r,'reshipper')||'Reshipper?',
+ function landedT(P){lane(P,{key:'land',list:()=>KMA(['At reshipper','Shipped from hub']),chip:r=>(gv(r,'reshipper')||'Reshipper?')+(r.status==='Shipped from hub'?' · dispatched':' · at hub'),
+  sort:(a,b)=>String(gv(a,'delivered_reshipper')).localeCompare(String(gv(b,'delivered_reshipper'))),
+  sections:[['Delivered at hub · waiting to fly',r=>r.status==='At reshipper','Store delivered these at the hub. Day count runs from the delivery date.'],['Dispatched to India',r=>true]],
   group:r=>String(gv(r,'reship_awb')||'').split(' ')[0]||(gv(r,'reshipper')&&gv(r,'shipped_reshipper')?'b:'+gv(r,'reshipper')+gv(r,'shipped_reshipper'):''),
   title:rows=>{const a=gv(rows[0],'reship_awb');return rows.length>1?(gv(rows[0],'reshipper')||'Batch')+' · '+rows.length+' parcels':(rows[0].order_id||rows[0]._id);},
-  cls:rows=>(days(gv(rows[0],'shipped_reshipper'))||0)>14?'late':'',
-  meta:rows=>{const r=rows[0];return [gv(r,'reshipper')||'',ageD(gv(r,'shipped_reshipper'))+' since dispatch',gv(r,'reship_awb')?trkChip(gv(r,'reship_awb')):'AWB?',rows.length>1?rows.map(x=>x.order_id||x._id).join(', '):''];},
+  cls:rows=>(days(gv(rows[0],'delivered_reshipper'))||0)>14?'late':'',
+  meta:rows=>{const r=rows[0];return [gv(r,'reshipper')||'',ageD(gv(r,'delivered_reshipper'))+' since delivered at hub',gv(r,'shipped_reshipper')?'flew '+ageD(gv(r,'shipped_reshipper'))+' ago':'not dispatched yet',gv(r,'reship_awb')?trkChip(gv(r,'reship_awb')):'AWB?',rows.length>1?rows.map(x=>x.order_id||x._id).join(', '):''];},
   acts:rows=>[btn('✓ India landed',async()=>{await putAll(rows,{landed_india:bdate()});draw();},'bb-b sm'),gv(rows[0],'reship_awb')?null:btn('+ AWB',()=>askTrk(rows,'reship_awb','Reshipper → India'))],
   bulk:[['✓ India landed',rs=>putAll(rs,{landed_india:bdate()})]],
   extra:(bar,L)=>{const by={};L.forEach(r=>{const k=gv(r,'reshipper')||'?';by[k]=(by[k]||[]).concat([r]);});Object.entries(by).forEach(([k,rs])=>{if(rs.length>1)bar.appendChild(btn('All '+k+' landed ('+rs.length+')',async()=>{if(!confirm(k+': all '+rs.length+' parcels → Landed India ('+bdate()+')?'))return;await putAll(rs,{landed_india:bdate()});draw();}));});},
@@ -971,7 +976,7 @@ window.lxB2B=async function(root,sb,toast){
  /* ---- Alerts: jo galat ja raha hai ---- */
  const alertsOf=r=>{const a=[];const sl=gv(r,'sla_deadline');if(sl&&sl<today()&&!DONE(r.status))a.push('SLA crossed '+sl);if(gv(r,'km_problem'))a.push('KM problem: '+gv(r,'km_problem'));{const cr=String(gv(r,'km_cancel_request')||'').toLowerCase();if(cr&&!['none','null','rejected','declined','withdrawn'].includes(cr))a.push('Cancel request: '+cr);}
   Object.entries(r.trk||{}).forEach(([n,x])=>{if(['Exception','AttemptFail','Expired'].includes(x.tag))a.push('Tracking '+x.label+' · '+n.slice(-6));});
-  const d=k=>days(gv(r,k))||0;if(r.status==='Ordered'&&d('retailer_date')>=6)a.push('Store has not shipped for '+d('retailer_date')+' days');if(r.status==='In transit to reshipper'&&d('retailer_ship_date')>=8)a.push('To warehouse '+d('retailer_ship_date')+' days');if(r.status==='At reshipper'&&d('delivered_reshipper')>=10)a.push('At warehouse '+d('delivered_reshipper')+' days');if(r.status==='Shipped from hub'&&d('shipped_reshipper')>=15)a.push('Not landed in India · '+d('shipped_reshipper')+' days');
+  const d=k=>days(gv(r,k))||0;if(r.status==='Ordered'&&d('retailer_date')>=6)a.push('Store has not shipped for '+d('retailer_date')+' days');if(r.status==='In transit to reshipper'&&d('retailer_ship_date')>=8)a.push('To warehouse '+d('retailer_ship_date')+' days');if(r.status==='At reshipper'&&d('delivered_reshipper')>=10)a.push('At international hub '+d('delivered_reshipper')+' days');if(r.status==='Shipped from hub'&&d('shipped_reshipper')>=15)a.push('Not landed in India · '+d('shipped_reshipper')+' days');
   if(confirmedOn(r)&&r.payout_status!=='Received'&&(days(confirmedOn(r))||0)>9)a.push('Payout overdue');return a;};
  function alertsT(P){lane(P,{key:'al',list:()=>all.filter(r=>isKM(r)&&r.payout_status!=='Received'&&alertsOf(r).length),chip:r=>LBL[r.status]||r.status,
   meta:rows=>[tag(LBL[rows[0].status]||rows[0].status),...alertsOf(rows[0]).map(x=>tag(x,'bad'))],acts:()=>[],empty:'No alerts ✓'});}
@@ -1410,7 +1415,7 @@ const sendMsg=async(thread,text,atts,meta)=>{const id='m-'+Date.now().toString(3
   clearInterval(window.__ibTimer);window.__ibTimer=setInterval(async()=>{if(S.tab!=='inbox'){clearInterval(window.__ibTimer);return;}const n=MSGS.length;await loadMsgs(true);if(MSGS.length!==n)render();},30000);}
  /* ================= Nav v3: groups + sub-tabs with live counts, ⌘K palette, undo ================= */
  const cnt=fnc=>{try{return fnc();}catch(e){return 0;}};
- const FLOW=[['bids','Bids',0],['toplace','To place',1],['intl','Ordered → WH',2],['wh','At warehouse',3],['landed','Flying → India',4],['tokm','To KM',5],['mrn','MRN',6],['confirm','KM confirm',7],['pay_run','Payout timer',8],['pay_chase','Chase payout',9],['pay_got','Paid',10]];
+ const FLOW=[['bids','Bids',0],['toplace','To place',1],['intl','Ordered',2],['transit','In transit',3],['wh','At international hub',4],['landed','Flying → India',5],['tokm','To KM',6],['mrn','MRN',7],['confirm','KM confirm',8],['pay_run','Payout timer',9],['pay_chase','Chase payout',10],['pay_got','Paid',11]];
  const G_TODAY=['today','Today',[['overview','Overview',()=>0],['todos','To-dos',()=>todoCount()],['stats','Stats',()=>0]]];
  const G_INBOX=['inbox','Inbox',[['inbox','Inbox',()=>unreadAll()]]];
  const G_MSGS=['msgs','Messages',[['msgs','Messages',()=>msgCount()]]];
@@ -1424,8 +1429,8 @@ const sendMsg=async(thread,text,atts,meta)=>{const id='m-'+Date.now().toString(3
  const WS=[
   ['home','🏠','Today','What to do today · talk to the heads',['brain','ops','cfo','clientdesk','auditor'],[G_TODAY,G_INBOX,G_MSGS,G_ALERTS]],
   ['km','🏭','KicksMachine','Bid to payout',['ops','mail','tracking','reconciler','payout'],[flowG(),G_ALERTS,G_BOXES,G_ORDERS]],
-  ['sx','🛒','Sourcex','Orders, pickup, payouts',['cfo','payout','tracking'],[G_SX,flowG(['toplace','intl','wh','landed','tokm','pay_got']),G_ALERTS]],
-  ['clients','👥','Clients','Swayam, Himanshu, Harshit…',['clientdesk','brain','tracking'],[flowG(['toplace','intl','wh','landed','tokm','pay_got']),G_INBOX,G_BOXES]],
+  ['sx','🛒','Sourcex','Orders, pickup, payouts',['cfo','payout','tracking'],[G_SX,flowG(['toplace','intl','transit','wh','landed','tokm','pay_got']),G_ALERTS]],
+  ['clients','👥','Clients','Swayam, Himanshu, Harshit…',['clientdesk','brain','tracking'],[flowG(['toplace','intl','transit','wh','landed','tokm','pay_got']),G_INBOX,G_BOXES]],
   ['mail','📬','Mail & Stores','Store orders, ids, cashback',['mail','pricing'],[G_ORDERS,['bids','Bids',[['bids','Bids',()=>(STAGES[0][2]()||[]).length]]],['cashback','Cashback',[['cashback','💸 Cashback',()=>all.filter(r=>gv(r,'cashback_status')==='Pending').length]]]]],
   ['money','💰','Money','Money at a glance',['cfo','payout','pricing'],[G_MONEY,flowG(['pay_run','pay_chase','pay_got'])]],
   ['hq','🤖','HQ','Company, agents, tickets',['brain','ops','cfo','clientdesk','auditor'],[G_HQ,G_INBOX]]];
