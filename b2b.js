@@ -219,8 +219,8 @@ window.lxB2B=async function(root,sb,toast){
  wrap.appendChild(el('p','bb-meta','Loading…'));
  const res=await sb.from('lx_b2b').select('kind,id,data,updated_at');
  if(res.error){wrap.textContent=res.error.message;return;}
- let all=(res.data||[]).filter(x=>x.kind==='order').map(x=>Object.assign({_id:x.id,_u:x.updated_at},x.data));
- let BIDS=(res.data||[]).filter(x=>x.kind==='bid').map(x=>Object.assign({_id:x.id,_u:x.updated_at},x.data));const META={};(res.data||[]).filter(x=>x.kind==='meta').forEach(x=>{META[x.id]=x.data;});const AGENTS={};(res.data||[]).filter(x=>x.kind==='agent').forEach(x=>{AGENTS[x.id]=x.data;});const DOCS=(res.data||[]).filter(x=>x.kind==='doc').map(x=>Object.assign({_id:x.id},x.data)).sort((a,b)=>String(a.order).localeCompare(String(b.order)));let BUYS=(res.data||[]).filter(x=>x.kind==='buy').map(x=>Object.assign({_id:x.id,_u:x.updated_at},x.data));
+ let all=(res.data||[]).filter(x=>x.kind==='order'&&!(x.data&&x.data.archived)).map(x=>Object.assign({_id:x.id,_u:x.updated_at},x.data));
+ let BIDS=(res.data||[]).filter(x=>x.kind==='bid'&&!(x.data&&x.data.archived)).map(x=>Object.assign({_id:x.id,_u:x.updated_at},x.data));const META={};(res.data||[]).filter(x=>x.kind==='meta').forEach(x=>{META[x.id]=x.data;});const AGENTS={};(res.data||[]).filter(x=>x.kind==='agent').forEach(x=>{AGENTS[x.id]=x.data;});const DOCS=(res.data||[]).filter(x=>x.kind==='doc').map(x=>Object.assign({_id:x.id},x.data)).sort((a,b)=>String(a.order).localeCompare(String(b.order)));let BUYS=(res.data||[]).filter(x=>x.kind==='buy').map(x=>Object.assign({_id:x.id,_u:x.updated_at},x.data));
  const saveK=async(kind,r,patch)=>{const d=Object.assign({},r,patch);['_id','_u'].forEach(k=>delete d[k]);const r2=await sb.from('lx_b2b').upsert({kind,id:r._id,data:d,updated_at:new Date().toISOString()},{onConflict:'kind,id'});if(r2.error){toast('Save nahi hua: '+r2.error.message);return false;}Object.assign(r,d);toast('Saved');return true;};
  const S={tab:'overview',who:'KicksMachine',st:'',rs:'',q:''};
  const save=async(r,patch)=>{const d=Object.assign({},r,patch);['_id','_u'].forEach(k=>delete d[k]);
