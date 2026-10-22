@@ -549,30 +549,30 @@ tabs.addEventListener('scroll',upd,{passive:true});window.addEventListener('resi
 /* Good to know -> open the Terms tab */
 document.addEventListener('click',function(ev){var b=ev.target.closest&&ev.target.closest('#gtk-terms');if(!b)return;var t=document.getElementById('tab-pol');if(t){t.click();try{t.scrollIntoView({block:'start'});}catch(_e){}window.scrollTo(0,0);}});
 
-/* Owner: adjust every tracker date by hand (order date, each step's date, ETA). Client sees the saved dates. Self-contained (extras helpers live in a closure). */
+/* Owner: tap any date in the tracker to change it (step dates, order date, ETA). Saves instantly. Owner-only. */
 (function(){const _t=window.__lxTrk;
- const E=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e;};
  const own=()=>{try{return !!photos.canEdit;}catch(e){return false;}};
  const key=x=>(typeof pslug==='function'?pslug(x):String(x));
  const msg=t=>{try{if(window.alertMsg)window.alertMsg(t);}catch(e){}};
- const NAMES=['Order placed','Order confirmed','Shipped by retailer/outlet','Received at international hub','Shipped from international hub','Received at Indian warehouse','Address requested','Shipped from Indian warehouse','Delivered'];
+ const fdt=v=>{try{return new Date(String(v).slice(0,10)+'T00:00:00').toLocaleDateString('en-IN',{day:'numeric',month:'short'});}catch(e){return v;}};
+ const cur=item=>{try{return (dash.data('orders').data||[]).find(x=>x.item===item);}catch(e){return null;}};
+ async function saveStage(item,k,val){const k0=key(item);const n=JSON.parse(JSON.stringify((photos.notes||{})[k0]||{order:item,items:[]}));n.order=item;n.items=n.items||[];n.stages=Object.assign({},n.stages||{});if(val)n.stages[k]=val;else delete n.stages[k];await photos.db.doc('notes/'+k0).set(n);}
+ async function saveField(item,f,val){const r=cur(item);if(!r)throw new Error('order not found');const d=Object.assign({},r);d[f]=val;if(f==='eta_date'&&r.eta_date&&val&&val!==r.eta_date)d.eta_prev=r.eta_date;delete d.item;await window.lx.saveOrder(item,d);}
+ /* one date chip: shows the date, tap opens the calendar, change saves */
+ function chip(label,val,onSave){const w=document.createElement('span');w.className='xo-dt'+(val?'':' empty');const t=document.createElement('span');t.textContent=(label?label+' ':'')+(val?fdt(val):'+ date');w.appendChild(t);
+  const i=document.createElement('input');i.type='date';i.value=val?String(val).slice(0,10):'';w.appendChild(i);
+  const stop=e=>{e.stopPropagation();};['click','pointerdown','mousedown','touchstart','keydown'].forEach(ev=>w.addEventListener(ev,stop));
+  w.addEventListener('click',()=>{try{if(i.showPicker)i.showPicker();else i.focus();}catch(e){i.focus();}});
+  i.addEventListener('change',async()=>{const v=i.value;t.textContent=(label?label+' ':'')+(v?fdt(v):'+ date');w.classList.toggle('empty',!v);w.classList.add('saving');try{await onSave(v);w.classList.remove('saving');w.classList.add('ok');setTimeout(()=>w.classList.remove('ok'),1200);msg('Date saved ✓');}catch(e){w.classList.remove('saving');msg('Save nahi hua: '+(e&&e.message||e));}});
+  if(val){const x=document.createElement('button');x.type='button';x.className='xo-dx';x.textContent='×';x.title='Date hatao';x.addEventListener('click',async e=>{e.stopPropagation();e.preventDefault();i.value='';i.dispatchEvent(new Event('change'));x.remove();});w.appendChild(x);}
+  return w;}
  window.__lxTrk=function(r,card){try{if(_t)_t(r,card);}catch(e){}if(!own()||!card)return;
- try{const local=String(r.order_type||'').indexOf('Local')>=0;const k0=key(r.item);const n=(photos.notes||{})[k0]||{};const st=n.stages||{};
- const box=E('details','xo-dates owner');box.appendChild(E('summary',null,'📅 Dates adjust karo (client ko yahi dates dikhengi)'));
- const grid=E('div','xo-dg');const ins={};
- const add=(lab,val,k,hint)=>{const w=E('label','xo-dl');w.appendChild(E('span',null,lab));const i=document.createElement('input');i.type='date';i.value=val?String(val).slice(0,10):'';w.appendChild(i);if(hint)w.appendChild(E('small',null,hint));grid.appendChild(w);ins[k]=i;};
- add('Order date',r.order_date,'order_date');
- NAMES.forEach((t,i)=>{const k=i+1;if(local&&k>=4&&k<=6)return;add((window.stName?window.stName(r,k):t),st[k],'s'+k,k===Number(r.stage||1)?'current step':'');});
- add('Expected delivery (ETA)',r.eta_date,'eta_date','client ko yahi ETA dikhega');
- box.appendChild(grid);
- const row=E('div','xo-dr');const sv=E('button','btn','Save dates');sv.type='button';
- sv.addEventListener('click',async()=>{sv.disabled=true;try{
-   const patch={};['order_date','eta_date'].forEach(k=>{const v=ins[k].value;if(v!==(r[k]?String(r[k]).slice(0,10):''))patch[k]=v;});
-   if(Object.keys(patch).length){const cur=((typeof dash!=='undefined'&&dash.data('orders').data)||[]).find(x=>x.item===r.item)||r;const d=Object.assign({},cur,patch);delete d.item;await window.lx.saveOrder(r.item,d);}
-   const cn=Object.assign({order:r.item,items:[]},JSON.parse(JSON.stringify((photos.notes||{})[k0]||{})));const s2=Object.assign({},cn.stages||{});
-   Object.keys(ins).filter(k=>k[0]==='s').forEach(k=>{const kk=k.slice(1);const v=ins[k].value;if(v)s2[kk]=v;else delete s2[kk];});
-   cn.stages=s2;cn.order=r.item;cn.items=cn.items||[];await photos.db.doc('notes/'+k0).set(cn);msg('Dates saved ✓');
-  }catch(e){msg('Dates save nahi hui: '+(e&&e.message||e));}sv.disabled=false;});
- row.appendChild(sv);row.appendChild(E('small',null,'Khaali chhodoge to us step ki date hat jayegi.'));box.appendChild(row);card.appendChild(box);
- if(!document.getElementById('xo-dates-css')){const s=document.createElement('style');s.id='xo-dates-css';s.textContent='.xo-dates{margin:14px 0;border:1px solid rgba(201,162,39,.35);padding:10px 12px}.xo-dates>summary{cursor:pointer;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold,#C9A227)}.xo-dg{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin:12px 0}.xo-dl{display:flex;flex-direction:column;gap:4px;font-size:12px}.xo-dl input{background:transparent;border:1px solid rgba(255,255,255,.18);color:inherit;padding:7px 8px;font:inherit;color-scheme:dark}.xo-dl small{opacity:.6;font-size:10.5px}.xo-dr{display:flex;align-items:center;gap:12px;flex-wrap:wrap}.xo-dr small{opacity:.65;font-size:11px}';document.head.appendChild(s);}
- }catch(e){console.error('xo-dates',e&&e.message);}};})();
+  try{card.querySelectorAll('.xo-form .xo-lbl').forEach(l=>{const t=(l.querySelector('span')||{}).textContent||'';if(t==='Current step done on'||t==='ETA')l.remove();});}catch(e){}
+  try{card.classList.add('xo-own');const local=String(r.order_type||'').indexOf('Local')>=0;const st=((photos.notes||{})[key(r.item)]||{}).stages||{};
+   const ks=[1,2,3,4,5,6,7,8,9].filter(k=>!(local&&k>=4&&k<=6));
+   const steps=[...card.querySelectorAll('.steps .st')].filter(x=>!x.classList.contains('pay'));
+   steps.forEach((el,idx)=>{const k=ks[idx];if(!k)return;el.querySelectorAll('.xo-dt').forEach(z=>z.remove());el.appendChild(chip('',st[k],v=>saveStage(r.item,k,v)));});
+   const bar=document.createElement('div');bar.className='xo-dbar';bar.appendChild(document.createTextNode('📅 Tap karke date badlo:'));bar.appendChild(chip('Order',r.order_date,v=>saveField(r.item,'order_date',v)));bar.appendChild(chip('ETA',r.eta_date,v=>saveField(r.item,'eta_date',v)));
+   const g=card.querySelector('.steps');if(g)g.parentNode.insertBefore(bar,g);else card.appendChild(bar);
+   if(!document.getElementById('xo-dt-css')){const s=document.createElement('style');s.id='xo-dt-css';s.textContent='.xo-own .steps .st .stdate{display:none}.xo-dt{position:relative;display:inline-flex;align-items:center;gap:4px;margin-top:6px;padding:4px 8px;border:1px solid rgba(201,162,39,.55);color:var(--gold,#C9A227);font-size:11px;letter-spacing:.04em;cursor:pointer;background:rgba(201,162,39,.06);white-space:nowrap;user-select:none}.xo-dt.empty{opacity:.55;border-style:dashed}.xo-dt.saving{opacity:.4}.xo-dt.ok{background:rgba(80,180,110,.25);border-color:#5cb87a}.xo-dt input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;font-size:16px;border:0;padding:0;margin:0;color-scheme:dark}.xo-dx{all:unset;position:relative;z-index:2;cursor:pointer;padding:0 2px;color:#e08a7a;font-size:13px;line-height:1}.xo-dbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:10px 0;font-size:12px;opacity:.95}.xo-dbar .xo-dt{margin-top:0}';document.head.appendChild(s);}
+  }catch(e){console.error('xo-dt',e&&e.message);}};})();
