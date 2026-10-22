@@ -22,7 +22,7 @@ const css=document.createElement('style');css.textContent=`
 .ad-c{display:block;width:100%;text-align:left;background:#121214;border:1px solid #232120;color:inherit;padding:12px 14px;margin-bottom:8px;cursor:pointer;font:inherit}
 .ad-c:hover{border-color:#6B5A24}.ad-c.on{border-color:#C9A227;background:#17150f}
 .ad-c b{display:block;font-weight:500;font-size:15px}.ad-c small{color:#A39C90;font-size:11.5px;letter-spacing:.04em}
-.ad-card{background:#121214;border:1px solid #232120;padding:18px 20px;margin-bottom:16px}
+.ad-addr{margin-top:12px;padding:10px 12px;border:1px dashed #3A3222;border-radius:10px;font-size:13.5px;line-height:1.45;color:#E6E0D4;display:flex;flex-direction:column;gap:6px;align-items:flex-start}.ad-addr.hot{border-color:#C9A227;background:#1a160d;animation:adfade .25s ease both}.ad-addr b{color:#E3C565}.ad-wa{margin-top:10px;display:flex;flex-direction:column;gap:6px}.ad-wa-p{white-space:pre-wrap;font-size:12.5px;color:#A39C90;background:#0b0b0c;border:1px solid #232120;border-radius:8px;padding:8px 10px;line-height:1.45}@keyframes adfade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}.ad-card{background:#121214;border:1px solid #232120;padding:18px 20px;margin-bottom:16px}
 .ad-card .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}
 .ad-card label{display:block;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#A39C90;margin:0 0 10px}
 .ad-card input,.ad-card select,.ad-side input{width:100%;background:#0A0A0A;border:1px solid #2A2724;color:#F3EEE6;padding:9px 10px;font:inherit;margin-top:4px}
@@ -204,6 +204,25 @@ async function renderClient(){
 /* ---- order control board: change stage / tracking / ETA / payment for any client's order ---- */
 const pslugA=x=>String(x).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,60);
 const todayA=()=>new Date().toISOString().slice(0,10);
+const slugA=s=>String(s||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,60);
+let ADDRS=[];const loadAddrs=async()=>{try{const r=await sb.from('lx_docs').select('client_id,doc_id,data').eq('collection','addresses');ADDRS=r.data||[];}catch(e){}return ADDRS;};
+const addrOf=r=>{const d=ADDRS.find(x=>x.client_id===r._c&&(x.doc_id===slugA(r.item)||String((x.data||{}).order||'')===r.item||(r.order_no&&String((x.data||{}).order||'').includes(r.order_no))));return d?Object.assign({_id:d.doc_id},d.data):null;};
+const inrA=n=>'₹'+Number(n||0).toLocaleString('en-IN');
+/* Per-stage WhatsApp message (Luxella voice). c = client row, r = order */
+function waMsg(r,c,st){st=Number(st||r.stage)||1;const first=String((c&&c.name)||'').split(' ')[0]||'there';const no=r.order_no?r.order_no+' ':'';const item=r.item||'your item';const link=base((c&&c.slug)||'');const eta=r.eta_date?' Expected by '+new Date(r.eta_date).toLocaleDateString('en-IN',{day:'numeric',month:'short'})+'.':'';const bal=r.payout_status!=='Received'&&Number(r.payout)?' Balance '+inrA(r.payout)+' — pay from your page: '+link+'#pay':'';
+ const T={
+  1:`Hi ${first}! Your Luxella order ${no}(${item}) is placed. Track it anytime here: ${link}#tr`,
+  2:`Hi ${first}, good news — ${no}${item} is confirmed with the store.${eta} Live tracking: ${link}#tr`,
+  3:`Hi ${first}, ${no}${item} has been shipped by the store and is on its way to our international hub.${eta} Track: ${link}#tr`,
+  4:`Hi ${first}, ${no}${item} has reached our international hub. Next stop: India ✈️ ${link}#tr`,
+  5:`Hi ${first}, ${no}${item} has left for India. Usually 7–10 days from here.${eta} ${link}#tr`,
+  6:`Hi ${first}, ${no}${item} has landed in India 🇮🇳 and is being prepared for dispatch. ${link}#tr`,
+  7:`Hi ${first}, ${no}${item} is ready to dispatch! Please add your delivery address + phone here (30 sec): ${link}#ad — we ship the same day we receive it.`,
+  8:`Hi ${first}, ${no}${item} is dispatched${r.local_courier?' via '+r.local_courier:''}${r.local_tracking?' · tracking: '+r.local_tracking:''}.${eta} Live status: ${link}#tr`,
+  9:`Hi ${first}, ${no}${item} is delivered 🎉 Hope you love it!${bal} — Luxella`};
+ return (T[st]||T[1]).replace(/\s+—\s+Luxella$/,'')+(st===9?'':'\n— Luxella');}
+const waHref=(phone,text)=>'https://wa.me/'+String(phone||'').replace(/[^0-9]/g,'').replace(/^(\d{10})$/,'91$1')+'?text='+encodeURIComponent(text);
+
 async function saveOrderPatch(clientId,item,patch,stageTo){
   const cur=await sb.from('lx_orders').select('data').match({client_id:clientId,item}).single();
   if(cur.error)throw new Error(cur.error.message);
@@ -258,7 +277,7 @@ function orderBoard(m,rows,name){
     }
     picked.clear();bgo.disabled=false;draw();toast(ok+' updated'+(fail.length?' · '+fail.length+' failed: '+fail[0]:'.'));
   };
-  const today=todayA();const isDone=r=>Number(r.stage)>=9;
+  const today=todayA();const isDone=r=>Number(r.stage)>=9;loadAddrs().then(()=>draw());
   const inp=(label,val,type)=>{const l=document.createElement('label');l.textContent=label;l.style.cssText='display:flex;flex-direction:column;gap:4px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#A39C90';const i=document.createElement('input');i.type=type||'text';i.value=val||'';i.style.cssText='background:#0A0A0A;color:#F3EEE6;border:1px solid #2A2724;padding:8px 10px;font:14px Jost,system-ui,sans-serif;text-transform:none;letter-spacing:0';l.appendChild(i);return [l,i];};
   function draw(){
     list.textContent='';
@@ -288,6 +307,18 @@ function orderBoard(m,rows,name){
       const pl=document.createElement('label');pl.textContent='Payment';pl.style.cssText=sl.style.cssText;
       const ps=document.createElement('select');ps.style.cssText=ss.style.cssText;['Pending','Received'].forEach(x=>{const o=document.createElement('option');o.value=x;o.textContent=x;if((r.payout_status||'Pending')===x)o.selected=true;ps.appendChild(o);});pl.appendChild(ps);
       body.append(sl,l2,l3,l4,l5,l6,pl);det.appendChild(body);
+      {const ad=addrOf(r);const cl=clients.find(c=>c.id===r._c)||{};const ab=el('div','ad-addr'+(ad&&!r.local_tracking&&st0>=7?' hot':''));
+       if(ad){ab.appendChild(el('b',null,(!r.local_tracking&&st0>=7?'📍 Address aaya — India tracking daalo':'📍 Delivery address')));ab.appendChild(el('div',null,ad.address||''));ab.appendChild(el('small','ad-mut',(ad.phone?'📞 '+ad.phone:'')+(ad.pref?' · '+ad.pref:'')+(ad.savedAt?' · filled '+ad.savedAt:'')));
+        const cp=el('button','ad-b g','Copy address');cp.type='button';cp.onclick=()=>navigator.clipboard.writeText((ad.address||'')+(ad.phone?'\n'+ad.phone:'')).then(()=>toast('Address copied'));ab.appendChild(cp);
+        if(!r.local_tracking&&st0>=7){const fo=el('button','ad-b','+ India tracking');fo.type='button';fo.onclick=()=>{det.open=true;iLt.focus();iLt.scrollIntoView({behavior:'smooth',block:'center'});};ab.appendChild(fo);}
+        if(st0===7&&r.local_tracking)ab.appendChild(el('small','ad-mut','Tracking hai → stage 8 (Dispatched) karo, client ko msg jaayega.'));}
+       else if(st0===7){ab.appendChild(el('b',null,'⏳ Address abhi tak nahi aaya'));ab.appendChild(el('small','ad-mut','Neeche WhatsApp msg bhejo — client apne page pe #ad me bharega, yahan apne aap dikh jaayega.'));}
+       if(ab.childNodes.length)det.appendChild(ab);
+       const wr=el('div','ad-wa');const ws=document.createElement('select');ws.style.cssText='background:#0A0A0A;color:#F3EEE6;border:1px solid #2A2724;padding:7px 9px;font:inherit;width:auto';STAGES.forEach((t,i)=>{const o=document.createElement('option');o.value=String(i+1);o.textContent='Msg · '+(i+1)+' '+t;if(i+1===st0)o.selected=true;ws.appendChild(o);});
+       const prev=el('div','ad-wa-p');const upd=()=>{prev.textContent=waMsg(r,cl,ws.value);};upd();ws.onchange=upd;
+       const go=el('a','ad-b','💬 WhatsApp');go.target='_blank';go.rel='noopener';go.onclick=()=>{go.href=waHref(ad&&ad.phone,waMsg(r,cl,ws.value));};go.href='#';
+       const cpy=el('button','ad-b g','Copy msg');cpy.type='button';cpy.onclick=()=>navigator.clipboard.writeText(waMsg(r,cl,ws.value)).then(()=>toast('Message copied'));
+       const hd=el('div','row');hd.append(ws,go,cpy);wr.append(hd,prev);det.appendChild(wr);}
       const rw=el('div','row');rw.style.marginTop='12px';
       const sv=el('button','ad-b','Save changes');sv.type='button';rw.appendChild(sv);
       const op=el('a','ad-b g','Open client page');op.href=base((clients.find(c=>c.id===r._c)||{}).slug||'');op.target='_blank';op.rel='noopener';rw.appendChild(op);
@@ -452,7 +483,7 @@ async function renderDash(m){
     sb.from('lx_audit').select('at,actor,tbl,op,ref,client_id').order('at',{ascending:false}).limit(60),
     sb.from('lx_docs').select('client_id,doc_id,data').eq('collection','paysub'),
     sb.from('lx_docs').select('client_id,doc_id,data').eq('collection','cases'),
-    sb.from('lx_docs').select('client_id,doc_id,data').eq('collection','stock')]);
+    sb.from('lx_docs').select('client_id,doc_id,data').eq('collection','stock'),loadAddrs()]);
   if(o.error){m.appendChild(el('p','ad-mut',o.error.message));return;}
   const name=id=>(clients.find(c=>c.id===id)||{}).name||'?';const slugOf=id=>(clients.find(c=>c.id===id)||{}).slug||'';
   const rows=(o.data||[]).map(x=>Object.assign({_c:x.client_id,item:x.item,_u:x.updated_at},x.data)).filter(r=>!/cancel/i.test(String(r.status||'')));
@@ -462,7 +493,7 @@ async function renderDash(m){
   const awaitAp=rows.filter(r=>r.placed_by==='client'&&(Number(r.stage)||1)<=1);
   const toVerify=(pq.data||[]).filter(x=>/pending/i.test(String((x.data||{}).status||'')));
   const openCases=(cs.data||[]).filter(x=>!/resolved|closed/i.test(String((x.data||{}).status||'')));
-  const needAddr=open.filter(r=>(Number(r.stage)||1)===7&&!r.delivery_address);
+  const needAddr=open.filter(r=>(Number(r.stage)||1)===7&&!addrOf(r));const addrReady=open.filter(r=>(Number(r.stage)||1)>=7&&addrOf(r)&&!r.local_tracking);
   const delUnpaid=rows.filter(r=>del(r)&&r.payout_status!=='Received');
   const stale=open.filter(r=>r._u&&(Date.now()-new Date(r._u))>7*864e5).sort((x,y)=>String(x._u).localeCompare(String(y._u)));
   /* header */
@@ -479,7 +510,7 @@ async function renderDash(m){
   /* today chips */
   const chips=el('div','dz-chips');
   const chip=(t,n,sec,warn)=>{const c=el('button','dz-chip'+(n&&warn?' warn':''));c.type='button';c.appendChild(el('b',null,String(n)));c.appendChild(el('span',null,t));c.onclick=()=>go(sec);chips.appendChild(c);};
-  chip('Awaiting approval',awaitAp.length,'today',1);chip('Payments to verify',toVerify.length,'today',1);chip('Open cases',openCases.length,'today',1);chip('Late vs ETA',late.length,'orders',1);chip('Address needed',needAddr.length,'orders',1);chip('Delivered, unpaid',delUnpaid.length,'money',1);
+  chip('Awaiting approval',awaitAp.length,'today',1);chip('Payments to verify',toVerify.length,'today',1);chip('Open cases',openCases.length,'today',1);chip('Late vs ETA',late.length,'orders',1);chip('Address needed',needAddr.length,'orders',1);chip('📍 Address aaya · tracking daalo',addrReady.length,'orders',1);chip('Delivered, unpaid',delUnpaid.length,'money',1);
   m.appendChild(chips);
   /* section tabs */
   const SECS=[['today','Today'],['orders','Orders'],['money','Money'],['rts','Ready to ship'],['clients','Clients'],['tools','Tools'],['activity','Activity']];
@@ -495,9 +526,10 @@ async function renderDash(m){
    await queueCard(P,name,rows);
    const at=el('div','ad-card');at.appendChild(el('h2',null,'Needs attention'));
    late.sort((x,y)=>x.eta_date.localeCompare(y.eta_date)).forEach(r=>at.appendChild(el('div','ad-mut','Late · '+name(r._c)+' · '+(r.order_no||'')+' '+r.item+' · ETA '+r.eta_date)));
-   needAddr.forEach(r=>at.appendChild(el('div','ad-mut','Address needed · '+name(r._c)+' · '+(r.order_no||'')+' '+r.item)));
+   addrReady.forEach(r=>{const ad=addrOf(r);const d=el('div','ad-mut');d.innerHTML='<b style="color:#E3C565">📍 Address aaya</b> · '+name(r._c)+' · '+(r.order_no||'')+' '+r.item+' → India tracking daalo<br><span style="color:#C9C2B6">'+String(ad.address||'').replace(/</g,'&lt;')+(ad.phone?' · 📞 '+ad.phone:'')+'</span>';at.appendChild(d);});
+   needAddr.forEach(r=>{const c=clients.find(x=>x.id===r._c)||{};const d=el('div','ad-mut');d.appendChild(document.createTextNode('Address needed · '+name(r._c)+' · '+(r.order_no||'')+' '+r.item+' '));const a=el('a','ad-b g','💬 Address maango');a.href=waHref('',waMsg(r,c,7));a.target='_blank';a.rel='noopener';d.appendChild(a);at.appendChild(d);});
    delUnpaid.forEach(r=>at.appendChild(el('div','ad-mut','Delivered, payment pending · '+name(r._c)+' · '+(r.order_no||'')+' '+r.item+' · '+inr(r.payout))));
-   if(!late.length&&!needAddr.length&&!delUnpaid.length)at.appendChild(el('p','ad-mut','All clear.'));P.appendChild(at);
+   if(!late.length&&!needAddr.length&&!addrReady.length&&!delUnpaid.length)at.appendChild(el('p','ad-mut','All clear.'));P.appendChild(at);
    const sc=el('div','ad-card');sc.appendChild(el('h2',null,'Not updated in 7+ days'));
    stale.slice(0,12).forEach(r=>{const d=Math.round((Date.now()-new Date(r._u))/864e5);sc.appendChild(el('div','ad-mut',d+' days · '+name(r._c)+' · '+(r.order_no||'')+' '+r.item+' · '+(STAGES[(Number(r.stage)||1)-1]||'')));});
    if(!stale.length)sc.appendChild(el('p','ad-mut','Sab orders recently update hue hain.'));P.appendChild(sc);}
