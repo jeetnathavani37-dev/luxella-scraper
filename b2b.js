@@ -922,8 +922,8 @@ window.lxB2B=async function(root,sb,toast){
  /* ---- Per-section message: one line per order — Courier + tracking · Item · Delivered date — copy or WhatsApp ---- */
  const orderLine=(r,i)=>{const t=gv(r,'retailer_tracking');const dr=gv(r,'delivered_reshipper');return (i+1)+'. '+(t?carrierOf(t)+' '+t:'No tracking')+' · '+String(r.item||'').trim()+(gv(r,'retailer_order_id')?' ('+gv(r,'retailer_order_id')+')':'')+' · '+(dr?'Delivered '+dShort(dr):(gv(r,'eta_reshipper')?'ETA '+dShort(gv(r,'eta_reshipper')):'Not delivered yet'));};
  const msgBox=(rs,title,cfg,SEL)=>{const box=el('details','msgbox');const sm=el('summary',null,'✉️ Message for this list · '+rs.length+' orders');box.appendChild(sm);const sel=()=>{const picked=rs.filter(r=>SEL&&SEL.has(r._id));return picked.length?picked:rs;};
-  const intro=el('input','inp msg-intro');intro.placeholder='First line (optional), e.g. Hi, please dispatch these together to India:';intro.value=cfg.msgIntro||'';const ta=el('textarea','msgbox-ta');ta.readOnly=true;ta.rows=Math.min(14,rs.length+3);
-  const build=()=>{const L=sel();ta.value=(intro.value.trim()?intro.value.trim()+'\n\n':'')+L.map(orderLine).join('\n')+'\n\nTotal: '+L.length+' parcel'+(L.length>1?'s':'')+'. Thanks!';};build();intro.addEventListener('input',build);
+  const intro=el('input','inp msg-intro');intro.placeholder='First line (optional), e.g. Hi, please dispatch these together to India:';intro.value=(typeof cfg.msgIntro==='function'?cfg.msgIntro(title):cfg.msgIntro)||'';const ta=el('textarea','msgbox-ta');ta.readOnly=true;ta.rows=Math.min(14,rs.length+3);
+  const build=()=>{const L=sel();ta.value=(intro.value.trim()?intro.value.trim()+'\n\n':'')+L.map(orderLine).join('\n')+'\n\n'+L.length+' parcel'+(L.length>1?'s':'')+'. Thanks!';};build();intro.addEventListener('input',build);
   const row=el('div','qp-b');const cp=btn('Copy',async()=>{build();try{await navigator.clipboard.writeText(ta.value);toast('Copied '+sel().length+' lines');}catch(e){toast('Copy failed');}},'bb-b sm');const wa=el('a','bb-b g sm','WhatsApp');wa.target='_blank';wa.rel='noopener';wa.style.textDecoration='none';wa.onclick=()=>{build();wa.href='https://wa.me/?text='+encodeURIComponent(ta.value);};wa.href='#';const rb=btn('Refresh',build,'bb-b g sm');row.append(cp,wa,rb,el('small','bb-meta','Tick cards above to send only some'));
   box.append(intro,ta,row);return box;};
  const isKM=r=>wsCl(r)&&!/cancel/i.test(r.status||'');
@@ -937,7 +937,7 @@ window.lxB2B=async function(root,sb,toast){
  /* ---- 4 · International in transit (store → warehouse) ---- */
  function intlT(P){intlLane(P,'intl',['Ordered'],'Nothing ordered that the store has not shipped yet.');}
  function transitT(P){intlLane(P,'transit',['In transit to reshipper'],'No parcels on the way to the hub.');}
- function intlLane(P,key,sts,emptyT){lane(P,{key,msg:true,msgIntro:key==='transit'?'Hi, these parcels are on the way to you:':'',list:()=>KMA(sts),chip:r=>gv(r,'reshipper')||'Reshipper?',
+ function intlLane(P,key,sts,emptyT){lane(P,{key,msg:true,msgIntro:key==='transit'?'Hi, these parcels are on their way to you. Please confirm once they arrive:':'Hi, these orders are placed; tracking will follow:',list:()=>KMA(sts),chip:r=>gv(r,'reshipper')||'Reshipper?',
   group:r=>String(gv(r,'retailer_tracking')||'').split(' ')[0]||(gv(r,'retailer_order_id')?'so:'+gv(r,'retailer_order_id'):''),
   sort:(a,b)=>String(gv(a,'retailer_date')).localeCompare(String(gv(b,'retailer_date'))),
   sections:[['No tracking yet',r=>!gv(r,'retailer_tracking'),'Store has not shipped or the mail was missed — check the store after 5+ days.'],['Heading to the international hub',r=>true]],
@@ -947,7 +947,7 @@ window.lxB2B=async function(root,sb,toast){
   bulk:[['✓ Reached hub',rs=>putAll(rs,{delivered_reshipper:bdate()})],['Copy form',async rs=>{await copyT(formTxt(rs));}]],empty:emptyT});}
 
  /* ---- 5 · Warehouse received (at reshipper) + form + ship out ---- */
- function whT(P){lane(P,{key:'wh',msg:true,msgIntro:'Hi, please ship these together to India:',list:()=>KMA('At reshipper'),chip:r=>gv(r,'reshipper')||'Reshipper?',
+ function whT(P){lane(P,{key:'wh',msg:true,msgIntro:t=>/Form pending/.test(t||'')?'Hi, these have been delivered at your end. Please confirm receipt and share the weights:':'Hi, forms are done for these. Please confirm the dispatch date to India:',list:()=>KMA('At reshipper'),chip:r=>gv(r,'reshipper')||'Reshipper?',
   sort:(a,b)=>String(gv(a,'delivered_reshipper')).localeCompare(String(gv(b,'delivered_reshipper'))),
   top:(P2,L)=>{const by={};L.forEach(r=>{const k=gv(r,'reshipper')||'?';const o=by[k]=by[k]||{n:0,kg:0,form:0};o.n++;o.kg+=Number(gv(r,'actual_weight'))||Number(gv(r,'est_weight'))||0;if(gv(r,'form_filled')!=='Yes')o.form++;});const s=el('div','fl-stats');Object.entries(by).forEach(([k,o])=>{const d=el('div');d.appendChild(el('b',null,k));d.appendChild(el('span',null,o.n+' parcels · ~'+o.kg.toFixed(2)+' kg'+(o.form?' · '+o.form+' form pending':' · forms ✓')));s.appendChild(d);});P2.appendChild(s);},
   sections:[['Form pending',r=>gv(r,'form_filled')!=='Yes','Fill the form, then ask the reshipper to dispatch. "Copy form" gives you ready text.'],['Form ✓ · waiting for dispatch',r=>true]],
@@ -973,9 +973,10 @@ window.lxB2B=async function(root,sb,toast){
   const fc=el('div','bb-card');fc.appendChild(el('h2',null,'📝 Form format (copy-paste)'));fc.appendChild(el('p','bb-meta','"Copy form" gives, per parcel: Tracking No · Item · Company (store) · Courier · Delivered / Expected date (one tracking = one block, combined items together). Add anything extra above/below here — the blocks go where {{items}} is.'));const ta=document.createElement('textarea');ta.className='fl-ta';ta.rows=8;ta.value=(META.reshippers||{}).form_template||'';ta.placeholder=formTxt(KMA('At reshipper').slice(0,1).concat([]).length?KMA('At reshipper').slice(0,1):[{order_id:'US000000',item:'Example bag',qty:1}]);fc.appendChild(ta);fc.appendChild(btn('Save format',async()=>{if(await saveMeta('reshippers',{form_template:ta.value.trim()}))toast('Format saved');},'bb-b sm'));P.appendChild(fc);}
 
  /* ---- 7 · Landed India (flying → landed) ---- */
- function landedT(P){lane(P,{key:'land',msg:true,msgIntro:'Hi, status please on these parcels:',list:()=>KMA(['At reshipper','Shipped from hub']),chip:r=>(gv(r,'reshipper')||'Reshipper?')+(r.status==='Shipped from hub'?' · dispatched':' · at hub'),
+ function landedT(P){lane(P,{key:'land',msg:true,list:()=>KMA(['At reshipper','Shipped from hub']),chip:r=>(gv(r,'reshipper')||'Reshipper?')+(r.status==='Shipped from hub'?' · dispatched':' · at hub'),
   sort:(a,b)=>String(gv(a,'delivered_reshipper')).localeCompare(String(gv(b,'delivered_reshipper'))),
-  sections:[['Delivered at hub · waiting to fly',r=>r.status==='At reshipper','Store delivered these at the hub. Day count runs from the delivery date.'],['Dispatched to India',r=>true]],
+  sections:[['Chase reshipper · 10+ days since delivered, not landed',r=>!gv(r,'landed_india')&&(days(gv(r,'delivered_reshipper'))||0)>=10,'Delivered at the hub 10+ days ago and still not in India. Ask the reshipper: have these landed?'],['Delivered at hub · waiting to fly',r=>r.status==='At reshipper','Store delivered these at the hub. Day count runs from the delivery date.'],['Dispatched to India',r=>true]],
+  msgIntro:t=>/Chase/.test(t||'')?'Hi, have these landed in India? Please share the dispatch status and AWB:':/waiting/.test(t||'')?'Hi, these were delivered to you. When will they be dispatched to India?':'Hi, please share the India tracking / AWB for these:',
   group:r=>String(gv(r,'reship_awb')||'').split(' ')[0]||(gv(r,'reshipper')&&gv(r,'shipped_reshipper')?'b:'+gv(r,'reshipper')+gv(r,'shipped_reshipper'):''),
   title:rows=>{const a=gv(rows[0],'reship_awb');return rows.length>1?(gv(rows[0],'reshipper')||'Batch')+' · '+rows.length+' parcels':(rows[0].order_id||rows[0]._id);},
   cls:rows=>(days(gv(rows[0],'delivered_reshipper'))||0)>14?'late':'',
