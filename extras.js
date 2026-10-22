@@ -548,3 +548,31 @@ tabs.addEventListener('scroll',upd,{passive:true});window.addEventListener('resi
 
 /* Good to know -> open the Terms tab */
 document.addEventListener('click',function(ev){var b=ev.target.closest&&ev.target.closest('#gtk-terms');if(!b)return;var t=document.getElementById('tab-pol');if(t){t.click();try{t.scrollIntoView({block:'start'});}catch(_e){}window.scrollTo(0,0);}});
+
+/* Owner: adjust every tracker date by hand (order date, each step's date, ETA). Client sees the saved dates. Self-contained (extras helpers live in a closure). */
+(function(){const _t=window.__lxTrk;
+ const E=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e;};
+ const own=()=>{try{return !!photos.canEdit;}catch(e){return false;}};
+ const key=x=>(typeof pslug==='function'?pslug(x):String(x));
+ const msg=t=>{try{if(window.alertMsg)window.alertMsg(t);}catch(e){}};
+ const NAMES=['Order placed','Order confirmed','Shipped by retailer/outlet','Received at international hub','Shipped from international hub','Received at Indian warehouse','Address requested','Shipped from Indian warehouse','Delivered'];
+ window.__lxTrk=function(r,card){try{if(_t)_t(r,card);}catch(e){}if(!own()||!card)return;
+ try{const local=String(r.order_type||'').indexOf('Local')>=0;const k0=key(r.item);const n=(photos.notes||{})[k0]||{};const st=n.stages||{};
+ const box=E('details','xo-dates owner');box.appendChild(E('summary',null,'📅 Dates adjust karo (client ko yahi dates dikhengi)'));
+ const grid=E('div','xo-dg');const ins={};
+ const add=(lab,val,k,hint)=>{const w=E('label','xo-dl');w.appendChild(E('span',null,lab));const i=document.createElement('input');i.type='date';i.value=val?String(val).slice(0,10):'';w.appendChild(i);if(hint)w.appendChild(E('small',null,hint));grid.appendChild(w);ins[k]=i;};
+ add('Order date',r.order_date,'order_date');
+ NAMES.forEach((t,i)=>{const k=i+1;if(local&&k>=4&&k<=6)return;add((window.stName?window.stName(r,k):t),st[k],'s'+k,k===Number(r.stage||1)?'current step':'');});
+ add('Expected delivery (ETA)',r.eta_date,'eta_date','client ko yahi ETA dikhega');
+ box.appendChild(grid);
+ const row=E('div','xo-dr');const sv=E('button','btn','Save dates');sv.type='button';
+ sv.addEventListener('click',async()=>{sv.disabled=true;try{
+   const patch={};['order_date','eta_date'].forEach(k=>{const v=ins[k].value;if(v!==(r[k]?String(r[k]).slice(0,10):''))patch[k]=v;});
+   if(Object.keys(patch).length){const cur=((typeof dash!=='undefined'&&dash.data('orders').data)||[]).find(x=>x.item===r.item)||r;const d=Object.assign({},cur,patch);delete d.item;await window.lx.saveOrder(r.item,d);}
+   const cn=Object.assign({order:r.item,items:[]},JSON.parse(JSON.stringify((photos.notes||{})[k0]||{})));const s2=Object.assign({},cn.stages||{});
+   Object.keys(ins).filter(k=>k[0]==='s').forEach(k=>{const kk=k.slice(1);const v=ins[k].value;if(v)s2[kk]=v;else delete s2[kk];});
+   cn.stages=s2;cn.order=r.item;cn.items=cn.items||[];await photos.db.doc('notes/'+k0).set(cn);msg('Dates saved ✓');
+  }catch(e){msg('Dates save nahi hui: '+(e&&e.message||e));}sv.disabled=false;});
+ row.appendChild(sv);row.appendChild(E('small',null,'Khaali chhodoge to us step ki date hat jayegi.'));box.appendChild(row);card.appendChild(box);
+ if(!document.getElementById('xo-dates-css')){const s=document.createElement('style');s.id='xo-dates-css';s.textContent='.xo-dates{margin:14px 0;border:1px solid rgba(201,162,39,.35);padding:10px 12px}.xo-dates>summary{cursor:pointer;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold,#C9A227)}.xo-dg{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin:12px 0}.xo-dl{display:flex;flex-direction:column;gap:4px;font-size:12px}.xo-dl input{background:transparent;border:1px solid rgba(255,255,255,.18);color:inherit;padding:7px 8px;font:inherit;color-scheme:dark}.xo-dl small{opacity:.6;font-size:10.5px}.xo-dr{display:flex;align-items:center;gap:12px;flex-wrap:wrap}.xo-dr small{opacity:.65;font-size:11px}';document.head.appendChild(s);}
+ }catch(e){console.error('xo-dates',e&&e.message);}};})();
