@@ -46,6 +46,10 @@ const css=document.createElement('style');css.textContent=`
 .dz-sres{margin:-4px 0 12px}.dz-hit{display:grid;grid-template-columns:1fr auto;gap:2px 10px;align-items:center;padding:8px 10px;border:1px solid #232120;margin-bottom:6px;background:#121214}.dz-hit .ad-mut{grid-column:1}.dz-hit a{grid-row:1/3;grid-column:2}
 .dz-chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}.dz-chip{display:flex;align-items:baseline;gap:8px;background:#121214;border:1px solid #232120;color:#A39C90;padding:9px 14px;cursor:pointer;font:inherit;font-size:12px}.dz-chip b{font-size:18px;color:#F3EEE6;font-weight:400}.dz-chip.warn{border-color:#6B5A24}.dz-chip.warn b{color:#E3C565}
 .dz-tabs{display:flex;gap:2px;border-bottom:1px solid #2A2724;margin-bottom:16px;overflow-x:auto;scrollbar-width:none}.dz-tab{background:transparent;border:0;border-bottom:2px solid transparent;color:#A39C90;padding:10px 14px;font:500 11px 'Jost',sans-serif;letter-spacing:.2em;text-transform:uppercase;cursor:pointer;white-space:nowrap}.dz-tab.on{color:#E3C565;border-bottom-color:#E3C565}
+.dz-tab .nb{display:inline-block;min-width:18px;padding:1px 6px;margin-left:6px;border-radius:10px;background:#E3C565;color:#000;font-size:10px;letter-spacing:0;text-align:center;vertical-align:1px}
+.ib-hd{display:flex;align-items:center;gap:10px;margin-bottom:10px}.ib-hd .sp{flex:1}.ib-f{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}.ib-f button{background:#121214;border:1px solid #232120;color:#A39C90;padding:5px 11px;font:inherit;font-size:11.5px;cursor:pointer;letter-spacing:.04em}.ib-f button.on{color:#E3C565;border-color:#6B5A24}
+.ib-it{display:grid;grid-template-columns:34px 1fr auto;gap:4px 12px;align-items:start;padding:12px 12px;border:1px solid #232120;background:#121214;margin-bottom:8px;transition:border-color .25s,background .25s;animation:ibin .35s ease both}.ib-it.new{border-left:3px solid #E3C565;background:#15130F}.ib-it .ic{font-size:20px;line-height:1.1;grid-row:1/4}.ib-it .t{font-size:14px;color:#F3EEE6}.ib-it .t b{color:#E3C565;font-weight:500}.ib-it .m{font-size:12px;color:#A39C90;grid-column:2}.ib-it .s{grid-column:2;font-size:13px;color:#C9C2B6;white-space:pre-wrap;word-break:break-word;margin-top:2px}.ib-it .a{grid-column:3;grid-row:1/4;display:flex;flex-direction:column;gap:6px;align-items:stretch;min-width:120px}.ib-it .a .ad-b{padding:7px 10px;font-size:11px;text-align:center}
+@keyframes ibin{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}@media(max-width:640px){.ib-it{grid-template-columns:28px 1fr}.ib-it .a{grid-column:1/3;grid-row:auto;flex-direction:row;flex-wrap:wrap}}
 .dz-pane[hidden]{display:none}.dz-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:16px}.dz-kpi{background:#121214;border:1px solid #232120;padding:14px 16px}.dz-kpi .v{font-size:24px;color:#E3C565;margin:4px 0}
 .dz-bar{display:grid;grid-template-columns:16rem 1fr 2rem;gap:10px;align-items:center;margin:6px 0;font-size:12.5px}.dz-bar .b{height:8px;background:#1C1A17}.dz-bar .b i{display:block;height:100%;background:linear-gradient(90deg,#B8943F,#F4E1A0)}
 .dz-chart{display:flex;gap:14px;align-items:flex-end;height:160px;margin-top:12px;padding-top:6px;border-bottom:1px solid #2A2724}.dz-chart .c{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%}.dz-chart .bars{flex:1;width:100%;display:flex;gap:4px;align-items:flex-end;justify-content:center}.dz-chart i{display:block;width:40%;max-width:22px;min-height:2px}.dz-chart .b1{background:#C9A227}.dz-chart .b2{background:#3E7D5A}
@@ -477,7 +481,60 @@ function composeCard(m){
   m.appendChild(card);
 }
 
-const DSEC={cur:'today'};let autoT=null;
+/* ---- unified client inbox: har client action ek jagah ---- */
+const IBF={cur:'all'};const hx=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+async function inboxCard(P,name,rows,go,setBadge){
+  const card=el('div','ad-card');P.appendChild(card);
+  const hd=el('div','ib-hd');hd.appendChild(el('h2',null,'Inbox'));hd.appendChild(el('span','ad-mut','Client ne jo bhi kiya — address, message, payment, request, order'));hd.appendChild(el('span','sp'));
+  const mall=el('button','ad-b g','Mark all read');mall.type='button';hd.appendChild(mall);card.appendChild(hd);
+  const fl=el('div','ib-f');card.appendChild(fl);const list=el('div');card.appendChild(list);
+  const [d,ao,sn]=await Promise.all([
+    sb.from('lx_docs').select('client_id,collection,doc_id,data,updated_at').in('collection',['addresses','addressbook','case_msgs','cases','paysub','requests','quote_resp']).order('updated_at',{ascending:false}).limit(200),
+    sb.from('lx_orders').select('client_id,item,data,updated_at').eq('data->>placed_by','client').order('updated_at',{ascending:false}).limit(40),
+    sb.from('lx_docs').select('client_id,data').eq('collection','meta').eq('doc_id','adseen')]);
+  if(d.error){card.appendChild(el('p','ad-mut',d.error.message));return;}
+  const seen={};(sn.data||[]).forEach(x=>{seen[x.client_id]=new Set(((x.data||{}).keys)||[]);});
+  const isSeen=it=>!!(seen[it.c]&&seen[it.c].has(it.key));
+  const markSeen=async arr=>{const by={};arr.forEach(it=>{(seen[it.c]=seen[it.c]||new Set()).add(it.key);by[it.c]=1;});
+    for(const cid of Object.keys(by)){const keys=[...seen[cid]].slice(-400);await sb.from('lx_docs').upsert({client_id:cid,collection:'meta',doc_id:'adseen',data:{keys,at:new Date().toISOString()}},{onConflict:'client_id,collection,doc_id'});}};
+  const fmt=t=>{const x=new Date(t);const dd=Date.now()-x;if(dd<3600e3)return Math.max(1,Math.round(dd/60e3))+' min ago';if(dd<86400e3)return Math.round(dd/3600e3)+' h ago';return x.toLocaleString('en-IN',{day:'numeric',month:'short',hour:'numeric',minute:'2-digit'});};
+  const ordOf=(cid,o)=>rows.find(r=>r._c===cid&&(r.item===o||r.order_no===o||(o&&r.item&&String(o).toLowerCase()===String(r.item).toLowerCase())));
+  const items=[];
+  (d.data||[]).forEach(x=>{const dd=x.data||{};const bs={c:x.client_id,at:x.updated_at,key:x.collection+'/'+x.doc_id+'@'+x.updated_at,col:x.collection,doc:x.doc_id,d:dd};
+    if(x.collection==='case_msgs'){if(dd.from==='luxella')return;const att=(dd.voice?' 🎤 voice note':'')+((dd.files||[]).length?' 📷 '+dd.files.length+' photo':'');items.push(Object.assign(bs,{k:'msg',ic:'💬',t:dd.case==='inbox'?'Message':'Reply on case '+(dd.ref||dd.case),s:((dd.text||'')+att).trim()||'(empty)',reply:dd.case==='inbox'?'inbox':(dd.ref||dd.case)}));return;}
+    if(x.collection==='cases'){if(!/submitted|reopened/i.test(String(dd.status||'')))return;items.push(Object.assign(bs,{k:'case',ic:'🛟',t:(/reopen/i.test(dd.status)?'Case reopened ':'New support case ')+(dd.ref||x.doc_id),s:(dd.type||'Issue')+(dd.order?' · '+dd.order:'')+(dd.desc?'\n'+dd.desc:''),queue:1}));return;}
+    if(x.collection==='paysub'){if(!/pending/i.test(String(dd.status||'')))return;items.push(Object.assign(bs,{k:'pay',ic:'💳',t:'Payment submitted · '+inr(dd.amount),s:(dd.order||'')+(dd.method?' · '+dd.method:'')+(dd.ref?' · ref '+dd.ref:''),queue:1}));return;}
+    if(x.collection==='addresses'){const r=ordOf(x.client_id,dd.order);items.push(Object.assign(bs,{k:'addr',ic:'📍',t:'Address submitted',s:(dd.order||'')+'\n'+(dd.address||'')+(dd.phone?'\n📞 '+dd.phone:'')+(dd.pref?'\n'+dd.pref:''),r,done:!!(r&&r.local_tracking)}));return;}
+    if(x.collection==='addressbook'){items.push(Object.assign(bs,{k:'addr',ic:'📒',t:'Saved an address'+(dd.label?' · '+dd.label:''),s:(dd.address||'')+(dd.phone?' · 📞 '+dd.phone:''),info:1}));return;}
+    if(x.collection==='requests'){items.push(Object.assign(bs,{k:'ord',ic:'🛍️',t:'Product request'+(dd.urgent?' · URGENT':''),s:[dd.brand,dd.product].filter(Boolean).join(' ')+(dd.qty>1?' · qty '+dd.qty:'')+(dd.budget?' · budget '+inr(dd.budget):'')+(dd.needBy?' · by '+dd.needBy:'')+(dd.status?'\nStatus: '+dd.status:''),page:'ov'}));return;}
+    if(x.collection==='quote_resp'){items.push(Object.assign(bs,{k:'ord',ic:dd.decision==='approved'?'✅':'❌',t:'Quote '+(dd.decision||''),s:(dd.item||'')+(dd.total?' · '+inr(dd.total):''),page:'ov'}));return;}});
+  (ao.data||[]).forEach(x=>{const dd=x.data||{};if((Number(dd.stage)||1)>1)return;items.push({c:x.client_id,at:x.updated_at,key:'order/'+x.item+'@'+x.updated_at,k:'ord',ic:'🆕',t:'New order placed',s:(dd.order_no?dd.order_no+' · ':'')+x.item+(dd.payout?' · '+inr(dd.payout):'')+(dd.size?' · '+dd.size:'')+(dd.delivery_later?' · address baad me':''),queue:1,d:dd});});
+  const zz=new Set(clients.filter(c=>/^zz/.test(c.slug||'')).map(c=>c.id));for(let i=items.length-1;i>=0;i--)if(zz.has(items[i].c))items.splice(i,1);
+  items.sort((a,b)=>a.at<b.at?1:-1);
+  const unread=()=>items.filter(it=>!isSeen(it)).length;
+  const FILT=[['all','All'],['new','Unread'],['addr','📍 Address'],['msg','💬 Messages'],['pay','💳 Payments'],['ord','🛍️ Orders'],['case','🛟 Cases']];
+  FILT.forEach(([k,t])=>{const b=el('button',null,t);b.type='button';b.dataset.k=k;b.onclick=()=>{IBF.cur=k;draw();};fl.appendChild(b);});
+  function draw(){
+    [...fl.children].forEach(b=>b.classList.toggle('on',b.dataset.k===IBF.cur));setBadge(unread());
+    list.textContent='';const L=items.filter(it=>IBF.cur==='all'||(IBF.cur==='new'?!isSeen(it):it.k===IBF.cur));
+    if(!L.length){list.appendChild(el('p','ad-mut',IBF.cur==='new'?'Sab padh liya. 🎉':'Kuch nahi.'));return;}
+    L.slice(0,80).forEach((it,i)=>{const c=clients.find(z=>z.id===it.c)||{};const row=el('div','ib-it'+(isSeen(it)?'':' new'));row.style.animationDelay=Math.min(i,12)*25+'ms';
+      row.appendChild(el('div','ic',it.ic));const t=el('div','t');t.innerHTML='<b>'+hx(name(it.c))+'</b> · '+hx(it.t)+(it.done?' <span style="color:#7FB07F">· tracking daal diya</span>':'');row.appendChild(t);
+      row.appendChild(el('div','m',fmt(it.at)));row.appendChild(el('div','s',it.s||''));
+      const a=el('div','a');row.appendChild(a);
+      const seenBtn=el('button','ad-b g',isSeen(it)?'Seen':'✓ Mark read');seenBtn.type='button';seenBtn.onclick=async()=>{await markSeen([it]);draw();};
+      if(it.k==='addr'&&it.r&&!it.done){const tb=el('button','ad-b','+ India tracking');tb.type='button';tb.onclick=async()=>{const v=prompt('India tracking no. / link for '+(it.r.order_no||'')+' '+it.r.item+':');if(!v||!v.trim())return;const st=Math.max(Number(it.r.stage)||1,8);if(!confirm('Tracking save + "Out for delivery" stage set karun? (client ko update jaayega)'))return;tb.disabled=true;try{await saveOrderPatch(it.c,it.r.item,{local_tracking:v.trim(),stage:st,status:STAGES[st-1]},st);it.r.local_tracking=v.trim();it.done=true;await markSeen([it]);toast('Tracking saved.');draw();}catch(e){tb.disabled=false;toast(e.message||String(e));}};a.appendChild(tb);
+        const cp=el('button','ad-b g','Copy address');cp.type='button';cp.onclick=()=>navigator.clipboard.writeText([it.d.address,it.d.phone].filter(Boolean).join(' · ')).then(()=>toast('Address copied'));a.appendChild(cp);}
+      if(it.reply){const rb=el('button','ad-b','Reply');rb.type='button';rb.onclick=()=>{if(row.querySelector('textarea'))return;const ta=document.createElement('textarea');ta.placeholder='Reply as Luxella…';ta.style.cssText='grid-column:2;width:100%;min-height:56px;background:#0A0A0A;color:#F3EEE6;border:1px solid #2A2724;padding:8px;margin-top:6px;font:inherit';const sd=el('button','ad-b','Send');sd.type='button';sd.style.cssText='grid-column:2;justify-self:start';row.append(ta,sd);ta.focus();
+          sd.onclick=async()=>{const tx=ta.value.trim();if(!tx)return;sd.disabled=true;const id='m'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);const w=await sb.from('lx_docs').insert({client_id:it.c,collection:'case_msgs',doc_id:id,data:{case:it.reply,ref:it.reply==='inbox'?'':it.reply,text:tx,files:[],voice:'',from:'luxella',at:new Date().toISOString()}});if(w.error){sd.disabled=false;toast(w.error.message);return;}await markSeen([it]);toast('Reply sent (mail + push).');draw();};};a.appendChild(rb);}
+      if(it.queue){const q=el('button','ad-b',it.k==='pay'?'Verify':it.k==='case'?'Open case':'Approve');q.type='button';q.onclick=()=>go('today');a.appendChild(q);}
+      if(it.page){const op=el('a','ad-b g','Open page');op.href=base(c.slug||'')+'#'+it.page;op.target='_blank';op.rel='noopener';a.appendChild(op);}
+      const oc=el('button','ad-b g','Client →');oc.type='button';oc.onclick=()=>{sel=c;renderList();renderClient();};a.appendChild(oc);
+      a.appendChild(seenBtn);list.appendChild(row);});}
+  mall.onclick=async()=>{await markSeen(items.filter(it=>!isSeen(it)));toast('Sab read mark ho gaya');draw();};
+  draw();
+}
+const DSEC={cur:'inbox'};let autoT=null;
 async function renderDash(m){
   const [o,a,pq,cs,stk]=await Promise.all([
     sb.from('lx_orders').select('client_id,item,data,updated_at'),
@@ -514,12 +571,16 @@ async function renderDash(m){
   chip('Awaiting approval',awaitAp.length,'today',1);chip('Payments to verify',toVerify.length,'today',1);chip('Open cases',openCases.length,'today',1);chip('Late vs ETA',late.length,'orders',1);chip('Address needed',needAddr.length,'orders',1);chip('📍 Address aaya · tracking daalo',addrReady.length,'orders',1);chip('Delivered, unpaid',delUnpaid.length,'money',1);
   m.appendChild(chips);
   /* section tabs */
-  const SECS=[['today','Today'],['orders','Orders'],['money','Money'],['rts','Ready to ship'],['clients','Clients'],['tools','Tools'],['activity','Activity']];
+  const SECS=[['inbox','📥 Inbox'],['today','Today'],['orders','Orders'],['money','Money'],['rts','Ready to ship'],['clients','Clients'],['tools','Tools'],['activity','Activity']];
   const tb=el('div','dz-tabs');const panes={};
   SECS.forEach(([k,t])=>{const b=el('button','dz-tab',t);b.type='button';b.dataset.k=k;b.onclick=()=>go(k);tb.appendChild(b);const p=el('div','dz-pane');p.dataset.k=k;panes[k]=p;});
   m.appendChild(tb);SECS.forEach(([k])=>m.appendChild(panes[k]));
   function go(k){DSEC.cur=k;[...tb.children].forEach(b=>b.classList.toggle('on',b.dataset.k===k));Object.entries(panes).forEach(([kk,p])=>p.hidden=kk!==k);}
   go(DSEC.cur);
+  /* INBOX */
+  {const P=panes.inbox;const ibtab=tb.querySelector('[data-k="inbox"]');const ibchip=el('button','dz-chip');ibchip.type='button';ibchip.appendChild(el('b',null,'…'));ibchip.appendChild(el('span',null,'📥 Unread'));ibchip.onclick=()=>{IBF.cur='new';go('inbox');};chips.insertBefore(ibchip,chips.firstChild);
+   const setBadge=n=>{let b=ibtab.querySelector('.nb');if(n){if(!b){b=el('span','nb');ibtab.appendChild(b);}b.textContent=String(n);}else if(b)b.remove();ibchip.firstChild.textContent=String(n);ibchip.classList.toggle('warn',n>0);document.title=(n?'('+n+') ':'')+'Luxella Admin';};
+   inboxCard(P,name,rows,go,setBadge).catch(e=>P.appendChild(el('p','ad-mut',e.message||String(e))));}
   /* TODAY */
   {const P=panes.today;
    const kpi=(k,v,sub)=>{const d=el('div','dz-kpi');d.appendChild(el('div','ad-mut',k));d.appendChild(el('div','v',v));if(sub)d.appendChild(el('div','ad-mut',sub));return d;};
