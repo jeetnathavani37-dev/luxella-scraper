@@ -212,6 +212,75 @@ details.cx{border:1px solid #262320;border-radius:12px;margin:10px 0;background:
 @media print{.bp-top,.bb-tabs,.bb-vt,.bb-bar,.bb-bulk,button{display:none!important}#admin-root{background:#fff!important;color:#000!important}}
 @media(max-width:820px){.bb-tr{grid-template-columns:1fr 1.6fr 1fr}.bb-tr>span:nth-child(n+4){display:none}.bb-tick{grid-template-columns:22px 1fr auto}.bb-tick .i{grid-column:2/4}.bb-tick .s,.bb-tick .d{display:none}.bb-bid{grid-template-columns:1fr auto}.bb-bid .r{grid-column:1/-1}}
 @media(max-width:820px){.bb-row>summary,.bb-th{grid-template-columns:1fr 1fr}.bb-row>summary>:nth-child(n+5),.bb-th>:nth-child(n+3){display:none}.bb-row .it{grid-column:1/-1;order:-1}}
+
+/* ===================== POLISH LAYER (2026-10-23) — tokens, gold hairlines, hover/focus, rhythm ===================== */
+:root{--lx-bg:#0A0A0A;--lx-s1:#101010;--lx-s2:#141311;--lx-line:#232120;--lx-line2:#2E2A24;--lx-gold:#C9A227;--lx-gold2:#E3C565;--lx-gold-dim:#6B5A24;--lx-ivory:#F3EEE6;--lx-mute:#A39C90;--lx-mute2:#7F786E;--lx-bad:#E9A08F;--lx-ok:#9CCB9C;--lx-ease:cubic-bezier(.2,.7,.2,1)}
+#admin-root{-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+#admin-root ::selection{background:rgba(201,162,39,.35)}
+#admin-root *:focus-visible{outline:1px solid var(--lx-gold);outline-offset:2px}
+/* surfaces */
+.fc,.rs-cd,.st-c,.cost-paste,.ib-m,.ov-st,.lx-mp,.msgbox{background:linear-gradient(180deg,#121110 0%,#0f0e0d 100%)}
+.fc,.rs-cd,.st-c,.ov-st,.cost-paste{position:relative;transition:border-color .25s var(--lx-ease),transform .25s var(--lx-ease),box-shadow .25s var(--lx-ease)}
+.fc:before,.st-c:before,.rs-cd:before{content:'';position:absolute;left:0;right:0;top:0;height:1px;background:linear-gradient(90deg,transparent,rgba(201,162,39,.55),transparent);opacity:.6;pointer-events:none}
+.fc{border-top:1px solid var(--lx-line)!important}
+.fc:hover,.rs-cd:hover,.ov-st:hover{border-color:var(--lx-gold-dim);transform:translateY(-1px);box-shadow:0 10px 30px -18px rgba(201,162,39,.35)}
+.fc.late{box-shadow:inset 3px 0 0 #7a3a30}
+/* headings */
+.bb-sech{margin:18px 0 12px;padding-bottom:8px}
+.bb-sech span{font:500 11px 'Jost',sans-serif;letter-spacing:.2em;color:var(--lx-gold)}
+.bb-sech small{color:var(--lx-mute2)}
+.fc-h,.td-h b,.td-top>b{font-family:'Cormorant Garamond',Georgia,serif;font-weight:500;letter-spacing:.01em}
+.fc-h{font-size:16px;color:var(--lx-ivory)}
+/* buttons */
+.bb-b{transition:background .2s var(--lx-ease),color .2s var(--lx-ease),border-color .2s var(--lx-ease),transform .12s var(--lx-ease);border-radius:0}
+.bb-b:not(.g):hover{background:var(--lx-gold2)}
+.bb-b.g:hover{border-color:var(--lx-gold)!important;color:var(--lx-gold2)!important}
+.bb-b:active{transform:translateY(1px)}
+.bb-b[disabled]{opacity:.45;cursor:default;transform:none}
+/* chips + tags */
+.bb-tag{border-radius:0;letter-spacing:.14em}
+.bb-tag.ok{color:var(--lx-ok);border-color:#2f4a2f}.bb-tag.bad{color:var(--lx-bad);border-color:#5a2a22}.bb-tag.info{color:#8fb7ff;border-color:#2f4a7a}
+.fc-trk{transition:background .2s var(--lx-ease)}.fc-trk:hover{background:rgba(201,162,39,.15)}
+/* filter pills (lane top tabs) */
+.bb-sum.tabs{gap:8px;margin:4px 0 14px}
+.bb-sum.tabs div{border:1px solid var(--lx-line);background:var(--lx-s1);padding:8px 12px;cursor:pointer;transition:border-color .2s var(--lx-ease),background .2s var(--lx-ease)}
+.bb-sum.tabs div:hover{border-color:var(--lx-gold-dim)}
+.bb-sum.tabs div.on{border-color:var(--lx-gold);background:#14120d;box-shadow:inset 0 -2px 0 var(--lx-gold)}
+.bb-sum.tabs div.bad.on{border-color:#7a3a30;box-shadow:inset 0 -2px 0 #e9a08f}
+/* nav */
+.nv-gb{transition:color .2s var(--lx-ease),border-color .2s var(--lx-ease)}
+.nv-gb:hover{color:var(--lx-ivory)}
+.nv-sb{transition:border-color .2s var(--lx-ease),color .2s var(--lx-ease),background .2s var(--lx-ease)}
+.nv-sb:hover{border-color:var(--lx-gold-dim);color:var(--lx-ivory)}
+.nv-gb i,.nv-sb i{font-variant-numeric:tabular-nums}
+/* inputs */
+.inp,.fc-form select,.fc-form input,.msgbox-ta,.fl-ta,.ib-f textarea{transition:border-color .2s var(--lx-ease),box-shadow .2s var(--lx-ease);border-radius:0}
+.inp:focus,.fc-form select:focus,.fc-form input:focus,.msgbox-ta:focus,.fl-ta:focus,.ib-f textarea:focus{border-color:var(--lx-gold)!important;box-shadow:0 0 0 3px rgba(201,162,39,.12);outline:none}
+.inp::placeholder,.msgbox-ta::placeholder,.ib-f textarea::placeholder{color:#5d574e}
+/* inbox */
+.ib-m{border-radius:0;box-shadow:0 1px 0 rgba(0,0,0,.4)}
+.ib-m.me{background:linear-gradient(180deg,#2a2410,#231e0e)}
+.ib-t.on{box-shadow:inset 3px 0 0 var(--lx-gold)}
+.ib-t:hover{background:#0f0e0c}
+.ib-day{letter-spacing:.2em;color:var(--lx-mute2);font-size:10px}
+/* money / numbers */
+.pf-e,.pf-a,.st-rk b,.ov-st b,.rs-n b{font-variant-numeric:tabular-nums}
+.st-rk{transition:border-color .2s var(--lx-ease),background .2s var(--lx-ease)}.st-rk:hover{border-color:var(--lx-gold-dim);background:#121110}
+/* empty states */
+.ib-empty,.fl-empty{font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-size:16px;color:var(--lx-mute2)}
+/* message boxes */
+.msgbox{border-style:solid;border-color:var(--lx-line2);border-top:1px solid var(--lx-gold-dim)}
+.msgbox summary{letter-spacing:.14em;font:500 11px 'Jost',sans-serif;text-transform:uppercase}
+.msgbox[open] summary{margin-bottom:4px;color:var(--lx-gold2)}
+/* scrollbars */
+#admin-root ::-webkit-scrollbar{height:6px;width:8px}#admin-root ::-webkit-scrollbar-thumb{background:#2a2622;border-radius:0}#admin-root ::-webkit-scrollbar-thumb:hover{background:var(--lx-gold-dim)}
+/* page rhythm */
+.fc-grid{gap:12px}
+.fl-bar{margin:8px 0 14px}
+.bb-meta{line-height:1.5}
+/* mobile */
+@media(max-width:700px){.bb-b{min-height:36px}.nv-sb{min-height:36px}.bb-sum.tabs div{padding:9px 12px}.fc{padding:12px}.fc-h{font-size:15px}.cost-f .inp{width:100%!important}.tpl-pick{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){#admin-root *{transition:none!important;animation:none!important}}
 `;document.head.appendChild(css);
 
 window.lxB2B=async function(root,sb,toast){
@@ -1600,7 +1669,7 @@ const sendMsg=async(thread,text,atts,meta)=>{const id='m-'+Date.now().toString(3
   const list=viewTools(P,BIDS,{date:'won_at',brandKey:'brand',get:(b,k)=>k==='brand'?((b.items||[])[0]||{}).brand:k==='payout'?b.payout_inr:b[k],text:b=>JSON.stringify(b).toLowerCase(),head:['KM order','Item','Payout','Won','Accept by','State'],row:b=>[(b.km_order_ids||[]).join(' '),(b.items||[]).map(x=>x.name).join(' + '),b.payout_inr,String(b.won_at).slice(0,10),b.accept_by,stOf(b)],line:b=>(b.km_order_ids||[]).join(',')+' · '+((b.items||[])[0]||{}).name+' · '+inr(b.payout_inr)});
   const c=el('div','bb-card');c.appendChild(el('h2',null,'Bids accepted (KicksMachine)'));
   const n={in:0,new:0,dis:0},v={in:0,new:0,dis:0};list.forEach(b=>{const k=stOf(b);n[k]++;v[k]+=Number(b.payout_inr)||0;});
-  const ch=el('div','bb-chips');[['','All',list.length],['new','Not in orders',n.new],['in','In orders',n.in],['dis','Not accepted / dismissed',n.dis]].forEach(([k,t,c2])=>{const b=el('button','bb-chip'+((S.bf||'')===k?' on':''),t);b.appendChild(el('b',null,String(c2)));b.onclick=()=>{S.bf=k;draw();};ch.appendChild(b);});c.appendChild(ch);
+  const ch=el('div','bb-chips');[['','All',list.length],['new','Not in orders',n.new],['in','In orders',n.in],['dis','Cancelled',n.dis]].forEach(([k,t,c2])=>{const b=el('button','bb-chip'+((S.bf||'')===k?' on':''),t);b.appendChild(el('b',null,String(c2)));b.onclick=()=>{S.bf=k;draw();};ch.appendChild(b);});c.appendChild(ch);
   const K=el('div','bb-kpis');[['Total won',inr(v.in+v.new+v.dis),list.length+' bids'],['In orders',inr(v.in),n.in+' bids'],['Missing',inr(v.new),n.new+' bids'],['Win rate (vs outbid mails)',BIDS.length?Math.round(BIDS.length/(BIDS.length+106)*100)+'%':'—','approx']].forEach(([t,x,y])=>{const d=el('div','bb-k');d.style.cursor='default';d.append(el('small',null,t),el('div','v',x),el('small',null,y));K.appendChild(d);});c.appendChild(K);
   const brands={};list.forEach(b=>{const br=((b.items||[])[0]||{}).brand||'Other';brands[br]=(brands[br]||0)+1;});c.appendChild(el('p','bb-meta','By brand: '+Object.entries(brands).sort((a,b)=>b[1]-a[1]).map(([b,c2])=>b+' '+c2).join(' · ')));
   const miss=list.filter(b=>stOf(b)==='new');if(miss.length){const ca=el('button','bb-b g','Create orders for all '+miss.length+' missing');ca.onclick=async()=>{if(!confirm(miss.length+' bids — create orders?'))return;for(const bd of miss)await createFrom(bd);draw();};c.appendChild(ca);}
