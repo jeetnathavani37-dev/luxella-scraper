@@ -1,7 +1,7 @@
 # Team protocol — agents ek doosre se kaise jude hain
 
 Sab agents ek hi office (table `lx_b2b`) me kaam karte hain. **Har run ki shuruaat me:**
-0. **Central brain + SOPs padho (zaroori, har agent):** `select id, data->>'md' from lx_b2b where kind='doc' and id in ('central-brain','sops','operating-principles','brand') order by data->>'order';` — operating bar, confidence rule, SOP done-definitions, aur drafts ke liye brand voice yahin se.
+0. **Central brain + SOPs + Jeet ke rules padho (zaroori, har agent):** `select id, data->>'md' from lx_b2b where kind='doc' and id in ('jeet-decisions','central-brain','sops','operating-principles','brand') order by data->>'order';` — operating bar, confidence rule, SOP done-definitions, aur drafts ke liye brand voice yahin se.
 1. Apna handbook padho (prompt me diya SQL).
 2. **Baaki sab agents ki rows padho**: `select id, data->>'summary', data->'items', data->'handoffs', data->>'last_run' from lx_b2b where kind='agent';` — dusron ne kya pakda, kya tumhare liye chhoda (`handoffs` jisme `to` = tumhara id).
 3. KM link status padho: `meta/kmsync` (+ `kind='km'` rows jab zaroorat ho).
@@ -57,3 +57,8 @@ Agents ek doosre se **Inbox ke HQ Room (`thread='group'`)** me baat karte hain �
 ## 👥 End clients (client portal) — sab agents ko pata ho
 Client portal (luxellaclients.duckdns.org/<slug>) pe clients khud kaam karte hain: naya order place (`lx_orders.data.placed_by='client'`), cancel request (`data.cancel_request='pending'`), payment proof (`lx_docs` collection `paysub`), support chat (`case_msgs` from client / `cases`), address (`addresses`), photos/notes.
 **Client Desk agent** ye sab har ghante padhta hai aur Inbox thread `clients` + group me summary daalta hai. Agar kisi client order ka kaam B2B side pe hai (place karna, tracking) to wo group me @ops/@tracking ko handoff karta hai. Client ko kuch bhi bhejna = sirf draft (Jeet admin se bhejega). Client-facing text me hamesha "Luxella", kabhi "Jeet"/reshipper/KM/cost/margin nahi.
+
+## 📒 Notebook — Jeet jo bhi likhe, HQ tak
+Jeet ke saare likhe hue words ek jagah: Inbox thread `notes` (kind='msg', from='jeet') + portal chat box + client-admin Assistant (kind='note'). Sab permanently saved.
+- **Brain** har run me naye Notebook msgs (`thread='notes'`, status new) padhta hai → (1) order/kaam hai to khud kare ya group me sahi agent ko `to:[..]` + @mention handoff, (2) permanent rule/preference hai to `jeet-decisions` doc me dated line append, (3) Notebook thread me ek line reply "✓ saved → @tracking ko diya / rulebook me daala", (4) msg pe status done.
+- Baaki agents: `jeet-decisions` doc ko Step 0 me padho — wo Jeet ka final word hai (sirf safety rules usse upar).
