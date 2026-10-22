@@ -41,3 +41,19 @@ Jeet ko report / sawaal / alert **sirf B2B portal ke Inbox** me jaata hai (https
 2. **End me post karo:** apne DM me run ka report (sirf jab kuch naya/badla — "kuch naya nahi" wale runs me post mat karo, spam nahi). Jo baat doosre agent ya poori team ke kaam ki hai → `group` me (@agent mention karke). Handoff = group me @agent + `handoffs` field dono.
 3. Group me roz: Ops subah 8:41 "Aaj ka plan" + shaam 7:41 "Din ka wrap" (notify:true). CFO 9:37pm paisa summary (notify:true). Baaki sirf zaroorat pe.
 4. Kabhi bhi Jeet ko kisi aur jagah (mail/WhatsApp/Claude app) message mat bhejo.
+
+## 🤝 Agent-to-agent coordination (team ki tarah kaam)
+Agents ek doosre se **Inbox ke HQ Room (`thread='group'`)** me baat karte hain — Jeet sab dekh sakta hai.
+- **Kaam dena / sawaal poochna:** group me post karo with `to:['<agent id>',…]` + text me `@<agent>`. Example: Tracking → `{"thread":"group","from":"tracking","to":["ops","clientdesk"],"text":"@ops @clientdesk US108749 Ishaan se landed — client ko update bhejna hai"}`.
+- **Har run ke shuru me padho (Jeet ke msgs ke saath):**
+  `select id,data from lx_b2b where kind='msg' and data->>'from'<>'<tumhara id>' and (data->'to' ? '<tumhara id>' or data->>'text' ilike '%@<tumhara id>%') and not coalesce(data->'seen_by','[]'::jsonb) ? '<tumhara id>' and (data->>'at')::timestamptz > now()-interval '3 days' order by data->>'at';`
+  Handle karo, phir mark: `update lx_b2b set data = jsonb_set(data,'{seen_by}', coalesce(data->'seen_by','[]'::jsonb) || '["<tumhara id>"]') where kind='msg' and id='<id>';`
+  Jawab chahiye to group me hi reply (`to:[sender]`, `reply_to:'<msg id>'`).
+- **Kaun kiska kaam:** naya bid/price → pricing · mail/order data → mail · parcel/landed/AfterShip → tracking · MRN/confirmation/payout → payout · KM vs portal mismatch → reconciler · paisa/bank → cfo · client portal (end clients) → clientdesk · notes/photos/naye client orders → brain · aaj ki priority → ops · galti/missing → auditor · system → qa.
+- **Ek kaam ek owner:** handoff ke baad wahi agent us order ko finish karega; doosra sirf follow-up. Duplicate kaam mat karo — pehle group padho ki koi aur already kar raha hai.
+- **Ops = team lead:** briefing me open handoffs (jo 6h+ se kisi ne seen nahi kiya) list karo aur owner ko @mention karo. Auditor: 24h+ purane unseen handoffs = finding.
+- Jeet ke messages ka mark `status='done'` hi rahega (Jeet ke liye). Agent-to-agent msgs me `seen_by` use karo.
+
+## 👥 End clients (client portal) — sab agents ko pata ho
+Client portal (luxellaclients.duckdns.org/<slug>) pe clients khud kaam karte hain: naya order place (`lx_orders.data.placed_by='client'`), cancel request (`data.cancel_request='pending'`), payment proof (`lx_docs` collection `paysub`), support chat (`case_msgs` from client / `cases`), address (`addresses`), photos/notes.
+**Client Desk agent** ye sab har ghante padhta hai aur Inbox thread `clients` + group me summary daalta hai. Agar kisi client order ka kaam B2B side pe hai (place karna, tracking) to wo group me @ops/@tracking ko handoff karta hai. Client ko kuch bhi bhejna = sirf draft (Jeet admin se bhejega). Client-facing text me hamesha "Luxella", kabhi "Jeet"/reshipper/KM/cost/margin nahi.
