@@ -94,7 +94,7 @@ html.bb-compact .bb-row>summary{padding:5px 0}html.bb-compact .bb-qr{padding:5px
 .fc-h{display:flex;align-items:center;gap:8px}.fc-h input{accent-color:#C9A227;margin:0}.fc-t{flex:1;min-width:0}.fc-t b{font-weight:400;color:#E3C565;font-size:14px;letter-spacing:.02em;word-break:break-word}.fc-t small{display:block;color:#8d867a;font-size:11px}.fc-amt{color:#F3EEE6;font-size:14px;white-space:nowrap}
 .fc-it{color:#C9C2B6;font-size:12.5px;line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.fc-it div{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .fc-m{display:flex;flex-wrap:wrap;gap:5px 10px;align-items:center;font-size:11.5px;color:#8d867a}.fc-m .bb-tag{font-size:10px;padding:1px 6px}
-.fc-trk{font-size:11px;color:#C9A227;text-decoration:none;border:1px solid #3a3322;padding:1px 6px}.fc-trk.core{font-size:12px;font-weight:600;border-color:#C9A227;background:rgba(201,162,39,.12);padding:2px 8px}.bb-tag.core{font-weight:600;font-size:12px;border:1px solid currentColor;padding:2px 8px}.bb-tag.info{color:#8fb7ff;border-color:#2f4a7a}.fc-trk.ok{color:#7fc98f;border-color:#2e4a33}.fc-trk.bad{color:#e07b67;border-color:#5a2a22}.fc-trk.go{color:#E3C565}
+.fc-trk{font-size:11px;color:#C9A227;text-decoration:none;border:1px solid #3a3322;padding:1px 6px}.msgbox{margin:10px 0 18px;border:1px dashed #3a3322;padding:8px 12px;background:#0f0e0a}.msgbox summary{cursor:pointer;color:#C9A227;font-size:12px;letter-spacing:.04em}.msgbox-ta{width:100%;margin:8px 0;background:#000;color:#eee;border:1px solid #2a2619;padding:8px;font:12px/1.5 ui-monospace,Menlo,monospace}.msg-intro{width:100%;margin-top:8px}.fc-trk.core{font-size:12px;font-weight:600;border-color:#C9A227;background:rgba(201,162,39,.12);padding:2px 8px}.bb-tag.core{font-weight:600;font-size:12px;border:1px solid currentColor;padding:2px 8px}.bb-tag.info{color:#8fb7ff;border-color:#2f4a7a}.fc-trk.ok{color:#7fc98f;border-color:#2e4a33}.fc-trk.bad{color:#e07b67;border-color:#5a2a22}.fc-trk.go{color:#E3C565}
 .fc-a{display:flex;gap:6px;align-items:center;margin-top:2px}.fc-a .bb-b{flex:0 0 auto}.fc-more{margin-left:auto;background:none;border:1px solid #2A2724;color:#A39C90;padding:4px 10px;cursor:pointer}.fc-pick{display:flex;flex-wrap:wrap;gap:6px}
 .fc-note{font-size:11.5px;color:#8d867a;line-height:1.4;max-height:3.1em;overflow:hidden}.fc-lnk{color:#C9A227;text-decoration:none}
 .fc-form{display:grid;grid-template-columns:1fr 1fr;gap:6px}.fc-form[hidden]{display:none}.fc-form select,.fc-form input{background:#0A0A0A;border:1px solid #2A2724;color:#F3EEE6;padding:7px;font:inherit;font-size:12px;min-width:0}
@@ -918,7 +918,14 @@ window.lxB2B=async function(root,sb,toast){
    if(title){const sh=el('div','bb-sech');sh.appendChild(el('span',null,title));sh.appendChild(el('small',null,rs.length+' · '+inr(sumP(rs))));P.appendChild(sh);if(hint)P.appendChild(el('p','bb-meta fl-note',hint));}
    const gm=new Map();rs.forEach(r=>{const k=cfg.group?cfg.group(r):'';const key=k||('#'+r._id);gm.set(key,(gm.get(key)||[]).concat([r]));});
    let gs=[...gm.values()];if(cfg.sort)gs.sort((a,b)=>cfg.sort(a[0],b[0]));
-   const g=el('div','fc-grid');gs.forEach(rows=>g.appendChild(fcard(rows,Object.assign({SEL,onSel},cfg))));P.appendChild(g);});}
+   const g=el('div','fc-grid');gs.forEach(rows=>g.appendChild(fcard(rows,Object.assign({SEL,onSel},cfg))));P.appendChild(g);if(cfg.msg)P.appendChild(msgBox(rs,title||cfg.key,cfg,SEL));});}
+ /* ---- Per-section message: one line per order — Courier + tracking · Item · Delivered date — copy or WhatsApp ---- */
+ const orderLine=(r,i)=>{const t=gv(r,'retailer_tracking');const dr=gv(r,'delivered_reshipper');return (i+1)+'. '+(t?carrierOf(t)+' '+t:'No tracking')+' · '+String(r.item||'').trim()+(gv(r,'retailer_order_id')?' ('+gv(r,'retailer_order_id')+')':'')+' · '+(dr?'Delivered '+dShort(dr):(gv(r,'eta_reshipper')?'ETA '+dShort(gv(r,'eta_reshipper')):'Not delivered yet'));};
+ const msgBox=(rs,title,cfg,SEL)=>{const box=el('details','msgbox');const sm=el('summary',null,'✉️ Message for this list · '+rs.length+' orders');box.appendChild(sm);const sel=()=>{const picked=rs.filter(r=>SEL&&SEL.has(r._id));return picked.length?picked:rs;};
+  const intro=el('input','inp msg-intro');intro.placeholder='First line (optional), e.g. Hi, please dispatch these together to India:';intro.value=cfg.msgIntro||'';const ta=el('textarea','msgbox-ta');ta.readOnly=true;ta.rows=Math.min(14,rs.length+3);
+  const build=()=>{const L=sel();ta.value=(intro.value.trim()?intro.value.trim()+'\n\n':'')+L.map(orderLine).join('\n')+'\n\nTotal: '+L.length+' parcel'+(L.length>1?'s':'')+'. Thanks!';};build();intro.addEventListener('input',build);
+  const row=el('div','qp-b');const cp=btn('Copy',async()=>{build();try{await navigator.clipboard.writeText(ta.value);toast('Copied '+sel().length+' lines');}catch(e){toast('Copy failed');}},'bb-b sm');const wa=el('a','bb-b g sm','WhatsApp');wa.target='_blank';wa.rel='noopener';wa.style.textDecoration='none';wa.onclick=()=>{build();wa.href='https://wa.me/?text='+encodeURIComponent(ta.value);};wa.href='#';const rb=btn('Refresh',build,'bb-b g sm');row.append(cp,wa,rb,el('small','bb-meta','Tick cards above to send only some'));
+  box.append(intro,ta,row);return box;};
  const isKM=r=>wsCl(r)&&!/cancel/i.test(r.status||'');
  const KMA=st=>all.filter(r=>isKM(r)&&(Array.isArray(st)?st.includes(r.status):r.status===st));
  const askTrk=async(rows,field,label,extra)=>{const t=prompt(label+' — tracking / AWB number:',gv(rows[0],field)||'');if(t==null)return;const v=t.trim();if(!v)return;const p=Object.assign({[field]:v},extra||{});await putAll(rows,p);draw();};
@@ -930,7 +937,7 @@ window.lxB2B=async function(root,sb,toast){
  /* ---- 4 · International in transit (store → warehouse) ---- */
  function intlT(P){intlLane(P,'intl',['Ordered'],'Nothing ordered that the store has not shipped yet.');}
  function transitT(P){intlLane(P,'transit',['In transit to reshipper'],'No parcels on the way to the hub.');}
- function intlLane(P,key,sts,emptyT){lane(P,{key,list:()=>KMA(sts),chip:r=>gv(r,'reshipper')||'Reshipper?',
+ function intlLane(P,key,sts,emptyT){lane(P,{key,msg:true,msgIntro:key==='transit'?'Hi, these parcels are on the way to you:':'',list:()=>KMA(sts),chip:r=>gv(r,'reshipper')||'Reshipper?',
   group:r=>String(gv(r,'retailer_tracking')||'').split(' ')[0]||(gv(r,'retailer_order_id')?'so:'+gv(r,'retailer_order_id'):''),
   sort:(a,b)=>String(gv(a,'retailer_date')).localeCompare(String(gv(b,'retailer_date'))),
   sections:[['No tracking yet',r=>!gv(r,'retailer_tracking'),'Store has not shipped or the mail was missed — check the store after 5+ days.'],['Heading to the international hub',r=>true]],
@@ -940,7 +947,7 @@ window.lxB2B=async function(root,sb,toast){
   bulk:[['✓ Reached hub',rs=>putAll(rs,{delivered_reshipper:bdate()})],['Copy form',async rs=>{await copyT(formTxt(rs));}]],empty:emptyT});}
 
  /* ---- 5 · Warehouse received (at reshipper) + form + ship out ---- */
- function whT(P){lane(P,{key:'wh',list:()=>KMA('At reshipper'),chip:r=>gv(r,'reshipper')||'Reshipper?',
+ function whT(P){lane(P,{key:'wh',msg:true,msgIntro:'Hi, please ship these together to India:',list:()=>KMA('At reshipper'),chip:r=>gv(r,'reshipper')||'Reshipper?',
   sort:(a,b)=>String(gv(a,'delivered_reshipper')).localeCompare(String(gv(b,'delivered_reshipper'))),
   top:(P2,L)=>{const by={};L.forEach(r=>{const k=gv(r,'reshipper')||'?';const o=by[k]=by[k]||{n:0,kg:0,form:0};o.n++;o.kg+=Number(gv(r,'actual_weight'))||Number(gv(r,'est_weight'))||0;if(gv(r,'form_filled')!=='Yes')o.form++;});const s=el('div','fl-stats');Object.entries(by).forEach(([k,o])=>{const d=el('div');d.appendChild(el('b',null,k));d.appendChild(el('span',null,o.n+' parcels · ~'+o.kg.toFixed(2)+' kg'+(o.form?' · '+o.form+' form pending':' · forms ✓')));s.appendChild(d);});P2.appendChild(s);},
   sections:[['Form pending',r=>gv(r,'form_filled')!=='Yes','Fill the form, then ask the reshipper to dispatch. "Copy form" gives you ready text.'],['Form ✓ · waiting for dispatch',r=>true]],
@@ -966,7 +973,7 @@ window.lxB2B=async function(root,sb,toast){
   const fc=el('div','bb-card');fc.appendChild(el('h2',null,'📝 Form format (copy-paste)'));fc.appendChild(el('p','bb-meta','"Copy form" gives, per parcel: Tracking No · Item · Company (store) · Courier · Delivered / Expected date (one tracking = one block, combined items together). Add anything extra above/below here — the blocks go where {{items}} is.'));const ta=document.createElement('textarea');ta.className='fl-ta';ta.rows=8;ta.value=(META.reshippers||{}).form_template||'';ta.placeholder=formTxt(KMA('At reshipper').slice(0,1).concat([]).length?KMA('At reshipper').slice(0,1):[{order_id:'US000000',item:'Example bag',qty:1}]);fc.appendChild(ta);fc.appendChild(btn('Save format',async()=>{if(await saveMeta('reshippers',{form_template:ta.value.trim()}))toast('Format saved');},'bb-b sm'));P.appendChild(fc);}
 
  /* ---- 7 · Landed India (flying → landed) ---- */
- function landedT(P){lane(P,{key:'land',list:()=>KMA(['At reshipper','Shipped from hub']),chip:r=>(gv(r,'reshipper')||'Reshipper?')+(r.status==='Shipped from hub'?' · dispatched':' · at hub'),
+ function landedT(P){lane(P,{key:'land',msg:true,msgIntro:'Hi, status please on these parcels:',list:()=>KMA(['At reshipper','Shipped from hub']),chip:r=>(gv(r,'reshipper')||'Reshipper?')+(r.status==='Shipped from hub'?' · dispatched':' · at hub'),
   sort:(a,b)=>String(gv(a,'delivered_reshipper')).localeCompare(String(gv(b,'delivered_reshipper'))),
   sections:[['Delivered at hub · waiting to fly',r=>r.status==='At reshipper','Store delivered these at the hub. Day count runs from the delivery date.'],['Dispatched to India',r=>true]],
   group:r=>String(gv(r,'reship_awb')||'').split(' ')[0]||(gv(r,'reshipper')&&gv(r,'shipped_reshipper')?'b:'+gv(r,'reshipper')+gv(r,'shipped_reshipper'):''),
