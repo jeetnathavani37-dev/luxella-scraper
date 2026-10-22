@@ -253,7 +253,10 @@ Deno.serve(async (req) => {
     const push = (pr?.data as any)?.push || {};
     if (push.all === false || push[msg.cat] === false) return json({ skipped: "prefs", ownerSent });
   }
-  if (msg.audience === "client" && !msg.noEmail) { const em: Em = msg.em || { subject: msg.title, headline: msg.title, text: msg.body, cta: ["Open your page", msg.url] }; const job = emailClient(sec, clientId, slug, client?.name || "", em).catch((e) => console.error("email", e)); try { (globalThis as any).EdgeRuntime.waitUntil(job); } catch (_e) { /* fall through */ } }
+  // owner-side mute: lx_docs collection 'meta' doc 'mute' { email: true } → no client emails (push/page still work)
+  let muted = false;
+  if (msg.audience === "client") { const { data: mu } = await admin.from("lx_docs").select("data").eq("client_id", clientId).eq("collection", "meta").eq("doc_id", "mute").maybeSingle(); muted = !!(mu?.data as any)?.email; }
+  if (msg.audience === "client" && !msg.noEmail && !muted) { const em: Em = msg.em || { subject: msg.title, headline: msg.title, text: msg.body, cta: ["Open your page", msg.url] }; const job = emailClient(sec, clientId, slug, client?.name || "", em).catch((e) => console.error("email", e)); try { (globalThis as any).EdgeRuntime.waitUntil(job); } catch (_e) { /* fall through */ } }
   const title = msg.audience === "owner" && client ? client.name + ": " + msg.title : msg.title;
   const r = await pushTo(sec, msg.audience, clientId, title, msg.body, slug + "#" + msg.url);
   return json({ sent: r.sent, removed: r.removed, ownerSent });
