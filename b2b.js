@@ -136,6 +136,11 @@ html.bb-compact .bb-row>summary{padding:5px 0}html.bb-compact .bb-qr{padding:5px
 .ib-go{justify-self:start;background:none;border:1px solid #6B5A24;color:#E3C565;padding:4px 10px;font-size:11px;cursor:pointer}
 .ib-f{display:flex;gap:8px;padding:10px;border-top:1px solid #232120}
 .ov-st.z{display:none!important}
+.mg-g{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:12px;margin-top:12px}.mg-c{background:#121214;border:1px solid #232120;padding:16px;display:flex;flex-direction:column;gap:10px;min-width:0}.mg-h b{display:block;font-weight:400;color:#F3EEE6}.mg-h small{color:#A39C90;font-size:11px}
+.mg-ta,.mg-sj{width:100%;box-sizing:border-box;background:#0A0A0A;border:1px solid #332F29;color:#E8E1D4;font:300 13px/1.55 'Jost',sans-serif;padding:10px 12px;resize:vertical}.mg-sj{font-weight:400}.mg-a{display:flex;gap:8px;flex-wrap:wrap}.mg-last{color:#8a8478;font-size:11px}
+.mg-ct{display:flex;flex-direction:column;gap:8px;padding:0 16px 16px}.mg-cr{display:grid;grid-template-columns:140px 1fr 1fr;gap:8px;align-items:center}.mg-cr b{font-weight:400;font-size:13px}.mg-cr input{background:#0A0A0A;border:1px solid #332F29;color:#F3EEE6;padding:8px 10px;font:300 13px 'Jost',sans-serif;min-width:0}
+@media(max-width:700px){.mg-g{grid-template-columns:1fr}.mg-cr{grid-template-columns:1fr}}
+
 .pf-c{display:flex;gap:8px;flex-wrap:wrap;font-size:11px;margin-top:-2px}.pf-e{color:#a89a74}.pf-a{color:#7fc493}.pf-a.low{color:#e08a7a}
 .pf-ed{display:flex;flex-direction:column;gap:6px;min-width:220px}.pf-ed input,.rs-menu input,.rs-rn input,.rs-rn select{background:#0A0A0A;border:1px solid #332F29;color:#F3EEE6;padding:8px 10px;font:300 13px 'Jost',sans-serif}
 .fc-rs{all:unset;cursor:pointer;font-size:11px;color:#C9A227;border:1px solid rgba(201,162,39,.45);padding:2px 8px;letter-spacing:.04em}.fc-rs.miss{color:#e08a7a;border-color:rgba(224,138,122,.6);border-style:dashed}.fc-rs:hover{background:rgba(201,162,39,.1)}
@@ -232,7 +237,7 @@ window.lxB2B=async function(root,sb,toast){
   navBar(wrap);
   const P=el('div');wrap.appendChild(P);
   if(S.tab==='tools'){S.tool=S.tool||'orders';const tc=el('div','bb-chips');[['orders','All orders'],['todo','To-do lists'],['pipe','Pipeline'],['bulk','Bulk upload'],['calc','Bid calculator'],['add','Add order'],['export','Export']].forEach(([id,t])=>{const b=el('button','bb-chip'+(S.tool===id?' on':''),t);b.onclick=()=>{S.tool=id;draw();};tc.appendChild(b);});P.appendChild(tc);const P2=el('div');P.appendChild(P2);({orders:orders,todo:todo,pipe:pipe,bulk:bulk,calc:calc,add:add,export:exp})[S.tool](P2);return;}
-  ({overview:overview,stats:statsT,inbox:inboxT,sx:sxT,todos:todosT,toplace:toplaceT,transit:transit,intl:intlT,wh:whT,rs:P=>{rsRenameCard(P);rsT(P);},landed:landedT,mrn:mrnT,alerts:alertsT,bids:bids,buys:buys,reship:reship,tokm:tokmT,confirm:confirmT,payouts:payouts,pay_run:payouts,pay_chase:payouts,pay_got:payouts,money:money,checklist:checklist,agents:agentsTab})[S.tab](P);try{tidy(P,S.tab);}catch(e){}};
+  ({overview:overview,stats:statsT,msgs:msgsT,inbox:inboxT,sx:sxT,todos:todosT,toplace:toplaceT,transit:transit,intl:intlT,wh:whT,rs:P=>{rsRenameCard(P);rsT(P);},landed:landedT,mrn:mrnT,alerts:alertsT,bids:bids,buys:buys,reship:reship,tokm:tokmT,confirm:confirmT,payouts:payouts,pay_run:payouts,pay_chase:payouts,pay_got:payouts,money:money,checklist:checklist,agents:agentsTab})[S.tab](P);try{tidy(P,S.tab);}catch(e){}};
  function orders(P){const c=el('div','bb-card');P.appendChild(c);
   const bar=el('div','bb-bar');S.q='';
   const who=document.createElement('select');[['KicksMachine','KicksMachine'],['Sourcex','Sourcex'],['__wa','WhatsApp clients'],['','All']].forEach(([v,t])=>{const o=el('option',null,t);o.value=v;if(v===S.who)o.selected=true;who.appendChild(o);});
@@ -1068,6 +1073,63 @@ window.lxB2B=async function(root,sb,toast){
   const to=document.createElement('input');to.placeholder='Sahi naam';to.setAttribute('list','rs-dl');const dl=document.createElement('datalist');dl.id='rs-dl';RS.forEach(x=>{const o=document.createElement('option');o.value=x;dl.appendChild(o);});
   const go=btn('Sab me badlo',async()=>{const f=from.value,t=to.value.trim();if(!t||t===f)return toast('Sahi naam likho');const rows=all.filter(r=>(gv(r,'reshipper')||'(khaali)')===f);if(!rows.length)return;if(!confirm(rows.length+' orders me "'+f+'" → "'+t+'"?'))return;await putAll(rows,{reshipper:t});toast(rows.length+' orders updated');draw();},'bb-b sm');
   row.append(from,el('span',null,'→'),to,dl,go);c.appendChild(row);P.appendChild(c);}
+ /* ================= Messages: ready-to-send texts for reshippers, payouts, MRN ================= */
+ const CONTACTS=()=>META.contacts||{};
+ const phoneOf=k=>String((CONTACTS()[k]||{}).phone||'').replace(/[^0-9]/g,'');const mailOf=k=>(CONTACTS()[k]||{}).email||'';
+ const fdM=d=>{try{return new Date(String(d).slice(0,10)+'T00:00:00').toLocaleDateString('en-IN',{day:'numeric',month:'short'});}catch(e){return d||'';}};
+ const kmid=r=>r.order_id||r._id;
+ function MSGS_BUILD(){const out=[];const km=all.filter(r=>isKM(r)&&r.status!=='Cancelled');
+  /* reshippers */
+  const byRS={};km.forEach(r=>{const k=gv(r,'reshipper');if(!k||k==='—')return;(byRS[k]=byRS[k]||[]).push(r);});
+  Object.entries(byRS).forEach(([rs,L])=>{
+   const wh=L.filter(r=>r.status==='At reshipper');
+   if(wh.length){const w=wh.reduce((t,r)=>t+(Number(gv(r,'actual_weight'))||Number(gv(r,'est_weight'))||0),0);
+    out.push({grp:'rs',to:rs,key:'rs:'+rs,title:'📦 Dispatch karo — '+wh.length+' parcels',rows:wh,mark:{dispatch_chased:today()},markT:'Chased',
+     text:'Hi '+rs.split('-')[0]+' bhai,\n\nYe '+wh.length+' parcels aapke warehouse pe pade hain — please India ke liye dispatch kar do'+(w?' (approx '+w.toFixed(1)+' kg)':'')+':\n\n'+wh.map((r,i)=>(i+1)+'. '+kmid(r)+' — '+String(r.item||'').slice(0,60)+(gv(r,'retailer_tracking')?' (trk '+String(gv(r,'retailer_tracking')).split(' ')[0]+')':'')+(gv(r,'delivered_reshipper')?' · aaya '+fdM(gv(r,'delivered_reshipper')):'')).join('\n')+'\n\nShip karne ke baad AWB / tracking number bhej dena. Thanks!'});}
+   const fp=L.filter(r=>['Ordered','In transit to reshipper','At reshipper'].includes(r.status)&&gv(r,'form_filled')!=='Yes'&&gv(r,'retailer_tracking'));
+   if(fp.length){out.push({grp:'rs',to:rs,key:'rsf:'+rs,title:'📝 Receiver form details — '+fp.length+' parcels',rows:fp,mark:{form_filled:'Yes'},markT:'Form filled',
+     text:'Hi '+rs.split('-')[0]+' bhai, ye parcels aapke address pe aa rahe hain / aa gaye hain — details:\n\n'+(typeof formTxt==='function'?formTxt(fp):fp.map(r=>'Tracking: '+gv(r,'retailer_tracking')+'\nItem: '+r.item).join('\n\n'))});}
+   const fl=L.filter(r=>r.status==='Shipped from hub'&&!gv(r,'reship_awb'));
+   if(fl.length){out.push({grp:'rs',to:rs,key:'rst:'+rs,title:'✈️ India tracking chahiye — '+fl.length+' parcels',rows:fl,mark:{tracking_chased:today()},markT:'Chased',
+     text:'Hi '+rs.split('-')[0]+' bhai, ye parcels aapne dispatch kiye the — inka AWB / India tracking number bhej do please:\n\n'+fl.map((r,i)=>(i+1)+'. '+kmid(r)+' — '+String(r.item||'').slice(0,60)+(gv(r,'shipped_reshipper')?' · ship '+fdM(gv(r,'shipped_reshipper')):'')).join('\n')});}
+  });
+  /* payouts */
+  const conf=km.filter(r=>confirmedOn(r)&&r.payout_status!=='Received');const over=conf.filter(r=>days(confirmedOn(r))>7),due=conf.filter(r=>days(confirmedOn(r))<=7);
+  if(over.length){const tot=over.reduce((t,r)=>t+(Number(gv(r,'payout'))||0),0);out.push({grp:'pay',to:'KM finance',key:'pay:over',title:'💸 Payout overdue — '+over.length+' orders · '+inr(tot),rows:over,mark:{payout_chased:today()},markT:'Chased today',subject:'Payout pending for confirmed orders — '+over.map(kmid).join(', '),
+   text:'Hi Team KicksMachine,\n\nThe payout for the following orders is still pending, though receiving was confirmed more than 7 days ago:\n\n'+over.map((r,i)=>(i+1)+'. '+kmid(r)+' — '+String(r.item||'').slice(0,50)+' — ₹'+Number(gv(r,'payout')||0).toLocaleString('en-IN')+' (confirmed '+fdM(confirmedOn(r))+', '+days(confirmedOn(r))+' days)').join('\n')+'\n\nTotal: ₹'+tot.toLocaleString('en-IN')+'\n\nCould you please process this at the earliest and share the UTR once done?\n\nThanks,\nLuxella'});}
+  if(due.length){const tot=due.reduce((t,r)=>t+(Number(gv(r,'payout'))||0),0);out.push({grp:'pay',to:'KM finance',key:'pay:due',title:'⏱ Payout due (7-day timer) — '+due.length+' orders · '+inr(tot),rows:due,mark:null,subject:'Upcoming payout — '+due.map(kmid).join(', '),
+   text:'Hi Team KicksMachine,\n\nGentle reminder — payout for these confirmed orders is due this week:\n\n'+due.map((r,i)=>(i+1)+'. '+kmid(r)+' — ₹'+Number(gv(r,'payout')||0).toLocaleString('en-IN')+' (confirmed '+fdM(confirmedOn(r))+', due '+fdM(new Date(new Date(String(confirmedOn(r)).slice(0,10)).getTime()+7*864e5).toISOString())+')').join('\n')+'\n\nTotal: ₹'+tot.toLocaleString('en-IN')+'\n\nThanks,\nLuxella'});}
+  /* MRN + confirmation */
+  const mrn=km.filter(r=>DONE(r.status)&&!gv(r,'mrn_updated')&&!confirmedOn(r)&&r.payout_status!=='Received');
+  if(mrn.length)out.push({grp:'mrn',to:'KM ops',key:'mrn',title:'📋 MRN update karwao — '+mrn.length+' orders',rows:mrn,mark:{mrn_chased:today()},markT:'Chased',subject:'MRN update request — '+mrn.map(kmid).join(', '),
+   text:'Hi Team,\n\nThese orders have been delivered to your warehouse — could you please update the MRN for them?\n\n'+mrn.map((r,i)=>(i+1)+'. '+kmid(r)+' — '+String(r.item||'').slice(0,50)+(gv(r,'delivered_km')?' (delivered '+fdM(gv(r,'delivered_km'))+')':'')+(gv(r,'km_tracking')?' · AWB '+gv(r,'km_tracking'):'')).join('\n')+'\n\nThanks,\nLuxella'});
+  const cf=km.filter(r=>DONE(r.status)&&gv(r,'mrn_updated')&&!confirmedOn(r)&&r.payout_status!=='Received'&&(days(gv(r,'mrn_updated'))||0)>=3);
+  if(cf.length)out.push({grp:'mrn',to:'KM ops',key:'conf',title:'✅ Receiving confirmation chahiye — '+cf.length+' orders',rows:cf,mark:{conf_chased:today()},markT:'Chased',subject:'Receiving confirmation pending — '+cf.map(kmid).join(', '),
+   text:'Hi Team,\n\nMRN is updated for these orders but we have not received the receiving confirmation yet:\n\n'+cf.map((r,i)=>(i+1)+'. '+kmid(r)+' — '+String(r.item||'').slice(0,50)+' (MRN '+fdM(gv(r,'mrn_updated'))+', '+days(gv(r,'mrn_updated'))+' days)').join('\n')+'\n\nCould you please share the confirmation so the payout timer can start?\n\nThanks,\nLuxella'});
+  return out;}
+ const msgCount=()=>{try{return MSGS_BUILD().length;}catch(e){return 0;}};
+ function msgsT(P){const L=MSGS_BUILD();if(!['all','rs','pay','mrn','ai'].includes(S.mg))S.mg='all';
+  const head=el('div','st-hd');head.appendChild(el('h2',null,'✉️ Messages'));head.appendChild(el('small',null,'Ready texts — tap WhatsApp / Email, khud bhejo. Kuch apne aap nahi jaata.'));P.appendChild(head);
+  const drafts=AG.flatMap(([id,em,nm])=>((AGENTS[id]||{}).drafts||[]).map(x=>Object.assign({ag:em+' '+nm},x)));
+  const ch=el('div','bb-chips');[['all','Sab',L.length+drafts.length],['rs','Reshippers',L.filter(x=>x.grp==='rs').length],['pay','Payouts',L.filter(x=>x.grp==='pay').length],['mrn','MRN / confirm',L.filter(x=>x.grp==='mrn').length],['ai','Agent drafts',drafts.length]].forEach(([k,t,n])=>{const b=el('button','bb-chip'+(S.mg===k?' on':''),t+' · '+n);b.onclick=()=>{S.mg=k;draw();};ch.appendChild(b);});P.appendChild(ch);
+  const g=el('div','mg-g');P.appendChild(g);
+  const card=(m)=>{const c=el('div','mg-c');const h=el('div','mg-h');const hl=el('div');hl.appendChild(el('b',null,m.title));const ph=phoneOf(m.to),em=mailOf(m.to);hl.appendChild(el('small',null,'To: '+m.to+(ph?' · +'+ph:'')+(em?' · '+em:'')+(m.rows?' · '+m.rows.length+' orders':'')));h.appendChild(hl);c.appendChild(h);
+   if(m.subject){const sj=document.createElement('input');sj.className='mg-sj';sj.value=m.subject;c.appendChild(sj);m._sj=sj;}
+   const ta=document.createElement('textarea');ta.className='mg-ta';ta.value=m.text;ta.rows=Math.min(14,Math.max(5,m.text.split('\n').length+1));c.appendChild(ta);
+   const last=(m.rows||[]).map(r=>gv(r,Object.keys(m.mark||{})[0]||'_')).filter(Boolean).sort().pop();if(last&&m.mark)c.appendChild(el('small','mg-last','Last chased: '+fdM(last)));
+   const a=el('div','mg-a');
+   a.appendChild(btn('WhatsApp',()=>{window.open('https://wa.me/'+(ph||'')+'?text='+encodeURIComponent(ta.value),'_blank');},'bb-b sm'));
+   if(m.subject||em)a.appendChild(btn('Email',()=>{location.href='mailto:'+(em||'')+'?subject='+encodeURIComponent(m._sj?m._sj.value:'')+'&body='+encodeURIComponent(ta.value);},'bb-b g sm'));
+   a.appendChild(btn('Copy',()=>copyT(ta.value),'bb-b g sm'));
+   if(m.mark&&m.rows)a.appendChild(btn('✓ Bhej diya',async()=>{await putAll(m.rows,m.mark);toast(m.rows.length+' orders marked');draw();},'bb-b g sm'));
+   c.appendChild(a);return c;};
+  const show=S.mg==='all'?L:S.mg==='ai'?[]:L.filter(x=>x.grp===S.mg);show.forEach(m=>g.appendChild(card(m)));
+  if(S.mg==='all'||S.mg==='ai')drafts.forEach(x=>g.appendChild(card({grp:'ai',to:x.to||x.label||'—',title:'🤖 '+(x.label||'Draft')+' · '+x.ag,text:x.text||'',subject:x.subject})));
+  if(!g.children.length)g.appendChild(el('p','bb-meta','Abhi bhejne layak kuch nahi ✓'));
+  /* contacts */
+  const cc=el('details','cx');const sm=el('summary',null,'📇 Contacts — WhatsApp number / email (ek baar daalo, phir seedha unko khulega)');cc.appendChild(sm);const cg=el('div','mg-ct');
+  const names=[...new Set(['KM finance','KM ops'].concat(rsNames()))];const ins={};names.forEach(n=>{const r=el('div','mg-cr');r.appendChild(el('b',null,n));const p=document.createElement('input');p.placeholder='WhatsApp no. (91…)';p.value=(CONTACTS()[n]||{}).phone||'';const e=document.createElement('input');e.placeholder='Email';e.value=(CONTACTS()[n]||{}).email||'';r.append(p,e);cg.appendChild(r);ins[n]=[p,e];});
+  cg.appendChild(btn('Save contacts',async()=>{const d={};Object.entries(ins).forEach(([n,[p,e]])=>{if(p.value.trim()||e.value.trim())d[n]={phone:p.value.trim(),email:e.value.trim()};});if(await saveMeta('contacts',d)){META.contacts=Object.assign({},META.contacts||{},d);toast('Contacts saved');draw();}},'bb-b sm'));cc.appendChild(cg);P.appendChild(cc);}
  /* ================= Clean UI helpers ================= */
  const THREAD_OF=id=>id==='clientdesk'?'clients':id;
  function teamCard(P){const c=el('div','bb-card tm-c');const h=el('div','tm-h');h.appendChild(el('h2',null,'🤖 Team'));const ib=el('button','bb-b g sm','Inbox ›');ib.onclick=()=>{S.tab='inbox';draw();};h.appendChild(ib);c.appendChild(h);
@@ -1146,6 +1208,7 @@ window.lxB2B=async function(root,sb,toast){
  const NAV=[
   ['today','Today',[['overview','Overview',()=>0],['todos','To-dos',()=>todoCount()],['stats','Stats',()=>0]]],
   ['inbox','Inbox',[['inbox','Inbox',()=>unreadAll()]]],
+  ['msgs','Messages',[['msgs','Messages',()=>msgCount()]]],
   ['flow','Pipeline',FLOW.map(([id,t,i])=>[id,(i+1)+' · '+t,()=>id==='pay_got'?0:(STAGES[i][2]()||[]).length])],
   ['sx','Sourcex',[['sx','Sourcex',()=>all.filter(r=>r.client==='Sourcex'&&r.status!=='Cancelled'&&['Pending','Unverified'].includes(r.payout_status)).length]]],
   ['money','Money',[['money','Money',()=>0]]],
