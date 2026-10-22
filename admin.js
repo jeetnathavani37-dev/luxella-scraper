@@ -217,7 +217,7 @@ function waMsg(r,c,st){st=Number(st||r.stage)||1;const first=String((c&&c.name)|
   4:`Hi ${first}, ${no}${item} has reached our international hub. Next stop: India ✈️ ${link}#tr`,
   5:`Hi ${first}, ${no}${item} has left for India. Usually 7–10 days from here.${eta} ${link}#tr`,
   6:`Hi ${first}, ${no}${item} has landed in India 🇮🇳 and is being prepared for dispatch. ${link}#tr`,
-  7:`Hi ${first}, ${no}${item} is ready to dispatch! Please add your delivery address + phone here (30 sec): ${link}#ad — we ship the same day we receive it.`,
+  7:`Hi ${first}, ${no}${item} is ready to dispatch! Please add your delivery address + phone here (30 sec): ${link}#ad:${slugA(item)} — we ship within 24 hours of receiving it.`,
   8:`Hi ${first}, ${no}${item} is dispatched${r.local_courier?' via '+r.local_courier:''}${r.local_tracking?' · tracking: '+r.local_tracking:''}.${eta} Live status: ${link}#tr`,
   9:`Hi ${first}, ${no}${item} is delivered 🎉 Hope you love it!${bal} — Luxella`};
  return (T[st]||T[1]).replace(/\s+—\s+Luxella$/,'')+(st===9?'':'\n— Luxella');}
