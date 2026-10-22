@@ -3,7 +3,7 @@
 'use strict';
 const ST=['To place','Ordered','In transit to reshipper','At reshipper','Shipped from hub','Landed India','Shipped to KM','Out for delivery','Delivered to KM','Delivered to client'];
 const DONE=s=>s==='Delivered to KM'||s==='Delivered to client';
-const RS=['Ishaan-USA','Ishaan-Canada','Ishaan-UK','Prabhmeet','Yash','Dev Gandhi','Direct'];
+const RS=['Ishaan-USA','Ishaan-Canada','Ishaan-UK','Prabhmeet','Yash','Dev Gandhi','Direct'];const RS_FORM={'Yash':'https://forms.gle/RBHx73FJnvPZrSeU9'};
 const inr=n=>n==null||isNaN(n)?'—':'₹'+new Intl.NumberFormat('en-IN').format(Math.round(Number(n)));
 const pct=x=>x==null||isNaN(x)||x===0?'—':Math.round(x*100)+'%';
 const el=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e;};
@@ -393,6 +393,7 @@ window.lxB2B=async function(root,sb,toast){
     {const snz=el('button','bb-b g','Snooze');snz.title='Hide from this list until tomorrow';snz.onclick=async()=>{const t=new Date(Date.now()+864e5).toISOString().slice(0,10);if(await save(r,{snooze_until:t}))draw();};l.appendChild(snz);
      const op=el('button','bb-b g','Open');op.onclick=()=>{S.tab='orders';S.who='';S.st='';S.q='';VF.orders={q:r.order_id||r._id};draw();setTimeout(()=>{const x=document.querySelector('.bb-row');if(x)x.open=true;},60);};l.appendChild(op);
      const cid=el('button','bb-b g','Copy');cid.onclick=async()=>{try{await navigator.clipboard.writeText(id(r)+(gv(r,'retailer_order_id')?' / '+gv(r,'retailer_order_id'):''));toast('Copied');}catch(e){}};l.appendChild(cid);
+     if(/receiver form/.test(title)&&RS_FORM[r.reshipper]){const fa=el('a','bb-b','Open '+r.reshipper+' form');fa.href=RS_FORM[r.reshipper];fa.target='_blank';fa.rel='noopener';fa.style.textDecoration='none';l.appendChild(fa);}
      if(/receiver form|Coming to hub|At hub/.test(title)&&r.reshipper){const a=el('a','bb-b g','WhatsApp '+r.reshipper.split('-')[0]);a.href='https://wa.me/?text='+encodeURIComponent('Hi, parcel for '+id(r)+': '+r.item+(gv(r,'retailer_tracking')?' · tracking '+gv(r,'retailer_tracking'):'')+(gv(r,'store')?' · from '+gv(r,'store'):''));a.target='_blank';a.rel='noopener';a.style.textDecoration='none';l.appendChild(a);}}
     if(title.startsWith('KM SLA')){const a=el('a','bb-b g','WhatsApp KM');a.href='https://wa.me/?text='+encodeURIComponent('Hi Maanvesh, update on '+id(r)+' ('+r.item+'): currently '+(LBL[r.status]||r.status)+(gv(r,'eta_india')?', ETA India '+gv(r,'eta_india'):'')+'. Will update as soon as it moves. Thanks!');a.target='_blank';a.rel='noopener';a.style.textDecoration='none';l.appendChild(a);l.appendChild(el('small','bb-meta','SLA '+gv(r,'sla_deadline')));}
     if(title.startsWith('Chase')||title==='Payout pending'){const a=el('a','bb-b g','WhatsApp');a.href='https://wa.me/?text='+encodeURIComponent('Hi Maanvesh, payout status for '+id(r)+' ('+r.item+', '+inr(r.payout)+')? MRN done on '+(gv(r,'mrn_confirmed')||gv(r,'delivered_km'))+'. Thanks!');a.target='_blank';a.rel='noopener';a.style.textDecoration='none';l.appendChild(a);}
