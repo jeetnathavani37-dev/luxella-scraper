@@ -131,6 +131,7 @@ Deno.serve(async (req) => {
       // nightly backup (03:xx IST run) + AfterShip tracking sync — each isolated so one failure never blocks the other
       const istH = new Date(Date.now() + 5.5 * 3600e3).getUTCHours();
       if (cronOk && istH === 3) { try { await db.rpc("lx_b2b_snapshot"); } catch (_) { /* ignore */ } }
+      if (cronOk) { try { await fetch(SB_URL + "/functions/v1/lx-msg-push", { method: "POST", headers: { "Content-Type": "application/json", "x-sync-key": key! }, body: JSON.stringify({ action: "sweep" }) }); } catch (_) { /* ignore */ } }
       if (cronOk) { try { await fetch(SB_URL + "/functions/v1/lx-aftership", { method: "POST", headers: { "Content-Type": "application/json", "x-sync-key": key! }, body: JSON.stringify({ action: "sync" }) }); } catch (_) { /* ignore */ } }
       try { return J(await sync()); } catch (e) { const s = { at: new Date().toISOString(), ok: false, error: String((e as Error).message || e) }; await upsert("meta", "kmsync", s); return J(s, 500); }
     }

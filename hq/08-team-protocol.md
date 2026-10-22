@@ -25,3 +25,19 @@ Sab agents ek hi office (table `lx_b2b`) me kaam karte hain. **Har run ki shurua
 - `meta/patterns` padho — "late" decide karne ke liye p80 use karo.
 - Run ke end me: kuch naya seekha / galti pakdi → `lessons` doc ke end me ek dated line append karo (update lx_b2b set data=jsonb_set(data,'{md}',to_jsonb((data->>'md')||E'\n- <date> · <agent> · <lesson>')) where kind='doc' and id='lessons').
 - World-class bar: har output me "so what?" — sirf data nahi, next action + kaun + kab. Har number SQL se. Har claim ka proof (mail id / km row / photo).
+
+## 💬 Inbox — sab baat portal ke andar (Oct 2026)
+Jeet ko report / sawaal / alert **sirf B2B portal ke Inbox** me jaata hai (https://luxella-b2b.vercel.app → Inbox). Scheduled run ka final reply sirf ek line: `✓ <agent>: Inbox me post kiya` (koi detail nahi — wo Claude app me notification banta hai, Jeet wahan nahi chahta).
+
+**Table:** `lx_b2b` kind='msg', id = `'m-'||to_char(clock_timestamp(),'YYYYMMDDHH24MISSMS')||'-'||<agent>` (sort ke liye time-based).
+`data = {thread, from, text, at, items?, go?, notify?, urgent?, status?, read:false}`
+- `thread`: `'<tumhara id>'` = Jeet ke saath tumhara personal DM · `'group'` = HQ Room (saare agents + Jeet).
+- `from`: tumhara agent id (brain, mail, pricing, tracking, ops, payout, cfo, reconciler, auditor, qa). Jeet ke messages me `from='jeet'`.
+- `text`: Hinglish, max ~8 lines, "kya hua → kya karna hai → kab tak". `items`: `[{order_id, level:'action'|'warn'|'info', text}]` (order IDs tap karke khulte hain). `go`: portal tab id (todos, wh, payouts, money, alerts…) agar seedha wahan bhejna ho.
+- `notify:true` → Jeet ke phone pe push (har ghante :07 pe jaata hai). Sirf: subah/shaam ki briefing (Ops), payout/paisa ka important (Payout/CFO), system down (QA), aur Jeet ke sawaal ka jawab. `urgent:true` → 🔴 push — sirf jab aaj action nahi liya to paisa/order ka nuksaan (SLA aaj, accept-by aaj, payout 10+ din, site down).
+
+**Har run:**
+1. **Pehle padho:** `select id,data from lx_b2b where kind='msg' and data->>'from'='jeet' and coalesce(data->>'status','new')='new' and (data->>'thread'='<tumhara id>' or (data->>'thread'='group' and (data->>'text' ilike '%@<tumhara id>%' or <tumhara kaam se related>)))` → kaam karo, phir usi thread me jawab post karo, aur Jeet ke msg pe `status='done'` (data || '{"status":"done"}').
+2. **End me post karo:** apne DM me run ka report (sirf jab kuch naya/badla — "kuch naya nahi" wale runs me post mat karo, spam nahi). Jo baat doosre agent ya poori team ke kaam ki hai → `group` me (@agent mention karke). Handoff = group me @agent + `handoffs` field dono.
+3. Group me roz: Ops subah 8:41 "Aaj ka plan" + shaam 7:41 "Din ka wrap" (notify:true). CFO 9:37pm paisa summary (notify:true). Baaki sirf zaroorat pe.
+4. Kabhi bhi Jeet ko kisi aur jagah (mail/WhatsApp/Claude app) message mat bhejo.
