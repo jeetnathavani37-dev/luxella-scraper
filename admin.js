@@ -104,6 +104,8 @@ async function createClient(){
   const r=await sb.from('lx_clients').insert({slug,name,biz:biz||null}).select().single();
   if(r.error){toast(r.error.message);return;}
   try{const tm=await sb.from('lx_docs').select('data').eq('collection','meta').eq('doc_id','terms').limit(1).maybeSingle();if(tm.data&&tm.data.data)await sb.from('lx_docs').insert({client_id:r.data.id,collection:'meta',doc_id:'terms',data:tm.data.data});}catch(_e){}
+  /* shared defaults for a new client: Ready-to-ship stock + Luxella contact + pay info, copied from an existing client */
+  try{const src=clients.find(c=>c.id!==r.data.id&&!/^zz/.test(c.slug||''));if(src){const sd=await sb.from('lx_docs').select('collection,doc_id,data').eq('client_id',src.id).or('collection.eq.stock,and(collection.eq.meta,doc_id.in.(contact,payinfo))');const rows=(sd.data||[]).map(x=>({client_id:r.data.id,collection:x.collection,doc_id:x.doc_id,data:x.data}));if(rows.length)await sb.from('lx_docs').upsert(rows,{onConflict:'client_id,collection,doc_id',ignoreDuplicates:true});}}catch(_e){}
   if(email){const u=await sb.from('lx_client_users').insert({client_id:r.data.id,email});if(u.error)toast('Client created, login failed: '+u.error.message);}
   await loadClients();sel=clients.find(c=>c.id===r.data.id)||null;
   ['nc-name','nc-biz','nc-slug','nc-email'].forEach(i=>document.getElementById(i).value='');
