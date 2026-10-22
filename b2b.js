@@ -136,6 +136,9 @@ html.bb-compact .bb-row>summary{padding:5px 0}html.bb-compact .bb-qr{padding:5px
 .ib-go{justify-self:start;background:none;border:1px solid #6B5A24;color:#E3C565;padding:4px 10px;font-size:11px;cursor:pointer}
 .ib-f{display:flex;gap:8px;padding:10px;border-top:1px solid #232120}
 .ov-st.z{display:none!important}
+.nv-s.nv-flow{display:flex;flex-wrap:nowrap;overflow-x:auto;gap:0;scrollbar-width:none;padding-bottom:2px}.nv-s.nv-flow::-webkit-scrollbar{display:none}
+.nv-flow .nv-sb{flex:0 0 auto;position:relative;margin-right:18px;white-space:nowrap}.nv-flow .nv-sb:not(:last-child):after{content:'›';position:absolute;right:-13px;top:50%;transform:translateY(-50%);color:#5a5348;pointer-events:none}
+
 .fl-note.fx{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;opacity:.7;margin:4px 0 10px}.fl-note.fx.open{white-space:normal;opacity:1}
 .tx-list{display:flex;flex-direction:column;gap:8px;margin-top:10px}
 .tx-sec{border:1px solid #262320;border-radius:12px;background:#0f0e0c;overflow:hidden}.tx-sec.bad{border-left:3px solid #c0533f}.tx-sec.open{border-color:#5a4a26}
@@ -195,11 +198,12 @@ window.lxB2B=async function(root,sb,toast){
   const atR=km.filter(r=>r.status==='At reshipper');const oldest=Math.max(0,...atR.map(r=>days(r.delivered_reshipper)||0));
   const dueP=km.filter(r=>r.status==='Delivered to KM'&&r.payout_status!=='Received');const got=km.filter(r=>r.payout_status==='Received');
   const sum=(a,k)=>a.reduce((t,r)=>t+(Number(r[k])||0),0);const low=km.filter(r=>r.margin_ok==='No');
+  if(S.tab==='payouts')S.tab=S.pf==='chase'?'pay_chase':S.pf==='got'?'pay_got':'pay_run';if(S.tab==='pay_run'||S.tab==='pay_chase'||S.tab==='pay_got'){if(S._pt!==S.tab){S.pf={pay_run:'run',pay_chase:'chase',pay_got:'got'}[S.tab];S._pt=S.tab;}}else S._pt='';
   const TOOLS=['pipe','bulk','calc','add','export','orders','todo'];if(S.tab==='transit')S.tab='intl';if(S.tab==='reship')S.tab='wh';if(TOOLS.includes(S.tab)){S.tool=S.tab;S.tab='tools';}
   navBar(wrap);
   const P=el('div');wrap.appendChild(P);
   if(S.tab==='tools'){S.tool=S.tool||'orders';const tc=el('div','bb-chips');[['orders','All orders'],['todo','To-do lists'],['pipe','Pipeline'],['bulk','Bulk upload'],['calc','Bid calculator'],['add','Add order'],['export','Export']].forEach(([id,t])=>{const b=el('button','bb-chip'+(S.tool===id?' on':''),t);b.onclick=()=>{S.tool=id;draw();};tc.appendChild(b);});P.appendChild(tc);const P2=el('div');P.appendChild(P2);({orders:orders,todo:todo,pipe:pipe,bulk:bulk,calc:calc,add:add,export:exp})[S.tool](P2);return;}
-  ({overview:overview,inbox:inboxT,sx:sxT,todos:todosT,toplace:toplaceT,transit:transit,intl:intlT,wh:whT,rs:rsT,landed:landedT,mrn:mrnT,alerts:alertsT,bids:bids,buys:buys,reship:reship,tokm:tokmT,confirm:confirmT,payouts:payouts,money:money,checklist:checklist,agents:agentsTab})[S.tab](P);try{tidy(P,S.tab);}catch(e){}};
+  ({overview:overview,inbox:inboxT,sx:sxT,todos:todosT,toplace:toplaceT,transit:transit,intl:intlT,wh:whT,rs:rsT,landed:landedT,mrn:mrnT,alerts:alertsT,bids:bids,buys:buys,reship:reship,tokm:tokmT,confirm:confirmT,payouts:payouts,pay_run:payouts,pay_chase:payouts,pay_got:payouts,money:money,checklist:checklist,agents:agentsTab})[S.tab](P);try{tidy(P,S.tab);}catch(e){}};
  function orders(P){const c=el('div','bb-card');P.appendChild(c);
   const bar=el('div','bb-bar');S.q='';
   const who=document.createElement('select');[['KicksMachine','KicksMachine'],['Sourcex','Sourcex'],['__wa','WhatsApp clients'],['','All']].forEach(([v,t])=>{const o=el('option',null,t);o.value=v;if(v===S.who)o.selected=true;who.appendChild(o);});
@@ -528,10 +532,10 @@ window.lxB2B=async function(root,sb,toast){
   ['landed','Flying to India',()=>KMO().filter(r=>r.status==='Shipped from hub')],
   ['tokm','To KicksMachine',()=>KMO().filter(r=>['Landed India','Shipped to KM','Out for delivery'].includes(r.status))],
   ['mrn','MRN update pending',()=>KMO().filter(r=>DONE(r.status)&&!gv(r,'mrn_updated')&&!confirmedOn(r)&&r.payout_status!=='Received')],
-  ['confirm','Waiting KM confirmation',()=>KMO().filter(r=>DONE(r.status)&&!confirmedOn(r)&&r.payout_status!=='Received')],
-  ['payouts','Payout · 7-day timer',()=>KMO().filter(r=>confirmedOn(r)&&r.payout_status!=='Received'&&days(confirmedOn(r))<=7)],
-  ['payouts','Chase payout',()=>KMO().filter(r=>confirmedOn(r)&&r.payout_status!=='Received'&&days(confirmedOn(r))>7),'chase'],
-  ['payouts','Paid',()=>KMO().filter(r=>r.payout_status==='Received'),'got']];
+  ['confirm','Waiting KM confirmation',()=>KMO().filter(r=>DONE(r.status)&&gv(r,'mrn_updated')&&!confirmedOn(r)&&r.payout_status!=='Received')],
+  ['pay_run','Payout · 7-day timer',()=>KMO().filter(r=>confirmedOn(r)&&r.payout_status!=='Received'&&days(confirmedOn(r))<=7)],
+  ['pay_chase','Chase payout',()=>KMO().filter(r=>confirmedOn(r)&&r.payout_status!=='Received'&&days(confirmedOn(r))>7),'chase'],
+  ['pay_got','Paid',()=>KMO().filter(r=>r.payout_status==='Received'),'got']];
 
  /* ---------- Overview ---------- */
  function overview(P){focusCard(P);const km=KMO();
@@ -995,6 +999,7 @@ window.lxB2B=async function(root,sb,toast){
   const g=el('div','tm-g');rows.forEach(([id,em,nm,at,st])=>{const fresh=at&&(Date.now()-new Date(at))<8*3600e3;const r=el('button','tm-r');r.appendChild(el('span',null,em));r.appendChild(el('b',null,nm));r.appendChild(el('i','tm-d '+(st?'bad':fresh?'ok':'old')));r.appendChild(el('small',null,at?agoT(at):'—'));const u=(typeof unreadOf==='function')?unreadOf(THREAD_OF(id)):0;if(u)r.appendChild(el('em',null,String(u)));
    const ag=AGENTS[id];if(ag&&ag.summary)r.title=ag.summary;r.onclick=()=>{if(id==='kmsync'){S.tab='agents';draw();return;}S.ibt=THREAD_OF(id);S.tab='inbox';draw();};g.appendChild(r);});c.appendChild(g);P.appendChild(c);}
  function tidy(P,tab){
+  if(/^pay_/.test(tab)){const t=P.querySelector('.bb-sum.tabs');if(t)t.remove();}
   P.querySelectorAll('.fl-note').forEach(n=>{n.classList.add('fx');n.title='Tap to read';n.onclick=()=>n.classList.toggle('open');});
   if(tab!=='todos')P.querySelectorAll('.fc-grid').forEach(g=>{const k=[...g.children];const LIM=9;if(k.length<=LIM+2)return;k.slice(LIM).forEach(c=>c.style.display='none');const b=el('button','bb-b g sm tx-more','Aur '+(k.length-LIM)+' dikhao ▾');b.onclick=()=>{k.forEach(c=>c.style.display='');b.remove();};g.after(b);});
   if(tab==='todos'){P.querySelectorAll('.fc-grid').forEach(g=>{const k=[...g.children];const LIM=8;if(k.length<=LIM+2)return;k.slice(LIM).forEach(c=>c.style.display='none');const b=el('button','bb-b g sm tx-more','Aur '+(k.length-LIM)+' dikhao ▾');b.onclick=()=>{k.forEach(c=>c.style.display='');b.remove();};g.after(b);});}
@@ -1060,21 +1065,20 @@ window.lxB2B=async function(root,sb,toast){
   clearInterval(window.__ibTimer);window.__ibTimer=setInterval(async()=>{if(S.tab!=='inbox'){clearInterval(window.__ibTimer);return;}const n=MSGS.length;await loadMsgs(true);if(MSGS.length!==n)render();},30000);}
  /* ================= Nav v3: groups + sub-tabs with live counts, ⌘K palette, undo ================= */
  const cnt=fnc=>{try{return fnc();}catch(e){return 0;}};
+ const FLOW=[['bids','Bids',0],['toplace','To place',1],['intl','Ordered → WH',2],['wh','At warehouse',3],['landed','Flying → India',4],['tokm','To KM',5],['mrn','MRN',6],['confirm','KM confirm',7],['pay_run','Payout timer',8],['pay_chase','Chase payout',9],['pay_got','Paid',10]];
  const NAV=[
   ['today','Today',[['overview','Overview',()=>0],['todos','To-dos',()=>todoCount()]]],
   ['inbox','Inbox',[['inbox','Inbox',()=>unreadAll()]]],
-  ['buy','Buying',[['bids','Bids',()=>BIDS.filter(b=>!b.dismissed&&!(b.km_order_ids||[]).every(i=>all.some(r=>(r.order_id||r._id)===i))).length],['toplace','Not placed yet',()=>KMA('To place').length],['buys','Orders placed',()=>0]]],
-  ['ship','Shipping',[['intl','Intl transit',()=>KMA(['Ordered','In transit to reshipper']).length],['wh','Warehouse',()=>KMA('At reshipper').length],['rs','Reshippers',()=>0],['landed','Landed India',()=>KMA('Shipped from hub').length],['tokm','To KicksMachine',()=>KMA(['Landed India','Shipped to KM','Out for delivery']).length]]],
-  ['km','KM & payouts',[['mrn','MRN',()=>KMA('Delivered to KM').filter(r=>!gv(r,'mrn_updated')&&!confirmedOn(r)&&r.payout_status!=='Received').length],['confirm','Confirmation',()=>KMA('Delivered to KM').filter(r=>gv(r,'mrn_updated')&&!confirmedOn(r)&&r.payout_status!=='Received').length],['payouts','Payouts',()=>all.filter(r=>isKM(r)&&confirmedOn(r)&&r.payout_status!=='Received').length]]],
+  ['flow','Pipeline',FLOW.map(([id,t,i])=>[id,(i+1)+' · '+t,()=>id==='pay_got'?0:(STAGES[i][2]()||[]).length])],
   ['sx','Sourcex',[['sx','Sourcex',()=>all.filter(r=>r.client==='Sourcex'&&r.status!=='Cancelled'&&['Pending','Unverified'].includes(r.payout_status)).length]]],
   ['money','Money',[['money','Money',()=>0]]],
   ['alerts','Alerts',[['alerts','Alerts',()=>all.filter(r=>isKM(r)&&r.payout_status!=='Received'&&alertsOf(r).length).length]]],
-  ['hq','HQ',[['agents','HQ · agents',()=>0],['checklist','Checklist',()=>0],['tools','More tools',()=>0]]]];
+  ['hq','HQ',[['agents','HQ · agents',()=>0],['buys','All orders',()=>0],['rs','Reshippers',()=>0],['checklist','Checklist',()=>0],['tools','More tools',()=>0]]]];
  const groupOf=t=>(NAV.find(g=>g[2].some(x=>x[0]===t))||NAV[0]);
  function navBar(wrap){const G=groupOf(S.tab);const top=el('div','nv-g');
   NAV.forEach(g=>{const n=g[2].reduce((t,x)=>t+cnt(x[2]),0);const b=el('button','nv-gb'+(g===G?' on':''));b.appendChild(el('span',null,g[1]));if(n&&g[0]!=='hq')b.appendChild(el('i',g[0]==='alerts'||g[0]==='today'||g[0]==='inbox'?'hot':'',String(n)));b.onclick=()=>{S.tab=(S['last_'+g[0]]&&g[2].some(x=>x[0]===S['last_'+g[0]]))?S['last_'+g[0]]:g[2][0][0];draw();window.scrollTo(0,0);};top.appendChild(b);});
   const k=el('button','nv-k','⌕ Search  ⌘K');k.onclick=()=>palette();top.appendChild(k);wrap.appendChild(top);
-  if(G[2].length>1){const sub=el('div','nv-s');G[2].forEach(([id,t,f])=>{const n=cnt(f);const b=el('button','nv-sb'+(S.tab===id?' on':''));b.appendChild(el('span',null,t));if(n)b.appendChild(el('i',null,String(n)));b.onclick=()=>{S.tab=id;S['last_'+G[0]]=id;draw();};sub.appendChild(b);});wrap.appendChild(sub);}
+  if(G[2].length>1){const sub=el('div','nv-s'+(G[0]==='flow'?' nv-flow':''));G[2].forEach(([id,t,f])=>{const n=cnt(f);const b=el('button','nv-sb'+(S.tab===id?' on':''));b.appendChild(el('span',null,t));if(n)b.appendChild(el('i',null,String(n)));b.onclick=()=>{S.tab=id;S['last_'+G[0]]=id;draw();};sub.appendChild(b);});wrap.appendChild(sub);if(G[0]==='flow')setTimeout(()=>{const on=sub.querySelector('.on');if(on)sub.scrollLeft=Math.max(0,on.offsetLeft-sub.clientWidth/2+on.offsetWidth/2);},0);}
   S['last_'+G[0]]=S.tab;}
  /* ⌘K palette: orders, tabs, AI */
  function palette(){if(document.querySelector('.pl-ov'))return;const ov=el('div','pl-ov');const bx=el('div','pl-bx');const i=document.createElement('input');i.placeholder='KM ID, item, tracking, store order, tab… ya AI se poochho';const res=el('div','pl-r');bx.append(i,res);ov.appendChild(bx);document.body.appendChild(ov);i.focus();
