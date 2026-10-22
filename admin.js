@@ -50,15 +50,16 @@ const css=document.createElement('style');css.textContent=`
 .ib-hd{display:flex;align-items:center;gap:10px;margin-bottom:10px}.ib-hd .sp{flex:1}.ib-f{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}.ib-f button{background:#121214;border:1px solid #232120;color:#A39C90;padding:5px 11px;font:inherit;font-size:11.5px;cursor:pointer;letter-spacing:.04em}.ib-f button.on{color:#E3C565;border-color:#6B5A24}
 .ib-it{display:grid;grid-template-columns:34px 1fr auto;gap:4px 12px;align-items:start;padding:12px 12px;border:1px solid #232120;background:#121214;margin-bottom:8px;transition:border-color .25s,background .25s;animation:ibin .35s ease both}.ib-it.new{border-left:3px solid #E3C565;background:#15130F}.ib-it .ic{font-size:20px;line-height:1.1;grid-row:1/4}.ib-it .t{font-size:14px;color:#F3EEE6}.ib-it .t b{color:#E3C565;font-weight:500}.ib-it .m{font-size:12px;color:#A39C90;grid-column:2}.ib-it .s{grid-column:2;font-size:13px;color:#C9C2B6;white-space:pre-wrap;word-break:break-word;margin-top:2px}.ib-it .a{grid-column:3;grid-row:1/4;display:flex;flex-direction:column;gap:6px;align-items:stretch;min-width:120px}.ib-it .a .ad-b{padding:7px 10px;font-size:11px;text-align:center}
 @keyframes ibin{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}@media(max-width:640px){.ib-it{grid-template-columns:28px 1fr}.ib-it .a{grid-column:1/3;grid-row:auto;flex-direction:row;flex-wrap:wrap}}
+.ib-eyes{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:-2px 0 12px;font-size:12px;color:#A39C90}.ib-eyes>b{font-weight:500;color:#C9C2B6;margin-right:4px}.ib-eye{border:1px solid #232120;background:#0F0F11;padding:5px 10px;color:#A39C90}.ib-eye b{color:#F3EEE6;font-weight:500}.ib-eye.hot{border-color:#6B5A24;color:#E3C565}.ib-eye.hot b{color:#E3C565}
 .dz-pane[hidden]{display:none}.dz-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:16px}.dz-kpi{background:#121214;border:1px solid #232120;padding:14px 16px}.dz-kpi .v{font-size:24px;color:#E3C565;margin:4px 0}
 .dz-bar{display:grid;grid-template-columns:16rem 1fr 2rem;gap:10px;align-items:center;margin:6px 0;font-size:12.5px}.dz-bar .b{height:8px;background:#1C1A17}.dz-bar .b i{display:block;height:100%;background:linear-gradient(90deg,#B8943F,#F4E1A0)}
 .dz-chart{display:flex;gap:14px;align-items:flex-end;height:160px;margin-top:12px;padding-top:6px;border-bottom:1px solid #2A2724}.dz-chart .c{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%}.dz-chart .bars{flex:1;width:100%;display:flex;gap:4px;align-items:flex-end;justify-content:center}.dz-chart i{display:block;width:40%;max-width:22px;min-height:2px}.dz-chart .b1{background:#C9A227}.dz-chart .b2{background:#3E7D5A}
 .dz-stk{display:grid;grid-template-columns:56px 1fr auto auto;gap:12px;align-items:center;padding:10px 0;border-top:1px solid #232120}.dz-stk img{width:56px;height:56px;object-fit:cover;background:#fff}.dz-noimg{width:56px;height:56px;display:flex;align-items:center;justify-content:center;border:1px solid #232120;color:#555}.dz-pr{color:#E3C565}.dz-act{display:flex;gap:6px}
 .dz-form{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px;margin-top:8px}.dz-form input,.dz-form select,.dz-form textarea{background:#0A0A0A;border:1px solid #2A2724;color:#F3EEE6;padding:9px 10px;font:inherit;width:100%}.dz-form textarea{grid-column:1/-1}.dz-form label{font-size:12.5px;color:#A39C90;display:flex;align-items:center;gap:6px}
 .dz-cl{display:flex;gap:14px;flex-wrap:wrap;margin:8px 0;font-size:13px}
-.dz-tbl{display:grid;gap:0}.dz-tr{display:grid;grid-template-columns:2fr .7fr .7fr 1fr 1fr 1fr auto;gap:10px;align-items:center;padding:10px 0;border-top:1px solid #232120;font-size:13px}.dz-tr.th{color:#A39C90;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;border-top:0}
+.dz-tbl{display:grid;gap:0}.dz-tr{display:grid;grid-template-columns:2fr .6fr .6fr 1fr 1fr 1fr .9fr .9fr auto;gap:10px;align-items:center;padding:10px 0;border-top:1px solid #232120;font-size:13px}.dz-tr.th{color:#A39C90;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;border-top:0}
 .dz-act-row{font-size:12.5px;color:#A39C90;padding:6px 0;border-top:1px solid #1A1917}
-@media(max-width:760px){.dz-tr{grid-template-columns:1.6fr .6fr 1fr auto}.dz-tr>span:nth-child(3),.dz-tr>span:nth-child(5),.dz-tr>span:nth-child(6){display:none}.dz-stk{grid-template-columns:48px 1fr}.dz-stk .dz-pr,.dz-stk .dz-act{grid-column:2}.dz-bar{grid-template-columns:9rem 1fr 1.5rem}}
+@media(max-width:760px){.dz-tr{grid-template-columns:1.6fr .6fr 1fr 1fr auto}.dz-tr>span:nth-child(3),.dz-tr>span:nth-child(5),.dz-tr>span:nth-child(6),.dz-tr>span:nth-child(7){display:none}.dz-stk{grid-template-columns:48px 1fr}.dz-stk .dz-pr,.dz-stk .dz-act{grid-column:2}.dz-bar{grid-template-columns:9rem 1fr 1.5rem}}
 .dz-cl label,.dz-form label{display:flex!important;align-items:center;gap:6px;text-transform:none!important;letter-spacing:0!important;margin:0!important;font-size:13px!important;color:#F3EEE6!important}.dz-cl input,.dz-form label input{width:auto!important;margin:0!important}
 .ad-nc{margin-top:18px;border-top:1px solid #232120;padding-top:14px}.ad-nc>summary{cursor:pointer;list-style:none;font:500 11px 'Jost',sans-serif;letter-spacing:.24em;text-transform:uppercase;color:#E3C565;margin-bottom:10px}.ad-nc>summary::-webkit-details-marker{display:none}
 @media(max-width:760px){.ad-wrap{grid-template-columns:1fr}.ad-side{border-right:0;border-bottom:1px solid #232120}.ad-o{grid-template-columns:1fr}}
@@ -68,13 +69,16 @@ function toast(t){let e=document.querySelector('.ad-toast');if(!e){e=document.cr
 function el(tag,cls,txt){const e=document.createElement(tag);if(cls)e.className=cls;if(txt!=null)e.textContent=txt;return e;}
 
 async function loadClients(){
-  const [c,o,u]=await Promise.all([
+  const [c,o,u,v]=await Promise.all([
     sb.from('lx_clients').select('id,slug,name,biz').order('name'),
     sb.from('lx_orders').select('client_id'),
-    sb.from('lx_client_users').select('client_id')]);
+    sb.from('lx_client_users').select('client_id'),
+    sb.from('lx_docs').select('client_id,doc_id,data').eq('collection','visits')]);
   if(c.error)throw new Error(c.error.message);
   clients=c.data||[];counts={};
-  clients.forEach(x=>counts[x.id]={o:0,u:0});
+  clients.forEach(x=>counts[x.id]={o:0,u:0,v:0,v7:0,vt:0,last:'',ua:''});
+  const wk=new Date(Date.now()-7*864e5).toISOString().slice(0,10),td=new Date(Date.now()+5.5*3600e3).toISOString().slice(0,10);
+  (v.data||[]).forEach(r=>{const k=counts[r.client_id];if(!k)return;const d=r.data||{};const n=Number(d.n)||0;k.v+=n;if(r.doc_id>=wk)k.v7+=n;if(r.doc_id===td)k.vt+=n;if(d.last_at>k.last){k.last=d.last_at;k.ua=d.ua||'';}});
   (o.data||[]).forEach(r=>{if(counts[r.client_id])counts[r.client_id].o++;});
   (u.data||[]).forEach(r=>{if(counts[r.client_id])counts[r.client_id].u++;});
 }
@@ -95,6 +99,7 @@ function renderList(){
     b.appendChild(el('b',null,c.name));
     const n=counts[c.id]||{o:0,u:0};
     b.appendChild(el('small',null,(c.biz?c.biz+' · ':'')+n.o+' orders · '+n.u+' login'+(n.u===1?'':'s')));
+    b.appendChild(el('small',null,n.v?'👁 '+n.v+'× opened · '+n.v7+' this week · last '+agoA(n.last)+(n.ua?' · '+n.ua:''):'👁 not opened yet'));
     b.onclick=()=>{sel=c;history.replaceState(null,'','#'+c.slug);renderList();renderClient();};
     w.appendChild(b);
   });
@@ -211,6 +216,7 @@ const todayA=()=>new Date().toISOString().slice(0,10);
 const slugA=s=>String(s||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,60);
 let ADDRS=[];const loadAddrs=async()=>{try{const r=await sb.from('lx_docs').select('client_id,doc_id,data').eq('collection','addresses');ADDRS=r.data||[];}catch(e){}return ADDRS;};
 const addrOf=r=>{const d=ADDRS.find(x=>x.client_id===r._c&&(x.doc_id===slugA(r.item)||String((x.data||{}).order||'')===r.item||(r.order_no&&String((x.data||{}).order||'').includes(r.order_no))));return d?Object.assign({_id:d.doc_id},d.data):null;};
+const agoA=t=>{if(!t)return '—';const d=Date.now()-new Date(t);if(d<60e3)return 'just now';if(d<3600e3)return Math.round(d/60e3)+' min ago';if(d<86400e3)return Math.round(d/3600e3)+' h ago';if(d<7*86400e3)return Math.round(d/86400e3)+' d ago';return new Date(t).toLocaleDateString('en-IN',{day:'numeric',month:'short'});};
 const inrA=n=>'₹'+Number(n||0).toLocaleString('en-IN');
 /* Per-stage WhatsApp message (Luxella voice). c = client row, r = order */
 function waMsg(r,c,st){st=Number(st||r.stage)||1;const first=String((c&&c.name)||'').split(' ')[0]||'there';const no=r.order_no?r.order_no+' ':'';const item=r.item||'your item';const link=base((c&&c.slug)||'');const eta=r.eta_date?' Expected by '+new Date(r.eta_date).toLocaleDateString('en-IN',{day:'numeric',month:'short'})+'.':'';const bal=r.payout_status!=='Received'&&Number(r.payout)?' Balance '+inrA(r.payout)+' — pay from your page: '+link+'#pay':'';
@@ -487,6 +493,9 @@ async function inboxCard(P,name,rows,go,setBadge){
   const card=el('div','ad-card');P.appendChild(card);
   const hd=el('div','ib-hd');hd.appendChild(el('h2',null,'Inbox'));hd.appendChild(el('span','ad-mut','Client ne jo bhi kiya — address, message, payment, request, order'));hd.appendChild(el('span','sp'));
   const mall=el('button','ad-b g','Mark all read');mall.type='button';hd.appendChild(mall);card.appendChild(hd);
+  {const op=clients.filter(c=>!/^zz/.test(c.slug||'')&&counts[c.id]&&counts[c.id].v).sort((a,b)=>String(counts[b.id].last).localeCompare(String(counts[a.id].last)));
+   const st=el('div','ib-eyes');st.appendChild(el('b',null,'👁 Kaun kab khola'));if(!op.length)st.appendChild(el('span','ad-mut','Abhi tak kisi ne page nahi khola.'));
+   op.forEach(c=>{const k=counts[c.id];const ch=el('span','ib-eye'+(k.vt?' hot':''));ch.innerHTML='<b>'+hx(c.name.split(' ')[0])+'</b> '+(k.vt?k.vt+'× today':k.v7+'× this week')+' · '+hx(agoA(k.last))+(k.ua?' · '+hx(k.ua):'');ch.title=k.v+' total opens';st.appendChild(ch);});card.appendChild(st);}
   const fl=el('div','ib-f');card.appendChild(fl);const list=el('div');card.appendChild(list);
   const [d,ao,sn]=await Promise.all([
     sb.from('lx_docs').select('client_id,collection,doc_id,data,updated_at').in('collection',['addresses','addressbook','case_msgs','cases','paysub','requests','quote_resp']).order('updated_at',{ascending:false}).limit(200),
@@ -642,9 +651,9 @@ async function renderDash(m){
    f.appendChild(go2);ad.appendChild(f);P.appendChild(ad);}
   /* CLIENTS */
   {const P=panes.clients;const pc=el('div','ad-card');pc.appendChild(el('h2',null,'Clients'));
-   const t=el('div','dz-tbl');t.appendChild(Object.assign(el('div','dz-tr th'),{innerHTML:'<span>Client</span><span>Orders</span><span>Open</span><span>Value</span><span>Due</span><span>Last order</span><span></span>'}));
+   const t=el('div','dz-tbl');t.appendChild(Object.assign(el('div','dz-tr th'),{innerHTML:'<span>Client</span><span>Orders</span><span>Open</span><span>Value</span><span>Due</span><span>Last order</span><span>Opens 7d / all</span><span>Last open</span><span></span>'}));
    clients.map(c=>{const r=rows.filter(x=>x._c===c.id);return {c,r,v:sum(r)};}).sort((x,y)=>y.v-x.v).forEach(({c,r,v})=>{const tr=el('div','dz-tr');const last=r.map(x=>x.order_date||'').sort().pop()||'—';
-     tr.append(el('span',null,c.name),el('span',null,String(r.length)),el('span',null,String(r.filter(x=>!del(x)).length)),el('span',null,inr(v)),el('span',null,inr(sum(r.filter(x=>x.payout_status!=='Received')))),el('span',null,last));
+     tr.append(el('span',null,c.name),el('span',null,String(r.length)),el('span',null,String(r.filter(x=>!del(x)).length)),el('span',null,inr(v)),el('span',null,inr(sum(r.filter(x=>x.payout_status!=='Received')))),el('span',null,last),el('span',null,(counts[c.id]||{}).v7+' / '+(counts[c.id]||{}).v),el('span',null,agoA((counts[c.id]||{}).last)));
      const b=el('button','ad-b g','Manage');b.type='button';b.onclick=()=>{sel=c;renderList();renderClient();};tr.appendChild(b);t.appendChild(tr);});
    pc.appendChild(t);P.appendChild(pc);}
   /* TOOLS */
