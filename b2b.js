@@ -110,7 +110,7 @@ html.bb-compact .bb-row>summary{padding:5px 0}html.bb-compact .bb-qr{padding:5px
 .td-top{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px;margin:4px 0 6px}.td-top>b{font-weight:400;font-size:20px;color:#E3C565}.td-top>span{color:#A39C90;font-size:12px}.td-nav{display:flex;flex-wrap:wrap;gap:6px;width:100%;margin-top:6px}
 .td-pill{background:#111110;border:1px solid #2A2724;color:#C9C2B6;padding:6px 10px;font:inherit;font-size:12px;cursor:pointer}.td-pill.bad{border-color:#5a2a22;color:#e9a08f}
 .td-sec{border-top:1px solid #232120;padding-top:14px;margin-top:14px;scroll-margin-top:70px}.td-sec.bad .td-h b{color:#e9a08f}.td-h{display:flex;justify-content:space-between;gap:10px;align-items:baseline}.td-h b{font-weight:400;font-size:15px;color:#E3C565}.td-h span{font-size:12px;color:#8d867a}.td-sec>.bb-meta{margin:4px 0 8px}
-.nv-g{display:flex;gap:4px;align-items:center;border-bottom:1px solid #232120;margin:0 0 0;overflow-x:auto;scrollbar-width:none}.nv-gb{background:none;border:0;border-bottom:2px solid transparent;color:#A39C90;padding:12px 14px 11px;font:500 11px 'Jost',sans-serif;letter-spacing:.18em;text-transform:uppercase;cursor:pointer;white-space:nowrap;display:flex;gap:7px;align-items:center}.nv-gb.on{color:#E3C565;border-bottom-color:#E3C565}
+.ws-bar{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:10px 0 6px;scroll-snap-type:x proximity}.ws-b{flex:none;scroll-snap-align:start;display:flex;align-items:center;gap:9px;background:#111010;border:1px solid #232120;border-radius:14px;padding:9px 12px 9px 10px;color:#C9C2B6;cursor:pointer;font:inherit;text-align:left;position:relative;transition:border-color .2s,transform .15s,background .2s}.ws-b:hover{transform:translateY(-1px);border-color:#3a342c}.ws-b.on{border-color:#C9A227;background:linear-gradient(180deg,#1a160d,#111010);box-shadow:0 0 0 1px rgba(201,162,39,.15),0 6px 18px -10px rgba(201,162,39,.5)}.ws-ic{font-size:20px;width:34px;height:34px;display:grid;place-items:center;background:#0b0b0c;border-radius:10px}.ws-b.on .ws-ic{background:#2a2310}.ws-tx{display:flex;flex-direction:column;line-height:1.15}.ws-tx b{font-size:13px;color:#F3EEE6;font-weight:600}.ws-tx small{font-size:10.5px;color:#8a8378;white-space:nowrap}.ws-b.on .ws-tx small{color:#b9a76a}.ws-b i{font-style:normal;background:#C9A227;color:#111;font-size:10.5px;font-weight:700;border-radius:999px;padding:1px 7px;margin-left:2px}.ws-ag{display:flex;gap:6px;align-items:center;overflow-x:auto;scrollbar-width:none;padding:2px 0 8px}.ws-ag>small{color:#6f6a60;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;white-space:nowrap;margin-right:4px}.ws-agc{flex:none;display:flex;align-items:center;gap:6px;background:none;border:1px solid #232120;border-radius:999px;padding:4px 10px 4px 7px;color:#C9C2B6;font:inherit;font-size:12px;cursor:pointer;transition:border-color .2s}.ws-agc:hover{border-color:#C9A227}.ws-agc .dot{width:7px;height:7px;border-radius:50%;background:#6b6}.ws-agc.late .dot{background:#e9a53b}.ws-agc.bad .dot{background:#e55}.ws-agc small{color:#8a8378;font-size:10.5px}@media(max-width:600px){.ws-tx small{display:none}.ws-b{padding:7px 10px 7px 8px}.ws-ic{width:30px;height:30px;font-size:18px}}.nv-g{display:flex;gap:4px;align-items:center;border-bottom:1px solid #232120;margin:0 0 0;overflow-x:auto;scrollbar-width:none}.nv-gb{background:none;border:0;border-bottom:2px solid transparent;color:#A39C90;padding:12px 14px 11px;font:500 11px 'Jost',sans-serif;letter-spacing:.18em;text-transform:uppercase;cursor:pointer;white-space:nowrap;display:flex;gap:7px;align-items:center}.nv-gb.on{color:#E3C565;border-bottom-color:#E3C565}
 .nv-gb i,.nv-sb i{font-style:normal;font-size:10px;letter-spacing:0;background:#1d1a14;color:#C9A227;border:1px solid #3a3322;padding:1px 6px;border-radius:9px}.nv-gb i.hot{background:#3a1d17;color:#f0a08f;border-color:#5a2a22}
 .nv-k{margin-left:auto;background:#111110;border:1px solid #2A2724;color:#8d867a;padding:7px 12px;font:inherit;font-size:12px;cursor:pointer;white-space:nowrap}
 .nv-s{display:flex;gap:6px;padding:10px 0 12px;overflow-x:auto;scrollbar-width:none}.nv-sb{background:#0E0E0F;border:1px solid #232120;color:#A39C90;padding:7px 12px;font:inherit;font-size:12.5px;cursor:pointer;white-space:nowrap;display:flex;gap:7px;align-items:center}.nv-sb.on{border-color:#C9A227;color:#F3EEE6;background:#14120d}
@@ -554,7 +554,7 @@ window.lxB2B=async function(root,sb,toast){
   if(!allRows.length&&!waiting.length)P.appendChild(el('p','bb-meta','Abhi kuch transit me nahi.'));}
 
  /* ---------- Workflow helpers ---------- */
- const KMO=()=>all.filter(r=>r.client==='KicksMachine'&&!/cancel/i.test(r.status||''));
+ const WSCL={home:r=>r.client==='KicksMachine',km:r=>r.client==='KicksMachine',sx:r=>r.client==='Sourcex',clients:r=>!['KicksMachine','Sourcex'].includes(r.client),mail:r=>true,money:r=>true,hq:r=>r.client==='KicksMachine'};const wsCl=r=>(WSCL[S.ws||'home']||WSCL.home)(r);const KMO=()=>all.filter(r=>wsCl(r)&&!/cancel/i.test(r.status||''));
  const confirmedOn=r=>r.payout_timer||gv(r,'mrn_confirmed');
  const wa=(t,msg)=>lnk(t,'https://wa.me/?text='+encodeURIComponent(msg));
  const go=t=>{S.tab=t;draw();window.scrollTo(0,0);};
@@ -896,7 +896,7 @@ window.lxB2B=async function(root,sb,toast){
    const gm=new Map();rs.forEach(r=>{const k=cfg.group?cfg.group(r):'';const key=k||('#'+r._id);gm.set(key,(gm.get(key)||[]).concat([r]));});
    let gs=[...gm.values()];if(cfg.sort)gs.sort((a,b)=>cfg.sort(a[0],b[0]));
    const g=el('div','fc-grid');gs.forEach(rows=>g.appendChild(fcard(rows,Object.assign({SEL,onSel},cfg))));P.appendChild(g);});}
- const isKM=r=>r.client==='KicksMachine'&&!/cancel/i.test(r.status||'');
+ const isKM=r=>wsCl(r)&&!/cancel/i.test(r.status||'');
  const KMA=st=>all.filter(r=>isKM(r)&&(Array.isArray(st)?st.includes(r.status):r.status===st));
  const askTrk=async(rows,field,label,extra)=>{const t=prompt(label+' — tracking / AWB number:',gv(rows[0],field)||'');if(t==null)return;const v=t.trim();if(!v)return;const p=Object.assign({[field]:v},extra||{});await putAll(rows,p);draw();};
  const carrierOf=n=>{n=String(n||'').toUpperCase();return /^1Z/.test(n)?'UPS':/^TBA/.test(n)?'Amazon':/^(9[2-5]\d{18,24}|[A-Z]{2}\d{9}US)$/.test(n)?'USPS':/^(1LS|D10|C1)/.test(n)?'OnTrac':/^\d{12}$|^\d{15}$/.test(n)?'FedEx':/^\d{20,22}$/.test(n)?'USPS':/^\d{10}$/.test(n)?'DHL':/^\d{16}$/.test(n)?'Canada Post':'—';};
@@ -1341,17 +1341,31 @@ const sendMsg=async(thread,text,atts,meta)=>{const id='m-'+Date.now().toString(3
  /* ================= Nav v3: groups + sub-tabs with live counts, ⌘K palette, undo ================= */
  const cnt=fnc=>{try{return fnc();}catch(e){return 0;}};
  const FLOW=[['bids','Bids',0],['toplace','To place',1],['intl','Ordered → WH',2],['wh','At warehouse',3],['landed','Flying → India',4],['tokm','To KM',5],['mrn','MRN',6],['confirm','KM confirm',7],['pay_run','Payout timer',8],['pay_chase','Chase payout',9],['pay_got','Paid',10]];
- const NAV=[
-  ['today','Today',[['overview','Overview',()=>0],['todos','To-dos',()=>todoCount()],['stats','Stats',()=>0]]],
-  ['inbox','Inbox',[['inbox','Inbox',()=>unreadAll()]]],
-  ['msgs','Messages',[['msgs','Messages',()=>msgCount()]]],
-  ['flow','Pipeline',FLOW.map(([id,t,i])=>[id,(i+1)+' · '+t,()=>id==='pay_got'?0:(STAGES[i][2]()||[]).length])],
-  ['sx','Sourcex',[['sx','Sourcex',()=>all.filter(r=>r.client==='Sourcex'&&r.status!=='Cancelled'&&['Pending','Unverified','Link received'].includes(r.payout_status)).length]]],
-  ['money','Money',[['money','Money',()=>0],['cashback','💸 Cashback',()=>all.filter(r=>gv(r,'cashback_status')==='Pending').length]]],
-  ['alerts','Alerts',[['alerts','Alerts',()=>all.filter(r=>isKM(r)&&r.payout_status!=='Received'&&alertsOf(r).length).length]]],
-  ['hq','HQ',[['agents','HQ · agents',()=>0],['org','🏢 Org',()=>TICKETS.filter(t=>t.status!=='done').length],['buys','All orders',()=>0],['rs','Reshippers',()=>0],['boxes','📦 Boxes',()=>BOXES.filter(b=>!['Landed','Done'].includes(b.status)).length],['checklist','Checklist',()=>0],['tools','More tools',()=>0]]]];
- const groupOf=t=>(NAV.find(g=>g[2].some(x=>x[0]===t))||NAV[0]);
- function navBar(wrap){const G=groupOf(S.tab);const top=el('div','nv-g');
+ const G_TODAY=['today','Today',[['overview','Overview',()=>0],['todos','To-dos',()=>todoCount()],['stats','Stats',()=>0]]];
+ const G_INBOX=['inbox','Inbox',[['inbox','Inbox',()=>unreadAll()]]];
+ const G_MSGS=['msgs','Messages',[['msgs','Messages',()=>msgCount()]]];
+ const flowG=(ids)=>['flow','Pipeline',FLOW.filter(([id])=>!ids||ids.includes(id)).map(([id,t,i])=>[id,(i+1)+' · '+t,()=>id==='pay_got'?0:(STAGES[i][2]()||[]).length])];
+ const G_ALERTS=['alerts','Alerts',[['alerts','Alerts',()=>all.filter(r=>isKM(r)&&r.payout_status!=='Received'&&alertsOf(r).length).length]]];
+ const G_SX=['sx','Sourcex',[['sx','Sourcex',()=>all.filter(r=>r.client==='Sourcex'&&r.status!=='Cancelled'&&['Pending','Unverified','Link received'].includes(r.payout_status)).length]]];
+ const G_MONEY=['money','Money',[['money','Money',()=>0],['cashback','💸 Cashback',()=>all.filter(r=>gv(r,'cashback_status')==='Pending').length]]];
+ const G_BOXES=['boxes','Boxes',[['boxes','📦 Boxes',()=>BOXES.filter(b=>!['Landed','Done'].includes(b.status)).length],['rs','Reshippers',()=>0]]];
+ const G_ORDERS=['buys','Orders',[['buys','All orders',()=>0]]];
+ const G_HQ=['hq','HQ',[['org','🏢 Org',()=>TICKETS.filter(t=>t.status!=='done').length],['agents','Agents',()=>0],['checklist','Checklist',()=>0],['tools','More tools',()=>0]]];
+ const WS=[
+  ['home','🏠','Today','Aaj kya karna hai · heads se baat',['brain','ops','cfo','clientdesk','auditor'],[G_TODAY,G_INBOX,G_MSGS,G_ALERTS]],
+  ['km','🏭','KicksMachine','Bid se payout tak',['ops','mail','tracking','reconciler','payout'],[flowG(),G_ALERTS,G_BOXES,G_ORDERS]],
+  ['sx','🛒','Sourcex','Orders, pickup, payouts',['cfo','payout','tracking'],[G_SX,flowG(['toplace','intl','wh','landed','tokm','pay_got']),G_ALERTS]],
+  ['clients','👥','Clients','Swayam, Himanshu, Harshit…',['clientdesk','brain','tracking'],[flowG(['toplace','intl','wh','landed','tokm','pay_got']),G_INBOX,G_BOXES]],
+  ['mail','📬','Mail & Stores','Store orders, ids, cashback',['mail','pricing'],[G_ORDERS,['bids','Bids',[['bids','Bids',()=>(STAGES[0][2]()||[]).length]]],['cashback','Cashback',[['cashback','💸 Cashback',()=>all.filter(r=>gv(r,'cashback_status')==='Pending').length]]]]],
+  ['money','💰','Money','Paisa ek nazar me',['cfo','payout','pricing'],[G_MONEY,flowG(['pay_run','pay_chase','pay_got'])]],
+  ['hq','🤖','HQ','Company, agents, tickets',['brain','ops','cfo','clientdesk','auditor'],[G_HQ,G_INBOX]]];
+ const wsOf=id=>WS.find(w=>w[0]===id)||WS[0];
+ const NAVW=()=>wsOf(S.ws||'home')[5];
+ const findWs=t=>WS.find(w=>w[5].some(g=>g[2].some(x=>x[0]===t)));
+ const groupOf=t=>{let N=NAVW();let g=N.find(g=>g[2].some(x=>x[0]===t));if(!g){const w=findWs(t);if(w){S.ws=w[0];N=w[5];g=N.find(g=>g[2].some(x=>x[0]===t));}}return g||N[0];};
+ function wsBar(wrap){const bar=el('div','ws-bar');WS.forEach(w=>{const n=w[5].reduce((t,g)=>t+g[2].reduce((u,x)=>u+cnt(x[2]),0),0);const b=el('button','ws-b'+((S.ws||'home')===w[0]?' on':''));b.appendChild(el('span','ws-ic',w[1]));const tx=el('span','ws-tx');tx.appendChild(el('b',null,w[2]));tx.appendChild(el('small',null,w[3]));b.appendChild(tx);if(n&&w[0]!=='hq')b.appendChild(el('i',null,String(n)));b.onclick=()=>{S.ws=w[0];const N=w[5];const last=S['lastws_'+w[0]];S.tab=(last&&N.some(g=>g[2].some(x=>x[0]===last)))?last:N[0][2][0][0];if(w[0]==='clients')S.ibt='clients';if(w[0]==='hq'&&S.tab==='inbox')S.ibt='group';draw();window.scrollTo(0,0);};bar.appendChild(b);});wrap.appendChild(bar);
+  const w=wsOf(S.ws||'home');const ag=el('div','ws-ag');ag.appendChild(el('small',null,'Is room ke agents'));w[4].forEach(id=>{const a=AGENTS[id]||{};const h=a.last_run?(Date.now()-new Date(a.last_run))/36e5:99;const c=el('button','ws-agc'+(a.status==='error'?' bad':h>8?' late':''));c.appendChild(el('span','dot'));c.appendChild(el('span',null,AGN[id]||id));c.appendChild(el('small',null,agoT(a.last_run)));c.title=(a.spec||'')+' · '+(a.summary||'');c.onclick=()=>{S.ibt=THREAD_OF(id);if(!NAVW().some(g=>g[2].some(x=>x[0]==='inbox')))S.ws='home';S.tab='inbox';draw();};ag.appendChild(c);});wrap.appendChild(ag);}
+ function navBar(wrap){wsBar(wrap);const NAV=NAVW();const G=groupOf(S.tab);S['lastws_'+(S.ws||'home')]=S.tab;const top=el('div','nv-g');
   NAV.forEach(g=>{const n=g[2].reduce((t,x)=>t+cnt(x[2]),0);const b=el('button','nv-gb'+(g===G?' on':''));b.appendChild(el('span',null,g[1]));if(n&&g[0]!=='hq')b.appendChild(el('i',g[0]==='alerts'||g[0]==='today'||g[0]==='inbox'?'hot':'',String(n)));b.onclick=()=>{S.tab=(S['last_'+g[0]]&&g[2].some(x=>x[0]===S['last_'+g[0]]))?S['last_'+g[0]]:g[2][0][0];draw();window.scrollTo(0,0);};top.appendChild(b);});
   const k=el('button','nv-k','⌕ Search  ⌘K');k.onclick=()=>palette();top.appendChild(k);wrap.appendChild(top);
   if(G[2].length>1){const sub=el('div','nv-s'+(G[0]==='flow'?' nv-flow':''));G[2].forEach(([id,t,f])=>{const n=cnt(f);const b=el('button','nv-sb'+(S.tab===id?' on':''));b.appendChild(el('span',null,t));if(n)b.appendChild(el('i',null,String(n)));b.onclick=()=>{S.tab=id;S['last_'+G[0]]=id;draw();};sub.appendChild(b);});wrap.appendChild(sub);if(G[0]==='flow')setTimeout(()=>{const on=sub.querySelector('.on');if(on)sub.scrollLeft=Math.max(0,on.offsetLeft-sub.clientWidth/2+on.offsetWidth/2);},0);}
@@ -1360,7 +1374,7 @@ const sendMsg=async(thread,text,atts,meta)=>{const id='m-'+Date.now().toString(3
  function palette(){if(document.querySelector('.pl-ov'))return;const ov=el('div','pl-ov');const bx=el('div','pl-bx');const i=document.createElement('input');i.placeholder='KM ID, item, tracking, store order, tab… ya AI se poochho';const res=el('div','pl-r');bx.append(i,res);ov.appendChild(bx);document.body.appendChild(ov);i.focus();
   const close=()=>ov.remove();ov.onclick=e=>{if(e.target===ov)close();};let items=[],sel=0;
   const render=()=>{res.textContent='';const q=i.value.trim().toLowerCase();items=[];
-   NAV.forEach(g=>g[2].forEach(([id,t])=>{if(!q||t.toLowerCase().includes(q))items.push({ic:'↦',t:t,s:g[1],go:()=>{S.tab=id;draw();}});}));
+   WS.forEach(w=>w[5].forEach(g=>g[2].forEach(([id,t])=>{if(!q||t.toLowerCase().includes(q))items.push({ic:'↦',t:w[2]+' · '+t,s:g[1],go:()=>{S.ws=w[0];S.tab=id;draw();}});})));
    if(q.length>=2)all.filter(r=>vtxt(r).includes(q)).slice(0,8).forEach(r=>items.unshift({ic:'#',t:(r.order_id||r._id)+' · '+String(r.item||'').slice(0,46),s:(LBL[r.status]||r.status||'')+(r.client!=='KicksMachine'?' · '+r.client:''),go:()=>openEd(r)}));
    if(q.length>=3)items.push({ic:'✦',t:'Assistant se poochho: "'+i.value.trim()+'"',s:'AI',go:()=>{const c=document.querySelector('.lx-chat');const t=document.querySelector('.lx-chat textarea');if(c&&t){c.hidden=false;t.value=i.value.trim();document.querySelector('.lx-chat .lx-ch-f .bb-b').click();}}});
    items=items.slice(0,12);sel=Math.min(sel,items.length-1);items.forEach((it,k)=>{const d=el('div','pl-i'+(k===sel?' on':''));d.appendChild(el('b',null,it.ic));d.appendChild(el('span',null,it.t));d.appendChild(el('small',null,it.s));d.onclick=()=>{close();it.go();};res.appendChild(d);});};
