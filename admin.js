@@ -318,7 +318,8 @@ function orderBoard(m,rows,name){
        const prev=el('div','ad-wa-p');const upd=()=>{prev.textContent=waMsg(r,cl,ws.value);};upd();ws.onchange=upd;
        const go=el('a','ad-b','💬 WhatsApp');go.target='_blank';go.rel='noopener';go.onclick=()=>{go.href=waHref(ad&&ad.phone,waMsg(r,cl,ws.value));};go.href='#';
        const cpy=el('button','ad-b g','Copy msg');cpy.type='button';cpy.onclick=()=>navigator.clipboard.writeText(waMsg(r,cl,ws.value)).then(()=>toast('Message copied'));
-       const hd=el('div','row');hd.append(ws,go,cpy);wr.append(hd,prev);det.appendChild(wr);}
+       const both=el('button','ad-b','📧 + 💬 Dono bhejo');both.type='button';both.title='Stage ka email + WhatsApp dono';both.onclick=()=>{window.open(waHref(ad&&ad.phone,waMsg(r,cl,ws.value)),'_blank','noopener');me.click();};
+       const hd=el('div','row');hd.append(ws,go,cpy,both);wr.append(hd,prev);det.appendChild(wr);}
       const rw=el('div','row');rw.style.marginTop='12px';
       const sv=el('button','ad-b','Save changes');sv.type='button';rw.appendChild(sv);
       const op=el('a','ad-b g','Open client page');op.href=base((clients.find(c=>c.id===r._c)||{}).slug||'');op.target='_blank';op.rel='noopener';rw.appendChild(op);

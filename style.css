@@ -1510,3 +1510,12 @@ html.lx-ro #tb-switch,html.lx-ro #tb-out,html.lx-ro #top .who{display:none!impor
 .sw #ordT tbody tr.oc2 td:nth-child(3){padding-right:84px!important}
 .sw .oc2-ic .oc2-b{width:36px!important;height:36px!important;min-width:0!important;margin:0!important;padding:0!important;border-radius:50%!important;box-shadow:none!important;align-self:center}
 .sw #ordT tbody tr.oc2 .ordbtns a.chip.wal{display:none!important}
+
+/* address CTA + modal */
+.lx-addr-b{margin-top:6px;font-size:12px;padding:5px 10px}
+.lx-glow{outline:2px solid var(--color-accent,#C9A227)!important;box-shadow:0 0 0 6px rgba(201,162,39,.18);transition:box-shadow .3s}
+.lx-modal{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.6);display:grid;place-items:center;padding:20px;animation:lxfade .2s ease both}
+.lx-modal-bx{background:var(--color-bg,#0E0E0F);border:1px solid #3A3222;border-radius:16px;padding:26px 24px;max-width:380px;width:100%;text-align:center;box-shadow:0 20px 60px -20px rgba(0,0,0,.8);animation:lxpop .25s ease both}
+.lx-modal-ic{width:52px;height:52px;border-radius:50%;margin:0 auto 12px;display:grid;place-items:center;background:#1a160d;color:#E3C565;font-size:26px;border:1px solid #C9A227}
+.lx-modal h3{margin:0 0 6px;font-size:20px}.lx-modal p{margin:0 0 16px;color:#C9C2B6;line-height:1.5}
+@keyframes lxfade{from{opacity:0}to{opacity:1}}@keyframes lxpop{from{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:none}}
