@@ -81,6 +81,15 @@ async function run() {
     const { error } = await db.from("lx_b2b").update({ data: nd, updated_at: now }).eq("kind", "order").eq("id", r.id);
     if (!error) filled++;
   }
+  // New SourceX orders that the portal does not have yet -> add them (once).
+  const have = new Set((mine || []).map((m: any) => m.id));
+  const add = [...byId.entries()].filter(([k]) => /^SX\d+$/.test(k) && !have.has(k)).map(([k, o]: [string, any]) => ({ kind: "order", id: k, updated_at: now, data: {
+    order_id: k, client: "Sourcex", source: "Sourcex sync", item: o?.inventory?.variant?.product?.title || "", brand: o?.inventory?.variant?.product?.brandName || "",
+    size: o?.inventory?.variant?.title || "", order_date: String(o.createdAt || "").slice(0, 10), payout: o.resellerPayout ?? null, sx_payout: o.resellerPayout ?? null,
+    status: o.status === "cancelled" ? "Cancelled" : o.status === "completed" ? "Delivered to client" : "To place",
+    payout_status: o.status === "cancelled" ? "N/A" : "Unverified", sx_status: o.status, sx_cod: !!o.isPpcod, km_tracking: o.trackingId || null,
+    image: o?.inventory?.variant?.product?.images?.edges?.[0]?.node?.image || "", image_src: "sourcex", sx_synced: now } }));
+  if (add.length) { await db.from("lx_b2b").insert(add); await db.from("lx_b2b").insert({ kind: "msg", id: "m-sx-" + Date.now(), updated_at: now, data: { thread: "ops", from: "ops", at: now, read: false, notify: true, text: "🆕 Sourcex pe " + add.length + " naya order aaya: " + add.map((a) => a.id + " " + String(a.data.item).slice(0, 40)).join(", "), items: add.map((a) => ({ order_id: a.id, text: String(a.data.item) + " · payout ₹" + a.data.payout + (a.data.sx_cod ? " · COD" : ""), level: "warn" })) } }); }
   await db.from("lx_b2b").upsert({ kind: "meta", id: "sxsync", data: { at: now, ok: true, orders: orders.length, matched: filled, missing: [...byId.keys()].filter((k) => !(mine || []).some((m: any) => m.id === k)), portfolio }, updated_at: now }, { onConflict: "kind,id" });
   return { ok: true, orders: orders.length, matched: filled };
 }
