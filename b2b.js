@@ -327,7 +327,7 @@ body::before{content:"";position:fixed;left:0;right:0;top:0;height:1px;backgroun
 window.lxB2B=async function(root,sb,toast){
  root.textContent='';const wrap=el('div','bb');root.appendChild(wrap);
  wrap.appendChild(el('p','bb-meta','Loading…'));
- const res=await sb.from('lx_b2b').select('kind,id,data,updated_at').neq('kind','att');
+ const res=await (async()=>{const out=[];const PG=1000;for(let f=0;f<200000;f+=PG){const r=await sb.from('lx_b2b').select('kind,id,data,updated_at').neq('kind','att').or('kind.not.in.(order,bid),data->>archived.is.null,data->>archived.neq.true').order('kind').order('id').range(f,f+PG-1);if(r.error)return r;out.push(...(r.data||[]));if(!r.data||r.data.length<PG)break;}return {data:out,error:null};})();
  if(res.error){wrap.textContent=res.error.message;return;}
  let all=(res.data||[]).filter(x=>x.kind==='order'&&!(x.data&&x.data.archived)).map(x=>Object.assign({_id:x.id,_u:x.updated_at},x.data));
  let BIDS=(res.data||[]).filter(x=>x.kind==='bid'&&!(x.data&&x.data.archived)).map(x=>Object.assign({_id:x.id,_u:x.updated_at},x.data));const META={};(res.data||[]).filter(x=>x.kind==='meta').forEach(x=>{META[x.id]=x.data;});const AGENTS={};(res.data||[]).filter(x=>x.kind==='agent').forEach(x=>{AGENTS[x.id]=x.data;});const DOCS=(res.data||[]).filter(x=>x.kind==='doc').map(x=>Object.assign({_id:x.id},x.data)).sort((a,b)=>String(a.order).localeCompare(String(b.order)));let TICKETS=(res.data||[]).filter(x=>x.kind==='ticket').map(x=>Object.assign({_id:x.id,_u:x.updated_at},x.data));let BOXES=(res.data||[]).filter(x=>x.kind==='box').map(x=>Object.assign({_id:x.id,_u:x.updated_at},x.data));let BUYS=(res.data||[]).filter(x=>x.kind==='buy').map(x=>Object.assign({_id:x.id,_u:x.updated_at},x.data));
