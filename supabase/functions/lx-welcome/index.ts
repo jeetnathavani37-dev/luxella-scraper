@@ -37,7 +37,7 @@ async function ownerFrom(req: Request) {
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: CORS });
   if (req.method !== "POST") return json({ error: "POST only" }, 405);
-  const { data: sr } = await admin.from("lx_secrets").select("k,v"); const sec: Record<string, string> = {}; (sr || []).forEach((r: any) => (sec[r.k] = r.v));
+  const { data: sr } = await admin.from("lx_secrets").select("k,v"); const sec: Record<string, string> = {}; (sr || []).forEach((r: any) => (sec[r.k] = r.v)); const eu = Deno.env.get("SMTP_USER"), ep = Deno.env.get("SMTP_PASS"); if (eu) sec.smtp_user = eu; if (ep) sec.smtp_pass = ep;
   const okHook = req.headers.get("x-lx-hook") && req.headers.get("x-lx-hook") === sec.hook_secret;
   if (!okHook && !(await ownerFrom(req))) return json({ error: "Owner only" }, 403);
   let p: any; try { p = await req.json(); } catch { return json({ error: "Bad JSON" }, 400); }

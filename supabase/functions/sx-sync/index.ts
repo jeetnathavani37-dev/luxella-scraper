@@ -32,9 +32,17 @@ async function gql(query: string, variables: Record<string, unknown>, token?: st
   return j?.data;
 }
 
+// --- vault sealing (24 Oct 2026): secrets in lx_km_vault are AES-GCM encrypted with LX_VAULT_KEY (edge secret, not readable from SQL) ---
+const VK = Deno.env.get("LX_VAULT_KEY") || "";
+const _b64 = (a: Uint8Array) => btoa(String.fromCharCode(...a));
+const _ub64 = (s: string) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
+async function _vkey() { return await crypto.subtle.importKey("raw", _ub64(VK), "AES-GCM", false, ["encrypt", "decrypt"]); }
+async function seal(o: any) { if (!VK) return o; const iv = crypto.getRandomValues(new Uint8Array(12)); const ct = new Uint8Array(await crypto.subtle.encrypt({ name: "AES-GCM", iv }, await _vkey(), new TextEncoder().encode(JSON.stringify(o)))); return { enc: "v1", iv: _b64(iv), ct: _b64(ct) }; }
+async function unseal(d: any) { if (!d || !d.enc) return d; const pt = await crypto.subtle.decrypt({ name: "AES-GCM", iv: _ub64(d.iv) }, await _vkey(), _ub64(d.ct)); return JSON.parse(new TextDecoder().decode(pt)); }
 async function run() {
   const { data: v } = await db.from("lx_km_vault").select("data").eq("id", "sx").maybeSingle();
-  const c: any = v?.data || {};
+  let c: any = v?.data || {};
+  if (c.enc) c = await unseal(c); else if (VK && c.email) await db.from("lx_km_vault").upsert({ id: "sx", data: await seal(c), updated_at: new Date().toISOString() });
   if (!c.email || !c.password) throw new Error("no SX credentials in vault");
   const lg = await gql(LOGIN, { email: c.email, password: c.password });
   const token = lg?.obtainToken?.token;

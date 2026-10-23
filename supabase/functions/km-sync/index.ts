@@ -44,8 +44,15 @@ function findOrderNo(o: any, depth = 0): string | null {
 const pick = (o: any, keys: string[]) => { for (const k of keys) { const v = k.split(".").reduce((a: any, p) => a?.[p], o); if (v != null && v !== "") return v; } return null; };
 const isoDate = (v: any) => { if (!v) return null; const d = new Date(v); return isNaN(+d) ? null : d.toISOString().slice(0, 10); };
 
-async function getCred() { const { data } = await db.from("lx_km_vault").select("data").eq("id", "km").maybeSingle(); return data?.data || null; }
-async function saveCred(d: any) { await db.from("lx_km_vault").upsert({ id: "km", data: d, updated_at: new Date().toISOString() }); }
+// --- vault sealing (24 Oct 2026): secrets in lx_km_vault are AES-GCM encrypted with LX_VAULT_KEY (edge secret, not readable from SQL) ---
+const VK = Deno.env.get("LX_VAULT_KEY") || "";
+const _b64 = (a: Uint8Array) => btoa(String.fromCharCode(...a));
+const _ub64 = (s: string) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
+async function _vkey() { return await crypto.subtle.importKey("raw", _ub64(VK), "AES-GCM", false, ["encrypt", "decrypt"]); }
+async function seal(o: any) { if (!VK) return o; const iv = crypto.getRandomValues(new Uint8Array(12)); const ct = new Uint8Array(await crypto.subtle.encrypt({ name: "AES-GCM", iv }, await _vkey(), new TextEncoder().encode(JSON.stringify(o)))); return { enc: "v1", iv: _b64(iv), ct: _b64(ct) }; }
+async function unseal(d: any) { if (!d || !d.enc) return d; const pt = await crypto.subtle.decrypt({ name: "AES-GCM", iv: _ub64(d.iv) }, await _vkey(), _ub64(d.ct)); return JSON.parse(new TextDecoder().decode(pt)); }
+async function getCred() { const { data } = await db.from("lx_km_vault").select("data").eq("id", "km").maybeSingle(); const d: any = data?.data || null; if (!d) return null; if (d.enc) return await unseal(d); if (VK) await saveCred(d); return d; }
+async function saveCred(d: any) { await db.from("lx_km_vault").upsert({ id: "km", data: await seal(d), updated_at: new Date().toISOString() }); }
 async function upsert(kind: string, id: string, data: any) { await db.from("lx_b2b").upsert({ kind, id, data, updated_at: new Date().toISOString() }, { onConflict: "kind,id" }); }
 
 async function token(cred: any): Promise<string> {
