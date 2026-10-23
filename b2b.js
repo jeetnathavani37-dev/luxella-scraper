@@ -1867,7 +1867,7 @@ const G_ALL=['allg','All',[['allov','Overview',()=>0],['exc','⚠ Problems',()=>
  const G_MONEY=['money','Money',[['money','Money',()=>0],['recon','🔍 Reconcile',()=>0],['cashback','💸 Cashback',()=>all.filter(r=>gv(r,'cashback_status')==='Pending').length]]];
  const G_BOXES=['boxes','Boxes',[['boxes','📦 Boxes',()=>BOXES.filter(b=>!['Landed','Done'].includes(b.status)).length],['rs','Reshippers',()=>0]]];
  const G_ORDERS=['buys','Orders',[['buys','All orders',()=>0]]];
- const G_HQ=['hq','HQ',[['messages','✉️ Messages',()=>TPL.reduce((n,t)=>n+KMO().filter(r=>r.status!=='Cancelled'&&t[2](r)).length,0)],['costing','💰 Costing',()=>all.filter(needCost).length],['org','🏢 Org',()=>TICKETS.filter(t=>t.status!=='done').length],['flows','⚡ Flows',()=>0],['agentc','📈 Agents',()=>0],['agents','Agents',()=>0],['checklist','Checklist',()=>0],['tools','More tools',()=>0]]];
+ const G_HQ=['hq','HQ',[['messages','✉️ Messages',()=>TPL.reduce((n,t)=>n+KMO().filter(r=>r.status!=='Cancelled'&&t[2](r)).length,0)],['costing','💰 Costing',()=>all.filter(needCost).length],['org','🏢 Org',()=>TICKETS.filter(t=>t.status!=='done').length],['flows','⚡ Flows',()=>0],['agentc','📈 Agent stats',()=>0],['agents','Agents',()=>0],['checklist','Checklist',()=>0],['tools','More tools',()=>0]]];
  const WS=[
   ['all','✦','All','Everything · all stats',['brain','cfo','ops','clientdesk'],[G_ALL]],
   ['home','🏠','Today','What to do today · talk to the heads',['brain','ops','cfo','clientdesk','auditor'],[G_TODAY,G_INBOX,G_MSGS,G_ALERTS]],

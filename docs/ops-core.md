@@ -71,3 +71,18 @@ Verified 2026-10-23: a syntax error and a runtime error in a workspace were both
 - Loader: scheduled task "B2B · 🔍 Recon Loader", 09:43 + 21:43 IST.
 - UI: Money → 🔍 Reconcile.
 - First run (24 Oct 2026): 67 source rows, 9 flags. KM 8-10 sheet ₹3,300 over its total; US108960/US109072 amounts swapped on KM's sheet; MRN 08-10 (₹75,700) marked Received with no KM payout evidence; SX342071 paid ₹128 less than the order mail; UTR 625023094972 (₹9,058) unlinked, likely SX314613. Sourcex UTRs Jul–Oct all tie out to the rupee.
+
+## Agent ledger and health (24 Oct 2026)
+
+- `lx_agent_runs`: one row per agent run, appended by `lx_agent_done`. The append is wrapped so a ledger error never blocks an agent.
+  - Counts made since the agent's previous run, by SQL: msgs, asks, tickets_opened, tickets_closed, field_changes (kind=log by/via).
+  - `duration_s` is filled only when the run began with `lx_agent_start(agent)`. Otherwise it reads "not measured".
+- `lx_agent_health_check()`: hourly (cron `lx-agent-health`, minute 33). Thresholds live in meta/agent_sla.
+  - agent_error: last run status is error.
+  - agent_silent: no run for more than 2× the agent's schedule.
+  - agent_error_streak: N errors in a row.
+  - agent_stuck_ticket: tickets overdue 24h+.
+  - agent_unanswered_ask: questions to Jeet unanswered 24h+.
+  - Raises one problem per agent per rule. A rule that is no longer seen auto-resolves.
+- UI: HQ → 📈 Agent stats. Shows runs, ok % (ok ÷ all runs), last ok, actions, tickets in, open questions, and drill-down. Tokens, cost, tool calls and retries show "not measured".
+- Pending: the `lx_agent_start` line in agent instructions. The update to the agent-api doc was blocked, so it needs Jeet to apply it or approve it again.
