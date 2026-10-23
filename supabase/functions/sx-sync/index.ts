@@ -32,11 +32,13 @@ async function gql(query: string, variables: Record<string, unknown>, token?: st
   return j?.data;
 }
 
-// --- vault sealing (24 Oct 2026): secrets in lx_km_vault are AES-GCM encrypted with LX_VAULT_KEY (edge secret, not readable from SQL) ---
-const VK = Deno.env.get("LX_VAULT_KEY") || "";
+// --- vault sealing (24 Oct 2026): secrets in lx_km_vault are AES-GCM encrypted with a key derived from the service-role key.
+// That key exists only in edge-function env; SQL sessions (agents) cannot read it, so they see only ciphertext. ---
+const VK = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
+let _VKC: CryptoKey | null = null;
 const _b64 = (a: Uint8Array) => btoa(String.fromCharCode(...a));
 const _ub64 = (s: string) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
-async function _vkey() { return await crypto.subtle.importKey("raw", _ub64(VK), "AES-GCM", false, ["encrypt", "decrypt"]); }
+async function _vkey() { if (_VKC) return _VKC; const h = await crypto.subtle.digest("SHA-256", new TextEncoder().encode("lx-vault-v1:" + VK)); _VKC = await crypto.subtle.importKey("raw", h, "AES-GCM", false, ["encrypt", "decrypt"]); return _VKC; }
 async function seal(o: any) { if (!VK) return o; const iv = crypto.getRandomValues(new Uint8Array(12)); const ct = new Uint8Array(await crypto.subtle.encrypt({ name: "AES-GCM", iv }, await _vkey(), new TextEncoder().encode(JSON.stringify(o)))); return { enc: "v1", iv: _b64(iv), ct: _b64(ct) }; }
 async function unseal(d: any) { if (!d || !d.enc) return d; const pt = await crypto.subtle.decrypt({ name: "AES-GCM", iv: _ub64(d.iv) }, await _vkey(), _ub64(d.ct)); return JSON.parse(new TextDecoder().decode(pt)); }
 async function run() {

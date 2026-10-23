@@ -143,9 +143,7 @@ Live now:
 - `lx_notify_push()` (trigger on `lx_orders` and `lx_docs`): when the change comes from a direct DB session (`session_user = postgres`, which is how agents and the SQL connector connect), no client email or push is sent. The data change still applies. A `mail.held` event and an Approvals card ("✉️ Mail roka") are created instead. Portal changes (owner, clients) and edge functions (service_role) work as before. `lx.override` lets an approved action through.
 - `lx-push` v31: `test_email` and `test_order` need Jeet's login. The hook secret alone gets 403 (verified).
 
-Ready in code, deploy after Jeet adds edge secrets `LX_VAULT_KEY`, `SMTP_USER`, `SMTP_PASS`:
-- `km-sync` and `sx-sync` seal the KM/SX logins in `lx_km_vault` with AES-GCM, so agents reading the table see only ciphertext.
-- `lx-push` and `lx-welcome` read SMTP from env; then `smtp_pass` in `lx_secrets` gets blanked.
+Vault sealing (live, verified 24 Oct): `km-sync` v7, `sx-sync` v4, `lx-push` v32, `lx-welcome` v2 encrypt `lx_km_vault` rows `km`, `sx`, `smtp` with AES-GCM. The key is SHA-256("lx-vault-v1:" + SUPABASE_SERVICE_ROLE_KEY), which exists only in edge env, so SQL sessions see ciphertext. `smtp_pass` in `lx_secrets` is blank; the mailers read the sealed copy. To change the Gmail password, put the new one in `lx_secrets.smtp_pass`: the next mail seals it, then blank it again. If the service-role key is ever rotated, the sealed rows stop decrypting: reconnect KM from the portal, re-enter SX and SMTP.
 
 Only Jeet can do (scheduled-task connector settings): remove Gmail send/reply/forward and browser connectors from agents. That is the only hard block on the Gmail connector, the KM portal website and reshipper Google Forms.
 

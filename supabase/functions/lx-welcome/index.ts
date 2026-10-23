@@ -28,6 +28,23 @@ function html(first: string, link: string, email: string) {
 <tr><td style="padding:30px 30px 0"><div style="border-top:1px solid ${LINE};padding-top:26px;font-family:${SANS};font-size:12px;line-height:1.8;color:${MUTED};text-align:center">Questions? Reply to this email, or tap Message Luxella on your page.</div></td></tr>
 </table></td></tr></table></body></html>`;
 }
+// --- vault sealing (24 Oct 2026): secrets in lx_km_vault are AES-GCM encrypted with a key derived from the service-role key.
+// That key exists only in edge-function env; SQL sessions (agents) cannot read it, so they see only ciphertext. ---
+const VK = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
+let _VKC: CryptoKey | null = null;
+const _b64 = (a: Uint8Array) => btoa(String.fromCharCode(...a));
+const _ub64 = (s: string) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
+async function _vkey() { if (_VKC) return _VKC; const h = await crypto.subtle.digest("SHA-256", new TextEncoder().encode("lx-vault-v1:" + VK)); _VKC = await crypto.subtle.importKey("raw", h, "AES-GCM", false, ["encrypt", "decrypt"]); return _VKC; }
+async function seal(o: any) { if (!VK) return o; const iv = crypto.getRandomValues(new Uint8Array(12)); const ct = new Uint8Array(await crypto.subtle.encrypt({ name: "AES-GCM", iv }, await _vkey(), new TextEncoder().encode(JSON.stringify(o)))); return { enc: "v1", iv: _b64(iv), ct: _b64(ct) }; }
+async function unseal(d: any) { if (!d || !d.enc) return d; const pt = await crypto.subtle.decrypt({ name: "AES-GCM", iv: _ub64(d.iv) }, await _vkey(), _ub64(d.ct)); return JSON.parse(new TextDecoder().decode(pt)); }
+// SMTP login: a non-empty smtp_pass in lx_secrets is sealed into lx_km_vault/smtp (so it can then be blanked); otherwise the sealed copy is used.
+async function smtpFill(db: any, m: Record<string, string>) {
+  try {
+    if (m.smtp_user && m.smtp_pass) { await db.from("lx_km_vault").upsert({ id: "smtp", data: await seal({ user: m.smtp_user, pass: m.smtp_pass }), updated_at: new Date().toISOString() }); return; }
+    const { data: v } = await db.from("lx_km_vault").select("data").eq("id", "smtp").maybeSingle();
+    if (v?.data?.enc) { const s = await unseal(v.data); if (s?.user) m.smtp_user = s.user; if (s?.pass) m.smtp_pass = s.pass; }
+  } catch (e) { console.error("smtp vault", String((e as any)?.message || e)); }
+}
 async function ownerFrom(req: Request) {
   const token = (req.headers.get("Authorization") || "").replace(/^Bearer\s+/i, ""); if (!token) return null;
   const asUser = createClient(URL_, ANON, { global: { headers: { Authorization: "Bearer " + token } } });
@@ -37,7 +54,7 @@ async function ownerFrom(req: Request) {
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: CORS });
   if (req.method !== "POST") return json({ error: "POST only" }, 405);
-  const { data: sr } = await admin.from("lx_secrets").select("k,v"); const sec: Record<string, string> = {}; (sr || []).forEach((r: any) => (sec[r.k] = r.v)); const eu = Deno.env.get("SMTP_USER"), ep = Deno.env.get("SMTP_PASS"); if (eu) sec.smtp_user = eu; if (ep) sec.smtp_pass = ep;
+  const { data: sr } = await admin.from("lx_secrets").select("k,v"); const sec: Record<string, string> = {}; (sr || []).forEach((r: any) => (sec[r.k] = r.v)); await smtpFill(admin, sec);
   const okHook = req.headers.get("x-lx-hook") && req.headers.get("x-lx-hook") === sec.hook_secret;
   if (!okHook && !(await ownerFrom(req))) return json({ error: "Owner only" }, 403);
   let p: any; try { p = await req.json(); } catch { return json({ error: "Bad JSON" }, 400); }

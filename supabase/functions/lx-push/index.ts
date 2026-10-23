@@ -22,7 +22,24 @@ const CLIENT_MSG: Record<number, string> = { 2: "Your piece has been confirmed a
 const LCLIENT_MSG: Record<number, string> = { 2: "Your order is confirmed.", 3: "Secured from the store and now with Luxella.", 7: "We need your delivery address. Open the Address tab.", 8: "Dispatched to you. Please record your unboxing.", 9: "Delivered. Thank you for choosing Luxella." };
 const admin = createClient(URL_, SERVICE, { auth: { persistSession: false } });
 
-async function secrets() { const { data } = await admin.from("lx_secrets").select("k,v"); const m: Record<string, string> = {}; (data || []).forEach((r: any) => (m[r.k] = r.v)); const eu = Deno.env.get("SMTP_USER"), ep = Deno.env.get("SMTP_PASS"); if (eu) m.smtp_user = eu; if (ep) m.smtp_pass = ep; return m; }
+// --- vault sealing (24 Oct 2026): secrets in lx_km_vault are AES-GCM encrypted with a key derived from the service-role key.
+// That key exists only in edge-function env; SQL sessions (agents) cannot read it, so they see only ciphertext. ---
+const VK = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
+let _VKC: CryptoKey | null = null;
+const _b64 = (a: Uint8Array) => btoa(String.fromCharCode(...a));
+const _ub64 = (s: string) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
+async function _vkey() { if (_VKC) return _VKC; const h = await crypto.subtle.digest("SHA-256", new TextEncoder().encode("lx-vault-v1:" + VK)); _VKC = await crypto.subtle.importKey("raw", h, "AES-GCM", false, ["encrypt", "decrypt"]); return _VKC; }
+async function seal(o: any) { if (!VK) return o; const iv = crypto.getRandomValues(new Uint8Array(12)); const ct = new Uint8Array(await crypto.subtle.encrypt({ name: "AES-GCM", iv }, await _vkey(), new TextEncoder().encode(JSON.stringify(o)))); return { enc: "v1", iv: _b64(iv), ct: _b64(ct) }; }
+async function unseal(d: any) { if (!d || !d.enc) return d; const pt = await crypto.subtle.decrypt({ name: "AES-GCM", iv: _ub64(d.iv) }, await _vkey(), _ub64(d.ct)); return JSON.parse(new TextDecoder().decode(pt)); }
+// SMTP login: a non-empty smtp_pass in lx_secrets is sealed into lx_km_vault/smtp (so it can then be blanked); otherwise the sealed copy is used.
+async function smtpFill(db: any, m: Record<string, string>) {
+  try {
+    if (m.smtp_user && m.smtp_pass) { await db.from("lx_km_vault").upsert({ id: "smtp", data: await seal({ user: m.smtp_user, pass: m.smtp_pass }), updated_at: new Date().toISOString() }); return; }
+    const { data: v } = await db.from("lx_km_vault").select("data").eq("id", "smtp").maybeSingle();
+    if (v?.data?.enc) { const s = await unseal(v.data); if (s?.user) m.smtp_user = s.user; if (s?.pass) m.smtp_pass = s.pass; }
+  } catch (e) { console.error("smtp vault", String((e as any)?.message || e)); }
+}
+async function secrets() { const { data } = await admin.from("lx_secrets").select("k,v"); const m: Record<string, string> = {}; (data || []).forEach((r: any) => (m[r.k] = r.v)); await smtpFill(admin, m); return m; }
 
 const EM: Record<number, { h: string; t: string; n: string; cta?: [string, string] }> = {
   1: { h: "Order received", t: "We have your request for {item}. Luxella is now placing it with the store on your behalf.", n: "Nothing is needed from you. Stores usually confirm within about a week, and we will email you the moment it is accepted. If a store cancels in that window, we re-source the piece or refund you in full." },
