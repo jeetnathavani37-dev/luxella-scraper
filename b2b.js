@@ -281,6 +281,32 @@ details.cx{border:1px solid #262320;border-radius:12px;margin:10px 0;background:
 /* mobile */
 @media(max-width:700px){.bb-b{min-height:36px}.nv-sb{min-height:36px}.bb-sum.tabs div{padding:9px 12px}.fc{padding:12px}.fc-h{font-size:15px}.cost-f .inp{width:100%!important}.tpl-pick{grid-template-columns:1fr}}
 @media(prefers-reduced-motion:reduce){#admin-root *{transition:none!important;animation:none!important}}
+/* product cards (bids + any list) */
+.pc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px;margin-top:14px}
+.pc{position:relative;display:flex;flex-direction:column;background:var(--lx-s1);border:1px solid var(--lx-line);cursor:default;transition:border-color .2s var(--lx-ease),transform .2s var(--lx-ease)}
+.pc:hover{border-color:var(--lx-gold-dim);transform:translateY(-1px)}
+.pc.todo{border-color:#5a4a1c}.pc.dim{opacity:.55}
+.pc-ph{aspect-ratio:1/1;background:#F3EEE6;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.pc-ph img{width:100%;height:100%;object-fit:contain;cursor:zoom-in}
+.pc-ini{font:400 42px 'Cormorant Garamond',serif;color:#8C857A}
+.pc-b{padding:10px 12px 12px;display:flex;flex-direction:column;gap:4px;flex:1}
+.pc-br{font:500 10.5px 'Jost',sans-serif;letter-spacing:.18em;text-transform:uppercase;color:var(--lx-gold)}
+.pc-n{color:var(--lx-ivory);font-size:13.5px;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.pc-s{color:var(--lx-mute);font-size:11.5px}
+.pc-f{display:flex;flex-wrap:wrap;gap:6px;justify-content:space-between;align-items:center;margin-top:auto;padding-top:6px}
+.pc-f b{font-weight:400;color:var(--lx-ivory);font-size:15px}
+.pc-st{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;border:1px solid #2f4a2f;color:var(--lx-ok);padding:2px 7px}
+.pc-st.new{border-color:var(--lx-gold-dim);color:var(--lx-gold2)}.pc-st.x{border-color:var(--lx-line2);color:var(--lx-mute)}
+.pc-id{color:#6f695f;font-size:11px}
+.pc-a{display:flex;gap:6px;align-items:center;margin-top:6px}.pc-a .bb-b{flex:1}
+.pc .fc-menu{position:absolute;right:8px;bottom:48px;z-index:20}
+@media(max-width:560px){.pc-grid{grid-template-columns:1fr 1fr;gap:8px}.pc-b{padding:8px}.pc-n{font-size:12.5px}}
+/* declutter */
+.ws-ag{display:none!important}
+.tm-sum{display:flex;justify-content:space-between;align-items:center;margin:4px 0 8px}
+.pt-h{font:500 10.5px 'Jost',sans-serif;letter-spacing:.18em;text-transform:uppercase;color:var(--lx-gold);margin:14px 0 6px}
+.pt-r{display:grid;grid-template-columns:1fr auto;gap:2px 12px;padding:6px 0;border-top:1px solid var(--lx-line)}.pt-r b{font-weight:400;color:var(--lx-ivory)}.pt-r small{grid-column:1/-1;color:var(--lx-mute);font-size:11px}
+.pt-f{font:inherit;display:flex;gap:10px;width:100%;text-align:left;background:none;border:1px solid #5a2a22;color:var(--lx-ivory);padding:8px 10px;margin:4px 0;cursor:pointer}.pt-f b{color:#e9a08f;font-weight:400;white-space:nowrap}.pt-f span{color:var(--lx-mute);font-size:12.5px}
 `;document.head.appendChild(css);
 
 window.lxB2B=async function(root,sb,toast){
@@ -1205,6 +1231,14 @@ window.lxB2B=async function(root,sb,toast){
   byKey('Profit by brand (est. after reship)',r=>r.brand||String(r.item||'').split(' ')[0],'Est. profit = payout − (price × fx + reship). Tap a brand to see its orders.');
   byKey('Profit by store',r=>gv(r,'store'));
   byKey('Profit by reshipper',r=>gv(r,'reshipper'));
+  {const c=C('🧠 Learned patterns — real data se, koi assumption nahi');const ld=el('p','bb-meta','Loading…');c.appendChild(ld);
+   const LB={store_to_hub_days:['Store → hub','d'],hub_to_india_days:['Hub → India','d'],km_payout_days:['KM payout after delivery','d'],reship_rs_per_kg:['Reship ₹/kg','₹'],weight_kg:['Weight by category','kg'],margin_pct:['Margin by brand (exact cost only)','%']};
+   (async()=>{const [a,b]=await Promise.all([sb.from('lx_v_patterns').select('*').gte('n',3),sb.from('lx_v_pattern_flags').select('*')]);ld.remove();
+    if(a.error){c.appendChild(el('p','bb-meta','Could not load patterns'));return;}
+    const F=(b.data||[]);if(F.length){c.appendChild(el('div','pt-h','⚠ Out of pattern — check ('+F.length+')'));F.forEach(f=>{const r=all.find(x=>(x.order_id||x._id)===f.order_id);const k=el('button','pt-f');k.appendChild(el('b',null,f.order_id));k.appendChild(el('span',null,f.detail));if(r)k.onclick=()=>openEd(r);c.appendChild(k);});}
+    else c.appendChild(el('p','bb-meta','Sab pattern ke andar ✓'));
+    const by={};(a.data||[]).forEach(x=>{(by[x.metric]=by[x.metric]||[]).push(x);});
+    Object.keys(LB).filter(m=>by[m]).forEach(m=>{const [t,u]=LB[m];c.appendChild(el('div','pt-h',t));by[m].filter(x=>x.key!=='Unknown').sort((x,y)=>y.n-x.n).forEach(x=>{const fm=v=>u==='₹'?'₹'+Math.round(v):u==='%'?Number(v).toFixed(1)+'%':Number(v)+(u==='d'?'d':' kg');const l=el('div','pt-r');l.appendChild(el('span',null,x.key));l.appendChild(el('b',null,fm(x.median)));l.appendChild(el('small',null,fm(x.p25)+'–'+fm(x.p75)+' · '+x.n+' orders'));c.appendChild(l);});});})();}
   {const need=live.filter(needCost);const c=C('💰 Add costing for these items — not counted above');if(!need.length)c.appendChild(el('p','bb-meta','All costed ✓'));else{const b=el('button','bb-b blink cost-cta','💰 Add costing · '+need.length);b.onclick=()=>{S.costFor=null;S.tab='costing';draw();};c.appendChild(b);need.slice(0,20).forEach(r=>{const k=el('button','st-rk bad');k.appendChild(el('span',null,(r.order_id||r._id)+' · '+String(r.item||'').slice(0,36)));k.appendChild(el('b',null,inr(PAY(r))));k.appendChild(el('small',null,estSus(r)));k.onclick=()=>{S.costFor=[r._id];S.tab='costing';draw();};c.appendChild(k);});}}
  }
  /* ================= Profit: estimated vs actual ================= */
@@ -1413,7 +1447,7 @@ const estSus=r=>{const c=estCost(r);const p=estP0(r);if(p==null||!c)return PAY(r
  const HEAD_OF={mail:'ops',tracking:'ops',reconciler:'ops',payout:'cfo',pricing:'cfo',qa:'auditor'};const HEADSET=['brain','ops','cfo','clientdesk','auditor'];const headOf=id=>HEAD_OF[id]||id;const THREAD_OF=id=>{const h=headOf(id);return h==='clientdesk'?'clients':h;};
  function teamCard(P){const c=el('div','bb-card tm-c');const h=el('div','tm-h');h.appendChild(el('h2',null,'🤖 Team'));const ib=el('button','bb-b g sm','Inbox ›');ib.onclick=()=>{S.tab='inbox';draw();};h.appendChild(ib);c.appendChild(h);
   const k=META.kmsync||{};const rows=[['kmsync','🔗','KM sync',k.at,k.ok===false?'error':'']].concat(AG.map(([id,em,nm])=>{const x=AGENTS[id]||{};return [id,em,nm.replace(/ agent$/,'').replace(/ \(.*\)$/,''),x.last_run,x.status==='error'?'error':''];}));
-  const g=el('div','tm-g');rows.forEach(([id,em,nm,at,st])=>{const fresh=at&&(Date.now()-new Date(at))<8*3600e3;const r=el('button','tm-r');r.appendChild(el('span',null,em));r.appendChild(el('b',null,nm));r.appendChild(el('i','tm-d '+(st?'bad':fresh?'ok':'old')));r.appendChild(el('small',null,at?agoT(at):'—'));const u=(typeof unreadOf==='function')?unreadOf(THREAD_OF(id)):0;if(u)r.appendChild(el('em',null,String(u)));
+  const unr=id=>(typeof unreadOf==='function')?unreadOf(THREAD_OF(id)):0;const isFresh=at=>at&&(Date.now()-new Date(at))<8*3600e3;const need=rows.filter(([id,,,at,st])=>st||!isFresh(at)||unr(id));{const sm=el('p','bb-meta tm-sum',need.length?need.length+' of '+rows.length+' need a look':'All '+rows.length+' agents live ✓');const tg=el('button','bb-b g sm',S.tmAll?'Hide':'All');tg.onclick=()=>{S.tmAll=!S.tmAll;draw();};sm.appendChild(tg);c.appendChild(sm);}const g=el('div','tm-g');(S.tmAll?rows:need).forEach(([id,em,nm,at,st])=>{const fresh=at&&(Date.now()-new Date(at))<8*3600e3;const r=el('button','tm-r');r.appendChild(el('span',null,em));r.appendChild(el('b',null,nm));r.appendChild(el('i','tm-d '+(st?'bad':fresh?'ok':'old')));r.appendChild(el('small',null,at?agoT(at):'—'));const u=(typeof unreadOf==='function')?unreadOf(THREAD_OF(id)):0;if(u)r.appendChild(el('em',null,String(u)));
    const ag=AGENTS[id];if(ag&&ag.summary)r.title=ag.summary;r.onclick=()=>{if(id==='kmsync'){S.tab='agents';draw();return;}S.ibt=THREAD_OF(id);S.tab='inbox';draw();};g.appendChild(r);});c.appendChild(g);P.appendChild(c);}
  function tidy(P,tab){
   if(!document.getElementById('lx-fonts')){const l=document.createElement('link');l.id='lx-fonts';l.rel='stylesheet';l.href='https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Jost:wght@300;400;500&display=swap';document.head.appendChild(l);}
@@ -1670,21 +1704,33 @@ const sendMsg=async(thread,text,atts,meta)=>{const id='m-'+Date.now().toString(3
   const c=el('div','bb-card');c.appendChild(el('h2',null,'Bids accepted (KicksMachine)'));
   const n={in:0,new:0,dis:0},v={in:0,new:0,dis:0};list.forEach(b=>{const k=stOf(b);n[k]++;v[k]+=Number(b.payout_inr)||0;});
   const ch=el('div','bb-chips');[['','All',list.length],['new','Not in orders',n.new],['in','In orders',n.in],['dis','Cancelled',n.dis]].forEach(([k,t,c2])=>{const b=el('button','bb-chip'+((S.bf||'')===k?' on':''),t);b.appendChild(el('b',null,String(c2)));b.onclick=()=>{S.bf=k;draw();};ch.appendChild(b);});c.appendChild(ch);
-  const K=el('div','bb-kpis');[['Total won',inr(v.in+v.new+v.dis),list.length+' bids'],['In orders',inr(v.in),n.in+' bids'],['Missing',inr(v.new),n.new+' bids'],['Win rate (vs outbid mails)',BIDS.length?Math.round(BIDS.length/(BIDS.length+106)*100)+'%':'—','approx']].forEach(([t,x,y])=>{const d=el('div','bb-k');d.style.cursor='default';d.append(el('small',null,t),el('div','v',x),el('small',null,y));K.appendChild(d);});c.appendChild(K);
-  const brands={};list.forEach(b=>{const br=((b.items||[])[0]||{}).brand||'Other';brands[br]=(brands[br]||0)+1;});c.appendChild(el('p','bb-meta','By brand: '+Object.entries(brands).sort((a,b)=>b[1]-a[1]).map(([b,c2])=>b+' '+c2).join(' · ')));
+  const K=el('div','bb-kpis');[['Total won',inr(v.in+v.new+v.dis),list.length+' bids'],['In orders',inr(v.in),n.in+' bids'],['Missing',inr(v.new),n.new+' bids']].forEach(([t,x,y])=>{const d=el('div','bb-k');d.style.cursor='default';d.append(el('small',null,t),el('div','v',x),el('small',null,y));K.appendChild(d);});c.appendChild(K);
   const miss=list.filter(b=>stOf(b)==='new');if(miss.length){const ca=el('button','bb-b g','Create orders for all '+miss.length+' missing');ca.onclick=async()=>{if(!confirm(miss.length+' bids — create orders?'))return;for(const bd of miss)await createFrom(bd);draw();};c.appendChild(ca);}
   async function createFrom(bd){const ids=bd.km_order_ids||[bd._id];const per=Math.round((Number(bd.payout_inr)||0)/ids.length);for(let i=0;i<ids.length;i++){if(byId[ids[i]])continue;const x=(bd.items||[])[i]||(bd.items||[])[0]||{};const r={_id:ids[i]};await save(r,{client:'KicksMachine',order_id:ids[i],item:x.name||'',brand:x.brand||'',size:[x.colour,x.size].filter(Boolean).join(' / '),order_date:String(bd.won_at||'').slice(0,10),accept_by:bd.accept_by_date||'',payout:per,status:'To place',payout_status:'Pending',source:'KM email'});all.push(r);byId[ids[i]]=r;}}
-  list.filter(b=>!S.bf||stOf(b)===S.bf).sort((a,b)=>String(b.won_at).localeCompare(String(a.won_at))).forEach(bd=>{const ids=bd.km_order_ids||[bd._id];const linked=ids.map(i=>byId[i]).filter(Boolean);
-   const l=el('div','bb-bid');const left=el('div');left.appendChild(el('span','o',ids.join(', ')));const it=(bd.items||[]).map(x=>[x.brand,x.name,x.size||x.colour].filter(Boolean).join(' · ')).join(' + ')||'';left.appendChild(el('div','i',it));
-   const hrs=bd.accept_by_date?Math.round((new Date(bd.accept_by_date+'T23:59:00')-Date.now())/36e5):null;const sm=el('small',null,'Won '+String(bd.won_at||'').slice(0,10)+(bd.accept_by?' · accept by '+bd.accept_by:''));if(!linked.length&&!bd.dismissed&&hrs!=null&&hrs>=0&&hrs<24){sm.style.color='#d98a7f';sm.textContent+=' · '+hrs+'h left';}left.appendChild(sm);l.appendChild(left);
-   l.appendChild(el('b',null,inr(bd.payout_inr)));
-   const st=el('div','r');
-   if(linked.length){st.appendChild(el('span','bb-st s5','In orders · '+(LBL[linked[0].status]||linked[0].status)));if(!DONE(linked[0].status)&&linked[0].status!=='Cancelled'){const cx=el('button','bb-b g','Cancel order');cx.onclick=async()=>{if(!confirm('Cancel '+ids.join(', ')+' (order + bid)?'))return;for(const o of linked)await save(o,{status:'Cancelled',cancelled_at:today()});await saveK('bid',bd,{dismissed:true,status:'Cancelled',cancelled_at:today()});draw();};st.appendChild(cx);}}
-   else if(bd.dismissed){st.appendChild(el('span','bb-st s0',bd.status==='Cancelled'?'Cancelled':'Not accepted'));const u=el('button','bb-b g','Undo');u.onclick=async()=>{if(await saveK('bid',bd,{dismissed:false,status:'',cancelled_at:''}))draw();};st.appendChild(u);}
-   else{const b=el('button','bb-b','Create order');b.onclick=async()=>{b.disabled=true;await createFrom(bd);draw();};st.appendChild(b);const cx=el('button','bb-b g','Cancel order');cx.title='Order cancelled (by KM / store / you) — leaves the Bids list';cx.onclick=async()=>{if(!confirm('Cancel '+ids.join(', ')+'? It will leave the Bids list.'))return;if(await saveK('bid',bd,{dismissed:true,status:'Cancelled',cancelled_at:today()}))draw();};st.appendChild(cx);}
-   const cl=el('button','bb-b g','Calc');cl.title='Open in bid calculator';cl.onclick=()=>{S.calcBid=bd.payout_inr;S.tab='calc';draw();};st.appendChild(cl);
-   if(bd.gmail_thread_id){const gm=el('a','bb-b g','Mail');gm.href='https://mail.google.com/mail/?authuser=jeetnatb@gmail.com#all/'+bd.gmail_thread_id;gm.target='_blank';gm.rel='noopener';gm.style.textDecoration='none';st.appendChild(gm);}
-   l.appendChild(st);c.appendChild(l);});P.appendChild(c);}
+  const grid=el('div','pc-grid');
+  list.filter(b=>!S.bf||stOf(b)===S.bf).sort((a,b)=>String(b.won_at).localeCompare(String(a.won_at))).forEach(bd=>{const ids=bd.km_order_ids||[bd._id];const linked=ids.map(i=>byId[i]).filter(Boolean);const L0=linked[0]||{};const x0=Object.assign({brand:gv(L0,'brand')||'',name:L0.item||''},(bd.items||[])[0]||{});const IT=(bd.items||[]).length?bd.items:(L0.item?[{brand:gv(L0,'brand')||'',name:L0.item}]:[]);
+   const hrs=bd.accept_by_date?Math.round((new Date(bd.accept_by_date+'T23:59:00')-Date.now())/36e5):null;
+   const pc=el('div','pc'+(linked.length?'':bd.dismissed?' dim':' todo'));
+   const ph=el('div','pc-ph');const iu=linked.map(o=>gv(o,'image')).find(Boolean);if(iu){const im=document.createElement('img');im.loading='lazy';im.alt=x0.name||'';imgSet(im,iu);im.onclick=e=>{e.stopPropagation();imgBig(iu,linked[0]);};ph.appendChild(im);}else ph.appendChild(el('span','pc-ini',String(x0.brand||'·').slice(0,1)));pc.appendChild(ph);
+   const b2=el('div','pc-b');b2.appendChild(el('div','pc-br',(x0.brand||'')+(ids.length>1?' · '+ids.length+' items':'')));
+   const nm=x=>{const n=String(x.name||''),br=String(x.brand||'');return br&&n.toLowerCase().startsWith(br.toLowerCase())?n.slice(br.length).trim():n;};
+   b2.appendChild(el('div','pc-n',IT.map(nm).join(' + ')||'—'));
+   const sz=[x0.colour,x0.size].filter(v=>v&&!/^OS$/i.test(v)).join(' · ');if(sz)b2.appendChild(el('div','pc-s',sz));
+   const ft=el('div','pc-f');ft.appendChild(el('b',null,inr(bd.payout_inr)));
+   const chip=linked.length?el('span','pc-st',LBL[linked[0].status]||linked[0].status):bd.dismissed?el('span','pc-st x','Cancelled'):el('span','pc-st new',hrs!=null&&hrs>=0&&hrs<24?hrs+'h left':'New');ft.appendChild(chip);b2.appendChild(ft);
+   b2.appendChild(el('div','pc-id',ids.join(', ')+(bd.won_at?' · won '+dShort(bd.won_at):'')));
+   const ac=el('div','pc-a');
+   if(!linked.length&&!bd.dismissed){const b=el('button','bb-b sm','Create order');b.onclick=async e=>{e.stopPropagation();b.disabled=true;await createFrom(bd);draw();};ac.appendChild(b);}
+   else if(linked.length){ac.appendChild(btn('Open',e=>{e&&e.stopPropagation&&e.stopPropagation();openEd(linked[0]);},'bb-b g sm'));}
+   const mo=btn('⋯',e=>{e&&e.stopPropagation&&e.stopPropagation();const ex=pc.querySelector('.fc-menu');if(ex){ex.remove();return;}document.querySelectorAll('.fc-menu').forEach(z=>z.remove());const mn=el('div','fc-menu');
+     if(bd.dismissed)mn.appendChild(btn('↺ Undo cancel',async()=>{if(await saveK('bid',bd,{dismissed:false,status:'',cancelled_at:''}))draw();},'fc-mi2'));
+     else if(!linked.length||(!DONE(linked[0].status)&&linked[0].status!=='Cancelled'))mn.appendChild(btn('✕ Cancel order',async()=>{if(!confirm('Cancel '+ids.join(', ')+(linked.length?' (order + bid)?':'? It will leave the Bids list.')))return;for(const o of linked)await save(o,{status:'Cancelled',cancelled_at:today()});await saveK('bid',bd,{dismissed:true,status:'Cancelled',cancelled_at:today()});draw();},'fc-mi2'));
+     mn.appendChild(btn('🧮 Calc',()=>{S.calcBid=bd.payout_inr;S.tab='calc';draw();},'fc-mi2'));
+     if(bd.gmail_thread_id)mn.appendChild(btn('✉ Mail',()=>{window.open('https://mail.google.com/mail/?authuser=jeetnatb@gmail.com#all/'+bd.gmail_thread_id,'_blank','noopener');},'fc-mi2'));
+     if(bd.accept_by)mn.appendChild(el('small',null,'Accept by '+bd.accept_by));
+     pc.appendChild(mn);},'fc-more');mo.title='More';ac.appendChild(mo);b2.appendChild(ac);
+   pc.appendChild(b2);if(linked.length)pc.onclick=()=>openEd(linked[0]);grid.appendChild(pc);});
+  c.appendChild(grid);P.appendChild(c);}
  function calc(P){const c=el('div','bb-card');c.appendChild(el('h2',null,'Bid calculator'));
   const PRE={'Ishaan-USA':{rate:1250,min:1,round:0.5,tax:0},'Yash':{rate:1250,min:0,round:0,tax:0},'Prabhmeet':{rate:1250,min:0,round:0,tax:7},'Ishaan-Canada':{rate:1250,min:1,round:1,tax:0},'Ishaan-UK':{rate:1250,min:1,round:0.5,tax:0}};
   const CUR={USD:95.5,GBP:129,CAD:70,EUR:104};
