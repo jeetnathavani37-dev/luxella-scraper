@@ -429,7 +429,7 @@ window.lxB2B=async function(root,sb,toast){
   navBar(wrap);
   const P=el('div','bp-main');wrap.appendChild(P);
   if(S.tab==='tools'){S.tool=S.tool||'orders';const tc=el('div','bb-chips');[['orders','All orders'],['todo','To-do lists'],['pipe','Pipeline'],['bulk','Bulk upload'],['calc','Bid calculator'],['add','Add order'],['export','Export']].forEach(([id,t])=>{const b=el('button','bb-chip'+(S.tool===id?' on':''),t);b.onclick=()=>{S.tool=id;draw();};tc.appendChild(b);});P.appendChild(tc);const P2=el('div');P.appendChild(P2);({orders:orders,todo:todo,pipe:pipe,bulk:bulk,calc:calc,add:add,export:exp})[S.tool](P2);return;}
-  ({appr:apprT,recon:reconT,agentc:agentCT,whatif:whatifT,exc:excT,flows:flowsT,allov:allOvT,overview:overview,stats:statsT,msgs:msgsT,inbox:inboxT,sx:sxT,todos:todosT,toplace:toplaceT,transit:transitT,intl:intlT,costing:costingT,messages:messagesT,wh:whT,rs:P=>{rsRenameCard(P);rsT(P);},landed:landedT,mrn:mrnT,alerts:alertsT,bids:bids,buys:buys,reship:reship,tokm:tokmT,confirm:confirmT,payouts:payouts,pay_run:payouts,pay_chase:payouts,pay_got:payouts,money:money,cashback:cashbackT,boxes:boxesT,checklist:checklist,agents:agentsTab,org:orgT})[S.tab](P);try{tidy(P,S.tab);}catch(e){}};
+  ({cmd:cmdT,appr:apprT,recon:reconT,agentc:agentCT,whatif:whatifT,exc:excT,flows:flowsT,allov:allOvT,overview:overview,stats:statsT,msgs:msgsT,inbox:inboxT,sx:sxT,todos:todosT,toplace:toplaceT,transit:transitT,intl:intlT,costing:costingT,messages:messagesT,wh:whT,rs:P=>{rsRenameCard(P);rsT(P);},landed:landedT,mrn:mrnT,alerts:alertsT,bids:bids,buys:buys,reship:reship,tokm:tokmT,confirm:confirmT,payouts:payouts,pay_run:payouts,pay_chase:payouts,pay_got:payouts,money:money,cashback:cashbackT,boxes:boxesT,checklist:checklist,agents:agentsTab,org:orgT})[S.tab](P);try{tidy(P,S.tab);}catch(e){}};
  function orders(P){const c=el('div','bb-card');P.appendChild(c);
   const bar=el('div','bb-bar');S.q='';
   const who=document.createElement('select');[['KicksMachine','KicksMachine'],['Sourcex','Sourcex'],['__wa','WhatsApp clients'],['','All']].forEach(([v,t])=>{const o=el('option',null,t);o.value=v;if(v===S.who)o.selected=true;who.appendChild(o);});
@@ -782,7 +782,7 @@ window.lxB2B=async function(root,sb,toast){
   items.forEach(([a,t,tab])=>{const l=el('button','ov-att');l.appendChild(el('b',null,String(a.length)));l.appendChild(el('span',null,t));l.appendChild(el('small',null,a.slice(0,3).map(r=>r.order_id||r._id).join(', ')+(a.length>3?'…':'')));l.onclick=()=>{if(tab==='payouts')S.pf='chase';go(tab);};att.appendChild(l);});
   const right=cols;
   const mo=el('div','bb-card');mo.appendChild(el('h2',null,'Money'));const pend=km.filter(r=>r.payout_status!=='Received'&&!['Cancelled','To place'].includes(r.status));const costed=km.filter(r=>Number(r.landed)>0);
-  [['Payout pending (all)',inr(sumP(pend))],['At KM, not yet paid',inr(sumP(pend.filter(r=>DONE(r.status))))],['Received',inr(sumP(km.filter(r=>r.payout_status==='Received')))],['Expected profit',inr(costed.reduce((t,r)=>t+(Number(r.profit)||0),0))]].forEach(([a,b])=>{const l=el('div','bb-line');l.appendChild(el('span','m',a));l.appendChild(el('b',null,b));mo.appendChild(l);});right.appendChild(mo);
+  [['Payout pending (placed)',inr(sumP(pend))],['At KM, not yet paid',inr(sumP(pend.filter(r=>DONE(r.status))))],['Received',inr(sumP(km.filter(r=>r.payout_status==='Received')))],['Expected profit',inr(costed.reduce((t,r)=>t+(Number(r.profit)||0),0))]].forEach(([a,b])=>{const l=el('div','bb-line');l.appendChild(el('span','m',a));l.appendChild(el('b',null,b));mo.appendChild(l);});right.appendChild(mo);
   teamCard(right);}
 
  /* ---------- Photo / screenshot → tracking (OCR in browser) ---------- */
@@ -1373,6 +1373,39 @@ window.lxB2B=async function(root,sb,toast){
   })();}
  /* ================= FLOWS: n8n-style automations on the event bus ================= */
  const EVL={'order.created':'New order','order.status':'Status changed','order.payout':'Payout changed','order.tracking':'Tracking added','jeet.message':'Jeet ka message','ticket.created':'Ticket created','*':'Every event'};
+ /* ================= COMMAND CENTRE: one honest screen, every number with its source + age ================= */
+ function cmdT(P){const hd=el('div','al-hd');hd.appendChild(el('h1',null,'Command Centre'));hd.appendChild(el('p',null,'Poora business ek screen pe. Har number database se aata hai (lx_command_centre), saath me kab update hua. Jo data missing hai woh "unknown" dikhta hai — koi green andaze se nahi.'));P.appendChild(hd);
+  const box=el('div');P.appendChild(box);box.appendChild(el('p','bb-meta','Loading…'));
+  const ago=t=>{if(!t)return 'never';const h=(Date.now()-new Date(t))/36e5;return h<1?Math.round(h*60)+'m ago':h<48?Math.round(h)+'h ago':Math.round(h/24)+'d ago';};
+  const fresh=(t,okH)=>{if(!t)return ['🔴','unknown'];const h=(Date.now()-new Date(t))/36e5;return h<=okH?['🟢','fresh']:h<=okH*4?['🟡','stale']:['🔴','stale'];};
+  const go=t=>{S.tab=t;draw();window.scrollTo(0,0);};
+  (async()=>{const r=await sb.rpc('lx_command_centre');box.textContent='';if(r.error||!r.data){box.appendChild(el('p','bb-meta','Could not load: '+((r.error&&r.error.message)||'no data')));return;}
+   const D=r.data,PR=D.problems||{},M=D.money||{},O=D.orders||{},DE=D.decisions||{},T=D.tickets||{},AG=D.agents||{},F=D.freshness||{},INC=D.incidents||[];
+   const crit=INC.filter(i=>i.severity==='critical'),high=INC.filter(i=>i.severity==='high');
+   const st=crit.length?['🔴','Attention needed',PR.critical+' critical problems in '+crit.length+' groups']:high.length?['🟡','Running, with gaps',PR.high+' high problems in '+high.length+' groups']:['🟢','Normal','No critical or high problems open'];
+   const sb2=el('div','st-c full');const h3=el('h3',null,st[0]+' '+st[1]);sb2.appendChild(h3);sb2.appendChild(el('p','bb-meta',st[2]+' · checks ran '+ago(PR.checked_at)+' · generated '+new Date(D.generated_at).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})));box.appendChild(sb2);
+   const k=el('div','st-k');const bc=O.by_channel||{};
+   [[String(O.in_pipeline??'—'),'Orders in pipeline',Object.entries(bc).map(([a,n])=>a+' '+n).join(' · ')+(O.with_critical?' · '+O.with_critical+' with a critical problem':''),'exc'],
+    [inr(M.to_collect_inr),'To collect (placed orders)',Object.entries(M.to_collect_by_channel||{}).map(([a,v])=>a+' '+inr(v)).join(' · ')+' · '+(M.to_collect_orders||0)+' orders'+(M.not_placed_orders?' · +'+inr(M.not_placed_inr)+' not placed yet':''),'money'],
+    [inr(M.received_month_inr),'Received this month',inr(M.received_month_with_utr_inr)+' verified by UTR · rest unverified','recon'],
+    [String(DE.open??'—'),'Decisions waiting for you','agents cannot decide these','appr'],
+    [String(T.open??'—'),'Open tickets',(T.blocked||0)+' blocked · '+(T.overdue||0)+' overdue','org'],
+    [AG.runs_24h?String(AG.runs_24h):'unknown','Agent runs logged (24h)',(AG.failing||0)+' agent health alerts'+(AG.runs_24h?'':' · ledger empty, cannot verify'),'agentc']].forEach(([v,l,x,t])=>{const d=el('button','st-kp');d.appendChild(el('b',null,v));d.appendChild(el('span',null,l));d.appendChild(el('small',null,x));d.onclick=()=>go(t);k.appendChild(d);});box.appendChild(k);
+   const g=el('div','st-g');box.appendChild(g);
+   const c1=el('div','st-c');c1.appendChild(el('h3',null,'Do these first — '+INC.length+' groups, '+(PR.open||0)+' problems'));g.appendChild(c1);
+   INC.slice(0,8).forEach((i,n)=>{const row=el('button','ex-tp');const dot=i.severity==='critical'?'🔴':i.severity==='high'?'🟡':'⚪';row.appendChild(el('b',null,(n+1)+'. '+dot+' '+String(i.example||i.rule).replace(/:.*$/,'')+' × '+i.count));
+    row.appendChild(el('span',null,(i.money_inr>0?inr(i.money_inr)+' at stake · ':'')+(i.clients?i.clients+(i.clients>1?' clients · ':' client · '):'')+'owner '+(AGN[i.owner]||i.owner||'—')+' · since '+ago(i.since)));
+    row.appendChild(el('small',null,'→ '+(i.action||'')+((i.orders||[]).length?' · '+(i.orders||[]).slice(0,5).join(', ')+(i.count>5?' …':''):'')));row.onclick=()=>{S.excOw='';go('exc');};c1.appendChild(row);});
+   if(INC.length>8)c1.appendChild(el('p','bb-meta','+'+(INC.length-8)+' smaller groups in Problems'));
+   const c2=el('div','st-c');c2.appendChild(el('h3',null,'Decisions waiting — '+(DE.open||0)));g.appendChild(c2);
+   (DE.top||[]).forEach(q=>{const l=el('div','pt-r');l.appendChild(el('span',null,(AGN[q.agent]||q.agent||'')+(q.order_id?' · '+q.order_id:'')));l.appendChild(el('b',null,ago(q.asked_at)));l.appendChild(el('small',null,String(q.question||'').slice(0,140)));c2.appendChild(l);});
+   c2.appendChild(btn('Open Approvals',()=>go('appr'),'bb-b sm'));
+   const c3=el('div','st-c');c3.appendChild(el('h3',null,'Data freshness'));g.appendChild(c3);
+   [['KM portal sync',F.km_sync&&F.km_sync.at,2,F.km_sync&&F.km_sync.ok===false?'last run failed':''],['Sourcex sync',F.sx_sync&&F.sx_sync.at,3,F.sx_sync&&F.sx_sync.ok===false?'last run failed':''],['Hourly problem checks',F.checks,2,''],['Recon sources (MRN, payout mails)',F.recon,30,''],['Last order change',F.orders_edit,24,'']].forEach(([n,t,h,bad])=>{const f=bad?['🔴',bad]:fresh(t,h);const l=el('div','pt-r');l.appendChild(el('span',null,f[0]+' '+n));l.appendChild(el('b',null,ago(t)));l.appendChild(el('small',null,f[1]+(t?' · '+new Date(t).toLocaleString('en-IN',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'')+' · fresh if under '+h+'h'));c3.appendChild(l);});
+   const c4=el('div','st-c');c4.appendChild(el('h3',null,'Numbers you cannot fully trust yet'));g.appendChild(c4);
+   [[M.received_no_utr_orders,'orders marked received with no UTR','received money is unverified','recon'],[M.unpriced_orders,'live orders with no store price','profit and margin are estimates','exc'],[AG.runs_24h?0:1,'agent run ledger empty','agent success rates unknown','agentc']].forEach(([n,a,b2,t])=>{if(!n)return;const l=el('button','ex-tp');l.appendChild(el('b',null,(t==='agentc'?'':n+' ')+a));l.appendChild(el('small',null,'Effect: '+b2));l.onclick=()=>go(t);c4.appendChild(l);});
+   box.appendChild(el('p','bb-meta','Sources: lx_exceptions (problems, grouped by rule), lx_v_orders (money, cancelled and archived excluded), Approvals messages, tickets, lx_agent_runs, sync meta rows. "Verified" received = has a UTR. Tap any box to open its detail.'));
+  })();}
  function agentCT(P){const hd=el('div','al-hd');hd.appendChild(el('h1',null,'Agents — performance'));hd.appendChild(el('p',null,'Sirf asli data: har run lx_agent_runs ledger me (24 Oct 2026 se). Jo measure nahi hota woh "not measured" dikhta hai — koi andaza nahi.'));P.appendChild(hd);
   const D=S.agD||7;const bar=el('div','bb-chips');[[1,'24h'],[7,'7 days'],[30,'30 days']].forEach(([d,t])=>{const b=el('button','bb-chip'+(D===d?' on':''),t);b.onclick=()=>{S.agD=d;S.agOpen=null;draw();};bar.appendChild(b);});P.appendChild(bar);
   const box=el('div');P.appendChild(box);box.appendChild(el('p','bb-meta','Loading…'));
@@ -1857,7 +1890,7 @@ const sendMsg=async(thread,text,atts,meta)=>{const id='m-'+Date.now().toString(3
  /* ================= Nav v3: groups + sub-tabs with live counts, ⌘K palette, undo ================= */
  const cnt=fnc=>{try{return fnc();}catch(e){return 0;}};
  const FLOW=[['bids','Bids',0],['toplace','To place',1],['intl','Ordered',2],['transit','In transit',3],['wh','Reached hub',4],['landed','Flying → India',5],['tokm','To KM',6],['mrn','MRN',7],['confirm','KM confirm',8],['pay_run','Payout timer',9],['pay_chase','Chase payout',10],['pay_got','Paid',11]];
- const G_TODAY=['today','Today',[['overview','Overview',()=>0],['todos','To-dos',()=>todoCount()]]];
+ const G_TODAY=['today','Today',[['cmd','🎯 Command',()=>0],['overview','Overview',()=>0],['todos','To-dos',()=>todoCount()]]];
 const G_ALL=['allg','All',[['allov','Overview',()=>0],['exc','⚠ Problems',()=>0],['appr','✓ Approvals',()=>0],['whatif','What-if',()=>0],['stats','Stats',()=>0]]];const G_STATS=['statsg','Stats',[['stats','Stats',()=>0]]];
  const G_INBOX=['inbox','Inbox',[['inbox','Inbox',()=>unreadAll()]]];
  const G_MSGS=['msgs','Messages',[['msgs','Messages',()=>msgCount()]]];

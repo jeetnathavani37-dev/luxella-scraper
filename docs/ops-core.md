@@ -148,3 +148,11 @@ Vault sealing (live, verified 24 Oct): `km-sync` v7, `sx-sync` v4, `lx-push` v32
 Only Jeet can do (scheduled-task connector settings): remove Gmail send/reply/forward and browser connectors from agents. That is the only hard block on the Gmail connector, the KM portal website and reshipper Google Forms.
 
 Known gap: an agent that reads `hook_secret` can still call `lx-push` with a crafted client-update payload. Closing it needs the hook secret moved out of SQL reach.
+
+## Founder Command Centre (24 Oct 2026)
+
+Today → 🎯 Command is the first screen. It reads one owner-only function, `lx_command_centre()` (source in `supabase/sql/lx_command_centre.sql`), which wraps `lx_command_centre_raw()` (not callable by clients).
+
+It shows: overall status (red if any critical problem is open), orders in the pipeline by channel, money to collect on placed orders by channel (orders not yet placed shown apart), money received this month split by UTR-verified, decisions waiting, open/blocked/overdue tickets, agent runs logged, problems grouped by rule and ranked by severity then ₹ at stake, data freshness per source, and the numbers that cannot be trusted yet.
+
+The Overview card label changed from "Payout pending (all)" to "Payout pending (placed)": it always excluded orders still To place, and KM's figure now matches the Command Centre exactly.
