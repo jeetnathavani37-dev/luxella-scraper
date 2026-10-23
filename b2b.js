@@ -361,6 +361,16 @@ body::before{content:"";position:fixed;left:0;right:0;top:0;height:1px;backgroun
 #admin-root .bb-b:not(.g):hover{filter:brightness(1.08)}
 .lx-modal,.pl-ov,.fc-menu,.ud-t{animation:pxFade .3s var(--px-ease) both}
 @media (prefers-reduced-motion:reduce){#admin-root *,#admin-root *::after{animation:none!important;transition:none!important}}
+.fw-list{display:grid;gap:12px;margin:8px 0 18px}
+.fw{border:1px solid #1d1b18;background:#050505;padding:16px 18px;opacity:.6;transition:opacity .35s var(--px-ease),border-color .35s var(--px-ease)}.fw.on{opacity:1;border-color:#6B5A24}
+.fw-t{display:flex;align-items:center;gap:12px;margin-bottom:12px}.fw-t b{font-weight:500;letter-spacing:.2em;text-transform:uppercase;font-size:11.5px;color:var(--lx-ivory)}.fw-t small{color:var(--lx-mute);font-size:11px;margin-left:auto}
+.fw-sw{border:1px solid #3a3326;background:transparent;color:var(--lx-mute);font-size:10px;letter-spacing:.24em;padding:5px 12px;cursor:pointer}.fw-sw.on{background:linear-gradient(180deg,#E3C565,#C9A227);color:#000;border-color:transparent}
+.fw-ch{display:flex;align-items:stretch;gap:8px;overflow-x:auto;padding-bottom:4px}
+.fw-n{min-width:150px;max-width:260px;border:1px solid #2a261f;padding:8px 10px;display:flex;flex-direction:column;gap:3px;background:#0a0907}.fw-n small{font-size:9.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--lx-gold)}.fw-n span{font-size:12px;color:var(--lx-ivory);line-height:1.35}
+.fw-n.trg{border-color:#6B5A24}.fw-n.act{border-style:dashed}.fw-ar{align-self:center;color:var(--lx-gold);font-style:normal}
+.fw-kv{display:flex;align-items:center;gap:8px;margin:8px 0;flex-wrap:wrap}.fw-kv small{min-width:90px;color:var(--lx-mute);font-size:10.5px;letter-spacing:.2em;text-transform:uppercase}.fw-kv code{font-size:12px;color:var(--lx-gold2);word-break:break-all;flex:1}
+.fw-in{flex:1;min-width:240px;background:#000;border:1px solid #2a261f;color:var(--lx-ivory);padding:8px 10px}
+.fw-ev{display:grid;grid-template-columns:110px 1fr;gap:2px 12px;padding:8px 0;border-top:1px solid #15130f}.fw-ev small{color:#6f695f;font-size:11px;grid-row:span 2}.fw-ev b{font-weight:400;font-size:12.5px;color:var(--lx-ivory)}.fw-ev span{font-size:11.5px;color:var(--lx-mute)}
 `;document.head.appendChild(css);
 
 window.lxB2B=async function(root,sb,toast){
@@ -395,7 +405,7 @@ window.lxB2B=async function(root,sb,toast){
   navBar(wrap);
   const P=el('div','bp-main');wrap.appendChild(P);
   if(S.tab==='tools'){S.tool=S.tool||'orders';const tc=el('div','bb-chips');[['orders','All orders'],['todo','To-do lists'],['pipe','Pipeline'],['bulk','Bulk upload'],['calc','Bid calculator'],['add','Add order'],['export','Export']].forEach(([id,t])=>{const b=el('button','bb-chip'+(S.tool===id?' on':''),t);b.onclick=()=>{S.tool=id;draw();};tc.appendChild(b);});P.appendChild(tc);const P2=el('div');P.appendChild(P2);({orders:orders,todo:todo,pipe:pipe,bulk:bulk,calc:calc,add:add,export:exp})[S.tool](P2);return;}
-  ({allov:allOvT,overview:overview,stats:statsT,msgs:msgsT,inbox:inboxT,sx:sxT,todos:todosT,toplace:toplaceT,transit:transitT,intl:intlT,costing:costingT,messages:messagesT,wh:whT,rs:P=>{rsRenameCard(P);rsT(P);},landed:landedT,mrn:mrnT,alerts:alertsT,bids:bids,buys:buys,reship:reship,tokm:tokmT,confirm:confirmT,payouts:payouts,pay_run:payouts,pay_chase:payouts,pay_got:payouts,money:money,cashback:cashbackT,boxes:boxesT,checklist:checklist,agents:agentsTab,org:orgT})[S.tab](P);try{tidy(P,S.tab);}catch(e){}};
+  ({flows:flowsT,allov:allOvT,overview:overview,stats:statsT,msgs:msgsT,inbox:inboxT,sx:sxT,todos:todosT,toplace:toplaceT,transit:transitT,intl:intlT,costing:costingT,messages:messagesT,wh:whT,rs:P=>{rsRenameCard(P);rsT(P);},landed:landedT,mrn:mrnT,alerts:alertsT,bids:bids,buys:buys,reship:reship,tokm:tokmT,confirm:confirmT,payouts:payouts,pay_run:payouts,pay_chase:payouts,pay_got:payouts,money:money,cashback:cashbackT,boxes:boxesT,checklist:checklist,agents:agentsTab,org:orgT})[S.tab](P);try{tidy(P,S.tab);}catch(e){}};
  function orders(P){const c=el('div','bb-card');P.appendChild(c);
   const bar=el('div','bb-bar');S.q='';
   const who=document.createElement('select');[['KicksMachine','KicksMachine'],['Sourcex','Sourcex'],['__wa','WhatsApp clients'],['','All']].forEach(([v,t])=>{const o=el('option',null,t);o.value=v;if(v===S.who)o.selected=true;who.appendChild(o);});
@@ -1268,6 +1278,32 @@ window.lxB2B=async function(root,sb,toast){
    list.appendChild(sec);});
   if(!act.length)P.appendChild(el('p','bb-meta','No pending tasks ✓'));}
 
+
+ /* ================= FLOWS: n8n-style automations on the event bus ================= */
+ const EVL={'order.created':'New order','order.status':'Status changed','order.payout':'Payout changed','order.tracking':'Tracking added','jeet.message':'Jeet ka message','ticket.created':'Ticket created','*':'Every event'};
+ function flowsT(P){const hd=el('div','al-hd');hd.appendChild(el('h1',null,'Flows'));hd.appendChild(el('p',null,'Har event (order, status, payout, aapka message) central brain ke event bus pe aata hai. Flows usse sahi agent tak le jaate hain — ticket, message ya n8n. Data sirf safe update (lx_apply) se badalta hai.'));P.appendChild(hd);
+  const wrapF=el('div','fw-list');P.appendChild(wrapF);wrapF.appendChild(el('p','bb-meta','Loading…'));
+  const cn=el('div','bb-card');cn.appendChild(el('h2',null,'Connect n8n / Zapier / Make'));P.appendChild(cn);
+  const feed=el('div','bb-card');feed.appendChild(el('h2',null,'Live events — central brain'));P.appendChild(feed);
+  (async()=>{const [fl,ev,hk]=await Promise.all([sb.from('lx_b2b').select('id,data').eq('kind','flow').order('id'),sb.from('lx_events').select('id,at,type,ref,payload,runs,source').order('id',{ascending:false}).limit(40),sb.rpc('lx_hook_info')]);
+   wrapF.textContent='';const F=(fl.data||[]).filter(x=>!/^zz-/.test(x.id)).sort((a,b)=>(a.data.order||9)-(b.data.order||9));const E=ev.data||[];
+   F.forEach(f=>{const d=f.data;const c=el('div','fw'+(d.on?' on':''));const top=el('div','fw-t');top.appendChild(el('b',null,d.name||f.id));
+     const n=E.filter(e=>(e.runs||[]).some(r=>r.flow===f.id)).length;top.appendChild(el('small',null,n?n+' runs (recent)':'no recent runs'));
+     const tg=el('button','fw-sw'+(d.on?' on':''),d.on?'ON':'OFF');tg.onclick=async()=>{tg.disabled=true;const nd=Object.assign({},d,{on:!d.on});if(f.id==='n8n-mirror'&&nd.on&&!((nd.do||[])[0]||{}).url){toast&&toast('Pehle n8n webhook URL daalo (neeche)');tg.disabled=false;return;}const r=await sb.from('lx_b2b').upsert({kind:'flow',id:f.id,data:nd,updated_at:new Date().toISOString()},{onConflict:'kind,id'});if(!r.error){d.on=nd.on;c.classList.toggle('on',d.on);tg.classList.toggle('on',d.on);tg.textContent=d.on?'ON':'OFF';}tg.disabled=false;};top.appendChild(tg);c.appendChild(top);
+     const ch=el('div','fw-ch');const node=(k,t,cls)=>{const x=el('div','fw-n'+(cls?' '+cls:''));x.appendChild(el('small',null,k));x.appendChild(el('span',null,t));return x;};
+     ch.appendChild(node('When',EVL[d.trigger]||d.trigger,'trg'));const w=Object.entries(d.when||{});if(w.length){ch.appendChild(el('i','fw-ar','→'));ch.appendChild(node('If',w.map(([k,v])=>k+' = '+(Array.isArray(v)?v.join(' / '):v)).join(' · ')));}
+     (d.do||[]).forEach(a=>{ch.appendChild(el('i','fw-ar','→'));ch.appendChild(node(a.type==='ticket'?'Ticket → '+(AGN[a.to]||a.to):a.type==='msg'?'Message → '+(a.thread||'brain'):a.type==='webhook'?'Webhook':a.type==='apply'?'Safe update':a.type,a.type==='ticket'?String(a.ask||'').slice(0,90):a.type==='webhook'?(a.url?a.url.replace(/^https?:\/\//,'').slice(0,40)+'…':'URL not set'):a.type==='apply'?JSON.stringify(a.patch||{}):String(a.text||''),'act'));});
+     c.appendChild(ch);wrapF.appendChild(c);});
+   // connect box
+   const h=hk&&hk.data;const row=(l,v,secret)=>{const r=el('div','fw-kv');r.appendChild(el('small',null,l));const code=el('code',null,secret?'••••••••••••'+String(v||'').slice(-4):v||'—');r.appendChild(code);const cp=btn('Copy',()=>{try{navigator.clipboard.writeText(v||'');toast&&toast('Copied');}catch(e){}},'bb-b g sm');r.appendChild(cp);if(secret){const sh=btn('Show',()=>{code.textContent=code.textContent.startsWith('••')?v:'••••••••••••'+String(v).slice(-4);},'bb-b g sm');r.appendChild(sh);}return r;};
+   cn.appendChild(el('p','bb-meta','IN (n8n → Luxella): n8n me HTTP Request node, POST is URL pe, header x-lx-secret. Body: {"type":"stock_alert","ref":"US110930","payload":{...},"apply":{"order_id":"US110930","patch":{"retailer_tracking":"1Z…"}}} — apply optional, sirf safe update.'));
+   if(h){cn.appendChild(row('Inbound URL',h.url));cn.appendChild(row('Secret',h.secret,true));}
+   cn.appendChild(el('p','bb-meta','OUT (Luxella → n8n): n8n me "Webhook" trigger node banao, uska Production URL yahan daalo. Har event wahan bhi jayega (flow "Sab events → n8n").'));
+   const mf=F.find(x=>x.id==='n8n-mirror');if(mf){const r=el('div','fw-kv');const inp=document.createElement('input');inp.placeholder='https://your-n8n…/webhook/…';inp.value=((mf.data.do||[])[0]||{}).url||'';inp.className='fw-in';const sv=btn('Save',async()=>{const u=inp.value.trim();if(u&&!/^https:\/\//.test(u)){toast&&toast('https:// URL chahiye');return;}const nd=Object.assign({},mf.data,{do:[{type:'webhook',url:u}],on:!!u&&mf.data.on});const r2=await sb.from('lx_b2b').upsert({kind:'flow',id:'n8n-mirror',data:nd,updated_at:new Date().toISOString()},{onConflict:'kind,id'});if(!r2.error){toast&&toast('Saved — ab flow ON karo');draw();}},'bb-b sm');r.append(inp,sv);cn.appendChild(r);}
+   // feed
+   if(!E.length)feed.appendChild(el('p','bb-meta','Abhi koi event nahi. Order ka status badalte hi yahan dikhega.'));
+   E.forEach(e=>{const r=el('div','fw-ev');r.appendChild(el('small',null,new Date(e.at).toLocaleString('en-IN',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})));const p=e.payload||{};r.appendChild(el('b',null,(EVL[e.type]||e.type)+(p.order_id?' · '+p.order_id:'')+(p.to?' → '+p.to:'')));r.appendChild(el('span',null,(e.runs||[]).map(x=>x.result).join(' · ')||(e.source==='webhook'?'from n8n':'—')));feed.appendChild(r);});
+  })();}
  /* ================= ALL: every channel in one place ================= */
  function allOvT(P){const M=today().slice(0,7);const inM=d=>!!d&&String(d).slice(0,7)===M;const pay=r=>Number(gv(r,'payout'))||0;const sum=(a,f)=>a.reduce((t,r)=>t+f(r),0);
   const hasP=r=>r.profit!=null&&r.profit!==''&&!isNaN(Number(r.profit));
@@ -1702,7 +1738,7 @@ const G_ALL=['allg','All',[['allov','Overview',()=>0],['stats','Stats',()=>0]]];
  const G_MONEY=['money','Money',[['money','Money',()=>0],['cashback','💸 Cashback',()=>all.filter(r=>gv(r,'cashback_status')==='Pending').length]]];
  const G_BOXES=['boxes','Boxes',[['boxes','📦 Boxes',()=>BOXES.filter(b=>!['Landed','Done'].includes(b.status)).length],['rs','Reshippers',()=>0]]];
  const G_ORDERS=['buys','Orders',[['buys','All orders',()=>0]]];
- const G_HQ=['hq','HQ',[['messages','✉️ Messages',()=>TPL.reduce((n,t)=>n+KMO().filter(r=>r.status!=='Cancelled'&&t[2](r)).length,0)],['costing','💰 Costing',()=>all.filter(needCost).length],['org','🏢 Org',()=>TICKETS.filter(t=>t.status!=='done').length],['agents','Agents',()=>0],['checklist','Checklist',()=>0],['tools','More tools',()=>0]]];
+ const G_HQ=['hq','HQ',[['messages','✉️ Messages',()=>TPL.reduce((n,t)=>n+KMO().filter(r=>r.status!=='Cancelled'&&t[2](r)).length,0)],['costing','💰 Costing',()=>all.filter(needCost).length],['org','🏢 Org',()=>TICKETS.filter(t=>t.status!=='done').length],['flows','⚡ Flows',()=>0],['agents','Agents',()=>0],['checklist','Checklist',()=>0],['tools','More tools',()=>0]]];
  const WS=[
   ['all','✦','All','Everything · all stats',['brain','cfo','ops','clientdesk'],[G_ALL]],
   ['home','🏠','Today','What to do today · talk to the heads',['brain','ops','cfo','clientdesk','auditor'],[G_TODAY,G_INBOX,G_MSGS,G_ALERTS]],
