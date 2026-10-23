@@ -134,3 +134,19 @@ Every fact is stored in `lx_mail_facts`: message and thread ids, sender, subject
 `lx_mail_selftest()` covers 11 scenarios: exact fill; the same mail twice; an inferred value; a supplier price change on a priced order; a fake payment mail; a real Razorpay UTR; a fuzzy match; a malicious mail trying to set payout; an unknown order; one mail with two orders; every fact recorded.
 
 The daily `lx_guard_selftest_run()` runs the guard and mail suites together. Result on 24 Oct: 22/22 passed.
+
+## Mail lock and sensitive-access lockdown (24 Oct 2026)
+
+Rule from Jeet: agents never send mail, and never edit the KM portal, reshipper forms or other sensitive systems on their own.
+
+Live now:
+- `lx_notify_push()` (trigger on `lx_orders` and `lx_docs`): when the change comes from a direct DB session (`session_user = postgres`, which is how agents and the SQL connector connect), no client email or push is sent. The data change still applies. A `mail.held` event and an Approvals card ("✉️ Mail roka") are created instead. Portal changes (owner, clients) and edge functions (service_role) work as before. `lx.override` lets an approved action through.
+- `lx-push` v31: `test_email` and `test_order` need Jeet's login. The hook secret alone gets 403 (verified).
+
+Ready in code, deploy after Jeet adds edge secrets `LX_VAULT_KEY`, `SMTP_USER`, `SMTP_PASS`:
+- `km-sync` and `sx-sync` seal the KM/SX logins in `lx_km_vault` with AES-GCM, so agents reading the table see only ciphertext.
+- `lx-push` and `lx-welcome` read SMTP from env; then `smtp_pass` in `lx_secrets` gets blanked.
+
+Only Jeet can do (scheduled-task connector settings): remove Gmail send/reply/forward and browser connectors from agents. That is the only hard block on the Gmail connector, the KM portal website and reshipper Google Forms.
+
+Known gap: an agent that reads `hook_secret` can still call `lx-push` with a crafted client-update payload. Closing it needs the hook secret moved out of SQL reach.

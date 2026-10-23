@@ -22,7 +22,7 @@ const CLIENT_MSG: Record<number, string> = { 2: "Your piece has been confirmed a
 const LCLIENT_MSG: Record<number, string> = { 2: "Your order is confirmed.", 3: "Secured from the store and now with Luxella.", 7: "We need your delivery address. Open the Address tab.", 8: "Dispatched to you. Please record your unboxing.", 9: "Delivered. Thank you for choosing Luxella." };
 const admin = createClient(URL_, SERVICE, { auth: { persistSession: false } });
 
-async function secrets() { const { data } = await admin.from("lx_secrets").select("k,v"); const m: Record<string, string> = {}; (data || []).forEach((r: any) => (m[r.k] = r.v)); return m; }
+async function secrets() { const { data } = await admin.from("lx_secrets").select("k,v"); const m: Record<string, string> = {}; (data || []).forEach((r: any) => (m[r.k] = r.v)); const eu = Deno.env.get("SMTP_USER"), ep = Deno.env.get("SMTP_PASS"); if (eu) m.smtp_user = eu; if (ep) m.smtp_pass = ep; return m; }
 
 const EM: Record<number, { h: string; t: string; n: string; cta?: [string, string] }> = {
   1: { h: "Order received", t: "We have your request for {item}. Luxella is now placing it with the store on your behalf.", n: "Nothing is needed from you. Stores usually confirm within about a week, and we will email you the moment it is accepted. If a store cancels in that window, we re-source the piece or refund you in full." },
@@ -238,6 +238,8 @@ Deno.serve(async (req) => {
     return json({ sent: (r as any).sent || 0, err: (r as any).err || "", subject: em.subject });
   }
   if (req.headers.get("x-lx-hook") !== sec.hook_secret) return json({ error: "Forbidden" }, 403);
+  // 24 Oct 2026: test mails to an arbitrary address need Jeet's login, never just the hook secret
+  if ((p.test_email || p.test_order) && !(await ownerFrom(req))) return json({ error: "Owner only" }, 403);
   if (p.test_email) { const em: Em = { subject: "Luxella email test", headline: "Email alerts are working", text: "If you can read this, email alerts are working.", cta: ["Open your page", "ov"] }; return json(await sendMail(sec, [String(p.test_email)], "there", "", em)); }
   if (p.test_order) { const d = p.test_order; const em = orderEmail(d, d.item || "Test piece", Number(d.stage) || 1); return json(await sendMail(sec, [String(p.to)], "there", "", em)); }
   if (p.table === "lx_orders" && p.op === "INSERT" && ((p.new || {}).data || {}).placed_by === "client") { const oj = fetch(URL_ + "/functions/v1/lx-order-alert", { method: "POST", headers: { "Content-Type": "application/json", "x-lx-hook": sec.hook_secret }, body: JSON.stringify(p) }).catch((e) => console.error("order-alert", e)); try { (globalThis as any).EdgeRuntime.waitUntil(oj); } catch (_e) { /* fall through */ } }
