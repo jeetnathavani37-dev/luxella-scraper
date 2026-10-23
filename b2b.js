@@ -1277,7 +1277,8 @@ window.lxB2B=async function(root,sb,toast){
   byKey('Profit by reshipper',r=>gv(r,'reshipper'));
   {const c=C('🧠 Learned patterns — real data se, koi assumption nahi');const ld=el('p','bb-meta','Loading…');c.appendChild(ld);
    const LB={store_to_hub_days:['Store → hub','d'],hub_to_india_days:['Hub → India','d'],km_payout_days:['KM payout after delivery','d'],reship_rs_per_kg:['Reship ₹/kg','₹'],weight_kg:['Weight by category','kg'],margin_pct:['Margin by brand (exact cost only)','%']};
-   (async()=>{const [a,b]=await Promise.all([sb.from('lx_v_patterns').select('*').gte('n',3),sb.from('lx_v_pattern_flags').select('*')]);ld.remove();
+   (async()=>{const [a,b,dp]=await Promise.all([sb.from('lx_v_patterns').select('*').gte('n',3),sb.from('lx_v_pattern_flags').select('*'),sb.from('lx_v_dupes').select('*')]);ld.remove();
+    if(dp&&dp.data&&dp.data.length){c.appendChild(el('div','pt-h','⚠ Same parcel, different channel — check ('+dp.data.length+')'));dp.data.forEach(x=>{const k=el('div','pt-f');k.appendChild(el('b',null,(x.orders||[]).join(' + ')));k.appendChild(el('span',null,(x.kind==='same_order_id'?'Same order ID twice':'Same tracking ')+' '+x.val));c.appendChild(k);});}
     if(a.error){c.appendChild(el('p','bb-meta','Could not load patterns'));return;}
     const F=(b.data||[]);if(F.length){c.appendChild(el('div','pt-h','⚠ Out of pattern — check ('+F.length+')'));F.forEach(f=>{const r=all.find(x=>(x.order_id||x._id)===f.order_id);const k=el('button','pt-f');k.appendChild(el('b',null,f.order_id));k.appendChild(el('span',null,f.detail));if(r)k.onclick=()=>openEd(r);c.appendChild(k);});}
     else c.appendChild(el('p','bb-meta','Sab pattern ke andar ✓'));
