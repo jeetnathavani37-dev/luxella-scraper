@@ -18,3 +18,17 @@ Objects added 23 Oct 2026. All live in `public`. Nothing is ever deleted; status
 | `lx_channel_stats()` | function | Server totals per channel (archived included) |
 
 Run the safety tests any time: `select lx_selftest();`
+
+## Added 23 Oct (intelligence & control layer)
+
+| Object | Purpose |
+|---|---|
+| `lx_approval_guard_t` | Only Jeet's login can set `received_ok` or close (`archived`) an order; agents are stripped and logged (`approval_blocked`) |
+| `lx_waive_guard_t` | Only Jeet can waive a problem |
+| `lx_v_problems` | Open problems ranked by severity + ₹ at stake + age, with "if ignored" and basis (verified rule vs learned pattern) |
+| `order.field` events | Before/after/who for price, payout, reship, profit, UTR, payout date, store order no, client, reshipper |
+| `doc.version` events | Previous text of every playbook / rule doc on each change (agent instructions are versioned) |
+| `price_stale` rule | To-place order whose store price check is older than 3 days |
+| Portal: All → Approvals, What-if, Problems "Do these first", order History | Approvals apply as Jeet; What-if never saves |
+
+Safety tests: 13 (`select lx_selftest();`).
