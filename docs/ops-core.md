@@ -156,3 +156,13 @@ Today → 🎯 Command is the first screen. It reads one owner-only function, `l
 It shows: overall status (red if any critical problem is open), orders in the pipeline by channel, money to collect on placed orders by channel (orders not yet placed shown apart), money received this month split by UTR-verified, decisions waiting, open/blocked/overdue tickets, agent runs logged, problems grouped by rule and ranked by severity then ₹ at stake, data freshness per source, and the numbers that cannot be trusted yet.
 
 The Overview card label changed from "Payout pending (all)" to "Payout pending (placed)": it always excluded orders still To place, and KM's figure now matches the Command Centre exactly.
+
+## Doubts & investigations (24 Oct 2026)
+
+Today → ❓ Doubts. Table `lx_doubts`, filled hourly at :39 by `lx_doubts_sync()` (source: `supabase/sql/lx_doubts.sql`).
+
+Sources: open agent questions (the same question asked again by the same agent is merged into one doubt), recon mismatches (sheet/mail vs portal, unlinked UTRs, sheet total), unverified "done" claims, duplicate tracking across channels.
+
+Each doubt has the 12 parts of the spec: what is unclear, why it matters, evidence with source and time, conflicting facts side by side, known, unknown, ranked possible explanations (labelled "not facts"), confidence with reason, recommended action, resolve options, approval, and a history record.
+
+Resolving: the agent's own options apply the same patches as Approvals and mark every merged question answered. "Resolved" closes the source check; the hourly check reopens it if the data is still wrong. "False alarm" needs a reason and waives the check. When a source closes elsewhere, the doubt closes itself with that fact recorded. Nothing here changes an order except an option you click.
