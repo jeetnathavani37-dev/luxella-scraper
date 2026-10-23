@@ -86,3 +86,32 @@ Verified 2026-10-23: a syntax error and a runtime error in a workspace were both
   - Raises one problem per agent per rule. A rule that is no longer seen auto-resolves.
 - UI: HQ → 📈 Agent stats. Shows runs, ok % (ok ÷ all runs), last ok, actions, tickets in, open questions, and drill-down. Tokens, cost, tool calls and retries show "not measured".
 - All 13 scheduled agents (brain, ops, mail, tracking, reconciler, cfo, payout, pricing, clientdesk, auditor, qa, council, reconloader) start with `lx_agent_start` and end with `lx_agent_done` (prompts updated 24 Oct 2026, Jeet approved). Night Council now ends through `lx_agent_done` too.
+
+## Write guard (Trust layer Phase A, 24 Oct 2026)
+
+`lx_write_guard_t` is a BEFORE INSERT/UPDATE/DELETE trigger on `lx_b2b`. It enforces these rules on every writer that is not exempt. Agents write as `postgres`, so it applies to all of them.
+
+- An order's status may move only forward (`lx_st_rank`), or to Cancelled.
+- A filled protected field is never overwritten: price_usd, payout, payout_utr, payout_date, retailer_order_id, retailer_tracking, reshipper, client, order_id.
+- A filled text or number field is never blanked.
+- An order whose order_id is already live cannot be inserted again.
+- No row of any kind can be deleted. The row is kept.
+
+When a change is blocked:
+- The rest of the write still applies.
+- A `guard.blocked` event is written, with the agent from `lx_current_agent()`.
+- A deduped ✓ Approvals card is created. Its "Haan, apply karo" button applies the change through Jeet's login.
+
+Exempt writers:
+- Jeet's owner login.
+- Flows (`lx.in_flow`).
+- `service_role` (edge functions such as km-sync and sx-sync).
+- A session with `set_config('lx.override','<reason>',true)`. Every override is logged as `guard.override`.
+
+Other parts of Phase A:
+- Field history (`order.field.by`) now names the agent whose run is open, instead of `postgres`.
+- `lx_claim_check()` runs hourly (cron `lx-claim-check`). It raises `claim_unverified` for any ticket closed as done that asked for a change, where no event or log for that order exists between open and close. Results saying "already" or "no change" are skipped.
+- `lx_guard_selftest()` has 11 tests in a rolled-back sub-transaction. It runs daily (cron `lx-guard-selftest`), writes the result to meta/guard_selftest, and raises `selftest_failed` on any failure. The existing 13 tests still pass with the guard on.
+- The delete-block path is not covered by an automated test: SQL containing `delete` is cancelled from this tooling.
+
+Rollback: `drop trigger lx_write_guard_t on lx_b2b;`. Everything else is additive.
