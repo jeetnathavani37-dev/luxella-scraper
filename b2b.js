@@ -428,7 +428,7 @@ window.lxB2B=async function(root,sb,toast){
   navBar(wrap);
   const P=el('div','bp-main');wrap.appendChild(P);
   if(S.tab==='tools'){S.tool=S.tool||'orders';const tc=el('div','bb-chips');[['orders','All orders'],['todo','To-do lists'],['pipe','Pipeline'],['bulk','Bulk upload'],['calc','Bid calculator'],['add','Add order'],['export','Export']].forEach(([id,t])=>{const b=el('button','bb-chip'+(S.tool===id?' on':''),t);b.onclick=()=>{S.tool=id;draw();};tc.appendChild(b);});P.appendChild(tc);const P2=el('div');P.appendChild(P2);({orders:orders,todo:todo,pipe:pipe,bulk:bulk,calc:calc,add:add,export:exp})[S.tool](P2);return;}
-  ({appr:apprT,whatif:whatifT,exc:excT,flows:flowsT,allov:allOvT,overview:overview,stats:statsT,msgs:msgsT,inbox:inboxT,sx:sxT,todos:todosT,toplace:toplaceT,transit:transitT,intl:intlT,costing:costingT,messages:messagesT,wh:whT,rs:P=>{rsRenameCard(P);rsT(P);},landed:landedT,mrn:mrnT,alerts:alertsT,bids:bids,buys:buys,reship:reship,tokm:tokmT,confirm:confirmT,payouts:payouts,pay_run:payouts,pay_chase:payouts,pay_got:payouts,money:money,cashback:cashbackT,boxes:boxesT,checklist:checklist,agents:agentsTab,org:orgT})[S.tab](P);try{tidy(P,S.tab);}catch(e){}};
+  ({appr:apprT,recon:reconT,whatif:whatifT,exc:excT,flows:flowsT,allov:allOvT,overview:overview,stats:statsT,msgs:msgsT,inbox:inboxT,sx:sxT,todos:todosT,toplace:toplaceT,transit:transitT,intl:intlT,costing:costingT,messages:messagesT,wh:whT,rs:P=>{rsRenameCard(P);rsT(P);},landed:landedT,mrn:mrnT,alerts:alertsT,bids:bids,buys:buys,reship:reship,tokm:tokmT,confirm:confirmT,payouts:payouts,pay_run:payouts,pay_chase:payouts,pay_got:payouts,money:money,cashback:cashbackT,boxes:boxesT,checklist:checklist,agents:agentsTab,org:orgT})[S.tab](P);try{tidy(P,S.tab);}catch(e){}};
  function orders(P){const c=el('div','bb-card');P.appendChild(c);
   const bar=el('div','bb-bar');S.q='';
   const who=document.createElement('select');[['KicksMachine','KicksMachine'],['Sourcex','Sourcex'],['__wa','WhatsApp clients'],['','All']].forEach(([v,t])=>{const o=el('option',null,t);o.value=v;if(v===S.who)o.selected=true;who.appendChild(o);});
@@ -1331,6 +1331,26 @@ window.lxB2B=async function(root,sb,toast){
    out.appendChild(el('p','bb-meta',N+' open orders not counted — cost missing (see Problems). Profit = payout − (price × FX + reship + tax), same formula as the portal.'));}
   calc();}
  /* ================= EXCEPTIONS: every missing / wrong thing, with owner + action ================= */
+ function reconT(P){const hd=el('div','al-hd');hd.appendChild(el('h1',null,'Reconcile'));hd.appendChild(el('p',null,'MRN sheets (aapki + KM ki), payout mails (UTR) aur order mails ko portal se milata hai. Sirf flag karta hai — koi order khud nahi badalta. Har ghante chalta hai.'));P.appendChild(hd);
+  const box=el('div');P.appendChild(box);box.appendChild(el('p','bb-meta','Loading…'));const R=v=>v==null?'—':'₹'+Math.round(Number(v)).toLocaleString('en-IN');
+  (async()=>{const [e,x]=await Promise.all([sb.from('lx_exceptions').select('*').like('rule','recon_%').eq('status','open'),sb.from('lx_v_recon').select('*')]);box.textContent='';
+   if(e.error||x.error){box.appendChild(el('p','bb-meta','Could not load'));return;}
+   const SV={critical:0,high:1,medium:2};const E=(e.data||[]).sort((a,b)=>(SV[a.severity]??3)-(SV[b.severity]??3));
+   const c1=el('div','st-c full');c1.appendChild(el('h3',null,E.length?'⚠ Mismatches — '+E.length:'Sab match ✓'));
+   E.forEach(z=>{const o=z.order_id&&all.find(y=>(y.order_id||'').replace(/^#(?=US|SX)/,'')===z.order_id);const r=el(o?'button':'div','ex-tp');r.appendChild(el('b',null,(z.severity==='critical'?'🔴 ':'🟡 ')+(z.order_id||z.ref.replace(/^[a-z_]+:/,''))));r.appendChild(el('span',null,z.reason));r.appendChild(el('small',null,'→ '+z.action));if(o)r.onclick=()=>openEd(o);c1.appendChild(r);});
+   box.appendChild(c1);
+   const X=x.data||[];const g=el('div','st-g');box.appendChild(g);
+   const c2=el('div','st-c');c2.appendChild(el('h3',null,'MRN batches — sheet vs portal'));g.appendChild(c2);
+   const bat={};X.filter(r=>r.src.startsWith('mrn')).forEach(r=>{const k=r.src+'|'+r.batch;(bat[k]=bat[k]||[]).push(r);});
+   Object.entries(bat).sort((a,b)=>String(b[1][0].meta.mrn||'').localeCompare(String(a[1][0].meta.mrn||''))||a[0].localeCompare(b[0])).forEach(([k,rows])=>{const [src,b]=k.split('|');const s=rows.reduce((t,r)=>t+Number(r.amount||0),0),t=Number(rows[0].batch_total||0);
+    const bad=E.some(z=>z.ref.startsWith(src+':'+b));const l=el('div','pt-r');l.appendChild(el('span',null,(src==='mrn_km'?'KM sheet ':'Your sheet ')+b));l.appendChild(el('b',null,bad?'⚠ check':'✓'));
+    l.appendChild(el('small',null,rows.length+' items · rows '+R(s)+' · total '+R(t)+(rows[0].meta.km_status?' · KM: '+rows[0].meta.km_status:'')));c2.appendChild(l);});
+   const c3=el('div','st-c');c3.appendChild(el('h3',null,'Payouts received — UTR vs orders'));g.appendChild(c3);
+   X.filter(r=>r.src==='payout_mail').sort((a,b)=>String(b.meta.paid_on).localeCompare(String(a.meta.paid_on))).forEach(r=>{const os=all.filter(o=>String(gv(o,'payout_utr')||'')===r.batch);const s=os.reduce((t,o)=>t+(Number(gv(o,'payout'))||0),0);const ok=os.length&&Math.abs(s-Number(r.amount))<=1;
+    const l=el('div','pt-r');l.appendChild(el('span',null,r.meta.paid_on+' · '+R(r.amount)));l.appendChild(el('b',null,ok?'✓':os.length?'⚠ '+R(s):'⚠ not linked'));l.appendChild(el('small',null,'UTR '+r.batch+(os.length?' · '+os.map(o=>o.order_id).join(', '):'')));c3.appendChild(l);});
+   X.filter(r=>r.src==='payout_link').forEach(r=>{const l=el('div','pt-r');l.appendChild(el('span',null,'KM link · MRN '+String(r.meta.mrn||'').slice(5).split('-').reverse().join('-')));l.appendChild(el('b',null,'link only'));l.appendChild(el('small',null,'sent '+(r.meta.sent_on||'')+' · a link is not proof of credit — add UTR when paid'));c3.appendChild(l);});
+   box.appendChild(el('p','bb-meta','Sources: '+X.length+' rows · last loaded '+(X.length?new Date(X.map(r=>r.ingested_at).sort().pop()).toLocaleString('en-IN'):'—')+'. MRN sheets are read-only for agents.'));
+  })();}
  function excT(P){const hd=el('div','al-hd');hd.appendChild(el('h1',null,'Problems'));hd.appendChild(el('p',null,'Har hour sab orders check hote hain. Koi value khud nahi bharti — har line batati hai kya missing hai, kaun theek karega, aur kya karna hai. Resolve = theek ho gaya (check dobara fail hua to wapas khulega). Waive = jaan bujh ke chhod do, reason ke saath.'));P.appendChild(hd);
   const bar=el('div','bb-chips');P.appendChild(bar);const box=el('div');P.appendChild(box);box.appendChild(el('p','bb-meta','Loading…'));
   const SEV={critical:['Critical','#e9a08f'],high:['High','#E3C565'],medium:['Medium','#A39C90']};
@@ -1819,7 +1839,7 @@ const G_ALL=['allg','All',[['allov','Overview',()=>0],['exc','⚠ Problems',()=>
  const flowG=(ids)=>['flow','Pipeline',FLOW.filter(([id])=>!ids||ids.includes(id)).map(([id,t,i])=>[id,(i+1)+' · '+t,()=>id==='pay_got'?0:(STAGES[i][2]()||[]).length])];
  const G_ALERTS=['alerts','Alerts',[['alerts','Alerts',()=>all.filter(r=>isKM(r)&&r.payout_status!=='Received'&&alertsOf(r).length).length],['costing','💰 Costing',()=>all.filter(needCost).length],['messages','✉️ Messages',()=>0]]];
  const G_SX=['sx','Sourcex',[['sx','Sourcex',()=>all.filter(r=>r.client==='Sourcex'&&r.status!=='Cancelled'&&['Pending','Unverified','Link received'].includes(r.payout_status)).length]]];
- const G_MONEY=['money','Money',[['money','Money',()=>0],['cashback','💸 Cashback',()=>all.filter(r=>gv(r,'cashback_status')==='Pending').length]]];
+ const G_MONEY=['money','Money',[['money','Money',()=>0],['recon','🔍 Reconcile',()=>0],['cashback','💸 Cashback',()=>all.filter(r=>gv(r,'cashback_status')==='Pending').length]]];
  const G_BOXES=['boxes','Boxes',[['boxes','📦 Boxes',()=>BOXES.filter(b=>!['Landed','Done'].includes(b.status)).length],['rs','Reshippers',()=>0]]];
  const G_ORDERS=['buys','Orders',[['buys','All orders',()=>0]]];
  const G_HQ=['hq','HQ',[['messages','✉️ Messages',()=>TPL.reduce((n,t)=>n+KMO().filter(r=>r.status!=='Cancelled'&&t[2](r)).length,0)],['costing','💰 Costing',()=>all.filter(needCost).length],['org','🏢 Org',()=>TICKETS.filter(t=>t.status!=='done').length],['flows','⚡ Flows',()=>0],['agents','Agents',()=>0],['checklist','Checklist',()=>0],['tools','More tools',()=>0]]];
