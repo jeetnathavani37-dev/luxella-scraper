@@ -115,3 +115,22 @@ Other parts of Phase A:
 - The delete-block path is not covered by an automated test: SQL containing `delete` is cancelled from this tooling.
 
 Rollback: `drop trigger lx_write_guard_t on lx_b2b;`. Everything else is additive.
+
+## Email facts (Trust layer Phase C, 24 Oct 2026)
+
+`lx_mail_fact(agent, message_id, thread_id, mail_at, sender, subject, order_id, match, facts[])` is the only path for order fields that come from an email. The Mail, Payout and Tracking prompts were updated to use it.
+
+For each fact, `{field, value, basis: stated|inferred}`, it does the following:
+- **Duplicate:** the same message + order + field already processed → `duplicate`. Nothing is written.
+- **Becomes a proposal** (Approvals card) when any of these is true: unknown field; match not `exact`; basis `inferred`; a payment field (UTR, date, status) from a sender that is not Razorpay, Cashfree, KM finance or Culture Circle.
+- **Same value as stored** → `already`.
+- **Otherwise** it writes the field and reads it back:
+  - `applied` if the stored value now matches.
+  - `blocked` if the write guard kept the old value. The guard has already created a proposal.
+- **Unknown order** → `no_order`. Nothing is written.
+
+Every fact is stored in `lx_mail_facts`: message and thread ids, sender, subject, stated/inferred, match, action, before and after values, agent.
+
+`lx_mail_selftest()` covers 11 scenarios: exact fill; the same mail twice; an inferred value; a supplier price change on a priced order; a fake payment mail; a real Razorpay UTR; a fuzzy match; a malicious mail trying to set payout; an unknown order; one mail with two orders; every fact recorded.
+
+The daily `lx_guard_selftest_run()` runs the guard and mail suites together. Result on 24 Oct: 22/22 passed.
