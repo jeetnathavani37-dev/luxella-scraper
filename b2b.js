@@ -1429,6 +1429,16 @@ window.lxB2B=async function(root,sb,toast){
     else c.appendChild(el('p','bb-meta','Sab pattern ke andar ✓'));
     const by={};(a.data||[]).forEach(x=>{(by[x.metric]=by[x.metric]||[]).push(x);});
     Object.keys(LB).filter(m=>by[m]).forEach(m=>{const [t,u]=LB[m];c.appendChild(el('div','pt-h',t));by[m].filter(x=>x.key!=='Unknown').sort((x,y)=>y.n-x.n).forEach(x=>{const fm=v=>u==='₹'?'₹'+Math.round(v):u==='%'?Number(v).toFixed(1)+'%':Number(v)+(u==='d'?'d':' kg');const l=el('div','pt-r');l.appendChild(el('span',null,x.key));l.appendChild(el('b',null,fm(x.median)));l.appendChild(el('small',null,fm(x.p25)+'–'+fm(x.p75)+' · '+x.n+' orders'));c.appendChild(l);});});})();}
+  {const c=C('📊 Supplier scorecard — reshippers & stores');const ld=el('p','bb-meta','Loading…');c.appendChild(ld);
+   (async()=>{const q=await sb.from('lx_v_supplier_score').select('*');ld.remove();if(q.error){c.appendChild(el('p','bb-meta','Could not load scorecard'));return;}
+    const R=(q.data||[]).filter(x=>x.key!=='Unknown');
+    c.appendChild(el('div','pt-h','Reshippers · hub → India vs your SLA'));
+    R.filter(x=>x.kind==='reshipper').sort((a,b)=>b.n_orders-a.n_orders).forEach(x=>{const l=el('div','pt-r'+(x.on_time_pct!=null&&x.on_time_pct<50?' bad':''));l.appendChild(el('span',null,x.key));
+     l.appendChild(el('b',null,x.on_time_pct!=null?x.on_time_pct+'% on time':(x.note||'—')));
+     l.appendChild(el('small',null,[x.med_days!=null?'median '+Number(x.med_days)+'d':null,x.sla_days?'SLA '+Number(x.sla_days)+'d':null,'landed '+x.n_landed+'/'+x.n_orders,x.late_now?x.late_now+' late now':null,x.rs_per_kg?'₹'+x.rs_per_kg+'/kg ('+x.n_rate+')':null].filter(Boolean).join(' · ')));c.appendChild(l);});
+    c.appendChild(el('div','pt-h','Stores · order → hub'));
+    R.filter(x=>x.kind==='store').sort((a,b)=>b.n_orders-a.n_orders).slice(0,8).forEach(x=>{const l=el('div','pt-r');l.appendChild(el('span',null,x.key));l.appendChild(el('b',null,x.med_days!=null&&x.n_landed>=5?Number(x.med_days)+'d':(x.note||'—')));l.appendChild(el('small',null,'reached hub '+x.n_landed+'/'+x.n_orders+(x.late_now?' · '+x.late_now+' late now':'')));c.appendChild(l);});
+    c.appendChild(el('p','bb-meta','Score shows only with 5+ completed orders. On time = hub → India within your SLA rule.'));})();}
   {const need=live.filter(needCost);const c=C('💰 Add costing for these items — not counted above');if(!need.length)c.appendChild(el('p','bb-meta','All costed ✓'));else{const b=el('button','bb-b blink cost-cta','💰 Add costing · '+need.length);b.onclick=()=>{S.costFor=null;S.tab='costing';draw();};c.appendChild(b);need.slice(0,20).forEach(r=>{const k=el('button','st-rk bad');k.appendChild(el('span',null,(r.order_id||r._id)+' · '+String(r.item||'').slice(0,36)));k.appendChild(el('b',null,inr(PAY(r))));k.appendChild(el('small',null,estSus(r)));k.onclick=()=>{S.costFor=[r._id];S.tab='costing';draw();};c.appendChild(k);});}}
  }
  /* ================= Profit: estimated vs actual ================= */
