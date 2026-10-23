@@ -47,3 +47,27 @@ Every run is logged in `lx_b2b` meta/releases (last 30: time, commit, b2b.js has
 `release.sh rollback [dpl_id]` points the domain back in about 1 second.
 Secrets: VT/TEAM (Vercel) and LX_SMOKE_EM/LX_SMOKE_PW come from env only. The smoke test never touches orders.
 Verified 2026-10-23: a syntax error and a runtime error in a workspace were both blocked at step 1/2; rollback took 1.4 s.
+
+## Revenue leakage recon (flag-only)
+
+`lx_recon` holds facts copied from outside sources. `lx_v_recon` shows the non-stale rows. Order rows are never written by recon.
+
+| src | batch | from |
+|---|---|---|
+| mrn_jeet / mrn_km | sheet tab | JeetXMRNKM / KM's JEET KM MRN (read-only) |
+| payout_mail | UTR | Razorpay "Paid out Successfully" (Sourcex), KM credit mails |
+| payout_link | km-cashfree-<date> | KM finance link mails (link is not proof of credit) |
+| order_mail | order id | KM "You won the bid", SourceX "Order Received" |
+
+- `lx_recon_load(src,batch,total,rows,meta,evidence)`: upserts one batch. Rows that disappear are marked stale, never deleted. Owner or service only.
+- `lx_recon_check()`: hourly (cron `lx-recon-check`, minute 27). Writes to lx_exceptions; recon rules that are no longer seen auto-resolve.
+- Rules:
+  - recon_sum: sheet rows ≠ sheet TOTAL
+  - recon_amount: MRN or order-mail amount ≠ portal payout
+  - recon_missing: on MRN but not in the portal, or Delivered to KM but not on KM's sheet
+  - recon_unlinked: UTR with no order; suggests a candidate order
+  - recon_payout: UTR amount ≠ the orders on it
+  - recon_no_evidence: KM Received with no UTR and no payout mail or link for its MRN
+- Loader: scheduled task "B2B · 🔍 Recon Loader", 09:43 + 21:43 IST.
+- UI: Money → 🔍 Reconcile.
+- First run (24 Oct 2026): 67 source rows, 9 flags. KM 8-10 sheet ₹3,300 over its total; US108960/US109072 amounts swapped on KM's sheet; MRN 08-10 (₹75,700) marked Received with no KM payout evidence; SX342071 paid ₹128 less than the order mail; UTR 625023094972 (₹9,058) unlinked, likely SX314613. Sourcex UTRs Jul–Oct all tie out to the rupee.
