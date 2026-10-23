@@ -381,6 +381,12 @@ body::before{content:"";position:fixed;left:0;right:0;top:0;height:1px;backgroun
 #admin-root .px-i{background:none;border:0;color:#6f695f;font-size:10px;letter-spacing:.22em;text-transform:uppercase;cursor:pointer;padding:2px 0;margin:2px 0 6px;display:block}#admin-root .px-i:hover,#admin-root .px-i.on{color:var(--lx-gold)}
 #admin-root .al-src{display:none}
 #admin-root .st-g{align-items:start}
+.ex-s{margin:14px 0 22px}.ex-h{display:flex;align-items:baseline;gap:12px;border-left:2px solid;padding:2px 0 2px 12px;margin-bottom:10px}.ex-h b{font-weight:500;letter-spacing:.28em;text-transform:uppercase;font-size:12px;color:var(--lx-ivory)}.ex-h small{color:var(--lx-mute);font-size:11px}
+.ex-g{border:1px solid #1d1b18;background:#050505;margin:6px 0}.ex-g>summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;gap:12px;padding:12px 14px;transition:background .3s var(--px-ease)}.ex-g>summary::-webkit-details-marker{display:none}.ex-g>summary:hover{background:#0b0a08}.ex-g[open]>summary{border-bottom:1px solid #1d1b18}
+.ex-g>summary span{color:var(--lx-ivory);font-size:13px}.ex-g>summary small{color:var(--lx-mute);font-size:11.5px;text-align:right}
+.ex-r{display:grid;grid-template-columns:120px 1fr 50px auto auto;gap:10px;align-items:center;padding:8px 14px;border-top:1px solid #12110e;font-size:12.5px}.ex-r span{color:var(--lx-mute)}.ex-r small{color:#6f695f;font-size:11px}
+.ex-id{background:none;border:0;color:var(--lx-gold2);font:inherit;text-align:left;cursor:pointer;padding:0}
+@media(max-width:640px){.ex-r{grid-template-columns:1fr auto auto}.ex-r span,.ex-r small{grid-column:1/-1}}
 `;document.head.appendChild(css);
 
 window.lxB2B=async function(root,sb,toast){
@@ -404,7 +410,7 @@ window.lxB2B=async function(root,sb,toast){
  const save=async(r,patch)=>{const d=Object.assign({},r,patch);['_id','_u'].forEach(k=>delete d[k]);
   const L=Number(d.landed),P=Number(d.payout);if(L&&P){d.profit=Math.round((P-L)*100)/100;d.profit_pct=(P-L)/L;d.margin_ok=(P-L)/L>=0.2?'Yes':'No';}
   const r2=await sb.from('lx_b2b').upsert({kind:'order',id:r._id,data:d,updated_at:new Date().toISOString()},{onConflict:'kind,id'});
-  if(r2.error){toast('Could not save: '+r2.error.message);return false;}Object.assign(r,d,{_u:new Date().toISOString()});toast('Saved');return true;};
+  if(r2.error){toast('Could not save: '+r2.error.message);return false;}const pv=r.payout_status;if(d.payout_status==='Received'&&pv!=='Received'&&!d.payout_utr&&!d.received_ok){d.payout_status=pv||'Pending';d.payout_claim='Received';Object.assign(r,d,{_u:new Date().toISOString()});toast('UTR nahi hai — Received tabhi hoga jab aap Inbox me confirm karoge');return true;}Object.assign(r,d,{_u:new Date().toISOString()});toast('Saved');return true;};
  const draw=()=>{wrap.textContent='';
   const km=all.filter(r=>r.client==='KicksMachine');const open=km.filter(r=>!DONE(r.status));const costed=km.filter(r=>Number(r.landed)>0);
   const atR=km.filter(r=>r.status==='At reshipper');const oldest=Math.max(0,...atR.map(r=>days(r.delivered_reshipper)||0));
@@ -415,7 +421,7 @@ window.lxB2B=async function(root,sb,toast){
   navBar(wrap);
   const P=el('div','bp-main');wrap.appendChild(P);
   if(S.tab==='tools'){S.tool=S.tool||'orders';const tc=el('div','bb-chips');[['orders','All orders'],['todo','To-do lists'],['pipe','Pipeline'],['bulk','Bulk upload'],['calc','Bid calculator'],['add','Add order'],['export','Export']].forEach(([id,t])=>{const b=el('button','bb-chip'+(S.tool===id?' on':''),t);b.onclick=()=>{S.tool=id;draw();};tc.appendChild(b);});P.appendChild(tc);const P2=el('div');P.appendChild(P2);({orders:orders,todo:todo,pipe:pipe,bulk:bulk,calc:calc,add:add,export:exp})[S.tool](P2);return;}
-  ({flows:flowsT,allov:allOvT,overview:overview,stats:statsT,msgs:msgsT,inbox:inboxT,sx:sxT,todos:todosT,toplace:toplaceT,transit:transitT,intl:intlT,costing:costingT,messages:messagesT,wh:whT,rs:P=>{rsRenameCard(P);rsT(P);},landed:landedT,mrn:mrnT,alerts:alertsT,bids:bids,buys:buys,reship:reship,tokm:tokmT,confirm:confirmT,payouts:payouts,pay_run:payouts,pay_chase:payouts,pay_got:payouts,money:money,cashback:cashbackT,boxes:boxesT,checklist:checklist,agents:agentsTab,org:orgT})[S.tab](P);try{tidy(P,S.tab);}catch(e){}};
+  ({exc:excT,flows:flowsT,allov:allOvT,overview:overview,stats:statsT,msgs:msgsT,inbox:inboxT,sx:sxT,todos:todosT,toplace:toplaceT,transit:transitT,intl:intlT,costing:costingT,messages:messagesT,wh:whT,rs:P=>{rsRenameCard(P);rsT(P);},landed:landedT,mrn:mrnT,alerts:alertsT,bids:bids,buys:buys,reship:reship,tokm:tokmT,confirm:confirmT,payouts:payouts,pay_run:payouts,pay_chase:payouts,pay_got:payouts,money:money,cashback:cashbackT,boxes:boxesT,checklist:checklist,agents:agentsTab,org:orgT})[S.tab](P);try{tidy(P,S.tab);}catch(e){}};
  function orders(P){const c=el('div','bb-card');P.appendChild(c);
   const bar=el('div','bb-bar');S.q='';
   const who=document.createElement('select');[['KicksMachine','KicksMachine'],['Sourcex','Sourcex'],['__wa','WhatsApp clients'],['','All']].forEach(([v,t])=>{const o=el('option',null,t);o.value=v;if(v===S.who)o.selected=true;who.appendChild(o);});
@@ -1289,6 +1295,26 @@ window.lxB2B=async function(root,sb,toast){
   if(!act.length)P.appendChild(el('p','bb-meta','No pending tasks ✓'));}
 
 
+
+ /* ================= EXCEPTIONS: every missing / wrong thing, with owner + action ================= */
+ function excT(P){const hd=el('div','al-hd');hd.appendChild(el('h1',null,'Problems'));hd.appendChild(el('p',null,'Har hour sab orders check hote hain. Koi value khud nahi bharti — har line batati hai kya missing hai, kaun theek karega, aur kya karna hai. Resolve = theek ho gaya (check dobara fail hua to wapas khulega). Waive = jaan bujh ke chhod do, reason ke saath.'));P.appendChild(hd);
+  const bar=el('div','bb-chips');P.appendChild(bar);const box=el('div');P.appendChild(box);box.appendChild(el('p','bb-meta','Loading…'));
+  const SEV={critical:['Critical','#e9a08f'],high:['High','#E3C565'],medium:['Medium','#A39C90']};
+  (async()=>{const r=await sb.from('lx_exceptions').select('*').eq('status','open').order('severity').order('created_at').limit(2000);box.textContent='';if(r.error){box.appendChild(el('p','bb-meta','Could not load'));return;}
+   let L=r.data||[];const owners={};L.forEach(x=>{owners[x.owner||'—']=(owners[x.owner||'—']||0)+1;});
+   [['','All',L.length],...Object.entries(owners).sort((a,b)=>b[1]-a[1]).map(([k,n])=>[k,(AGN[k]||k),n])].forEach(([k,t,n])=>{const b=el('button','bb-chip'+((S.excOw||'')===k?' on':''),t);b.appendChild(el('b',null,String(n)));b.onclick=()=>{S.excOw=k;draw();};bar.appendChild(b);});
+   if(S.excOw)L=L.filter(x=>(x.owner||'—')===S.excOw);
+   if(!L.length){box.appendChild(el('p','bb-meta','Koi open problem nahi ✓'));return;}
+   ['critical','high','medium'].forEach(sv=>{const A=L.filter(x=>x.severity===sv);if(!A.length)return;const [lab,col]=SEV[sv];
+    const sec=el('div','ex-s');const h=el('div','ex-h');h.appendChild(el('b',null,lab));h.appendChild(el('small',null,A.length+' open'));h.style.borderColor=col;sec.appendChild(h);
+    const byRule={};A.forEach(x=>{(byRule[x.rule]=byRule[x.rule]||[]).push(x);});
+    Object.entries(byRule).sort((a,b)=>b[1].length-a[1].length).forEach(([rule,X])=>{const g=el('details','ex-g');const sm=el('summary');sm.appendChild(el('span',null,X[0].reason.replace(/:.*$/,'').replace(/\d+ days ago/,'N days ago')));sm.appendChild(el('small',null,X.length+' · '+(AGN[X[0].owner]||X[0].owner||'')+' · '+X[0].action));g.appendChild(sm);
+     X.forEach(x=>{const row=el('div','ex-r');const o=all.find(y=>y._id===x.ref);const id=el(o?'button':'b','ex-id',x.order_id||x.ref);if(o)id.onclick=()=>openEd(o);row.appendChild(id);row.appendChild(el('span',null,x.reason));
+      const age=Math.floor((Date.now()-new Date(x.created_at))/864e5);row.appendChild(el('small',null,age?age+'d':'today'));
+      const rs=btn('Resolve',async()=>{const q=await sb.from('lx_exceptions').update({status:'resolved',resolved_at:new Date().toISOString(),resolved_by:'jeet'}).eq('id',x.id);if(!q.error){row.remove();toast('Resolved');}},'bb-b g sm');
+      const wv=btn('Waive',async()=>{const why=prompt('Kyun chhodna hai? (reason zaroori)');if(!why||!why.trim())return;const q=await sb.from('lx_exceptions').update({status:'waived',resolved_at:new Date().toISOString(),resolved_by:'jeet',note:why.trim()}).eq('id',x.id);if(!q.error){row.remove();toast('Waived');}},'bb-b g sm');
+      row.append(rs,wv);g.appendChild(row);});sec.appendChild(g);});box.appendChild(sec);});
+  })();}
  /* ================= FLOWS: n8n-style automations on the event bus ================= */
  const EVL={'order.created':'New order','order.status':'Status changed','order.payout':'Payout changed','order.tracking':'Tracking added','jeet.message':'Jeet ka message','ticket.created':'Ticket created','*':'Every event'};
  function flowsT(P){const hd=el('div','al-hd');hd.appendChild(el('h1',null,'Flows'));hd.appendChild(el('p',null,'Har event (order, status, payout, aapka message) central brain ke event bus pe aata hai. Flows usse sahi agent tak le jaate hain — ticket, message ya n8n. Data sirf safe update (lx_apply) se badalta hai.'));P.appendChild(hd);
@@ -1742,7 +1768,7 @@ const sendMsg=async(thread,text,atts,meta)=>{const id='m-'+Date.now().toString(3
  const cnt=fnc=>{try{return fnc();}catch(e){return 0;}};
  const FLOW=[['bids','Bids',0],['toplace','To place',1],['intl','Ordered',2],['transit','In transit',3],['wh','Reached hub',4],['landed','Flying → India',5],['tokm','To KM',6],['mrn','MRN',7],['confirm','KM confirm',8],['pay_run','Payout timer',9],['pay_chase','Chase payout',10],['pay_got','Paid',11]];
  const G_TODAY=['today','Today',[['overview','Overview',()=>0],['todos','To-dos',()=>todoCount()]]];
-const G_ALL=['allg','All',[['allov','Overview',()=>0],['stats','Stats',()=>0]]];const G_STATS=['statsg','Stats',[['stats','Stats',()=>0]]];
+const G_ALL=['allg','All',[['allov','Overview',()=>0],['exc','⚠ Problems',()=>0],['stats','Stats',()=>0]]];const G_STATS=['statsg','Stats',[['stats','Stats',()=>0]]];
  const G_INBOX=['inbox','Inbox',[['inbox','Inbox',()=>unreadAll()]]];
  const G_MSGS=['msgs','Messages',[['msgs','Messages',()=>msgCount()]]];
  const flowG=(ids)=>['flow','Pipeline',FLOW.filter(([id])=>!ids||ids.includes(id)).map(([id,t,i])=>[id,(i+1)+' · '+t,()=>id==='pay_got'?0:(STAGES[i][2]()||[]).length])];
