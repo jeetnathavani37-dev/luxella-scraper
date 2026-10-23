@@ -85,4 +85,4 @@ Verified 2026-10-23: a syntax error and a runtime error in a workspace were both
   - agent_unanswered_ask: questions to Jeet unanswered 24h+.
   - Raises one problem per agent per rule. A rule that is no longer seen auto-resolves.
 - UI: HQ → 📈 Agent stats. Shows runs, ok % (ok ÷ all runs), last ok, actions, tickets in, open questions, and drill-down. Tokens, cost, tool calls and retries show "not measured".
-- Pending: the `lx_agent_start` line in agent instructions. The update to the agent-api doc was blocked, so it needs Jeet to apply it or approve it again.
+- All 13 scheduled agents (brain, ops, mail, tracking, reconciler, cfo, payout, pricing, clientdesk, auditor, qa, council, reconloader) start with `lx_agent_start` and end with `lx_agent_done` (prompts updated 24 Oct 2026, Jeet approved). Night Council now ends through `lx_agent_done` too.
