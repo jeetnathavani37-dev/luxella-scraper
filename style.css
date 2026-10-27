@@ -1802,3 +1802,7 @@ html.lx-ro #tb-switch,html.lx-ro #tb-out,html.lx-ro #top .who{display:none!impor
 .sw.sw .st .sdesc p,.sw.sw .datenote,.sw.sw .note,.sw.sw p.note,.sw.sw .hero-cap,.sw.sw .ab-l span,.sw.sw .lx-await>div:nth-child(2)+*,.sw.sw .pc2-m small,.sw.sw .ord .lbl,.sw.sw #nextdel .lbl,.sw.sw .lbl{font-family:'Lux Text','Jost',sans-serif!important;font-weight:400!important;letter-spacing:.02em}
 .sw.sw .st .sdesc p{font-size:13px!important;line-height:1.7!important;color:#bdb4a4!important}
 .sw.sw .datenote{font-size:11.5px!important;line-height:1.65!important}
+/* product photos: full piece, never cropped, clean white plate (GOAT-style) */
+.sw.sw img.ph,.sw.sw .pc2-ph img,.sw.sw .rts-i img,.sw.sw #nextdel img,.sw.sw .feat img,.sw.sw #ordT td img{object-fit:contain!important;object-position:center!important;background:#fff!important;padding:7%!important;box-sizing:border-box!important;border:0!important;border-radius:4px!important;box-shadow:0 1px 0 rgba(255,255,255,.04),0 8px 22px rgba(0,0,0,.35)!important;aspect-ratio:1/1;height:auto}
+.sw.sw div.ph{border:1px dashed rgba(201,169,106,.25)!important;background:transparent!important;border-radius:4px!important;display:flex;align-items:center;justify-content:center;font:400 9px 'Jost',sans-serif;letter-spacing:.16em;color:#6f685d;text-transform:uppercase;text-align:center}
+.sw.sw img.ph.big:hover{transform:none!important}
