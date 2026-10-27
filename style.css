@@ -1700,3 +1700,29 @@ html.lx-ro #tb-switch,html.lx-ro #tb-out,html.lx-ro #top .who{display:none!impor
 .sw #tracker:empty,.sw #ordT tbody:empty{display:block;min-height:260px;border-radius:4px;background:linear-gradient(90deg,rgba(201,169,106,.05) 25%,rgba(201,169,106,.13) 37%,rgba(201,169,106,.05) 63%) 0 0/400% 100%,repeating-linear-gradient(180deg,transparent 0 96px,#0b0a08 96px 112px);animation:lxskel 1.4s ease infinite}
 @keyframes lxskel{from{background-position:100% 0,0 0}to{background-position:0 0,0 0}}
 .sw .chip{white-space:nowrap}
+/* ===== Luxella display type (Instrument Serif italic accents, Bodoni caps) ===== */
+@font-face{font-family:'Lux Display';font-style:italic;font-weight:400;font-display:swap;src:url(assets/instrument-italic.woff2) format('woff2')}
+@font-face{font-family:'Lux Display';font-style:normal;font-weight:400;font-display:swap;src:url(assets/instrument.woff2) format('woff2')}
+@font-face{font-family:'Lux Bodoni';font-style:normal;font-weight:400;font-display:swap;src:url(assets/bodoni.woff2) format('woff2')}
+.sw{--lux-goldtext:linear-gradient(180deg,#FFF7E0 0%,#F1DDAE 45%,#C9A35E 100%)}
+.sw .lxg,.sw .card>h2,.sw section>h2,.sw .ab-l b,.sw .dpill b,.sw .ord .ohead .oname .otitle,.sw .big{background:var(--lux-goldtext);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:#F1DDAE}
+/* hero: Bodoni caps line */
+.sw .hero h1,.sw #h1{font-family:'Lux Bodoni',Didot,serif!important;font-weight:400!important;letter-spacing:.06em!important;text-transform:uppercase}
+/* section headings: big condensed italic like the poster */
+.sw .card>h2,.sw section>h2{font-family:'Lux Display',serif!important;font-style:italic!important;font-weight:400!important;font-size:34px!important;line-height:1!important;letter-spacing:.01em!important;text-transform:none!important;margin-bottom:10px!important}
+.sw .card>h2::after,.sw section>h2::after{content:'';display:block;width:64px;height:1px;margin-top:12px;background:linear-gradient(90deg,#C9A35E,rgba(201,163,94,0))}
+/* accents */
+.sw .ord .ohead .oname .otitle{font-family:'Lux Display',serif!important;font-style:italic!important;font-weight:400!important;font-size:27px!important;line-height:1.05!important;letter-spacing:.005em}
+.sw .ab-l b{font-family:'Lux Display',serif!important;font-style:italic!important;font-size:23px!important;font-weight:400!important}
+.sw .dpill b{font-family:'Lux Display',serif!important;font-style:italic!important;font-size:21px!important;font-weight:400!important}
+.sw .big{font-family:'Lux Display',serif!important;font-style:italic!important;font-weight:400!important;letter-spacing:0!important}
+.sw .lx-await>div:nth-child(2),.lx-toast span,.lxub .ub-h{font-family:'Lux Display',serif!important;font-style:italic!important}
+/* ===== tabs ===== */
+.sw .tabs{background:linear-gradient(180deg,#0f0d0a,#0b0a08)!important;border-bottom:0!important;box-shadow:inset 0 -1px 0 rgba(201,169,106,.22);padding:0 4px}
+.sw .tab{position:relative;padding:16px 16px 14px!important;font:500 10.5px 'Jost',sans-serif!important;letter-spacing:.22em!important;text-transform:uppercase;color:#8d867a!important;border:0!important;transition:color .3s}
+.sw .tab:hover{color:#E9D3A0!important}
+.sw .tab[aria-selected=true]{color:#F6E6BE!important;font-weight:500!important}
+.sw .tab::after{content:'';position:absolute;left:14px;right:14px;bottom:0;height:2px;border-radius:2px;background:linear-gradient(90deg,rgba(201,163,94,0),#E9C978 30%,#FFF1C9 50%,#E9C978 70%,rgba(201,163,94,0));transform:scaleX(0);transition:transform .45s cubic-bezier(.2,.8,.2,1);box-shadow:0 0 12px rgba(233,201,120,.6)}
+.sw .tab[aria-selected=true]::after{transform:scaleX(1)}
+.sw .tab span{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;margin-left:7px;padding:0 5px!important;border:0!important;border-radius:9px!important;background:rgba(201,169,106,.16)!important;color:#E9D3A0!important;font:600 9.5px 'Jost',sans-serif!important;letter-spacing:0!important;vertical-align:1px}
+.sw .tab[aria-selected=true] span{background:linear-gradient(180deg,#F1DDAE,#C9A35E)!important;color:#14110c!important}
