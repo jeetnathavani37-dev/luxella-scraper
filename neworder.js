@@ -163,7 +163,7 @@ function init(){
    const rt=el('div','dr');rt.appendChild(el('span','dpr',r.payout?inr(r.payout):''));rt.appendChild(el('span','dst'+(r.placed_by==='client'&&st<=1?' wait':''),r.placed_by==='client'&&st<=1?'Awaiting confirmation':((window.stName?window.stName(r,st):STAGES[st-1])||r.status||'')));
    s.appendChild(th);s.appendChild(l);s.appendChild(rt);d.appendChild(s);
    const b=el('div','db');const row=(k,v)=>{const x=el('div','dx');x.appendChild(el('span','k',k));x.appendChild(el('span','v',v));b.appendChild(x);};
-   row('Type',local?'Local order':'International');row('Step',(local?(ks.indexOf(st)+1||ks.filter(x=>x<=st).length):st)+' of '+ks.length);if(r.brand)row('Brand',r.brand);if(!local)row('Origin',st>=3?'Shipped':'Pending');if(!local)row('Hub',st>=5?'Departed':(st>=4?'Received':'Awaiting'));if(local)row('Dispatch',st>=8?'Dispatched':(st>=3?'Item secured':'Pending'));else row('India',st>=8?'Out for delivery':(st>=6?'Landed':'In transit'));row('ETA',r.eta_date&&typeof fd==='function'?fd(r.eta_date):'—');
+   row('Type',local?'Local order':'International');row('Step',(local?(ks.indexOf(st)+1||ks.filter(x=>x<=st).length):st)+' of '+ks.length);if(r.brand)row('Brand',r.brand);if(!local)row('Origin',st>=3?'Shipped':'Pending');if(!local)row('Hub',st>=5?'Departed':(st>=4?'Received':'Awaiting'));if(local)row('Dispatch',st>=8?'Dispatched':(st>=3?'Item secured':'Pending'));else row('India',st>=8?'Out for delivery':(st>=6?'Landed':'In transit'));row('ETA',typeof etaOf==='function'&&typeof fd==='function'?fd(etaOf(r)):'—');
    const bt=el('button','btn2','Open order');bt.type='button';bt.addEventListener('click',()=>{try{openDrawer(r);}catch(e){}});b.appendChild(bt);d.appendChild(b);box.appendChild(d);});};
  render();dash.onData(render);
 }

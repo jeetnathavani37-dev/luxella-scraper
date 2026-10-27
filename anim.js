@@ -69,3 +69,17 @@
  }
  new MutationObserver(ms=>ms.forEach(m=>m.addedNodes.forEach(add))).observe(document.body,{childList:true,subtree:true});
 })();
+
+/* Departures: compact swipe deck with active-card focus + dots */
+(function(){
+ function deck(){const box=document.getElementById('dep-cards');if(!box)return;const cards=[...box.querySelectorAll(':scope>.dep')];if(!cards.length)return;
+  if(box.dataset.n===String(cards.length)&&box.nextElementSibling&&box.nextElementSibling.classList.contains('dep-dots'))return;box.dataset.n=cards.length;
+  let dots=box.nextElementSibling;if(!dots||!dots.classList.contains('dep-dots')){dots=document.createElement('div');dots.className='dep-dots';box.after(dots);}dots.textContent='';
+  if(cards.length<2){dots.remove();return;}
+  cards.forEach((c,i)=>{c.style.animationDelay=(i*70)+'ms';const d=document.createElement('button');d.type='button';d.setAttribute('aria-label','Order '+(i+1));d.addEventListener('click',()=>box.scrollTo({left:c.offsetLeft-box.offsetLeft-16,behavior:'smooth'}));dots.appendChild(d);});
+  const mark=()=>{const x=box.scrollLeft+box.clientWidth/2;let best=0,bd=1e9;cards.forEach((c,i)=>{const m=c.offsetLeft-box.offsetLeft+c.offsetWidth/2;const dd=Math.abs(m-x);if(dd<bd){bd=dd;best=i;}});cards.forEach((c,i)=>c.classList.toggle('on',i===best));[...dots.children].forEach((d,i)=>d.classList.toggle('on',i===best));};
+  if(!box.dataset.l){box.dataset.l='1';box.addEventListener('scroll',()=>requestAnimationFrame(mark),{passive:true});}
+  mark();
+ }
+ setInterval(deck,1200);setTimeout(deck,600);
+})();

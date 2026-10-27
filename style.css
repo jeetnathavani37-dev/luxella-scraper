@@ -1981,3 +1981,24 @@ html.lx-ro #tb-switch,html.lx-ro #tb-out,html.lx-ro #top .who{display:none!impor
 .sw.sw.sw #ordT tbody td:nth-child(2){position:relative;z-index:2}
 .sw.sw.sw #pane-al #ordT tbody td:nth-child(8){grid-column:3/6!important}.sw.sw.sw #pane-al #ordT tbody td:nth-child(2){justify-self:end;text-align:right}
 .sw.sw.sw #pane-al #ordT tbody td:nth-child(8){justify-self:start;text-align:left}
+
+/* Departures swipe deck (phones) */
+@media (max-width:700px){
+.sw.sw #dep-cards{display:flex!important;flex-direction:row!important;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;margin:0 -16px;padding:4px 16px 10px;scrollbar-width:none;-webkit-overflow-scrolling:touch;align-items:flex-start}
+.sw.sw #dep-cards::-webkit-scrollbar{display:none}
+.sw.sw #dep-cards>.dep{flex:0 0 80%;scroll-snap-align:center;margin:0!important;border-radius:18px!important;overflow:hidden;transform:scale(.95);opacity:.65;transition:transform .45s cubic-bezier(.2,.8,.2,1),opacity .45s,box-shadow .45s;animation:depIn .6s cubic-bezier(.2,.8,.2,1) both}
+.sw.sw #dep-cards>.dep.on{transform:none;opacity:1;box-shadow:0 12px 34px rgba(0,0,0,.5),0 0 0 1px rgba(227,192,106,.35)}
+.sw.sw #dep-cards>.dep summary{display:grid!important;grid-template-columns:64px 1fr;grid-template-areas:"ph l" "r r";gap:10px 12px;padding:14px!important}
+.sw.sw #dep-cards>.dep .dth{grid-area:ph}
+.sw.sw #dep-cards>.dep .dth img,.sw.sw #dep-cards>.dep .dth .ph{width:64px!important;height:64px!important}
+.sw.sw #dep-cards>.dep .dl{grid-area:l;min-width:0}
+.sw.sw #dep-cards>.dep .dit{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:17px!important}
+.sw.sw #dep-cards>.dep .dr{grid-area:r;display:flex;justify-content:space-between;align-items:baseline;gap:10px;text-align:left!important;border-top:1px solid rgba(201,169,106,.15);padding-top:10px}
+.sw.sw #dep-cards>.dep .dpr{font-family:'Lux Num',sans-serif!important;font-size:14px!important;color:#F4E1A0}
+.sw.sw #dep-cards>.dep .dst{font-size:10.5px!important;text-align:right}
+.sw.sw #dep-cards>.dep .db{padding:0 14px 14px!important}
+.sw .dep-dots{display:flex;justify-content:center;gap:7px;margin:4px 0 6px}
+.sw .dep-dots button{all:unset;width:6px;height:6px;border-radius:3px!important;background:rgba(237,230,218,.28);cursor:pointer;transition:width .35s,background .35s}
+.sw .dep-dots button.on{width:22px;background:linear-gradient(90deg,#C99A45,#F4E1A0)}
+@keyframes depIn{from{opacity:0;transform:translateX(40px) scale(.95)}}
+}
