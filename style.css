@@ -1734,3 +1734,13 @@ html.lx-ro #tb-switch,html.lx-ro #tb-out,html.lx-ro #top .who{display:none!impor
 .sw .btn:hover,.sw .btn2:hover,.sw a.chip.wal:hover,.sw .chip:not(.tog):not(.cx-badge):not(.eta-tag):not(.rts-c):not(.pc2-c):hover,.sw .stbtn.due:hover,.sw .ab-b:hover,.sw .lx-rcv button:hover{background:var(--lux-gbtn)!important;background-size:160% 160%!important;background-position:100% 100%!important;color:#16120a!important;box-shadow:0 4px 22px rgba(227,192,106,.4),inset 0 1px 0 rgba(255,255,255,.55)!important}
 @media (prefers-reduced-motion:reduce){.sw .btn::before,.sw .btn2::before,.sw a.chip.wal::before,.sw .chip::before,.sw .stbtn.due::before,.sw .ab-b::before,.sw .lx-rcv button::before{animation:none;display:none}}
 .sw .ab-h+.ab-r .ab-b,.sw #pane-ov .btn:first-child{background:var(--lux-gbtn)!important;background-size:160% 160%!important;color:#16120a!important}
+/* display font only on key accents: section headings, Action needed titles, estimated delivery date */
+.sw .ord .ohead .oname .otitle{font-family:'Cormorant Garamond',Georgia,serif!important;font-style:normal!important;font-weight:500!important;font-size:22px!important;line-height:1.2!important;background:none!important;-webkit-text-fill-color:currentColor!important;color:var(--fg,#EDE6DA)!important}
+.sw .big{font-family:'Cormorant Garamond',Georgia,serif!important;font-style:normal!important;background:none!important;-webkit-text-fill-color:currentColor!important;color:var(--ivory,#EDE6DA)!important}
+.sw .dpill.od b{font-family:'Cormorant Garamond',Georgia,serif!important;font-style:normal!important;font-size:17px!important;font-weight:600!important;background:none!important;-webkit-text-fill-color:currentColor!important;color:var(--gold)!important}
+.sw .lx-await>div:nth-child(2),.lx-toast span{font-family:'Cormorant Garamond',Georgia,serif!important;font-style:normal!important}
+/* filter chips: outline, only the selected one gold */
+.sw .chip[aria-pressed]{background:transparent!important;border:1px solid rgba(201,169,106,.35)!important;color:#a39c90!important;box-shadow:none!important;text-shadow:none!important;font-weight:500!important;min-height:34px!important}
+.sw .chip[aria-pressed]::before{display:none!important}
+.sw .chip[aria-pressed]:hover{background:rgba(201,169,106,.08)!important;color:#E9D3A0!important}
+.sw .chip[aria-pressed=true]{background:var(--lux-gbtn)!important;border-color:#F4E1A0!important;color:#16120a!important;font-weight:600!important}
