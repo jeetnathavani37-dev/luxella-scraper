@@ -1137,9 +1137,9 @@ window.lxB2B=async function(root,sb,toast){
   };
   const box=el('div','bb-meta');box.style.cssText='margin:10px 0;padding:10px;border:1px solid var(--bd,#2a2a2a);border-radius:10px';
   box.appendChild(el('b',null,'✉️ Client message (professional)'));
-  const sel=document.createElement('select');sel.style.cssText='display:block;margin:8px 0;max-width:100%';Object.keys(T).forEach(k=>{const o=el('option',null,k);o.value=k;sel.appendChild(o);});
+  const sel=document.createElement('select');sel.style.cssText='display:block;margin:8px 0;max-width:100%;background:#0c0c0c;color:#eee;border:1px solid #3a3322;padding:6px;border-radius:6px';Object.keys(T).forEach(k=>{const o=el('option',null,k);o.value=k;sel.appendChild(o);});
   sel.value=DONE(r.status)?'Rating request':(isPend(r)&&st>=8?'Payment reminder':'Stage update');
-  const ta=document.createElement('textarea');ta.rows=9;ta.style.cssText='width:100%;box-sizing:border-box;font:inherit;padding:8px';
+  const ta=document.createElement('textarea');ta.rows=7;ta.style.cssText='width:100%;box-sizing:border-box;font:inherit;padding:8px;background:#0c0c0c;color:#eee;border:1px solid #3a3322;border-radius:6px';
   const fill=()=>{ta.value=T[sel.value]();};sel.onchange=fill;fill();
   const row=el('div');row.style.cssText='display:flex;gap:8px;flex-wrap:wrap;margin-top:8px';
   row.appendChild(btn('Copy',async()=>{try{await navigator.clipboard.writeText(ta.value);toast('Message copied');}catch(e){ta.select();toast('Select + copy');}}));
@@ -1164,9 +1164,9 @@ window.lxB2B=async function(root,sb,toast){
    catch(x){toast('Email nahi gaya');}b.disabled=false;}));
   box.append(sel,ta,row);pn.appendChild(box);
  }catch(e){}})();}
- function openEd(r){const ov=el('div','lx-modal');const pn=el('div','lx-mp');const hd=el('div','lx-mh');hd.appendChild(el('b',null,(r.order_id||r._id)+' · '+String(r.item||'').slice(0,50)));const x=btn('×',()=>ov.remove(),'lx-mx');hd.appendChild(x);pn.appendChild(hd);const d=rowEl(r);d.classList.add('in-modal');pn.appendChild(d);ov.appendChild(pn);ov.onclick=e=>{if(e.target===ov)ov.remove();};document.body.appendChild(ov);d.open=true;
-  clientMsgBox(r,pn);
-  if(DONE(r.status)&&r.client!=='KicksMachine'&&r.client!=='Sourcex')ratingBox(r,pn);
+ function openEd(r){const ov=el('div','lx-modal');const pn=el('div','lx-mp');const hd=el('div','lx-mh');hd.appendChild(el('b',null,(r.order_id||r._id)+' · '+String(r.item||'').slice(0,50)));const x=btn('×',()=>ov.remove(),'lx-mx');hd.appendChild(x);pn.appendChild(hd);const d=rowEl(r);d.classList.add('in-modal');const top=el('div');pn.appendChild(top);pn.appendChild(d);ov.appendChild(pn);ov.onclick=e=>{if(e.target===ov)ov.remove();};document.body.appendChild(ov);d.open=true;
+  if(DONE(r.status)&&r.client!=='KicksMachine'&&r.client!=='Sourcex')ratingBox(r,top);
+  clientMsgBox(r,top);
   {const tl=el('details','tl-c');tl.appendChild(el('summary',null,'History — every change & automation'));pn.appendChild(tl);let ld=false;tl.ontoggle=async()=>{if(ld||!tl.open)return;ld=true;const q=await sb.from('lx_events').select('at,type,payload,runs,source').eq('ref',r._id).order('id',{ascending:false}).limit(80);const L=q.data||[];if(!L.length){tl.appendChild(el('p','bb-meta','No history yet (recording started 23 Oct).'));return;}
    L.forEach(e=>{const p=e.payload||{};const t=e.type==='order.field'?p.field+': '+JSON.stringify(p.from===undefined?null:p.from)+' → '+JSON.stringify(p.to===undefined?null:p.to)+(p.by?' · '+p.by:''):e.type==='order.status'?'Status: '+(p.from||'—')+' → '+p.to:e.type==='order.payout'?'Payout: '+(p.from||'—')+' → '+p.to:e.type==='order.created'?'Order created':e.type==='order.tracking'?'Tracking added: '+p.tracking:e.type;const rr=el('div','tl-r');rr.appendChild(el('small',null,new Date(e.at).toLocaleString('en-IN',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})));rr.appendChild(el('span',null,t));if((e.runs||[]).length)rr.appendChild(el('em',null,'→ '+e.runs.map(x=>x.result).join(' · ')));tl.appendChild(rr);});};}}
  /* shared order sort: payment-pending first, then newest (order date, falling back to last update) */
