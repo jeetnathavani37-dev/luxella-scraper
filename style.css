@@ -1915,3 +1915,16 @@ html.lx-ro #tb-switch,html.lx-ro #tb-out,html.lx-ro #top .who{display:none!impor
 .sw.sw.sw #pane-ov .lxbr-go{height:46px;line-height:46px;font-size:13.5px}
 .sw.sw.sw #pane-ov .rts-n,.sw.sw.sw #pane-ov .oc-it,.sw.sw.sw #pane-ov .dit{font-size:17px!important}
 .sw.sw.sw #pane-ov .btn,.sw.sw.sw #pane-ov .btn2,.sw.sw.sw #pane-ov .ab-b{min-height:36px!important;font-size:9.5px!important}
+/* price: highlighted, AMG numerals */
+.sw.sw.sw .dpill.pr{position:relative;border:1px solid transparent!important;background:linear-gradient(180deg,#1a160f,#0f0d09) padding-box,linear-gradient(135deg,#FFF1C9,#E3C06A 40%,#8a6a2c 70%,#F4E1A0) border-box!important;box-shadow:0 0 22px rgba(227,192,106,.16)}
+.sw.sw.sw .dpill.pr b{font-family:'Lux Num',sans-serif!important;font-style:normal!important;font-size:17px!important;letter-spacing:.02em!important;background:linear-gradient(180deg,#FFF7E0,#E9C978 60%,#C99A45)!important;-webkit-background-clip:text!important;background-clip:text!important;-webkit-text-fill-color:transparent!important}
+.sw .dpill .pst{font:600 8.5px 'Jost',sans-serif;font-style:normal;letter-spacing:.2em;text-transform:uppercase;margin-top:3px}
+.sw .dpill .pst.due{color:#e0907a}.sw .dpill .pst.ok{color:#8fbf8a}
+/* orders tab price */
+.sw.sw.sw #ordT tbody td:nth-child(9){font-family:'Lux Num',sans-serif!important;font-size:14px!important;letter-spacing:.02em!important;color:#F4E1A0!important;background:linear-gradient(180deg,rgba(227,192,106,.14),rgba(227,192,106,.04))!important;border:1px solid rgba(227,192,106,.35)!important}
+.sw.sw.sw #ordT tbody td:nth-child(9)::before{font-family:'Jost',sans-serif!important}
+/* sticky tabs: keep clear of the iPhone status bar */
+.sw.sw.sw .tabs{padding-top:env(safe-area-inset-top,0px)!important;top:0!important;background:linear-gradient(180deg,#0b0a08,#0f0d0a)!important}
+/* brand marks are never photos */
+.sw.sw.sw.sw img.mk{background:transparent!important;padding:0!important;box-shadow:none!important;border-radius:0!important;aspect-ratio:auto!important}
+.sw.sw.sw #ordT img.mk,.sw.sw.sw #tracker img.mk,.sw.sw.sw #nextdel img.mk{background:transparent!important;padding:0!important;box-shadow:none!important;border-radius:0!important;aspect-ratio:auto!important}
