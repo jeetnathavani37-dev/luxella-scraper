@@ -1655,7 +1655,7 @@ html.lx-ro #tb-switch,html.lx-ro #tb-out,html.lx-ro #top .who{display:none!impor
 .sw .ab-l b{font:500 18px/1.2 'Cormorant Garamond',serif!important;color:var(--fg,#EDE6DA)!important}
 .sw .ab-l span{font-size:12px!important}
 .sw .ab-b{min-width:128px;height:38px;padding:0 16px!important;background:transparent!important;color:var(--gold)!important;border:1px solid var(--gold)!important;font:500 10.5px 'Jost',sans-serif!important;letter-spacing:.18em!important;transition:background .25s,color .25s}
-.sw .ab-b:hover,.sw .ab-h+.ab-r .ab-b{background:var(--gold)!important;color:#14110c!important}
+
 /* professional pass: unified buttons */
 .sw .btn,.sw .btn2,.sw a.chip.wal,.sw .chip:not(.tog):not(.cx-badge):not(.eta-tag),.sw .stbtn,.sw .lx-askc{display:inline-flex!important;align-items:center;justify-content:center;gap:8px;min-height:40px;padding:0 18px!important;border:1px solid rgba(201,169,106,.5)!important;border-radius:2px!important;background:transparent!important;color:var(--gold)!important;font:500 10.5px/1 'Jost',sans-serif!important;letter-spacing:.18em!important;text-transform:uppercase!important;text-decoration:none!important;box-shadow:none!important;cursor:pointer;transition:background .25s,border-color .25s,color .25s;-webkit-tap-highlight-color:transparent}
 .sw .btn:hover,.sw .btn2:hover,.sw a.chip.wal:hover,.sw .chip:not(.tog):not(.cx-badge):not(.eta-tag):hover,.sw .stbtn:hover,.sw .lx-askc:hover{border-color:var(--gold)!important;background:rgba(201,169,106,.08)!important}
@@ -1726,3 +1726,11 @@ html.lx-ro #tb-switch,html.lx-ro #tb-out,html.lx-ro #top .who{display:none!impor
 .sw .tab[aria-selected=true]::after{transform:scaleX(1)}
 .sw .tab span{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;margin-left:7px;padding:0 5px!important;border:0!important;border-radius:9px!important;background:rgba(201,169,106,.16)!important;color:#E9D3A0!important;font:600 9.5px 'Jost',sans-serif!important;letter-spacing:0!important;vertical-align:1px}
 .sw .tab[aria-selected=true] span{background:linear-gradient(180deg,#F1DDAE,#C9A35E)!important;color:#14110c!important}
+/* ===== golden gradient buttons with sheen ===== */
+.sw{--lux-gbtn:linear-gradient(135deg,#F7E7B4 0%,#E8C774 38%,#C99A45 72%,#E3C06A 100%)}
+.sw .btn,.sw .btn2,.sw a.chip.wal,.sw .chip:not(.tog):not(.cx-badge):not(.eta-tag):not(.rts-c):not(.pc2-c),.sw .stbtn.due,.sw .lx-askc,.sw .ab-b,.sw .lx-rcv button,.sw .ub-go{position:relative;overflow:hidden;background:var(--lux-gbtn)!important;background-size:160% 160%!important;border:1px solid #F4E1A0!important;color:#16120a!important;font-weight:600!important;box-shadow:0 2px 14px rgba(227,192,106,.22),inset 0 1px 0 rgba(255,255,255,.45)!important;text-shadow:0 1px 0 rgba(255,255,255,.25);transition:background-position .5s,box-shadow .3s,transform .15s!important}
+.sw .btn::before,.sw .btn2::before,.sw a.chip.wal::before,.sw .chip:not(.tog):not(.cx-badge):not(.eta-tag):not(.rts-c):not(.pc2-c)::before,.sw .stbtn.due::before,.sw .ab-b::before,.sw .lx-rcv button::before{content:'';position:absolute;top:0;bottom:0;left:-60%;width:40%;background:linear-gradient(100deg,rgba(255,255,255,0),rgba(255,255,255,.55),rgba(255,255,255,0));transform:skewX(-20deg);pointer-events:none;animation:lxbtnsheen 4.5s ease-in-out infinite}
+@keyframes lxbtnsheen{0%,62%{left:-60%}100%{left:140%}}
+.sw .btn:hover,.sw .btn2:hover,.sw a.chip.wal:hover,.sw .chip:not(.tog):not(.cx-badge):not(.eta-tag):not(.rts-c):not(.pc2-c):hover,.sw .stbtn.due:hover,.sw .ab-b:hover,.sw .lx-rcv button:hover{background:var(--lux-gbtn)!important;background-size:160% 160%!important;background-position:100% 100%!important;color:#16120a!important;box-shadow:0 4px 22px rgba(227,192,106,.4),inset 0 1px 0 rgba(255,255,255,.55)!important}
+@media (prefers-reduced-motion:reduce){.sw .btn::before,.sw .btn2::before,.sw a.chip.wal::before,.sw .chip::before,.sw .stbtn.due::before,.sw .ab-b::before,.sw .lx-rcv button::before{animation:none;display:none}}
+.sw .ab-h+.ab-r .ab-b,.sw #pane-ov .btn:first-child{background:var(--lux-gbtn)!important;background-size:160% 160%!important;color:#16120a!important}
