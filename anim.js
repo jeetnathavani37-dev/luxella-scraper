@@ -89,3 +89,9 @@
  function clamp(){document.querySelectorAll('.st .sdesc p:not([data-cl])').forEach(p=>{if(!p.offsetParent)return;p.dataset.cl='1';p.classList.add('lx-cl');requestAnimationFrame(()=>{if(p.scrollHeight<=p.clientHeight+2){p.classList.remove('lx-cl');return;}const b=document.createElement('button');b.type='button';b.className='lx-more';b.textContent='More';b.addEventListener('click',e=>{e.stopPropagation();const o=p.classList.toggle('lx-cl');b.textContent=o?'More':'Less';b.classList.toggle('open',!o);});p.after(b);});});}
  setInterval(clamp,1000);
 })();
+
+/* Orders: compact cards that expand on demand */
+(function(){
+ function prep(){document.querySelectorAll('#ordT tbody tr.oc2:not(.lxc)').forEach(tr=>{tr.classList.add('lxc');const td=document.createElement('td');td.className='lxc-t';const b=document.createElement('button');b.type='button';b.className='lxc-b';b.innerHTML='<span>Details</span><i></i>';b.addEventListener('click',e=>{e.stopPropagation();const o=tr.classList.toggle('open');b.firstChild.textContent=o?'Less':'Details';if(o){tr.classList.add('lxc-anim');setTimeout(()=>tr.classList.remove('lxc-anim'),500);}});td.appendChild(b);tr.appendChild(td);});}
+ setInterval(prep,800);setTimeout(prep,300);
+})();
