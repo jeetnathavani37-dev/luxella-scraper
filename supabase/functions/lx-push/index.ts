@@ -50,7 +50,7 @@ const EM: Record<number, { h: string; t: string; n: string; cta?: [string, strin
   6: { h: "Landed in India", t: "{item} has landed in India and is clearing customs. After that, it is prepared for dispatch to you.", n: "Please keep your delivery address ready. We will ask for it in the next update.", cta: ["Open your page", "tr"] },
   7: { h: "We need your delivery address", t: "{item} is ready to be dispatched to you. We just need to know where to send it.", n: "Tap the button below — it opens this order's address card on your page. Add or pick an address, check the pin code and phone number, and save. We ship within 24 hours of receiving it.", cta: ["Share your address", "ad"] },
   8: { h: "Local pickup initiated", t: "{item} is packed at our Indian warehouse and the courier pickup has been booked.", n: "The courier will collect it shortly. Follow it with the tracking number below once the courier scans it. Please keep your phone reachable, and record a continuous unboxing video before you open the parcel. It protects you if anything is wrong." },
-  9: { h: "Delivered", t: "{item} has been delivered. Thank you for choosing Luxella.", n: "If anything is not right, open the Help tab on your page and share your unboxing video, and we will take care of it." },
+  9: { h: "Delivered", t: "{item} has been delivered. Thank you for choosing Luxella.", n: "We would love to know how it went. Tap the button below and rate your order. It takes a few seconds and helps us a lot. If anything is not right, open the Help tab on your page and share your unboxing video, and we will take care of it.", cta: ["Rate your order", "tr"] },
 };
 const LEM: Record<number, { h: string; t: string; n: string; cta?: [string, string] }> = {
   1: { h: "Order received", t: "We have your order for {item}. Luxella is now securing it from the store in India.", n: "Nothing is needed from you. We will confirm within 24–48 hours, by email and in your Orders tab." },
@@ -84,7 +84,8 @@ function orderEmail(d: any, item: string, stage: number): Em {
     return { subject: "Order received: " + item, headline: "Order received", text: "Thank you. We have received your order for " + item + ". Luxella will now verify your payment and check availability.", next: "You will receive a confirmation within 24–48 hours, by email and in your Orders tab. Nothing else is needed from you. If we cannot source the piece, we will tell you straight away and refund you in full.", rows, stage, cta: ["Track your order", "tr"], ks, stLabel };
   }
   // stage 7: deep link straight to THIS order's address card (#ad:<order-slug>)
-  const cta: [string, string] = stage === 7 ? ["Share your address", "ad:" + slugify(item)] : (e.cta || ["Track your order", "tr"]);
+  const rateNo = String(d.order_no || "").replace(/^#/, "");
+  const cta: [string, string] = stage === 7 ? ["Share your address", "ad:" + slugify(item)] : (stage === 9 && /^\d{1,8}$/.test(rateNo)) ? ["Rate your order", "rate:" + rateNo] : (e.cta || ["Track your order", "tr"]);
   return { subject: e.h + ": " + item, headline: e.h, text: e.t.replace("{item}", item), next: e.n, rows, stage, cta, ks, stLabel };
 }
 
@@ -245,12 +246,13 @@ Deno.serve(async (req) => {
   let p: any; try { p = await req.json(); } catch { return json({ error: "Bad JSON" }, 400); }
   if (p.manual_stage) {
     const who = await ownerFrom(req); if (!who) return json({ error: "Owner only" }, 403);
-    const { client_id, item } = p.manual_stage;
-    const { data: row } = await admin.from("lx_orders").select("data").eq("client_id", client_id).eq("item", item).maybeSingle();
+    const { client_id, item, order_no } = p.manual_stage;
+    const q0 = admin.from("lx_orders").select("data,item").eq("client_id", client_id);
+    const { data: row } = await (order_no ? q0.eq("data->>order_no", String(order_no)) : q0.eq("item", item)).maybeSingle();
     if (!row) return json({ error: "Order not found" }, 404);
     const d: any = row.data || {}; const st = Number(p.manual_stage.stage) || Number(d.stage) || 1;
     const { data: client } = await admin.from("lx_clients").select("slug,name").eq("id", client_id).maybeSingle();
-    const em = orderEmail(d, d.item || item, st);
+    const em = orderEmail(d, d.item || item || (row as any).item, st);
     const r = await emailClient(sec, client_id, client?.slug || "", client?.name || "", em);
     return json({ sent: (r as any).sent || 0, err: (r as any).err || "", subject: em.subject });
   }
