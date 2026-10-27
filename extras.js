@@ -579,3 +579,26 @@ document.addEventListener('click',function(ev){var b=ev.target.closest&&ev.targe
    const g=card.querySelector('.steps');if(g)g.parentNode.insertBefore(bar,g);else card.appendChild(bar);
    if(!document.getElementById('xo-dt-css')){const s=document.createElement('style');s.id='xo-dt-css';s.textContent='.xo-own .steps .st .stdate{display:none}.xo-dt{position:relative;display:inline-flex;align-items:center;gap:4px;margin-top:6px;padding:4px 8px;border:1px solid rgba(201,162,39,.55);color:var(--gold,#C9A227);font-size:11px;letter-spacing:.04em;cursor:pointer;background:rgba(201,162,39,.06);white-space:nowrap;user-select:none}.xo-dt.empty{opacity:.55;border-style:dashed}.xo-dt.saving{opacity:.4}.xo-dt.ok{background:rgba(80,180,110,.25);border-color:#5cb87a}.xo-dt input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;font-size:16px;border:0;padding:0;margin:0;color-scheme:dark}.xo-dx{all:unset;position:relative;z-index:2;cursor:pointer;padding:0 2px;color:#e08a7a;font-size:13px;line-height:1}.xo-dbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:10px 0;font-size:12px;opacity:.95}.xo-dbar .xo-dt{margin-top:0}';document.head.appendChild(s);}
   }catch(e){console.error('xo-dt',e&&e.message);}};})();
+
+/* Client "Received successfully" (shipped -> Delivered) and owner "Back to tracker" for delivered orders */
+(function(){
+ const own=()=>{try{return !!photos.canEdit;}catch(e){return false;}};
+ const sayX=t=>{try{if(window.alertMsg)window.alertMsg(t);else if(typeof toast==='function')toast(t);}catch(e){}};
+ function recBtn(r){
+  const wrap=document.createElement('div');wrap.className='lx-rcv';wrap.style.cssText='margin:14px 0 4px';
+  const b=document.createElement('button');b.type='button';b.textContent='\u2713 Received successfully';
+  b.style.cssText='width:100%;padding:15px 22px;border-radius:10px;border:1px solid #F4E1A0;background:linear-gradient(135deg,#F4E1A0,#E3C06A 50%,#B8943F);color:#000;font:inherit;font-weight:700;letter-spacing:.14em;text-transform:uppercase;font-size:13px;cursor:pointer;box-shadow:0 2px 14px rgba(227,192,106,.25)';
+  b.addEventListener('click',async e=>{e.stopPropagation();if(!confirm('Confirm that you have received '+(r.item||'this order')+'?'))return;b.disabled=true;b.textContent='Confirming\u2026';
+   try{const tok=await window.lx.authToken();const res=await fetch('https://qzripzgbstvxkfobzhyv.supabase.co/functions/v1/lx-push',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+tok},body:JSON.stringify({received:{order_no:r.order_no||'',item:r.item}})});const j=await res.json();
+    if(j.ok){b.textContent='\u2713 Thank you';sayX('Thank you! Marked as delivered.');const no=String(r.order_no||'').replace(/^#/,'');setTimeout(()=>{if(/^\d{1,8}$/.test(no))location.hash='rate:'+no;location.reload();},700);}
+    else{b.disabled=false;b.textContent='\u2713 Received successfully';sayX(j.error||'Could not update. Please try again.');}}
+   catch(x){b.disabled=false;b.textContent='\u2713 Received successfully';sayX('Could not update. Please try again.');}});
+  wrap.appendChild(b);return wrap;}
+ function backBtn(r){
+  const b=document.createElement('button');b.type='button';b.className='btn2';b.textContent='\u21a9 Move back to tracker';b.style.cssText='margin:12px 0';
+  b.addEventListener('click',async e=>{e.stopPropagation();if(!confirm('Move '+(r.order_no||r.item)+' back to the tracker (Shipped, not delivered)?'))return;b.disabled=true;
+   try{if(window.__lxSetStage)await window.__lxSetStage(r,8);const dr=document.querySelector('.sw .drawer');if(dr)dr.remove();}catch(x){b.disabled=false;sayX('Could not move it back');}});
+  return b;}
+ const _tr=window.__lxTrk;window.__lxTrk=function(r,card){try{if(_tr)_tr(r,card);}catch(e){}try{if(card&&!own()&&Number(r.stage||1)===8&&!card.querySelector('.lx-rcv'))card.appendChild(recBtn(r));}catch(e){}};
+ const _dr=window.__lxDrawer;window.__lxDrawer=function(r,pan){try{if(_dr)_dr(r,pan);}catch(e){}try{const st=Number(r.stage||1);if(own()&&st>=9)pan.appendChild(backBtn(r));if(!own()&&st===8&&!pan.querySelector('.lx-rcv'))pan.appendChild(recBtn(r));}catch(e){}};
+})();

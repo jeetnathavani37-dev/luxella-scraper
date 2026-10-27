@@ -110,6 +110,7 @@ function compose(p: any): Msg | null {
     const c = n.collection; const d = n.data || {}; const od = o.data || {};
     if (c === "notes") { const s = Number(d.stageOverride), os = Number(od.stageOverride); if (s && s !== os) return { audience: "client", cat: "orders", title: d.item || n.doc_id || "Order update", body: STAGES[s - 1] + (CLIENT_MSG[s] ? " — " + CLIENT_MSG[s] : ""), url: s === 7 ? "ad" : "tr", noEmail: true }; return null; }
     if (c === "notices" && p.op === "INSERT") return { audience: "client", cat: "orders", title: String(d.title || "Update from Luxella").slice(0, 80), body: String(d.body || "").slice(0, 160), url: d.url || "tr", noEmail: true };
+    if (c === "received" && p.op === "INSERT") return { audience: "owner", cat: "owner", title: "Received successfully", body: (d.order_no ? d.order_no + " \u00b7 " : "") + (d.order || "Order") + " \u2014 client confirmed delivery", url: "al" };
     if (c === "photos" && p.op === "INSERT") return { audience: "client", cat: "photos", title: "Photo added", body: (d.order || "Your order") + " — see it on the Orders tab.", url: "al" };
     if (c === "pod" && p.op === "INSERT") return { audience: "client", cat: "photos", title: "Proof of delivery added", body: d.order || "Your order", url: "al", em: { subject: "Proof of delivery added", headline: "Proof of delivery added", text: "We have added the proof of delivery for " + (d.order || "your order") + " to your page.", next: "Open the Orders tab to see it.", cta: ["Open Orders", "al"] } };
     if (c === "qc" && p.op === "INSERT") return { audience: "client", cat: "photos", title: "Quality check photos added", body: d.order || "Your order", url: "al", em: { subject: "Quality check photos added", headline: "Quality check photos added", text: "Our team has inspected " + (d.order || "your order") + " and added the quality check photos to your page.", next: "Open the Orders tab to see them.", cta: ["Open Orders", "al"] } };
@@ -257,6 +258,34 @@ Deno.serve(async (req) => {
     const em = orderEmail(d, d.item || item || (row as any).item, st);
     const r = await emailClient(sec, client_id, client?.slug || "", client?.name || "", em);
     return json({ sent: (r as any).sent || 0, err: (r as any).err || "", subject: em.subject });
+  }
+  if (p.received) {
+    // client taps "Received successfully": moves their own shipped order to Delivered. No automatic mail (notify_hold); owner gets a push.
+    const token = (req.headers.get("Authorization") || "").replace(/^Bearer\s+/i, "");
+    if (!token) return json({ error: "Sign in required" }, 401);
+    const asUser = createClient(URL_, ANON, { global: { headers: { Authorization: "Bearer " + token } } });
+    const { data: { user } } = await asUser.auth.getUser(token);
+    const email = (user?.email || "").toLowerCase(); if (!email) return json({ error: "Sign in required" }, 401);
+    const { data: cu } = await admin.from("lx_client_users").select("client_id,email");
+    const mine = (cu || []).filter((x: any) => String(x.email || "").toLowerCase() === email).map((x: any) => x.client_id);
+    if (!mine.length) return json({ error: "Not a client" }, 403);
+    const no = String(p.received.order_no || ""); const itm = String(p.received.item || "");
+    const q = admin.from("lx_orders").select("client_id,item,data").in("client_id", mine);
+    const { data: rows } = await (no ? q.eq("data->>order_no", no) : q.eq("item", itm));
+    const row: any = (rows || [])[0]; if (!row) return json({ error: "Order not found" }, 404);
+    const d: any = row.data || {}; const st = Number(d.stage) || 1;
+    if (st >= 9) return json({ ok: true, already: true });
+    if (st < 8) return json({ error: "This order has not shipped yet" }, 400);
+    const now = new Date().toISOString(); const today = now.slice(0, 10);
+    const next = { ...d, stage: 9, status: stN(d, 9), notify_hold: now, received_by: "client", received_at: now };
+    const u = await admin.from("lx_orders").update({ data: next, updated_at: now }).eq("client_id", row.client_id).eq("item", row.item);
+    if (u.error) return json({ error: u.error.message }, 500);
+    const key = slugify(row.item);
+    const { data: nr } = await admin.from("lx_docs").select("data").eq("client_id", row.client_id).eq("collection", "notes").eq("doc_id", key).maybeSingle();
+    const n: any = (nr as any)?.data || { order: row.item, items: [] }; const stg: any = { ...(n.stages || {}) }; if (!stg[9]) stg[9] = today;
+    await admin.from("lx_docs").upsert({ client_id: row.client_id, collection: "notes", doc_id: key, data: { ...n, order: row.item, items: n.items || [], stages: stg } }, { onConflict: "client_id,collection,doc_id" });
+    await admin.from("lx_docs").insert({ client_id: row.client_id, collection: "received", doc_id: "rc-" + Date.now().toString(36), data: { order: row.item, order_no: d.order_no || "", at: now } });
+    return json({ ok: true });
   }
   if (p.manual_msg) {
     // owner-edited message from the B2B portal: Jeet clicked Send, so this is an explicit owner action
