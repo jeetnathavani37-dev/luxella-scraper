@@ -1562,3 +1562,12 @@ html.lx-ro #tb-switch,html.lx-ro #tb-out,html.lx-ro #top .who{display:none!impor
 .sw .dpill b{font:600 17px/1.1 'Cormorant Garamond',serif;color:var(--gold);letter-spacing:.02em}
 .sw .dpill.eta{border-color:var(--gold);background:linear-gradient(180deg,rgba(201,169,106,.26),rgba(201,169,106,.1))}
 .sw .datenote{margin:8px 0 0;font:400 11.5px/1.55 'Jost',sans-serif;color:var(--mut,#A39C90);max-width:62ch}
+
+.sw .actionbar{margin:0 0 18px;padding:14px 16px;border:1px solid var(--gold);border-radius:4px;background:linear-gradient(180deg,rgba(201,169,106,.2),rgba(201,169,106,.06))}
+.sw .ab-h{font:500 10px 'Jost',sans-serif;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);margin-bottom:8px}
+.sw .ab-r{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 0;border-top:1px solid rgba(201,169,106,.22)}
+.sw .ab-r:first-of-type{border-top:0}
+.sw .ab-l{display:flex;flex-direction:column;gap:2px;min-width:0}
+.sw .ab-l b{font:600 17px/1.2 'Cormorant Garamond',serif;color:var(--gold)}
+.sw .ab-l span{font:400 12px/1.4 'Jost',sans-serif;color:var(--mut,#A39C90)}
+.sw .ab-b{flex:none;padding:9px 16px;border:1px solid var(--gold);background:var(--gold);color:#14110c;font:500 11px 'Jost',sans-serif;letter-spacing:.14em;text-transform:uppercase;border-radius:2px;cursor:pointer}
