@@ -1553,3 +1553,5 @@ html.lx-ro #tb-switch,html.lx-ro #tb-out,html.lx-ro #top .who{display:none!impor
 .sw .oname .ometa .odt{font-family:'Jost',sans-serif;font-size:9.5px;font-weight:400;letter-spacing:.26em;text-transform:uppercase;color:#8E887C;position:relative;padding-left:12px}
 .sw .oname .ometa .odt::before{content:"";position:absolute;left:0;top:50%;width:4px;height:4px;margin-top:-2px;background:#B8943F;transform:rotate(45deg);opacity:.8}
 @media (min-width:641px){.sw .oname .otitle{font-size:25px!important}}
+
+.sw #ordT th:nth-child(11),.sw #ordT tbody td:nth-child(11){display:none!important}

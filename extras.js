@@ -21,7 +21,7 @@ const isOwner=()=>{try{return !!photos.canEdit;}catch(e){return false;}};
 })();
 
 /* ================= Support cases ================= */
-const TYPES=['Delayed shipment','Incorrect product or size','Damaged parcel','Missing parcel or item','Payment discrepancy','Cancellation request','Other order-related question'];
+const TYPES=['Delayed shipment','Incorrect product or size','Damaged parcel','Missing parcel or item','Payment discrepancy','Other order-related question'];
 const FLOW=['Submitted','Under review','Awaiting reseller','Resolution proposed','Resolved'];
 const state={cases:{},msgs:{},open:null};
 
