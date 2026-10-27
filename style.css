@@ -1883,3 +1883,9 @@ html.lx-ro #tb-switch,html.lx-ro #tb-out,html.lx-ro #top .who{display:none!impor
 .sw .lxbs-bar::after{content:'';position:absolute;left:0;top:0;bottom:0;width:var(--p);background:linear-gradient(90deg,#B8913F,#F4E1A0)}
 .sw .lxbs-am{font:400 13px 'Lux Num',sans-serif;color:#F6EEDC;align-self:start;margin-top:18px}
 @media (min-width:700px){.sw .lxbs{align-items:center}.sw .lxbs-p{border-radius:28px!important;border-bottom:1px solid rgba(201,169,106,.25)}}
+/* Rolex-style wide sans for the welcome + select labels */
+@font-face{font-family:'Lux Wide';font-style:normal;font-weight:300;font-display:swap;src:url(assets/lexexa-300.woff2) format('woff2')}
+@font-face{font-family:'Lux Wide';font-style:normal;font-weight:400;font-display:swap;src:url(assets/lexexa-400.woff2) format('woff2')}
+.sw.sw.sw .hero h1,.sw.sw.sw #h1{font-family:'Lux Wide',sans-serif!important;font-weight:400!important;font-size:21px!important;line-height:1.35!important;letter-spacing:.08em!important;text-transform:uppercase!important}
+.sw.sw.sw #hero-cap{font-family:'Lux Wide',sans-serif!important;font-weight:300!important;font-size:14px!important;line-height:1.7!important;letter-spacing:.01em!important;color:#b9b0a1!important}
+.sw.sw.sw .lxbr-h,.sw.sw.sw .tiles .card>.lbl,.sw.sw.sw .card>.lbl:first-child,.sw.sw.sw .dpill small,.sw.sw.sw .lxbs-st small{font-family:'Lux Wide',sans-serif!important;font-weight:400!important;letter-spacing:.14em!important}
