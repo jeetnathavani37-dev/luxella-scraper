@@ -22,8 +22,10 @@ const photos={stock:{},resale:{},qc:{},quotes:{},budget:null,pod:{},clientMeta:n
 const brandHue=b=>{let x=0;for(const c of String(b))x=(x*31+c.charCodeAt(0))>>>0;return x%360;};
 function brandEl(r){const b=r.brand||'';const w=document.createElement('span');w.className='brand';tap(w,()=>{goTab('al');const s=document.getElementById('f-brand');if(s){s.value=b;state.brand=b;render();}},'Show all '+b+' orders');const lg=photos.brands[pslug(b)];
  if(lg&&lg.url){w.classList.add('haslogo');const im=document.createElement('img');im.src=lg.url;im.alt=b;im.addEventListener('error',()=>{im.remove();w.classList.remove('haslogo');w.textContent=b;});w.appendChild(im);}
- else{w.textContent=b;w.style.borderColor='hsl('+brandHue(b)+' 40% 60% / .6)';w.style.background='hsl('+brandHue(b)+' 50% 50% / .10)';}
+ else{const mk=staticLogo(b);if(mk){w.classList.add('hasmark');const im=document.createElement('img');im.className='mk';im.src=mk;im.alt='';im.addEventListener('error',()=>im.remove());w.appendChild(im);const tx=document.createElement('span');tx.className='bn';tx.textContent=b;w.appendChild(tx);}else{w.textContent=b;}w.style.borderColor='hsl('+brandHue(b)+' 40% 60% / .6)';w.style.background='hsl('+brandHue(b)+' 50% 50% / .10)';}
  return w;}
+const STATIC_LOGOS=['kate-spade','marc-jacobs','coach','michael-kors'];
+function staticLogo(b){const s=String(b||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');const k=STATIC_LOGOS.find(x=>s===x||s.indexOf(x+'-')===0);return k?'assets/brands/'+k+'.png':'';}
 function addLogoBtn(r){const b=document.createElement('button');b.type='button';b.className='addph';b.textContent=photos.brands[pslug(r.brand)]?'Change logo':'Add brand logo';
  b.addEventListener('click',()=>{photos.pendingBrand=r.brand;document.getElementById('bl-file').click();});return b;}
 document.getElementById('ss-file').addEventListener('change',async e=>{const f=e.target.files&&e.target.files[0];const r=photos.pendingSS;e.target.value='';if(!f||!r||!photos.assets||!photos.db)return;
