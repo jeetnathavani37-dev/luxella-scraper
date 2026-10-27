@@ -370,9 +370,9 @@ const el=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=nu
 let shown=new Set(),open=false;
 const ls=k=>{try{return localStorage.getItem(k);}catch(e){return null;}};
 const show=list=>{list=list.filter(n=>n.preview||!ls('lx_nt_'+n.id));if(open||!list.length)return;open=true;let i=0;
- (async()=>{if(photos.canEdit)return;for(const n of list){if(n.preview)continue;try{localStorage.setItem('lx_nt_'+n.id,'1');}catch(e){}try{await photos.db.doc('notices/'+n.id).set(Object.assign({},n.d,{seen:true,seen_at:new Date().toISOString()}));}catch(e){}}})();
+ (async()=>{if(photos.canEdit)return;for(const n of list){if(n.preview)continue;try{localStorage.setItem('lx_nt_'+n.id,'1');}catch(e){}try{await window.lx.markNoticeSeen(n.id);}catch(e){}}})();
  const ov=el('div','nt-ov');const bx=el('div','nt');ov.appendChild(bx);
- const close=async()=>{ov.classList.remove('on');setTimeout(()=>ov.remove(),300);open=false;for(const n of list){if(n.preview||photos.canEdit)continue;try{await photos.db.doc('notices/'+n.id).set(Object.assign({},n.d,{seen:true,seen_at:new Date().toISOString()}));}catch(e){}}};
+ const close=async()=>{ov.classList.remove('on');setTimeout(()=>ov.remove(),300);open=false;for(const n of list){if(n.preview||photos.canEdit)continue;try{await window.lx.markNoticeSeen(n.id);}catch(e){}}};
  const draw=()=>{const n=list[i];bx.textContent='';const x=el('button','ps-x','×');x.type='button';x.addEventListener('click',close);bx.appendChild(x);
   bx.appendChild(el('div','nt-eb',(n.preview?'Preview · ':'')+'Update from Luxella'+(list.length>1?' · '+(i+1)+' of '+list.length:'')));
   let row=null;try{row=(dash.data('orders').data||[]).find(o=>o.item===n.d.item);}catch(e){}
