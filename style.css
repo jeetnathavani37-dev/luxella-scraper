@@ -2002,3 +2002,4 @@ html.lx-ro #tb-switch,html.lx-ro #tb-out,html.lx-ro #top .who{display:none!impor
 .sw .dep-dots button.on{width:22px;background:linear-gradient(90deg,#C99A45,#F4E1A0)}
 @keyframes depIn{from{opacity:0;transform:translateX(40px) scale(.95)}}
 }
+.sw.sw .pricebar{padding:9px 14px!important;margin-top:12px!important}.sw.sw .pricebar .pb-v{font-size:16px!important}.sw.sw .pricebar .pb-l{font-size:8.5px!important}.sw.sw .pricebar .pb-s{font-size:8px!important}.sw.sw .pricebar .pb-lw{gap:3px!important}
