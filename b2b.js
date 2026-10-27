@@ -1144,6 +1144,24 @@ window.lxB2B=async function(root,sb,toast){
   const row=el('div');row.style.cssText='display:flex;gap:8px;flex-wrap:wrap;margin-top:8px';
   row.appendChild(btn('Copy',async()=>{try{await navigator.clipboard.writeText(ta.value);toast('Message copied');}catch(e){ta.select();toast('Select + copy');}}));
   row.appendChild(btn('WhatsApp pe kholo',()=>{window.open('https://wa.me/?text='+encodeURIComponent(ta.value),'_blank','noopener');}));
+  /* per-template email/popup meta: subject, headline, CTA label + hash (what the client's button opens) */
+  const META=()=>{const k=sel.value;
+   if(k==='Rating request')return{subject:'How was your order? '+item,headline:'How was your order?',cta:['Rate your order','rate:'+no],pop:{title:'How was your order?',url:'tr',rate:true}};
+   if(k==='Payment reminder')return{subject:'Payment reminder: '+item,headline:'Payment reminder',cta:['View payments','pay'],pop:{title:'Payment reminder',url:'pay'}};
+   if(k==='Address request'||(k==='Stage update'&&st===7))return{subject:'We need your delivery address: '+item,headline:'We need your delivery address',cta:['Share your address','ad'],pop:{title:'Share your delivery address',url:'ad'}};
+   if(st>=9)return{subject:'Delivered: '+item,headline:'Delivered',cta:['Rate your order','rate:'+no],pop:{title:item,url:'tr',rate:true}};
+   return{subject:'Order update: '+item,headline:'Order update',cta:['Track your order','tr'],pop:{title:item,url:'tr'}};};
+  /* popup/email body: the page already shows greeting, sign-off and the button, so strip those and bare links */
+  const plain=()=>ta.value.replace(/^Dear [^\n]*,\s*/i,'').replace(/\s*Warm regards,\s*Luxella\s*$/i,'').replace(/^.*https?:\/\/\S+.*$/gm,m=>m.replace(/\s*https?:\/\/\S+/g,'').trim()).replace(/\n{3,}/g,'\n\n').replace(/^You can (?:follow every update|also submit it) here:?\.?\s*$/gm,'').replace(/[:][ \t]*$/gm,'.').replace(/\n{3,}/g,'\n\n').trim();
+  const needTxt=()=>{if(!ta.value.trim()){toast('Message khali hai');return false;}return true;};
+  row.appendChild(btn('Popup bhejo',async e=>{if(!needTxt())return;const m=META();if(!confirm('Client ke page par popup dikhana hai? ('+(r.client||'')+' · #'+no+')'))return;const b=e.target;b.disabled=true;
+   const rr=await sb.from('lx_docs').insert({client_id:cl.id,collection:'notices',doc_id:'nt-'+Date.now().toString(36),data:Object.assign({title:m.pop.title,body:plain().slice(0,600),item:item,stage:st,order_no:'#'+no,url:m.pop.url,at:new Date().toISOString(),seen:false},m.pop.rate?{rate:true}:{})});
+   if(rr.error){toast('Popup nahi gaya: '+rr.error.message);}else toast('Popup client ke page par lag gaya');b.disabled=false;}));
+  row.appendChild(btn('Email bhejo',async e=>{if(!needTxt())return;const m=META();if(!confirm('Client ko EMAIL bhejna hai?\n'+(r.client||'')+' · #'+no+'\nSubject: '+m.subject))return;const b=e.target;b.disabled=true;
+   try{const ss=await sb.auth.getSession();const tok=ss.data&&ss.data.session&&ss.data.session.access_token;
+    const res=await fetch('https://qzripzgbstvxkfobzhyv.supabase.co/functions/v1/lx-push',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+tok},body:JSON.stringify({manual_msg:{client_id:cl.id,subject:m.subject,headline:m.headline,text:plain(),cta:m.cta}})});
+    const j=await res.json();if(j.sent>0)toast('Email gaya: '+(j.subject||''));else toast('Email nahi gaya'+(j.err?': '+j.err:j.error?': '+j.error:''));}
+   catch(x){toast('Email nahi gaya');}b.disabled=false;}));
   box.append(sel,ta,row);pn.appendChild(box);
  }catch(e){}})();}
  function openEd(r){const ov=el('div','lx-modal');const pn=el('div','lx-mp');const hd=el('div','lx-mh');hd.appendChild(el('b',null,(r.order_id||r._id)+' · '+String(r.item||'').slice(0,50)));const x=btn('×',()=>ov.remove(),'lx-mx');hd.appendChild(x);pn.appendChild(hd);const d=rowEl(r);d.classList.add('in-modal');pn.appendChild(d);ov.appendChild(pn);ov.onclick=e=>{if(e.target===ov)ov.remove();};document.body.appendChild(ov);d.open=true;
@@ -1332,7 +1350,7 @@ window.lxB2B=async function(root,sb,toast){
   const sl=gv(r,'sla_deadline');if(sl)m.appendChild(el('span',null,'SLA '+sl.slice(5)));c.appendChild(m);if(p&&p.note){const n=el('div','fc-note',p.note);c.appendChild(n);}
   const a=el('div','fc-a');const form=el('div','fc-form');form.hidden=true;const ss=document.createElement('select');['',...STORES].forEach(v=>{const o=el('option',null,v||'Store');o.value=v;if(p&&p.store&&String(p.store).toLowerCase().includes(v.toLowerCase())&&v)o.selected=true;ss.appendChild(o);});const on=document.createElement('input');on.placeholder='Store order no.';const cs=document.createElement('select');CTRY.forEach(([n,f])=>{const o=el('option',null,f+' '+n);o.value=n;cs.appendChild(o);});
   const ok=btn('Save',async()=>{if(!on.value.trim()){toast('Enter the store order no.');return;}const pp={store:ss.value,retailer_order_id:on.value.trim(),retailer_date:today(),country:cs.value};if(!(await put(r,pp)))return;let bu=BUYS.find(b=>b.store_order_no===pp.retailer_order_id);if(bu){await saveK('buy',bu,{km_ids:[...new Set([...(bu.km_ids||[]),r.order_id||r._id])]});}else{bu={_id:'buy-'+Date.now().toString(36)};if(await saveK('buy',bu,{store:pp.store,store_order_no:pp.retailer_order_id,order_date:today(),status:'ordered',country:cs.value,items:[{name:r.item,size:r.size}],km_ids:[r.order_id||r._id]}))BUYS.push(bu);}draw();},'bb-b sm');
-  form.append(ss,on,cs,ok);a.appendChild(btn('✓ Order placed',()=>{form.hidden=!form.hidden;if(!form.hidden)on.focus();},'bb-b sm'));const mo=btn('⋯',()=>openEd(r),'fc-more');a.appendChild(mo);c.appendChild(a);c.appendChild(form);return c;}
+  form.append(ss,on,cs,ok);a.appendChild(btn('✓ Order placed',()=>{form.hidden=!form.hidden;if(!form.hidden)on.focus();},'bb-b sm'));if(r.client!=='KicksMachine'&&r.client!=='Sourcex')a.appendChild(btn('✉️',()=>openEd(r),'fc-more'));const mo=btn('⋯',()=>openEd(r),'fc-more');a.appendChild(mo);c.appendChild(a);c.appendChild(form);return c;}
  /* ================= To-dos: har kaam ka alag section + reminder ================= */
  const dd=(r,k)=>{const v=gv(r,k);return v?(days(v)||0):null;};
  const snz=(r,key)=>{const s=(r.snooze||{})[key];return s&&s>today();};
