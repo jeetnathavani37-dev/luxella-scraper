@@ -1772,3 +1772,18 @@ html.lx-ro #tb-switch,html.lx-ro #tb-out,html.lx-ro #top .who{display:none!impor
 .sw.sw.sw .stbtn.due:hover,.sw.sw.sw .lx-rcv button:hover,.sw.sw.sw .btn.trk-go:hover,.sw.sw.sw .btn.lx-addr-b:hover,.sw.sw.sw .ab-h+.ab-r .ab-b:hover,.sw.sw.sw .ordbtns>.btn:first-child:hover,.sw.sw.sw #pane-ov .btn:first-child:hover{background-position:100% 100%!important;color:#16120a!important;box-shadow:0 4px 24px rgba(227,192,106,.42),inset 0 1px 0 rgba(255,255,255,.55)!important}
 .sw.sw.sw .ordbtns .chip.chip.chip.chip:not(.wal):not([aria-pressed]){background:transparent!important;border:0!important;box-shadow:none!important;min-height:34px!important;padding:0 4px!important;color:#b9ab8c!important;flex:0 0 auto!important;background-image:linear-gradient(90deg,#C99A45,rgba(201,154,69,0))!important;background-size:100% 1px!important;background-position:0 calc(100% - 6px)!important;background-repeat:no-repeat!important}
 .sw.sw.sw .ordbtns .chip.chip.chip.chip:not(.wal):not([aria-pressed]):hover{color:#F4E1A0!important}
+
+.sw.sw.sw.sw .lx-demote{background:linear-gradient(180deg,#17140f,#0e0c09) padding-box,linear-gradient(135deg,#F7E7B4,#B8913F 45%,#6b5426 70%,#E3C06A) border-box!important;border:1px solid transparent!important;color:#E9D3A0!important;font-weight:500!important;text-shadow:none!important;box-shadow:inset 0 1px 0 rgba(244,225,160,.08)!important}
+.sw.sw.sw.sw .lx-demote::before{display:none!important}
+.sw.sw.sw.sw .lx-demote:hover{color:#FFF1C9!important;box-shadow:0 0 18px rgba(227,192,106,.18)!important}
+/* numbers: wide geometric (AMG-style) */
+@font-face{font-family:'Lux Num';font-style:normal;font-weight:400;font-display:swap;src:url(assets/michroma.woff2) format('woff2')}
+.sw .big,.sw .pc2-a b,.sw .pc2-s b,.sw .pn-row b,.sw .pn-tot,.sw .money,.sw #ordT td.n,.sw .tab .bdg,.sw .mini b,.sw .ono,.sw .dpill .cd,.sw .lx-num{font-family:'Lux Num',sans-serif!important;font-style:normal!important;font-weight:400!important;letter-spacing:.02em!important;font-variant-numeric:tabular-nums}
+.sw .big{font-size:24px!important;line-height:1.15!important;margin-top:10px!important}
+.sw .pc2-a b,.sw .pn-row b{font-size:14px!important}
+.sw .pc2-s b,.sw .pn-tot{font-size:17px!important}
+.sw .money,.sw #ordT td.n{font-size:12px!important}
+.sw .mini b,.sw .ono,.sw .tab .bdg{font-size:9.5px!important}
+.sw .dpill .cd{font-size:9.5px!important;letter-spacing:.04em!important}
+.sw #bn-t{font-family:'Cormorant Garamond',Georgia,serif!important;font-size:26px!important;letter-spacing:0!important}
+.sw .pc2-s b{font-size:13px!important;letter-spacing:0!important;white-space:nowrap}

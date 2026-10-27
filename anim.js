@@ -41,5 +41,19 @@
   $$('.stbtn:not(.due)').forEach(b=>{if(b.dataset.lxp)return;b.dataset.lxp='1';b.classList.add('lx-paid');});
  }
  try{dash.onData(()=>{moments();setTimeout(deco,60);});}catch(e){}
+
+ /* only one gold button per card / list: demote the rest to noir-gilt */
+ const PRIM=['.lx-rcv button','.stbtn.due','.ordbtns>.btn:first-child','.btn.trk-go','.btn.lx-addr-b'];
+ function oneGold(){
+  document.querySelectorAll('.lx-demote').forEach(b=>b.classList.remove('lx-demote'));
+  const groups=[...document.querySelectorAll('#tracker .ord,#ordT tbody tr,.drawer,#pane-ov,.lx-await')];
+  const seen=new Set();
+  document.querySelectorAll('#tracker .ord,#ordT tbody tr,.drawer').forEach(g=>{let keep=null;PRIM.some(sel=>{const b=[...g.querySelectorAll(sel)].find(x=>x.offsetParent);if(b){keep=b;return true;}return false;});g.querySelectorAll(PRIM.join(',')).forEach(b=>{if(b!==keep)b.classList.add('lx-demote');seen.add(b);});});
+  /* lists outside cards (payments): first gold only */
+  const rest=[...document.querySelectorAll(PRIM.join(','))].filter(b=>!seen.has(b)&&b.offsetParent);
+  const byPane={};rest.forEach(b=>{const p=b.closest('[id^="pane-"]')||document.body;(byPane[p.id]=byPane[p.id]||[]).push(b);});
+  Object.values(byPane).forEach(a=>a.slice(1).forEach(b=>b.classList.add('lx-demote')));
+ }
+ setInterval(oneGold,1200);
  setInterval(deco,1500);setTimeout(()=>{moments();deco();},400);
 })();
