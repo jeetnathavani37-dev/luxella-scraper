@@ -1656,3 +1656,19 @@ html.lx-ro #tb-switch,html.lx-ro #tb-out,html.lx-ro #top .who{display:none!impor
 .sw .ab-l span{font-size:12px!important}
 .sw .ab-b{min-width:128px;height:38px;padding:0 16px!important;background:transparent!important;color:var(--gold)!important;border:1px solid var(--gold)!important;font:500 10.5px 'Jost',sans-serif!important;letter-spacing:.18em!important;transition:background .25s,color .25s}
 .sw .ab-b:hover,.sw .ab-h+.ab-r .ab-b{background:var(--gold)!important;color:#14110c!important}
+/* professional pass: unified buttons */
+.sw .btn,.sw .btn2,.sw a.chip.wal,.sw .chip:not(.tog):not(.cx-badge):not(.eta-tag),.sw .stbtn,.sw .lx-askc{display:inline-flex!important;align-items:center;justify-content:center;gap:8px;min-height:40px;padding:0 18px!important;border:1px solid rgba(201,169,106,.5)!important;border-radius:2px!important;background:transparent!important;color:var(--gold)!important;font:500 10.5px/1 'Jost',sans-serif!important;letter-spacing:.18em!important;text-transform:uppercase!important;text-decoration:none!important;box-shadow:none!important;cursor:pointer;transition:background .25s,border-color .25s,color .25s;-webkit-tap-highlight-color:transparent}
+.sw .btn:hover,.sw .btn2:hover,.sw a.chip.wal:hover,.sw .chip:not(.tog):not(.cx-badge):not(.eta-tag):hover,.sw .stbtn:hover,.sw .lx-askc:hover{border-color:var(--gold)!important;background:rgba(201,169,106,.08)!important}
+.sw .btn.trk-go,.sw .btn.rts-go,.sw .stbtn.due,.sw .btn.lx-addr-b,.sw .btn.primary,.sw .lx-askc{background:var(--gold)!important;border-color:var(--gold)!important;color:#14110c!important}
+.sw .btn.trk-go:hover,.sw .btn.rts-go:hover,.sw .stbtn.due:hover,.sw .btn.lx-addr-b:hover,.sw .btn.primary:hover,.sw .lx-askc:hover{background:#d9bb7c!important;color:#14110c!important}
+.sw .btn:disabled,.sw .btn2:disabled{opacity:.45;cursor:default}
+.sw .ordbtns{display:flex;flex-wrap:wrap;gap:8px}
+.sw .ordbtns>.btn,.sw .ordbtns>.btn2,.sw .ordbtns>.chip,.sw .ordbtns>a{flex:1 1 150px}
+.sw .rts-c,.sw .pc2-c,.sw .chip.tog{border-radius:2px!important;font:500 10.5px 'Jost',sans-serif!important;letter-spacing:.16em!important}
+.sw .cal-add{display:inline-flex;align-items:center;margin-left:8px;padding:4px 10px;border:1px solid rgba(201,169,106,.4);border-radius:2px;font:500 9.5px 'Jost',sans-serif;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);text-decoration:none}
+.sw .eta-tag{display:inline-flex;align-items:center;margin-left:8px;padding:4px 10px;border:1px solid currentColor;border-radius:2px;font:500 9.5px 'Jost',sans-serif;letter-spacing:.16em;text-transform:uppercase}
+.sw .addph{border-radius:2px!important;font:500 10px 'Jost',sans-serif!important;letter-spacing:.16em!important}
+.sw .stbtn{box-sizing:border-box!important;max-width:100%}
+.sw .stbtn:not(.due){min-height:32px!important;border-color:rgba(122,170,120,.35)!important;color:#8fbf8a!important;background:rgba(122,170,120,.06)!important;cursor:default}
+.sw .stbtn:not(.due):hover{background:rgba(122,170,120,.06)!important}
+.sw #pane-ov .btn:first-child,.sw #pane-ov .qa .btn:first-child{background:var(--gold)!important;color:#14110c!important;border-color:var(--gold)!important}
