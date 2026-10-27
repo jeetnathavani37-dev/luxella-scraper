@@ -1083,7 +1083,28 @@ window.lxB2B=async function(root,sb,toast){
  const TRKC={Delivered:'ok',OutForDelivery:'go',InTransit:'go',InfoReceived:'',Pending:'',AvailableForPickup:'go',AttemptFail:'bad',Exception:'bad',Expired:'bad'};
  const trkChip=no=>{if(!no)return null;no=String(no).split(' ')[0];const t=(all.find(r=>r.trk&&r.trk[no])||{}).trk;const x=t&&t[no];const a=el('a','fc-trk '+(x?TRKC[x.tag]||'':''),(x?x.label||x.tag:'Track')+' · '+no.slice(-6));a.href=trackUrl(no);a.target='_blank';a.rel='noopener';a.title=no+(x&&x.last?' — '+x.last:'')+(x&&x.eta?' · ETA '+x.eta:'');return a;};
  /* full editor in a modal */
+ /* ⭐ Client rating: share a link that opens the client's own page on this order's rating box; shows the rating once given.
+  The client submits it (lx_docs feedback); this never sends anything itself — Jeet shares the link. */
+ const RT_HOST='https://luxellaclients.duckdns.org/';
+ async function ratingBox(r,pn){try{
+  const cq=await sb.from('lx_clients').select('id,slug,name');const cl=(cq.data||[]).find(c=>String(c.name||'').toLowerCase()===String(r.client||'').toLowerCase());if(!cl)return;
+  const no=String(r.order_id||r._id||'').replace(/^#/,'');if(!/^\d{1,8}$/.test(no))return;
+  const url=RT_HOST+cl.slug+'#rate:'+no;
+  const box=el('div','bb-meta');box.style.cssText='margin:10px 0;padding:10px;border:1px solid var(--bd,#2a2a2a);border-radius:10px';
+  box.appendChild(el('b',null,'⭐ Client rating'));pn.appendChild(box);
+  const slug=t=>String(t||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,60);
+  const fq=await sb.from('lx_docs').select('doc_id,data').eq('collection','feedback').eq('client_id',cl.id);
+  const fb=((fq.data||[]).map(x=>x.data||{})).find(x=>String(x.order_no||'')==='#'+no||slug(x.order)===slug(r.item));
+  if(fb){const p=el('p',null,'★'.repeat(fb.rating||0)+'☆'.repeat(5-(fb.rating||0))+(fb.note?' · '+fb.note:''));p.style.margin='6px 0';box.appendChild(p);return;}
+  box.appendChild(el('p',null,'Abhi rating nahi aayi. Link share karo, client apne page par star + note daal dega.'));
+  const row=el('div');row.style.cssText='display:flex;gap:8px;flex-wrap:wrap';
+  const msg='Hi '+String(r.client||'').split(' ')[0]+', aapka '+(r.item||'order')+' deliver ho gaya. Kripya 1 minute me rating de dijiye: '+url;
+  row.appendChild(btn('WhatsApp pe share',()=>{window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank','noopener');}));
+  row.appendChild(btn('Link copy',async()=>{try{await navigator.clipboard.writeText(url);toast('Rating link copied');}catch(e){toast(url);}}));
+  box.appendChild(row);
+ }catch(e){}}
  function openEd(r){const ov=el('div','lx-modal');const pn=el('div','lx-mp');const hd=el('div','lx-mh');hd.appendChild(el('b',null,(r.order_id||r._id)+' · '+String(r.item||'').slice(0,50)));const x=btn('×',()=>ov.remove(),'lx-mx');hd.appendChild(x);pn.appendChild(hd);const d=rowEl(r);d.classList.add('in-modal');pn.appendChild(d);ov.appendChild(pn);ov.onclick=e=>{if(e.target===ov)ov.remove();};document.body.appendChild(ov);d.open=true;
+  if(DONE(r.status)&&r.client!=='KicksMachine'&&r.client!=='Sourcex')ratingBox(r,pn);
   {const tl=el('details','tl-c');tl.appendChild(el('summary',null,'History — every change & automation'));pn.appendChild(tl);let ld=false;tl.ontoggle=async()=>{if(ld||!tl.open)return;ld=true;const q=await sb.from('lx_events').select('at,type,payload,runs,source').eq('ref',r._id).order('id',{ascending:false}).limit(80);const L=q.data||[];if(!L.length){tl.appendChild(el('p','bb-meta','No history yet (recording started 23 Oct).'));return;}
    L.forEach(e=>{const p=e.payload||{};const t=e.type==='order.field'?p.field+': '+JSON.stringify(p.from===undefined?null:p.from)+' → '+JSON.stringify(p.to===undefined?null:p.to)+(p.by?' · '+p.by:''):e.type==='order.status'?'Status: '+(p.from||'—')+' → '+p.to:e.type==='order.payout'?'Payout: '+(p.from||'—')+' → '+p.to:e.type==='order.created'?'Order created':e.type==='order.tracking'?'Tracking added: '+p.tracking:e.type;const rr=el('div','tl-r');rr.appendChild(el('small',null,new Date(e.at).toLocaleString('en-IN',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})));rr.appendChild(el('span',null,t));if((e.runs||[]).length)rr.appendChild(el('em',null,'→ '+e.runs.map(x=>x.result).join(' · ')));tl.appendChild(rr);});};}}
  /* compact card */

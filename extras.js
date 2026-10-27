@@ -314,7 +314,7 @@ window.__lxDrawer=function(r,pan){
   if(fb){b.appendChild(el('p',null,'Your feedback: '+'★'.repeat(fb.rating||0)+'☆'.repeat(5-(fb.rating||0))+(fb.note?' · '+fb.note:'')));}
   else{const stars=el('div','xo-stars');let val=0;const btns=[1,2,3,4,5].map(n=>{const x=el('button','xo-star','☆');x.type='button';x.addEventListener('click',()=>{val=n;btns.forEach((y,k)=>y.textContent=k<n?'★':'☆');});stars.appendChild(x);return x;});
    const note=field('Anything we should know? (private, optional)');const send=el('button','btn2','Send feedback');send.type='button';
-   send.addEventListener('click',async()=>{if(!val){say('Pick a rating first');return;}send.disabled=true;try{const fo={id:'fb-'+oslug(r.item),order:r.item,rating:val,note:note.value.trim(),at:nowIso()};await photos.db.doc('feedback/fb-'+oslug(r.item)).set(fo);fbState.items[fo.id]=fo;say('Thank you for the feedback');try{openDrawer(r);}catch(e){}}catch(e){say('Could not send');send.disabled=false;}});
+   send.addEventListener('click',async()=>{if(!val){say('Pick a rating first');return;}send.disabled=true;try{const fo={id:'fb-'+oslug(r.item),order:r.item,order_no:r.order_no||'',rating:val,note:note.value.trim(),at:nowIso()};await photos.db.doc('feedback/fb-'+oslug(r.item)).set(fo);fbState.items[fo.id]=fo;say('Thank you for the feedback');try{openDrawer(r);}catch(e){}}catch(e){say('Could not send');send.disabled=false;}});
    b.appendChild(el('p',null,'How was this order?'));b.appendChild(stars);b.appendChild(note);b.appendChild(send);}
   const re=el('button','btn2','Reorder this');re.type='button';re.style.marginTop='8px';re.addEventListener('click',async()=>{if(!confirm('Send Luxella a request to source this again?'))return;re.disabled=true;try{const id='rq-'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);await photos.db.doc('requests/'+id).set({brand:r.brand||'',product:r.item,spec:'',qty:1,budget:0,needBy:'',link:'',photo:'',note:'Reorder of '+(r.order_no||r.item),urgent:false,status:'Submitted',at:nowIso()});say('Reorder request sent. Track it under Request a product.');}catch(e){say('Could not send');re.disabled=false;}});b.appendChild(re);
   pan.appendChild(b);}
@@ -328,6 +328,8 @@ const isCancelled=r=>/cancel/i.test(String(r.status||''));
 function costTotal(c){return ['product','intl','dom','other'].reduce((s,k)=>s+Number((c||{})[k]||0),0);}
 function profitOf(r){const c=opsState.costs[r.item];if(!c)return null;const rev=Number(r.payout||0),cost=costTotal(c);return {rev,cost,profit:rev-cost,margin:rev?(rev-cost)/rev*100:0,final:!!c.final};}
 function openOrder(item){const r=ordersData().find(x=>x.item===item);if(r&&typeof openDrawer==='function')openDrawer(r);}
+/* rating link: <client page>#rate:1024 opens that delivered order's drawer on the rating box (once, after login/data) */
+(function(){const m=String(location.hash||'').match(/^#rate:(\d{1,8})$/);if(!m)return;const no='#'+m[1];let n=0;const t=setInterval(()=>{if(++n>300){clearInterval(t);return;}try{const r=ordersData().find(x=>String(x.order_no)===no);if(r&&typeof openDrawer==='function'&&fbState.loaded){clearInterval(t);openDrawer(r);setTimeout(()=>{const s=document.querySelector('.xo-stars');if(s&&s.scrollIntoView)s.scrollIntoView({block:'center',behavior:'smooth'});},350);}}catch(e){}},600);})();
 function queueItems(){
  const q=[],t=todayS(),rows=ordersData().filter(r=>!isCancelled(r));
  rows.forEach(r=>{const open=!isDone(r);
@@ -534,7 +536,7 @@ ready(()=>{
  photos.db.collection('paysub').onSnapshot(s=>{const m={};s.docs.forEach(d=>{if(d.exists)m[d.id]=Object.assign({id:d.id},d.data());});psState.subs=m;renderPaySub();},()=>{});
  photos.db.collection('requests').onSnapshot(s=>{const m={};s.docs.forEach(d=>{if(d.exists)m[d.id]=d.data();});rqState.items=m;renderRequests();},()=>{});
  photos.db.collection('quote_resp').onSnapshot(s=>{Object.keys(qrState).forEach(k=>delete qrState[k]);s.docs.forEach(d=>{if(d.exists)qrState[d.id]=d.data();});if(typeof renderQuotes==='function')renderQuotes();},()=>{});
- photos.db.collection('feedback').onSnapshot(sn=>{const m={};sn.docs.forEach(d=>{if(d.exists)m[d.id]=d.data();});fbState.items=m;},()=>{});
+ photos.db.collection('feedback').onSnapshot(sn=>{const m={};sn.docs.forEach(d=>{if(d.exists)m[d.id]=d.data();});fbState.items=m;fbState.loaded=true;},()=>{fbState.loaded=true;});
  renderPaySub();renderRequests();
 });
 })();
