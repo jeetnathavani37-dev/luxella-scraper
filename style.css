@@ -1787,3 +1787,18 @@ html.lx-ro #tb-switch,html.lx-ro #tb-out,html.lx-ro #top .who{display:none!impor
 .sw .dpill .cd{font-size:9.5px!important;letter-spacing:.04em!important}
 .sw #bn-t{font-family:'Cormorant Garamond',Georgia,serif!important;font-size:26px!important;letter-spacing:0!important}
 .sw .pc2-s b{font-size:13px!important;letter-spacing:0!important;white-space:nowrap}
+/* order names: editorial italic (Her-wishlist style) */
+.sw.sw .ord .ohead .oname .otitle,.sw.sw #nextdel .big,.sw.sw #bn-t,.sw.sw .rts-n,.sw.sw .oc-it,.sw.sw .dit,.sw.sw .piece span,.sw.sw .drawer h2,.sw.sw .drawer h3,.sw.sw .pc2-t,.sw.sw #ordT tbody td:nth-child(3),.sw.sw .feat h3,.lxub .ub-h{font-family:'Lux Display',Georgia,serif!important;font-style:italic!important;font-weight:400!important;letter-spacing:.005em!important;text-transform:none!important}
+.sw.sw .ord .ohead .oname .otitle{font-size:28px!important;line-height:1.05!important;color:#F6EEDC!important}
+.sw.sw #nextdel .big{font-size:30px!important;line-height:1.08!important;color:#F6EEDC!important;background:none!important;-webkit-text-fill-color:currentColor!important}
+.sw.sw #bn-t{font-size:30px!important;line-height:1.08!important}
+.sw.sw .rts-n,.sw.sw .oc-it,.sw.sw .dit,.sw.sw .pc2-t{font-size:19px!important;line-height:1.15!important}
+.sw.sw #ordT tbody td:nth-child(3){font-size:21px!important;line-height:1.15!important}
+.sw.sw .pc2-t{font-family:'Jost',sans-serif!important;font-style:normal!important;font-size:9.5px!important;letter-spacing:.16em!important;text-transform:uppercase!important}
+.sw.sw .pc2-m>b{font-family:'Lux Display',Georgia,serif!important;font-style:italic!important;font-weight:400!important;font-size:21px!important;line-height:1.1!important}
+/* body text: wide elegant sans (Very-Merry-Miller style) */
+@font-face{font-family:'Lux Text';font-style:normal;font-weight:400;font-display:swap;src:url(assets/tenor.woff2) format('woff2')}
+:root,.sw{--font-anthropic-sans:'Lux Text','Jost',-apple-system,'Segoe UI',Helvetica,Arial,sans-serif}
+.sw.sw .st .sdesc p,.sw.sw .datenote,.sw.sw .note,.sw.sw p.note,.sw.sw .hero-cap,.sw.sw .ab-l span,.sw.sw .lx-await>div:nth-child(2)+*,.sw.sw .pc2-m small,.sw.sw .ord .lbl,.sw.sw #nextdel .lbl,.sw.sw .lbl{font-family:'Lux Text','Jost',sans-serif!important;font-weight:400!important;letter-spacing:.02em}
+.sw.sw .st .sdesc p{font-size:13px!important;line-height:1.7!important;color:#bdb4a4!important}
+.sw.sw .datenote{font-size:11.5px!important;line-height:1.65!important}
