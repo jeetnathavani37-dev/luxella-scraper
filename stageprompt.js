@@ -9,7 +9,7 @@
  const slugify=s=>String(s||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,60);
  const FN='https://qzripzgbstvxkfobzhyv.supabase.co/functions/v1/lx-push';
  function hostBase(slug){return 'https://luxellaclients.duckdns.org/'+slug;}
- function build(o,c,s){
+ function build(o,c,s,mode){
   const first=String(c.name||'').split(' ')[0]||'there';const no=String(o.order_no||'').replace(/^#/,'');const item=o.item||'your order';
   const ref=item+(no?' (Order #'+no+')':'');const page=hostBase(c.slug);const lk=h=>page+'#'+h;const local=isL(o);
   const useLocal=s>=8||local;const trk=useLocal?(o.local_tracking||(local?'':o.intl_tracking_no)):o.intl_tracking_no;const cour=useLocal?o.local_courier:o.intl_courier;
@@ -26,15 +26,18 @@
    8:ref+' has been dispatched with our courier partner.'+trkTxt+'\nPlease keep your phone reachable and record a continuous unboxing video before opening the parcel.'+follow+(/^\d{1,8}$/.test(no)?'\n\nOnce it reaches you, please confirm here: '+lk('recv:'+no):''),
    9:ref+' has been delivered. Thank you for choosing Luxella. We would be grateful if you could rate your experience:\n'+lk(/^\d{1,8}$/.test(no)?'rate:'+no:'tr')
   };
+  M.confirm=ref+' has been delivered by our courier partner. Please confirm that it has reached you:\n'+lk('recv:'+no)+'\n\nIf it has not reached you yet, tap "Not yet delivered" on the same page and we will check right away.';
   const hash=s===7?'ad:'+slugify(item):(s===9&&/^\d{1,8}$/.test(no))?'rate:'+no:'tr';
   const cta=s===7?['Share your address',hash]:s===9?['Rate your order',hash]:(s===8&&/^\d{1,8}$/.test(no))?['Received successfully','recv:'+no]:['Track your order','tr'];
+  const conf=mode==='confirm'&&/^\d{1,8}$/.test(no);
+  if(conf)return {text:'Dear '+first+',\n\n'+M.confirm+'\n\nWarm regards,\nLuxella',link:lk('recv:'+no),track:trk?((cour&&cour!=='\u2014'?cour+' ':'')+trk):'',cta:['Received successfully','recv:'+no],url:'tr',subject:'Please confirm receipt: '+item,headline:'Has it reached you?',confirm:true};
   return {text:'Dear '+first+',\n\n'+(M[s]||M[1])+'\n\nWarm regards,\nLuxella',link:lk(hash),track:trk?((cour&&cour!=='—'?cour+' ':'')+trk):'',cta,url:s===7?'ad':'tr',subject:stN(o,s)+': '+item};
  }
  const strip=t=>String(t||'').replace(/^Dear [^\n]*,\s*/i,'').replace(/\s*Warm regards,\s*Luxella\s*$/i,'').replace(/^.*https?:\/\/\S+.*$/gm,m=>m.replace(/\s*https?:\/\/\S+/g,'').trim()).replace(/^(?:Track your order here|You can follow every update here|Once it reaches you, please confirm here):?\.?\s*$/gm,'').replace(/[:][ \t]*$/gm,'.').replace(/\n{3,}/g,'\n\n').trim();
  window.lxStagePrompt=function(P){try{
   const o=P.order||{},c=P.client||{},s=Number(P.to)||Number(o.stage)||1;if(!c.id)return;
   const old=document.getElementById('lx-sp');if(old)old.remove();
-  const B=build(o,c,s);const sn=stN(o,s);
+  let mode=P.mode||'';let B=build(o,c,s,mode);const sn=stN(o,s);
   const ov=document.createElement('div');ov.id='lx-sp';ov.style.cssText='position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.72);display:flex;align-items:flex-end;justify-content:center;padding:0;font-family:inherit';
   const pn=document.createElement('div');pn.style.cssText='background:#0b0b0b;color:#eee;border:1px solid #3a3322;border-radius:14px 14px 0 0;width:100%;max-width:560px;max-height:92vh;overflow:auto;padding:16px 16px 20px;box-sizing:border-box';
   const h=(t,css)=>{const d=document.createElement('div');d.textContent=t;if(css)d.style.cssText=css;return d;};
@@ -48,17 +51,18 @@
   row('Order link',B.link,B.link);
   pn.appendChild(info);
   const ta=document.createElement('textarea');ta.rows=8;ta.value=B.text;ta.style.cssText='width:100%;box-sizing:border-box;font:inherit;font-size:13px;padding:8px;background:#0c0c0c;color:#eee;border:1px solid #3a3322;border-radius:6px';pn.appendChild(ta);
+  if(s===8){const sel=document.createElement('select');sel.style.cssText='display:block;margin:0 0 8px;max-width:100%;background:#0c0c0c;color:#eee;border:1px solid #3a3322;padding:6px;border-radius:6px;font:inherit;font-size:12.5px';[['','Shipped update'],['confirm','Delivered \u2014 ask client to confirm receipt']].forEach(([v,t])=>{const op=document.createElement('option');op.value=v;op.textContent=t;sel.appendChild(op);});sel.value=mode;sel.onchange=()=>{mode=sel.value;B=build(o,c,s,mode);ta.value=B.text;};pn.insertBefore(sel,ta);}
   const edited=()=>ta.value!==B.text;
   const bar=document.createElement('div');bar.style.cssText='display:flex;gap:8px;flex-wrap:wrap;margin-top:10px';
   const mk=(t,fn,gold)=>{const b=document.createElement('button');b.type='button';b.textContent=t;b.style.cssText='padding:10px 14px;border-radius:8px;font:inherit;font-size:12px;letter-spacing:.08em;cursor:pointer;border:1px solid #E3C06A;'+(gold?'background:#E3C06A;color:#000;font-weight:700':'background:transparent;color:#E3C06A');b.onclick=()=>fn(b);bar.appendChild(b);return b;};
   const say=t=>{try{if(window.alertMsg)window.alertMsg(t);else if(typeof toast==='function')toast(t);}catch(e){}};
   mk('✉️ Send email',async b=>{if(!ta.value.trim())return;b.disabled=true;const prev=b.textContent;b.textContent='Sending…';
-   try{const tok=await P.token();const body=(edited()||(s===8&&/^\d{1,8}$/.test(String(o.order_no||'').replace(/^#/,''))))?{manual_msg:{client_id:c.id,subject:B.subject,headline:sn,text:strip(ta.value),cta:B.cta}}:{manual_stage:{client_id:c.id,item:o.item,order_no:o.order_no||undefined,stage:s}};
+   try{const tok=await P.token();const body=(edited()||B.confirm||(s===8&&/^\d{1,8}$/.test(String(o.order_no||'').replace(/^#/,''))))?{manual_msg:{client_id:c.id,subject:B.subject,headline:B.headline||sn,text:strip(ta.value),cta:B.cta}}:{manual_stage:{client_id:c.id,item:o.item,order_no:o.order_no||undefined,stage:s}};
     const r=await fetch(FN,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+tok},body:JSON.stringify(body)});const j=await r.json();
     if(j.sent>0){b.textContent='Email sent ✓';say('Email sent: '+(j.subject||sn));}else{b.textContent=prev;b.disabled=false;say('Email nahi gaya'+(j.err?': '+j.err:j.error?': '+j.error:''));}}
    catch(e){b.textContent=prev;b.disabled=false;say('Email nahi gaya');}},true);
   mk('🔔 Send popup',async b=>{if(!ta.value.trim())return;b.disabled=true;
-   try{await P.addNotice({title:s>=9?'How was your order?':sn,body:(o.order_no?o.order_no+' · ':'')+(o.item||'')+' — '+strip(ta.value).replace(/\s+/g,' ').slice(0,260),item:o.item,stage:s,order_no:o.order_no||'',url:B.url,rate:s>=9,at:new Date().toISOString(),seen:false});b.textContent='Popup sent ✓';say('Client ko popup chala gaya');}
+   try{await P.addNotice({title:B.confirm?'Your order has been delivered':(s>=9?'How was your order?':sn),body:(s>=9&&!edited())?((o.item||'')+(o.order_no?' (Order '+o.order_no+')':'')+' has been delivered. We would love to hear how it went. It takes a few seconds.'):strip(ta.value).replace(/\s+/g,' ').slice(0,260),item:o.item,stage:B.confirm?8:s,order_no:o.order_no||'',url:B.url,rate:s>=9&&!B.confirm,at:new Date().toISOString(),seen:false});b.textContent='Popup sent ✓';say('Client ko popup chala gaya');}
    catch(e){b.disabled=false;say('Popup nahi gaya');}});
   mk('💬 WhatsApp',()=>{const ph=String(P.phone||'').replace(/[^0-9]/g,'').replace(/^(\d{10})$/,'91$1');window.open('https://wa.me/'+ph+'?text='+encodeURIComponent(ta.value),'_blank','noopener');});
   mk('Copy',async()=>{try{await navigator.clipboard.writeText(ta.value);say('Copied');}catch(e){ta.select();}});
