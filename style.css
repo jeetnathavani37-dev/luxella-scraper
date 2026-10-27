@@ -2003,3 +2003,17 @@ html.lx-ro #tb-switch,html.lx-ro #tb-out,html.lx-ro #top .who{display:none!impor
 @keyframes depIn{from{opacity:0;transform:translateX(40px) scale(.95)}}
 }
 .sw.sw .pricebar{padding:9px 14px!important;margin-top:12px!important}.sw.sw .pricebar .pb-v{font-size:16px!important}.sw.sw .pricebar .pb-l{font-size:8.5px!important}.sw.sw .pricebar .pb-s{font-size:8px!important}.sw.sw .pricebar .pb-lw{gap:3px!important}
+
+/* concise descriptions with dropdowns */
+.sw .datenote.lxmore{margin-top:8px}
+.sw .datenote.lxmore summary{list-style:none;cursor:pointer;display:inline-flex;align-items:center;gap:8px;font:400 10.5px 'Lux Text','Jost',sans-serif;color:#a39c90;letter-spacing:0}
+.sw .datenote.lxmore summary::-webkit-details-marker{display:none}
+.sw .datenote.lxmore summary::after{content:'';width:6px;height:6px;border-right:1px solid #C9A35E;border-bottom:1px solid #C9A35E;transform:rotate(45deg) translateY(-2px);transition:transform .3s}
+.sw .datenote.lxmore[open] summary::after{transform:rotate(-135deg) translateY(-1px)}
+.sw .datenote.lxmore p{margin:8px 0 0;font:400 10.5px/1.7 'Lux Text','Jost',sans-serif;color:#8f887c;animation:lxst .4s ease both}
+.sw .st .sdesc p.lx-cl{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.sw .lx-more{all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:6px;margin:2px 0 6px;font:500 9.5px 'Jost',sans-serif;letter-spacing:.2em;text-transform:uppercase;color:#C9A35E}
+.sw .lx-more::after{content:'';width:5px;height:5px;border-right:1px solid currentColor;border-bottom:1px solid currentColor;transform:rotate(45deg) translateY(-2px);transition:transform .3s}
+.sw .lx-more.open::after{transform:rotate(-135deg)}
+/* info badges: tighter so they fit one line */
+.sw.sw .badges2 .chip,.sw.sw .badges2>span{letter-spacing:.12em!important;font-size:8.5px!important;padding:6px 10px!important}

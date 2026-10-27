@@ -83,3 +83,9 @@
  }
  setInterval(deck,1200);setTimeout(deck,600);
 })();
+
+/* long step descriptions: two lines + "More" */
+(function(){
+ function clamp(){document.querySelectorAll('.st .sdesc p:not([data-cl])').forEach(p=>{if(!p.offsetParent)return;p.dataset.cl='1';p.classList.add('lx-cl');requestAnimationFrame(()=>{if(p.scrollHeight<=p.clientHeight+2){p.classList.remove('lx-cl');return;}const b=document.createElement('button');b.type='button';b.className='lx-more';b.textContent='More';b.addEventListener('click',e=>{e.stopPropagation();const o=p.classList.toggle('lx-cl');b.textContent=o?'More':'Less';b.classList.toggle('open',!o);});p.after(b);});});}
+ setInterval(clamp,1000);
+})();
