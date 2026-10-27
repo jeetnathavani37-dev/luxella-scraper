@@ -1543,3 +1543,13 @@ html.lx-ro #tb-switch,html.lx-ro #tb-out,html.lx-ro #top .who{display:none!impor
 .sw .brand.hasmark img.mk{height:26px;width:auto;max-width:64px;object-fit:contain;display:block;flex:0 0 auto}
 .sw .brand.hasmark .bn{font-weight:800}
 .sw #ordT tbody tr.oc2 td:nth-child(4) .brand.hasmark img.mk{height:30px;max-width:72px}
+
+/* 28 Oct 2026: tracker order header — luxury type: refined serif title, small letterspaced meta line */
+.sw .oname{display:block!important;flex:1 1 0;min-width:0}
+.sw .oname .otitle{display:block;font-family:'Cormorant Garamond','Didot',Georgia,serif!important;font-size:21px!important;font-weight:500!important;line-height:1.22;letter-spacing:.012em!important;color:#F6EFDD;text-wrap:balance}
+.sw .oname .ometa{display:flex;flex-wrap:wrap;align-items:center;gap:4px 12px;margin-top:8px}
+.sw .oname .ometa .ono{display:inline-block;margin:0!important;font-family:'Jost',sans-serif!important;font-size:9.5px!important;font-weight:500;letter-spacing:.26em!important;text-transform:uppercase;color:#B8943F!important;vertical-align:baseline!important}
+.sw .oname .ometa .ono::before{content:"Ref ";color:#7C7467!important;letter-spacing:.26em}
+.sw .oname .ometa .odt{font-family:'Jost',sans-serif;font-size:9.5px;font-weight:400;letter-spacing:.26em;text-transform:uppercase;color:#8E887C;position:relative;padding-left:12px}
+.sw .oname .ometa .odt::before{content:"";position:absolute;left:0;top:50%;width:4px;height:4px;margin-top:-2px;background:#B8943F;transform:rotate(45deg);opacity:.8}
+@media (min-width:641px){.sw .oname .otitle{font-size:25px!important}}
