@@ -578,7 +578,7 @@ ready(()=>{
  photos.db.collection('paysub').onSnapshot(s=>{const m={};s.docs.forEach(d=>{if(d.exists)m[d.id]=Object.assign({id:d.id},d.data());});psState.subs=m;renderPaySub();},()=>{});
  photos.db.collection('requests').onSnapshot(s=>{const m={};s.docs.forEach(d=>{if(d.exists)m[d.id]=d.data();});rqState.items=m;renderRequests();},()=>{});
  photos.db.collection('quote_resp').onSnapshot(s=>{Object.keys(qrState).forEach(k=>delete qrState[k]);s.docs.forEach(d=>{if(d.exists)qrState[d.id]=d.data();});if(typeof renderQuotes==='function')renderQuotes();},()=>{});
- photos.db.collection('feedback').onSnapshot(sn=>{const m={};sn.docs.forEach(d=>{if(d.exists)m[d.id]=d.data();});fbState.items=m;fbState.loaded=true;},()=>{fbState.loaded=true;});
+ photos.db.collection('feedback').onSnapshot(sn=>{const m={};sn.docs.forEach(d=>{if(d.exists)m[d.id]=d.data();});fbState.items=m;fbState.loaded=true;try{setTimeout(()=>{if(window.__lxReRender)window.__lxReRender();},200);}catch(e){}},()=>{fbState.loaded=true;});
  renderPaySub();renderRequests();
 });
 })();
