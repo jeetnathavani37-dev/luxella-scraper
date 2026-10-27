@@ -24,7 +24,7 @@ function brandEl(r){const b=r.brand||'';const w=document.createElement('span');w
  if(lg&&lg.url){w.classList.add('haslogo');const im=document.createElement('img');im.src=lg.url;im.alt=b;im.addEventListener('error',()=>{im.remove();w.classList.remove('haslogo');w.textContent=b;});w.appendChild(im);}
  else{const mk=staticLogo(b);if(mk){w.classList.add('hasmark');const im=document.createElement('img');im.className='mk';im.src=mk;im.alt='';im.addEventListener('error',()=>im.remove());w.appendChild(im);const tx=document.createElement('span');tx.className='bn';tx.textContent=b;w.appendChild(tx);}else{w.textContent=b;}w.style.borderColor='hsl('+brandHue(b)+' 40% 60% / .6)';w.style.background='hsl('+brandHue(b)+' 50% 50% / .10)';}
  return w;}
-const STATIC_LOGOS=['kate-spade','marc-jacobs','coach','michael-kors'];
+const STATIC_LOGOS=['kate-spade','marc-jacobs','coach','michael-kors','tissot'];
 function staticLogo(b){const s=String(b||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');const k=STATIC_LOGOS.find(x=>s===x||s.indexOf(x+'-')===0);return k?'assets/brands/'+k+'.png':'';}
 function addLogoBtn(r){const b=document.createElement('button');b.type='button';b.className='addph';b.textContent=photos.brands[pslug(r.brand)]?'Change logo':'Add brand logo';
  b.addEventListener('click',()=>{photos.pendingBrand=r.brand;document.getElementById('bl-file').click();});return b;}
