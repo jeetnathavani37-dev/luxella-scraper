@@ -1806,3 +1806,12 @@ html.lx-ro #tb-switch,html.lx-ro #tb-out,html.lx-ro #top .who{display:none!impor
 .sw.sw img.ph,.sw.sw .pc2-ph img,.sw.sw .rts-i img,.sw.sw #nextdel img,.sw.sw .feat img,.sw.sw #ordT td img{object-fit:contain!important;object-position:center!important;background:#fff!important;padding:7%!important;box-sizing:border-box!important;border:0!important;border-radius:4px!important;box-shadow:0 1px 0 rgba(255,255,255,.04),0 8px 22px rgba(0,0,0,.35)!important;aspect-ratio:1/1;height:auto}
 .sw.sw div.ph{border:1px dashed rgba(201,169,106,.25)!important;background:transparent!important;border-radius:4px!important;display:flex;align-items:center;justify-content:center;font:400 9px 'Jost',sans-serif;letter-spacing:.16em;color:#6f685d;text-transform:uppercase;text-align:center}
 .sw.sw img.ph.big:hover{transform:none!important}
+/* condensed Didone caps (Trending-Gifts style) for select headers */
+.sw.sw.sw .nwo-ft h2,.sw.sw.sw .pc2-h h2,.sw.sw.sw .ab-h,.sw.sw.sw .lx-await>div:first-child{font-family:'Lux Display',Didot,serif!important;font-style:normal!important;font-weight:400!important;text-transform:uppercase!important;letter-spacing:.015em!important;background:var(--lux-goldtext)!important;-webkit-background-clip:text!important;background-clip:text!important;-webkit-text-fill-color:transparent!important}
+.sw.sw.sw .nwo-ft h2{font-size:30px!important;line-height:1!important;margin:0 0 6px!important}
+.sw.sw.sw .nwo-ft h2::after{display:none}
+.sw.sw.sw .pc2-h h2{font-size:28px!important;line-height:1!important}
+.sw.sw.sw .ab-h{font-size:22px!important;line-height:1!important;padding-bottom:12px}
+.sw.sw.sw .lx-await>div:first-child{font-size:20px!important;line-height:1!important}
+.sw #neworder .nwo-ft h2{font-size:32px!important;letter-spacing:.015em!important;line-height:1!important;display:flex;align-items:center;gap:12px}
+.sw #neworder .nwo-ft h2::before{-webkit-text-fill-color:#14110c!important;font-family:'Jost',sans-serif!important;font-size:8.5px!important;line-height:1.4;margin-right:0!important;flex:none}
