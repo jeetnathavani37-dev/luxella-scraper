@@ -16,28 +16,36 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div id="lxintro" aria-hidden="true"><div class="li-stage"><div class="li-logo"><img class="li-wm" src="assets/luxella_wordmark.svg" alt=""><span class="li-star"><svg viewBox="-50 -50 100 100"><defs><radialGradient id="lig" r="60%"><stop offset="0" stop-color="#fff"/><stop offset=".5" stop-color="#FFF4CF"/><stop offset="1" stop-color="#E3B85A"/></radialGradient></defs><path d="M0-50C2.5-12 12-2.5 50 0 12 2.5 2.5 12 0 50-2.5 12-12 2.5-50 0-12-2.5-2.5-12 0-50Z" fill="url(#lig)"/></svg></span></div><div class="li-tag">The Standard for Rare</div></div></div>
+<div id="lxintro" aria-hidden="true"><div class="li-cur li-t"></div><div class="li-cur li-b"></div><div class="li-stage"><div class="li-rule"></div><div class="li-logo"><img class="li-wm" src="assets/luxella_wordmark.svg" alt=""><span class="li-sweep"></span><span class="li-star"><svg viewBox="-50 -50 100 100"><path d="M0-50C2.5-12 12-2.5 50 0 12 2.5 2.5 12 0 50-2.5 12-12 2.5-50 0-12-2.5-2.5-12 0-50Z" fill="#FFF6DC"/></svg></span></div><div class="li-tag">The Standard for Rare</div><div class="li-rule li-r2"></div></div></div>
 <style>
 @font-face{font-family:'Lux Wide';font-weight:300;font-display:block;src:url(assets/lexexa-300.woff2) format('woff2')}
-#lxintro{position:fixed;inset:0;z-index:2147483000;background:radial-gradient(ellipse at 50% 46%,#15110a 0,#000 62%);display:flex;align-items:center;justify-content:center;overflow:hidden;cursor:pointer}
-#lxintro .li-stage{width:min(76vw,480px);display:flex;flex-direction:column;align-items:center;gap:18px}
+#lxintro{position:fixed;inset:0;z-index:2147483000;display:flex;align-items:center;justify-content:center;overflow:hidden;cursor:pointer;pointer-events:auto}
+#lxintro .li-cur{position:absolute;left:0;right:0;height:50.5%;background:radial-gradient(ellipse 80% 120% at 50% 100%,#17120a 0,#050403 60%,#000 100%);transition:transform 1.1s cubic-bezier(.77,0,.18,1)}
+#lxintro .li-t{top:0}
+#lxintro .li-b{bottom:0;background:radial-gradient(ellipse 80% 120% at 50% 0%,#17120a 0,#050403 60%,#000 100%)}
+#lxintro .li-stage{position:relative;z-index:2;width:min(74vw,460px);display:flex;flex-direction:column;align-items:center;gap:20px;transition:opacity .5s ease,transform .9s cubic-bezier(.77,0,.18,1)}
+#lxintro .li-rule{width:0;height:1px;background:linear-gradient(90deg,rgba(201,163,94,0),#E9C978 30%,#FFF1C9 50%,#E9C978 70%,rgba(201,163,94,0));animation:liRule 1.1s .15s cubic-bezier(.65,0,.25,1) forwards}
+#lxintro .li-r2{animation-delay:1.55s}
 #lxintro .li-logo{position:relative;width:100%;aspect-ratio:3096/478}
-#lxintro .li-wm{width:100%;height:100%;display:block;clip-path:circle(0% at 36.5% 40%);opacity:.0;animation:liReveal 1.5s 1.15s cubic-bezier(.6,0,.2,1) forwards}
-#lxintro .li-star{position:absolute;left:36.5%;top:40%;width:9%;aspect-ratio:1;transform:translate(-50%,-50%) scale(0);opacity:0;animation:liTwinkle 1.2s .2s ease-in-out forwards,liSettle .9s 1.4s cubic-bezier(.4,0,.2,1) forwards,liGlint 1.6s 2.6s ease-in-out}
-#lxintro .li-star svg{width:100%;height:100%;display:block;filter:drop-shadow(0 0 4px #fff) drop-shadow(0 0 14px rgba(255,214,120,.9)) drop-shadow(0 0 34px rgba(227,184,90,.55))}
-#lxintro .li-tag{font:300 clamp(9px,2.6vw,13px) 'Lux Wide',sans-serif;text-transform:uppercase;letter-spacing:.7em;color:#d9cfbd;opacity:0;margin-right:-.4em;animation:liTag 1.3s 1.9s cubic-bezier(.2,.8,.2,1) forwards;white-space:nowrap}
-#lxintro.out{animation:liOut .8s cubic-bezier(.6,0,.4,1) forwards}
-@keyframes liTwinkle{0%{opacity:0;transform:translate(-50%,-50%) scale(.2) rotate(-30deg)}25%{opacity:1;transform:translate(-50%,-50%) scale(1.1) rotate(0)}40%{opacity:.25;transform:translate(-50%,-50%) scale(.75)}60%{opacity:1;transform:translate(-50%,-50%) scale(1.2)}75%{opacity:.4;transform:translate(-50%,-50%) scale(.85)}100%{opacity:1;transform:translate(-50%,-50%) scale(1.25)}}
-@keyframes liSettle{from{opacity:1;transform:translate(-50%,-50%) scale(1.25)}to{opacity:1;transform:translate(-50%,-50%) scale(.82)}}
-@keyframes liGlint{0%,100%{filter:none}50%{filter:brightness(1.5)}}
-@keyframes liReveal{0%{opacity:1;clip-path:circle(0% at 36.5% 40%);filter:brightness(1.6)}to{opacity:1;clip-path:circle(120% at 36.5% 40%);filter:none}}
-@keyframes liTag{from{opacity:0;letter-spacing:.7em}to{opacity:1;letter-spacing:.34em}}
-@keyframes liOut{to{opacity:0;transform:scale(1.04);filter:blur(3px)}}
-@media (prefers-reduced-motion:reduce){#lxintro *{animation-duration:.01s!important;animation-delay:0s!important}}
+#lxintro .li-wm{width:100%;height:100%;display:block;opacity:0;clip-path:inset(100% 0 0 0);transform:translateY(16px);filter:blur(8px);animation:liRise 1.25s .55s cubic-bezier(.2,.75,.15,1) forwards}
+#lxintro .li-sweep{position:absolute;inset:0;-webkit-mask:url(assets/luxella_wordmark.svg) center/100% 100% no-repeat;mask:url(assets/luxella_wordmark.svg) center/100% 100% no-repeat;background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.95) 50%,transparent 65%) -120% 0/45% 100% no-repeat;opacity:0;animation:liSweep 1.25s 1.75s cubic-bezier(.45,0,.2,1) forwards}
+#lxintro .li-star{position:absolute;left:36.5%;top:40%;width:7%;aspect-ratio:1;transform:translate(-50%,-50%) scale(0) rotate(0);opacity:0;animation:liGlint 1s 2.45s cubic-bezier(.3,0,.2,1) forwards}
+#lxintro .li-star svg{width:100%;height:100%;display:block;filter:drop-shadow(0 0 3px #fff) drop-shadow(0 0 12px rgba(255,214,120,.9))}
+#lxintro .li-tag{font:300 clamp(8.5px,2.4vw,12px) 'Lux Wide',sans-serif;text-transform:uppercase;letter-spacing:.85em;margin-right:-.5em;color:#cfc4b0;opacity:0;white-space:nowrap;animation:liTag 1.4s 1.45s cubic-bezier(.2,.8,.2,1) forwards}
+#lxintro.out .li-stage{opacity:0;transform:scale(.97)}
+#lxintro.out .li-t{transform:translateY(-101%)}
+#lxintro.out .li-b{transform:translateY(101%)}
+#lxintro.out{pointer-events:none}
+@keyframes liRule{to{width:62%}}
+@keyframes liRise{to{opacity:1;clip-path:inset(-10% 0 -10% 0);transform:none;filter:none}}
+@keyframes liSweep{0%{opacity:1;background-position:-120% 0}to{opacity:1;background-position:220% 0}}
+@keyframes liGlint{0%{opacity:0;transform:translate(-50%,-50%) scale(0) rotate(-45deg)}45%{opacity:1;transform:translate(-50%,-50%) scale(1.15) rotate(0)}to{opacity:.9;transform:translate(-50%,-50%) scale(.7) rotate(20deg)}}
+@keyframes liTag{from{opacity:0;letter-spacing:.85em}to{opacity:1;letter-spacing:.38em}}
+@media (prefers-reduced-motion:reduce){#lxintro *{animation-duration:.01s!important;animation-delay:0s!important;transition-duration:.2s!important}}
 </style>
 <script>(function(){var el=document.getElementById('lxintro');try{if(sessionStorage.getItem('lxintro')){el.remove();return;}sessionStorage.setItem('lxintro','1');}catch(e){}
-var done=false;function go(){if(done)return;done=true;el.classList.add('out');setTimeout(function(){el.remove();},820);}
-var rm=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;setTimeout(go,rm?400:3700);el.addEventListener('click',go);})();</script>
+var done=false;function go(){if(done)return;done=true;el.classList.add('out');setTimeout(function(){el.remove();},1250);}
+var rm=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;setTimeout(go,rm?400:3600);el.addEventListener('click',go);})();</script>
 
 <div id="gate" class="lx-gate" hidden></div>
 <div id="top" class="lx-top" hidden></div>
