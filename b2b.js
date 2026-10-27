@@ -1098,7 +1098,7 @@ window.lxB2B=async function(root,sb,toast){
   if(fb){const p=el('p',null,'★'.repeat(fb.rating||0)+'☆'.repeat(5-(fb.rating||0))+(fb.note?' · '+fb.note:''));p.style.margin='6px 0';box.appendChild(p);return;}
   box.appendChild(el('p',null,'Abhi rating nahi aayi. Link share karo, client apne page par star + note daal dega.'));
   const row=el('div');row.style.cssText='display:flex;gap:8px;flex-wrap:wrap';
-  const msg='Hi '+String(r.client||'').split(' ')[0]+', aapka '+(r.item||'order')+' deliver ho gaya. Kripya 1 minute me rating de dijiye: '+url;
+  const msg='Dear '+(String(r.client||'').split(' ')[0]||'there')+',\n\nWe hope you are delighted with '+(r.item||'your order')+' (Order #'+no+'). We would be grateful if you could take a moment to rate your experience:\n'+url+'\n\nThank you for choosing Luxella.\n\nWarm regards,\nLuxella';
   row.appendChild(btn('WhatsApp pe share',()=>{window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank','noopener');}));
   row.appendChild(btn('Link copy',async()=>{try{await navigator.clipboard.writeText(url);toast('Rating link copied');}catch(e){toast(url);}}));
   const oq=await sb.from('lx_orders').select('item').eq('client_id',cl.id).eq('data->>order_no','#'+no).maybeSingle();const cItem=(oq.data&&oq.data.item)||r.item;
@@ -1106,7 +1106,48 @@ window.lxB2B=async function(root,sb,toast){
   row.appendChild(btn('Email bhejo',async e=>{if(!confirm('Client ko rating ka EMAIL bhejna hai? ('+(r.client||'')+' · #'+no+')'))return;const b=e.target;b.disabled=true;try{const ss=await sb.auth.getSession();const tok=ss.data&&ss.data.session&&ss.data.session.access_token;const res=await fetch('https://qzripzgbstvxkfobzhyv.supabase.co/functions/v1/lx-push',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+tok},body:JSON.stringify({manual_stage:{client_id:cl.id,order_no:'#'+no,stage:9}})});const j=await res.json();if(j.sent>0)toast('Email gaya: '+(j.subject||'rating'));else{toast('Email nahi gaya'+(j.err?': '+j.err:j.error?': '+j.error:''));b.disabled=false;}}catch(x){toast('Email nahi gaya');b.disabled=false;}}));
   box.appendChild(row);
  }catch(e){}}
+/* Professional client message templates (English). Nothing is sent from here: Jeet edits, copies or opens WhatsApp. */
+ function clientMsgBox(r,pn){(async()=>{try{
+  if(r.client==='KicksMachine'||r.client==='Sourcex')return;
+  const cq=await sb.from('lx_clients').select('id,slug,name');const cl=(cq.data||[]).find(c=>String(c.name||'').toLowerCase()===String(r.client||'').toLowerCase());if(!cl)return;
+  const no=String(r.order_id||r._id||'').replace(/^#/,'');if(!/^\d{1,8}$/.test(no))return;
+  const oq=await sb.from('lx_orders').select('item,data').eq('client_id',cl.id).eq('data->>order_no','#'+no).maybeSingle();const od=(oq.data&&oq.data.data)||{};const item=(oq.data&&oq.data.item)||r.item||'your order';
+  const first=String(r.client||'').split(' ')[0]||'there';const st=Number(od.stage)||1;const local=String(od.order_type||'').includes('Local');
+  const page=RT_HOST+cl.slug;const lk=h=>page+'#'+h;const ref=item+' (Order #'+no+')';
+  const trk=od.local_tracking||od.intl_tracking_no||'';const cour=od.local_tracking?od.local_courier:od.intl_courier;const trkTxt=trk?'\n'+(cour&&cour!=='—'?cour+' ':'')+'tracking number: '+trk:'';
+  const hi='Dear '+first+',\n\n',sign='\n\nWarm regards,\nLuxella';
+  const follow='\n\nYou can follow every update here: '+lk('tr');
+  const STG={
+   1:'Thank you for your order. We have received your request for '+ref+' and are now placing it with the store on your behalf. We will confirm as soon as it is accepted.'+follow,
+   2:'Good news. Your order for '+ref+' is confirmed'+(local?'.':' and bought in your name. Next, the store will ship it to our hub abroad.')+follow,
+   3:local?ref+' has been secured from the store and is now with Luxella. Please keep your delivery address ready; we will ask for it shortly.'+follow:'The store has shipped '+ref+' to our hub abroad.'+trkTxt+follow,
+   4:ref+' has reached our international hub and is being quality checked by our team. We will confirm once it leaves for India.'+follow,
+   5:ref+' has left our hub and is on its way to India. We will update you as soon as it lands.'+follow,
+   6:ref+' has landed in India and is clearing customs. It will then be prepared for dispatch to you. Please keep your delivery address ready.'+follow,
+   7:'Your order, '+ref+', is ready to be dispatched. Kindly share your delivery address, with pin code and a reachable phone number, using this link:\n'+lk('ad')+'\nWe ship within 24 hours of receiving it.',
+   8:ref+' has been dispatched with our courier partner.'+trkTxt+'\nPlease keep your phone reachable and record a continuous unboxing video before opening the parcel; it protects you in case of any issue.'+follow,
+   9:ref+' has been delivered. Thank you for choosing Luxella. We would be grateful if you could rate your experience:\n'+lk('rate:'+no)+'\n\nIf anything is not right, please share your unboxing video with us and we will take care of it immediately.'
+  };
+  const pend=(typeof all!=='undefined'?all:[]).filter(x=>x.client===r.client&&isPend(x));
+  const T={
+   'Stage update':()=>hi+(STG[st]||STG[1])+sign,
+   'Rating request':()=>hi+'We hope you are delighted with '+ref+'. We would be grateful if you could take a moment to rate your experience:\n'+lk('rate:'+no)+'\n\nThank you for choosing Luxella.'+sign,
+   'Payment reminder':()=>{const L=pend.length?pend:[r];const tot=L.reduce((t,x)=>t+(Number(x.payout)||0),0);return hi+'This is a gentle reminder that payment for the following '+(L.length>1?'orders is':'order is')+' pending:\n\n'+L.map(x=>'• '+String(x.item||'').slice(0,70)+' (Order '+(x.order_id||x._id)+') — '+inr(x.payout)).join('\n')+(L.length>1?'\n\nTotal pending: '+inr(tot):'')+'\n\nKindly share the payment confirmation (UTR or screenshot) once done, and we will update your order right away. You can also submit it here: '+lk('pay')+'\n\nThank you for your prompt support.'+sign;},
+   'Address request':()=>hi+'To dispatch '+ref+', we kindly request your delivery address. Please add or confirm it, along with the pin code and a reachable phone number, here:\n'+lk('ad')+'\n\nWe ship within 24 hours of receiving it.'+sign
+  };
+  const box=el('div','bb-meta');box.style.cssText='margin:10px 0;padding:10px;border:1px solid var(--bd,#2a2a2a);border-radius:10px';
+  box.appendChild(el('b',null,'✉️ Client message (professional)'));
+  const sel=document.createElement('select');sel.style.cssText='display:block;margin:8px 0;max-width:100%';Object.keys(T).forEach(k=>{const o=el('option',null,k);o.value=k;sel.appendChild(o);});
+  sel.value=DONE(r.status)?'Rating request':(isPend(r)&&st>=8?'Payment reminder':'Stage update');
+  const ta=document.createElement('textarea');ta.rows=9;ta.style.cssText='width:100%;box-sizing:border-box;font:inherit;padding:8px';
+  const fill=()=>{ta.value=T[sel.value]();};sel.onchange=fill;fill();
+  const row=el('div');row.style.cssText='display:flex;gap:8px;flex-wrap:wrap;margin-top:8px';
+  row.appendChild(btn('Copy',async()=>{try{await navigator.clipboard.writeText(ta.value);toast('Message copied');}catch(e){ta.select();toast('Select + copy');}}));
+  row.appendChild(btn('WhatsApp pe kholo',()=>{window.open('https://wa.me/?text='+encodeURIComponent(ta.value),'_blank','noopener');}));
+  box.append(sel,ta,row);pn.appendChild(box);
+ }catch(e){}})();}
  function openEd(r){const ov=el('div','lx-modal');const pn=el('div','lx-mp');const hd=el('div','lx-mh');hd.appendChild(el('b',null,(r.order_id||r._id)+' · '+String(r.item||'').slice(0,50)));const x=btn('×',()=>ov.remove(),'lx-mx');hd.appendChild(x);pn.appendChild(hd);const d=rowEl(r);d.classList.add('in-modal');pn.appendChild(d);ov.appendChild(pn);ov.onclick=e=>{if(e.target===ov)ov.remove();};document.body.appendChild(ov);d.open=true;
+  clientMsgBox(r,pn);
   if(DONE(r.status)&&r.client!=='KicksMachine'&&r.client!=='Sourcex')ratingBox(r,pn);
   {const tl=el('details','tl-c');tl.appendChild(el('summary',null,'History — every change & automation'));pn.appendChild(tl);let ld=false;tl.ontoggle=async()=>{if(ld||!tl.open)return;ld=true;const q=await sb.from('lx_events').select('at,type,payload,runs,source').eq('ref',r._id).order('id',{ascending:false}).limit(80);const L=q.data||[];if(!L.length){tl.appendChild(el('p','bb-meta','No history yet (recording started 23 Oct).'));return;}
    L.forEach(e=>{const p=e.payload||{};const t=e.type==='order.field'?p.field+': '+JSON.stringify(p.from===undefined?null:p.from)+' → '+JSON.stringify(p.to===undefined?null:p.to)+(p.by?' · '+p.by:''):e.type==='order.status'?'Status: '+(p.from||'—')+' → '+p.to:e.type==='order.payout'?'Payout: '+(p.from||'—')+' → '+p.to:e.type==='order.created'?'Order created':e.type==='order.tracking'?'Tracking added: '+p.tracking:e.type;const rr=el('div','tl-r');rr.appendChild(el('small',null,new Date(e.at).toLocaleString('en-IN',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})));rr.appendChild(el('span',null,t));if((e.runs||[]).length)rr.appendChild(el('em',null,'→ '+e.runs.map(x=>x.result).join(' · ')));tl.appendChild(rr);});};}}
