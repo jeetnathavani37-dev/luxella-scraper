@@ -516,6 +516,21 @@ function statusMsg(r){const st=Number(r.stage||1);const line=stName(r,st)||r.sta
  if(r.payout_status==='Pending')m+='\n• Payment of ₹'+fmt(Number(r.payout))+' is pending.';
  return m+'\n— Luxella';}
 const fd=s=>s?d3.utcFormat('%-d %b')(new Date(s)):'—';
+
+function lxCdTick(ep){const c=ep.querySelector('.cd');if(!c)return;const end=new Date(ep.dataset.eta+'T18:00:00+05:30').getTime();let ms=end-Date.now();const today=new Date().toISOString().slice(0,10);if(ep.dataset.eta===today){c.textContent='Arriving today';c.classList.add('now');return;}if(ms<=0){c.textContent='Any day now';return;}const d=Math.floor(ms/864e5);ms-=d*864e5;const h=Math.floor(ms/36e5);ms-=h*36e5;const m=Math.floor(ms/6e4);c.textContent='Arriving in '+(d?d+'d ':'')+h+'h '+String(m).padStart(2,'0')+'m';}
+setInterval(()=>{document.querySelectorAll('.dpill.eta[data-eta]').forEach(lxCdTick);},30000);
+function journeyEl(r,st){const loc=isLocalO(r);const N=loc?[[20,'Store'],[170,'Luxella'],[320,'You']]:[[20,'US store'],[100,'Reshipper'],[170,'In flight'],[240,'India hub'],[320,'You']];
+ const P=loc?{1:20,2:20,3:170,7:170,8:250,9:320}:{1:20,2:20,3:60,4:100,5:170,6:240,7:240,8:282,9:320};const x=P[st]!=null?P[st]:20;
+ const ns='http://www.w3.org/2000/svg';const w=document.createElement('div');w.className='journey';const s=document.createElementNS(ns,'svg');s.setAttribute('viewBox','0 0 340 64');s.setAttribute('preserveAspectRatio','xMidYMid meet');
+ const mk=(t,at)=>{const e=document.createElementNS(ns,t);Object.entries(at).forEach(([k,v])=>e.setAttribute(k,v));s.appendChild(e);return e;};
+ mk('path',{d:'M20 26 Q95 4 170 26 T320 26',class:'jb'});
+ const pg=mk('path',{d:'M20 26 Q95 4 170 26 T320 26',class:'jp'});
+ N.forEach(([nx,l])=>{const done=nx<=x;mk('circle',{cx:nx,cy:jy(nx),r:done?4.5:3.5,class:done?'jn on':'jn'});const t=mk('text',{x:nx,y:56,class:'jl'+(done?' on':''),'text-anchor':'middle'});t.textContent=l;});
+ const ic=st>=9?'✓':(!loc&&st===5?'✈':'●');const g=mk('g',{class:'jdot',transform:'translate('+x+' '+jy(x)+')'});const c=document.createElementNS(ns,'circle');c.setAttribute('r','9');c.setAttribute('class','jh');g.appendChild(c);const t=document.createElementNS(ns,'text');t.setAttribute('text-anchor','middle');t.setAttribute('y','4');t.setAttribute('class','ji');t.textContent=ic;g.appendChild(t);
+ w.appendChild(s);requestAnimationFrame(()=>{try{const L=pg.getTotalLength();let lo=0,hi=L;for(let i=0;i<22;i++){const m=(lo+hi)/2;if(pg.getPointAtLength(m).x<x)lo=m;else hi=m;}pg.style.strokeDasharray=L;pg.style.strokeDashoffset=L;pg.getBoundingClientRect();pg.style.transition='stroke-dashoffset 1.6s cubic-bezier(.2,.8,.2,1)';pg.style.strokeDashoffset=L-lo;}catch(e){}});
+ return w;}
+function jy(x){/* y on curve M20 26 Q95 4 170 26 T320 26 */if(x<=170){const t=(x-20)/150;return (1-t)*(1-t)*26+2*(1-t)*t*4+t*t*26;}const t=(x-170)/150;return (1-t)*(1-t)*26+2*(1-t)*t*48+t*t*26;}
+
 const fdy=s=>s?d3.utcFormat('%-d %b %Y')(new Date(s)):'—';
 const etaOf=r=>{if(!r.order_date)return r.eta_date||'';const d=new Date(r.order_date);if(isNaN(d))return r.eta_date||'';const m=d.getUTCMonth()+1,y=d.getUTCFullYear()+Math.floor(m/12),mm=m%12;const day=Math.min(d.getUTCDate(),new Date(Date.UTC(y,mm+1,0)).getUTCDate());return new Date(Date.UTC(y,mm,day)).toISOString().slice(0,10);};
 const state={q:'',f:'All',k:'order_date',asc:true,from:'',to:'',brand:'',type:'',group:'',cols:null};
@@ -601,8 +616,8 @@ function tracker(rows){trkChips();const so=trkState.sort||'stage';rows=rows.slic
   {const dp=document.createElement('div');dp.className='datepills';const pill=(k,v,c)=>{const b=document.createElement('span');b.className='dpill '+c;const kk=document.createElement('small');kk.textContent=k;const vv=document.createElement('b');vv.textContent=v;b.appendChild(kk);b.appendChild(vv);dp.appendChild(b);};
    if(r.order_date)pill('Order date',fdy(r.order_date),'od');
    const dn=r.status==='Delivered'||stage>=9||/cancel/i.test(String(r.status||''));
-   if(r.order_date&&!dn)pill('Estimated delivery',fdy(etaOf(r)),'eta');
-   if(dp.childNodes.length){o.appendChild(dp);if(!dn&&r.order_date){const ds=document.createElement('div');ds.className='datenote';ds.textContent='The estimated delivery date is indicative and is calculated at approximately one month from the order date. Actual delivery depends on brand confirmation, customs clearance and courier schedules, and may therefore vary slightly. Any material change will be communicated to you promptly.';o.appendChild(ds);}}}
+   if(r.order_date&&!dn){pill('Estimated delivery',fdy(etaOf(r)),'eta');const ep=dp.lastChild;ep.dataset.eta=etaOf(r);const cd=document.createElement('i');cd.className='cd';ep.appendChild(cd);lxCdTick(ep);}
+   if(!/cancel/i.test(String(r.status||'')))o.appendChild(journeyEl(r,stage));if(dp.childNodes.length){o.appendChild(dp);if(!dn&&r.order_date){const ds=document.createElement('div');ds.className='datenote';ds.textContent='The estimated delivery date is indicative and is calculated at approximately one month from the order date. Actual delivery depends on brand confirmation, customs clearance and courier schedules, and may therefore vary slightly. Any material change will be communicated to you promptly.';o.appendChild(ds);}}}
   o.appendChild(infoBadges(r));
   if(stage<9&&STAGE_DUR[stage-1]&&!(local&&stage>=3&&stage<=5)){const nx=document.createElement('div');nx.className='lbl';nx.style.marginTop='6px';nx.textContent='Next: '+stName(r,stNext(r,stage)||stage+1)+' · typically '+STAGE_DUR[stage-1];o.appendChild(nx);}
   if(r.local_tracking){const tl=document.createElement('div');tl.className='trkline';

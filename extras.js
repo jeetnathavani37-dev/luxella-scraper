@@ -650,7 +650,7 @@ document.addEventListener('click',function(ev){var b=ev.target.closest&&ev.targe
   b.style.cssText='width:100%;padding:15px 22px;border-radius:10px;border:1px solid #F4E1A0;background:linear-gradient(135deg,#F4E1A0,#E3C06A 50%,#B8943F);color:#000;font:inherit;font-weight:700;letter-spacing:.14em;text-transform:uppercase;font-size:13px;cursor:pointer;box-shadow:0 2px 14px rgba(227,192,106,.25)';
   b.addEventListener('click',async e=>{e.stopPropagation();if(!confirm('Confirm that you have received '+(r.item||'this order')+'?'))return;b.disabled=true;b.textContent='Confirming\u2026';
    try{const tok=await window.lx.authToken();const res=await fetch('https://qzripzgbstvxkfobzhyv.supabase.co/functions/v1/lx-push',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+tok},body:JSON.stringify({received:{order_no:r.order_no||'',item:r.item}})});const j=await res.json();
-    if(j.ok){b.textContent='\u2713 Thank you';sayX('Thank you! Marked as delivered.');const no=String(r.order_no||'').replace(/^#/,'');setTimeout(()=>{if(/^\d{1,8}$/.test(no))location.hash='rate:'+no;location.reload();},700);}
+    if(j.ok){b.textContent='\u2713 Thank you';const no=String(r.order_no||'').replace(/^#/,'');const fin=()=>{if(/^\d{1,8}$/.test(no))location.hash='rate:'+no;location.reload();};if(window.lxUnbox)window.lxUnbox(r,fin);else{sayX('Thank you! Marked as delivered.');setTimeout(fin,700);}}
     else{b.disabled=false;b.textContent='\u2713 Received successfully';sayX(j.error||'Could not update. Please try again.');}}
    catch(x){b.disabled=false;b.textContent='\u2713 Received successfully';sayX('Could not update. Please try again.');}});
   wrap.appendChild(b);return wrap;}
