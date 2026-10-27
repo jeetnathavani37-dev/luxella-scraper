@@ -288,6 +288,22 @@ async function saveOrd(r,patch){const d=Object.assign({},r,patch);delete d.item;
 function isDone(r){return r.status==='Delivered'||Number(r.stage||1)>=9;}
 function box(title){const b=el('div','xo-box');b.appendChild(el('div','lbl',title));return b;}
 function field(ph,type){const i=el('input');i.type=type||'text';i.placeholder=ph;i.className='xo-in';return i;}
+/* inline rating on every delivered order card (client rates; owner sees the rating) */
+window.__lxOA=function(r,bb){
+ if(!isDone(r))return;const fid='fb-'+oslug(r.item);const fb=fbState.items[fid];
+ const stars=n=>'★'.repeat(n||0)+'☆'.repeat(5-(n||0));
+ const w=el('div','lx-rate');w.style.cssText='flex:0 0 100%;width:100%;margin:2px 0 10px;padding:12px 14px;border:1px solid #E3C06A;border-radius:10px;background:rgba(227,192,106,.07)';
+ const own=(()=>{try{return !!photos.canEdit;}catch(e){return false;}})();
+ const shown=n=>{w.innerHTML='';const t=el('div',null,(own?'Client rating':'Your rating')+'  '+stars(n.rating));t.style.cssText='color:#F4E1A0;letter-spacing:.12em;font-size:14px';w.appendChild(t);if(n.note){const q=el('div',null,n.note);q.style.cssText='opacity:.75;font-size:12.5px;margin-top:4px';w.appendChild(q);}};
+ if(fb){shown(fb);bb.insertBefore(w,bb.firstChild);return;}
+ if(own)return;
+ const hd=el('div',null,'How was your order? Tap to rate');hd.style.cssText='font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:#E3C06A;margin-bottom:8px';w.appendChild(hd);
+ const row=el('div');row.style.cssText='display:flex;gap:6px;align-items:center;flex-wrap:wrap';let val=0;
+ const note=el('input');note.placeholder='Anything we should know? (optional)';note.hidden=true;note.style.cssText='width:100%;box-sizing:border-box;margin-top:8px;padding:9px;background:#0c0c0c;color:#eee;border:1px solid #3a3322;border-radius:8px;font:inherit';
+ const send=el('button',null,'Send rating');send.type='button';send.hidden=true;send.style.cssText='margin-top:8px;padding:11px 20px;border-radius:8px;border:1px solid #F4E1A0;background:linear-gradient(135deg,#F4E1A0,#E3C06A 50%,#B8943F);color:#000;font:inherit;font-weight:700;letter-spacing:.14em;text-transform:uppercase;font-size:12px;cursor:pointer';
+ const bt=[1,2,3,4,5].map(n=>{const x=el('button',null,'☆');x.type='button';x.style.cssText='background:none;border:0;color:#E3C06A;font-size:30px;line-height:1;padding:2px 4px;cursor:pointer';x.addEventListener('click',e=>{e.stopPropagation();val=n;bt.forEach((y,k)=>y.textContent=k<n?'★':'☆');note.hidden=false;send.hidden=false;});row.appendChild(x);return x;});
+ send.addEventListener('click',async e=>{e.stopPropagation();if(!val){say('Pick a rating first');return;}send.disabled=true;try{const fo={id:fid,order:r.item,order_no:r.order_no||'',rating:val,note:note.value.trim(),at:nowIso()};await photos.db.doc('feedback/'+fid).set(fo);fbState.items[fid]=fo;say('Thank you for your rating');shown(fo);}catch(x){say('Could not send');send.disabled=false;}});
+ w.appendChild(row);w.appendChild(note);w.appendChild(send);bb.insertBefore(w,bb.firstChild);};
 window.__lxDrawer=function(r,pan){
  const done=isDone(r),own=isOwner();
  /* delay notice */

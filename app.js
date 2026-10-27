@@ -717,6 +717,7 @@ function orderActions(r){const bb=document.createElement('div');bb.className='or
  if(st>=8){bb.appendChild(copyBtn('Received, all good',()=>'Hi Luxella, '+(r.order_no||'')+' '+r.item+' received, all good. Thanks!','chip'));
   bb.appendChild(copyBtn('Issue with this order',()=>'Hi Luxella, issue with '+(r.order_no||'')+' '+r.item+': [describe: wrong size / damaged / missing]. Sending photos.','chip'));}
  if(r.status==='Delivered'||st>=9)bb.appendChild(copyBtn('Order again',()=>'Hi Luxella, quote please:\n• Item: '+r.item+' ('+r.brand+')\n• Same as '+(r.order_no||'')+'\n— Swayam','chip'));
+ try{if(window.__lxOA)window.__lxOA(r,bb);}catch(e){}
  return bb;}
 function journey(r){const st=Number(r.stage||1),local=String(r.order_type).indexOf('Local')>=0;const w=document.createElement('div');w.className='journey';
  const ns='http://www.w3.org/2000/svg';const svg=document.createElementNS(ns,'svg');svg.setAttribute('viewBox','0 0 400 70');
