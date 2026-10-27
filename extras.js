@@ -292,7 +292,7 @@ function field(ph,type){const i=el('input');i.type=type||'text';i.placeholder=ph
 window.__lxOA=function(r,bb){
  if(!isDone(r))return;const fid='fb-'+oslug(r.item);const fb=fbState.items[fid];
  const stars=n=>'★'.repeat(n||0)+'☆'.repeat(5-(n||0));
- const w=el('div','lx-rate');w.dataset.item=r.item;w.dataset.no=String(r.order_no||'').replace(/^#/,'');w.style.cssText='flex:0 0 100%;width:100%;margin:2px 0 10px;padding:12px 14px;border:1px solid #E3C06A;border-radius:10px;background:rgba(227,192,106,.07)';
+ const w=el('div','lx-rate');w.dataset.item=r.item;w.dataset.no=String(r.order_no||'').replace(/^#/,'');w.style.cssText='flex:0 0 100%;width:100%;box-sizing:border-box;max-width:100%;margin:2px 0 10px;padding:12px 14px;border:1px solid #E3C06A;border-radius:10px;background:rgba(227,192,106,.07)';
  const own=(()=>{try{return !!photos.canEdit;}catch(e){return false;}})();
  const shown=n=>{w.innerHTML='';const t=el('div',null,(own?'Client rating':'Your rating')+'  '+stars(n.rating));t.style.cssText='color:#F4E1A0;letter-spacing:.12em;font-size:14px';w.appendChild(t);if(n.note){const q=el('div',null,n.note);q.style.cssText='opacity:.75;font-size:12.5px;margin-top:4px';w.appendChild(q);}};
  if(fb){shown(fb);bb.insertBefore(w,bb.firstChild);return;}
@@ -300,7 +300,8 @@ window.__lxOA=function(r,bb){
   const t=el('div',null,'\u2606\u2606\u2606\u2606\u2606  Not rated yet');t.style.cssText='color:#F4E1A0;letter-spacing:.1em;font-size:13px;margin-bottom:8px';w.appendChild(t);
   const row=el('div');row.style.cssText='display:flex;gap:8px;flex-wrap:wrap';
   const mkb=(txt,fn,gold)=>{const x=el('button',null,txt);x.type='button';x.style.cssText='padding:10px 14px;border-radius:8px;font:inherit;font-size:12px;letter-spacing:.08em;cursor:pointer;border:1px solid #E3C06A;'+(gold?'background:linear-gradient(135deg,#F4E1A0,#E3C06A 50%,#B8943F);color:#000;font-weight:700':'background:transparent;color:#E3C06A');x.addEventListener('click',e=>{e.stopPropagation();fn(x);});row.appendChild(x);};
-  mkb('\u2B50 Ask for rating',()=>{if(window.__lxAsk)window.__lxAsk(r,9);},true);
+  mkb('\uD83D\uDCE6 Ask client to confirm receipt',()=>{if(window.__lxAsk)window.__lxAsk(r,8,'confirm');},true);
+  mkb('\u2B50 Ask for rating',()=>{if(window.__lxAsk)window.__lxAsk(r,9);});
   mkb('\u21a9 Move back to tracker',async x=>{if(!confirm('Move '+(r.order_no||r.item)+' back to the tracker (Shipped, not delivered)?'))return;x.disabled=true;try{if(window.__lxSetStage)await window.__lxSetStage(r,8);}catch(e){x.disabled=false;say('Could not move it back');}});
   w.appendChild(row);bb.insertBefore(w,bb.firstChild);return;}
  const hd=el('div',null,'How was your order? Tap to rate');hd.style.cssText='font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:#E3C06A;margin-bottom:8px';w.appendChild(hd);
