@@ -1555,3 +1555,10 @@ html.lx-ro #tb-switch,html.lx-ro #tb-out,html.lx-ro #top .who{display:none!impor
 @media (min-width:641px){.sw .oname .otitle{font-size:25px!important}}
 
 .sw #ordT th:nth-child(11),.sw #ordT tbody td:nth-child(11){display:none!important}
+
+.sw .datepills{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0 0}
+.sw .dpill{display:inline-flex;flex-direction:column;gap:3px;padding:9px 16px;border:1px solid rgba(201,169,106,.55);border-radius:3px;background:linear-gradient(180deg,rgba(201,169,106,.16),rgba(201,169,106,.06));box-shadow:inset 0 0 0 1px rgba(201,169,106,.12)}
+.sw .dpill small{font:400 9.5px 'Jost',sans-serif;letter-spacing:.2em;text-transform:uppercase;color:var(--mut,#A39C90)}
+.sw .dpill b{font:600 17px/1.1 'Cormorant Garamond',serif;color:var(--gold);letter-spacing:.02em}
+.sw .dpill.eta{border-color:var(--gold);background:linear-gradient(180deg,rgba(201,169,106,.26),rgba(201,169,106,.1))}
+.sw .datenote{margin:8px 0 0;font:400 11.5px/1.55 'Jost',sans-serif;color:var(--mut,#A39C90);max-width:62ch}
