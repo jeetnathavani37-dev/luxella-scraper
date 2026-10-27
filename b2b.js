@@ -1125,7 +1125,7 @@ window.lxB2B=async function(root,sb,toast){
    5:ref+' has left our hub and is on its way to India. We will update you as soon as it lands.'+follow,
    6:ref+' has landed in India and is clearing customs. It will then be prepared for dispatch to you. Please keep your delivery address ready.'+follow,
    7:'Your order, '+ref+', is ready to be dispatched. Kindly share your delivery address, with pin code and a reachable phone number, using this link:\n'+lk('ad')+'\nWe ship within 24 hours of receiving it.',
-   8:ref+' has been dispatched with our courier partner.'+trkTxt+'\nPlease keep your phone reachable and record a continuous unboxing video before opening the parcel; it protects you in case of any issue.'+follow,
+   8:ref+' has been dispatched with our courier partner.'+trkTxt+'\nPlease keep your phone reachable and record a continuous unboxing video before opening the parcel; it protects you in case of any issue.'+follow+'\n\nOnce it reaches you, please confirm here: '+lk('recv:'+no),
    9:ref+' has been delivered. Thank you for choosing Luxella. We would be grateful if you could rate your experience:\n'+lk('rate:'+no)+'\n\nIf anything is not right, please share your unboxing video with us and we will take care of it immediately.'
   };
   const pend=(typeof all!=='undefined'?all:[]).filter(x=>x.client===r.client&&isPend(x));
@@ -1133,6 +1133,7 @@ window.lxB2B=async function(root,sb,toast){
    'Stage update':()=>hi+(STG[st]||STG[1])+sign,
    'Rating request':()=>hi+'We hope you are delighted with '+ref+'. We would be grateful if you could take a moment to rate your experience:\n'+lk('rate:'+no)+'\n\nThank you for choosing Luxella.'+sign,
    'Payment reminder':()=>{const L=pend.length?pend:[r];const tot=L.reduce((t,x)=>t+(Number(x.payout)||0),0);return hi+'This is a gentle reminder that payment for the following '+(L.length>1?'orders is':'order is')+' pending:\n\n'+L.map(x=>'• '+String(x.item||'').slice(0,70)+' (Order '+(x.order_id||x._id)+') — '+inr(x.payout)).join('\n')+(L.length>1?'\n\nTotal pending: '+inr(tot):'')+'\n\nKindly share the payment confirmation (UTR or screenshot) once done, and we will update your order right away. You can also submit it here: '+lk('pay')+'\n\nThank you for your prompt support.'+sign;},
+   'Delivery confirmation':()=>hi+ref+' has been delivered. Please confirm that it has reached you:\n'+lk('recv:'+no)+'\n\nIf it has not reached you yet, tap "Not yet delivered" on the same page and we will check right away.'+sign,
    'Address request':()=>hi+'To dispatch '+ref+', we kindly request your delivery address. Please add or confirm it, along with the pin code and a reachable phone number, here:\n'+lk('ad')+'\n\nWe ship within 24 hours of receiving it.'+sign
   };
   const box=el('div','bb-meta');box.style.cssText='margin:10px 0;padding:10px;border:1px solid var(--bd,#2a2a2a);border-radius:10px';
@@ -1146,13 +1147,14 @@ window.lxB2B=async function(root,sb,toast){
   row.appendChild(btn('WhatsApp pe kholo',()=>{window.open('https://wa.me/?text='+encodeURIComponent(ta.value),'_blank','noopener');}));
   /* per-template email/popup meta: subject, headline, CTA label + hash (what the client's button opens) */
   const META=()=>{const k=sel.value;
+   if(k==='Delivery confirmation'||(k==='Stage update'&&st===8))return{subject:'Please confirm receipt: '+item,headline:'Has it reached you?',cta:['Received successfully','recv:'+no],pop:{title:'Your order has been delivered',url:'tr'}};
    if(k==='Rating request')return{subject:'How was your order? '+item,headline:'How was your order?',cta:['Rate your order','rate:'+no],pop:{title:'How was your order?',url:'tr',rate:true}};
    if(k==='Payment reminder')return{subject:'Payment reminder: '+item,headline:'Payment reminder',cta:['View payments','pay'],pop:{title:'Payment reminder',url:'pay'}};
    if(k==='Address request'||(k==='Stage update'&&st===7))return{subject:'We need your delivery address: '+item,headline:'We need your delivery address',cta:['Share your address','ad'],pop:{title:'Share your delivery address',url:'ad'}};
    if(st>=9)return{subject:'Delivered: '+item,headline:'Delivered',cta:['Rate your order','rate:'+no],pop:{title:item,url:'tr',rate:true}};
    return{subject:'Order update: '+item,headline:'Order update',cta:['Track your order','tr'],pop:{title:item,url:'tr'}};};
   /* popup/email body: the page already shows greeting, sign-off and the button, so strip those and bare links */
-  const plain=()=>ta.value.replace(/^Dear [^\n]*,\s*/i,'').replace(/\s*Warm regards,\s*Luxella\s*$/i,'').replace(/^.*https?:\/\/\S+.*$/gm,m=>m.replace(/\s*https?:\/\/\S+/g,'').trim()).replace(/\n{3,}/g,'\n\n').replace(/^You can (?:follow every update|also submit it) here:?\.?\s*$/gm,'').replace(/[:][ \t]*$/gm,'.').replace(/\n{3,}/g,'\n\n').trim();
+  const plain=()=>ta.value.replace(/^Dear [^\n]*,\s*/i,'').replace(/\s*Warm regards,\s*Luxella\s*$/i,'').replace(/^.*https?:\/\/\S+.*$/gm,m=>m.replace(/\s*https?:\/\/\S+/g,'').trim()).replace(/\n{3,}/g,'\n\n').replace(/^(?:You can (?:follow every update|also submit it) here|Once it reaches you, please confirm here|Track your order here):?\.?\s*$/gm,'').replace(/[:][ \t]*$/gm,'.').replace(/\n{3,}/g,'\n\n').trim();
   const needTxt=()=>{if(!ta.value.trim()){toast('Message khali hai');return false;}return true;};
   row.appendChild(btn('Popup bhejo',async e=>{if(!needTxt())return;const m=META();if(!confirm('Client ke page par popup dikhana hai? ('+(r.client||'')+' · #'+no+')'))return;const b=e.target;b.disabled=true;
    const rr=await sb.from('lx_docs').insert({client_id:cl.id,collection:'notices',doc_id:'nt-'+Date.now().toString(36),data:Object.assign({title:m.pop.title,body:plain().slice(0,600),item:item,stage:st,order_no:'#'+no,url:m.pop.url,at:new Date().toISOString(),seen:false},m.pop.rate?{rate:true}:{})});

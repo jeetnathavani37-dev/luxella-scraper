@@ -23,14 +23,14 @@
    5:ref+' has left our hub and is on its way to India.'+follow,
    6:ref+' has landed in India and is clearing customs. It will then be prepared for dispatch to you. Please keep your delivery address ready.'+follow,
    7:'Your order, '+ref+', is ready to be dispatched. Kindly share your delivery address, with pin code and a reachable phone number:\n'+lk('ad:'+slugify(item))+'\nWe ship within 24 hours of receiving it.',
-   8:ref+' has been dispatched with our courier partner.'+trkTxt+'\nPlease keep your phone reachable and record a continuous unboxing video before opening the parcel.'+follow,
+   8:ref+' has been dispatched with our courier partner.'+trkTxt+'\nPlease keep your phone reachable and record a continuous unboxing video before opening the parcel.'+follow+(/^\d{1,8}$/.test(no)?'\n\nOnce it reaches you, please confirm here: '+lk('recv:'+no):''),
    9:ref+' has been delivered. Thank you for choosing Luxella. We would be grateful if you could rate your experience:\n'+lk(/^\d{1,8}$/.test(no)?'rate:'+no:'tr')
   };
   const hash=s===7?'ad:'+slugify(item):(s===9&&/^\d{1,8}$/.test(no))?'rate:'+no:'tr';
-  const cta=s===7?['Share your address',hash]:s===9?['Rate your order',hash]:['Track your order','tr'];
+  const cta=s===7?['Share your address',hash]:s===9?['Rate your order',hash]:(s===8&&/^\d{1,8}$/.test(no))?['Received successfully','recv:'+no]:['Track your order','tr'];
   return {text:'Dear '+first+',\n\n'+(M[s]||M[1])+'\n\nWarm regards,\nLuxella',link:lk(hash),track:trk?((cour&&cour!=='—'?cour+' ':'')+trk):'',cta,url:s===7?'ad':'tr',subject:stN(o,s)+': '+item};
  }
- const strip=t=>String(t||'').replace(/^Dear [^\n]*,\s*/i,'').replace(/\s*Warm regards,\s*Luxella\s*$/i,'').replace(/^.*https?:\/\/\S+.*$/gm,m=>m.replace(/\s*https?:\/\/\S+/g,'').trim()).replace(/^(?:Track your order|You can follow every update) here:?\.?\s*$/gm,'').replace(/[:][ \t]*$/gm,'.').replace(/\n{3,}/g,'\n\n').trim();
+ const strip=t=>String(t||'').replace(/^Dear [^\n]*,\s*/i,'').replace(/\s*Warm regards,\s*Luxella\s*$/i,'').replace(/^.*https?:\/\/\S+.*$/gm,m=>m.replace(/\s*https?:\/\/\S+/g,'').trim()).replace(/^(?:Track your order here|You can follow every update here|Once it reaches you, please confirm here):?\.?\s*$/gm,'').replace(/[:][ \t]*$/gm,'.').replace(/\n{3,}/g,'\n\n').trim();
  window.lxStagePrompt=function(P){try{
   const o=P.order||{},c=P.client||{},s=Number(P.to)||Number(o.stage)||1;if(!c.id)return;
   const old=document.getElementById('lx-sp');if(old)old.remove();
@@ -53,7 +53,7 @@
   const mk=(t,fn,gold)=>{const b=document.createElement('button');b.type='button';b.textContent=t;b.style.cssText='padding:10px 14px;border-radius:8px;font:inherit;font-size:12px;letter-spacing:.08em;cursor:pointer;border:1px solid #E3C06A;'+(gold?'background:#E3C06A;color:#000;font-weight:700':'background:transparent;color:#E3C06A');b.onclick=()=>fn(b);bar.appendChild(b);return b;};
   const say=t=>{try{if(window.alertMsg)window.alertMsg(t);else if(typeof toast==='function')toast(t);}catch(e){}};
   mk('✉️ Send email',async b=>{if(!ta.value.trim())return;b.disabled=true;const prev=b.textContent;b.textContent='Sending…';
-   try{const tok=await P.token();const body=edited()?{manual_msg:{client_id:c.id,subject:B.subject,headline:sn,text:strip(ta.value),cta:B.cta}}:{manual_stage:{client_id:c.id,item:o.item,order_no:o.order_no||undefined,stage:s}};
+   try{const tok=await P.token();const body=(edited()||(s===8&&/^\d{1,8}$/.test(String(o.order_no||'').replace(/^#/,''))))?{manual_msg:{client_id:c.id,subject:B.subject,headline:sn,text:strip(ta.value),cta:B.cta}}:{manual_stage:{client_id:c.id,item:o.item,order_no:o.order_no||undefined,stage:s}};
     const r=await fetch(FN,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+tok},body:JSON.stringify(body)});const j=await r.json();
     if(j.sent>0){b.textContent='Email sent ✓';say('Email sent: '+(j.subject||sn));}else{b.textContent=prev;b.disabled=false;say('Email nahi gaya'+(j.err?': '+j.err:j.error?': '+j.error:''));}}
    catch(e){b.textContent=prev;b.disabled=false;say('Email nahi gaya');}},true);

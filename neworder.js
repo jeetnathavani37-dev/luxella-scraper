@@ -382,6 +382,7 @@ const show=list=>{list=list.filter(n=>n.preview||!ls('lx_nt_'+n.id));if(open||!l
   const r2=el('div','ps-row');const goTo=rate=>{close();const t=document.getElementById('tab-'+(n.d.url||'tr'));if(t)t.click();setTimeout(()=>{try{if(row){openDrawer(row);if(rate)setTimeout(()=>{const s=document.querySelector('.xo-stars');if(s&&s.scrollIntoView)s.scrollIntoView({block:'center',behavior:'smooth'});},400);}}catch(e){}},300);};
   const isRate=!!n.d.rate||Number(n.d.stage)>=9;
   if(isRate){const rb=el('button','btn','Rate your order');rb.type='button';rb.addEventListener('click',()=>goTo(true));r2.appendChild(rb);}
+  if(!isRate&&Number(n.d.stage)===8&&!photos.canEdit&&window.__lxRecvByNo&&/^#?\d{1,8}$/.test(String(n.d.order_no||''))){const cb=el('button','btn','Received successfully');cb.type='button';cb.addEventListener('click',()=>{close();setTimeout(()=>window.__lxRecvByNo(String(n.d.order_no).replace(/^#/,'')),250);});r2.appendChild(cb);}
   const v=el('button',isRate?'btn2':'btn',n.d.url==='ad'?'Share your address':'Track your order');v.type='button';v.addEventListener('click',()=>goTo(false));r2.appendChild(v);
   const nx=el('button','btn2',i<list.length-1?'Next':'Got it');nx.type='button';nx.addEventListener('click',()=>{if(i<list.length-1){i++;draw();}else close();});r2.appendChild(nx);bx.appendChild(r2);};
  draw();(document.querySelector('.sw')||document.body).appendChild(ov);requestAnimationFrame(()=>ov.classList.add('on'));};

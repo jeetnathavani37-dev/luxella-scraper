@@ -346,6 +346,31 @@ function profitOf(r){const c=opsState.costs[r.item];if(!c)return null;const rev=
 function openOrder(item){const r=ordersData().find(x=>x.item===item);if(r&&typeof openDrawer==='function')openDrawer(r);}
 /* rating link: <client page>#rate:1024 opens that delivered order's drawer on the rating box (once, after login/data) */
 (function(){const m=String(location.hash||'').match(/^#rate:(\d{1,8})$/);if(!m)return;const no='#'+m[1];let n=0;const t=setInterval(()=>{if(++n>300){clearInterval(t);return;}try{const r=ordersData().find(x=>String(x.order_no)===no);if(r&&typeof openDrawer==='function'&&fbState.loaded){clearInterval(t);openDrawer(r);setTimeout(()=>{const s=document.querySelector('.xo-stars');if(s&&s.scrollIntoView)s.scrollIntoView({block:'center',behavior:'smooth'});},350);}}catch(e){}},600);})();
+/* delivery confirmation card: <client page>#recv:1024 -> "Received successfully" / "Not yet delivered" */
+function recvCard(r){
+ const old=document.getElementById('lx-recv');if(old)old.remove();
+ const ov=el('div');ov.id='lx-recv';ov.style.cssText='position:fixed;inset:0;z-index:99998;background:rgba(0,0,0,.78);display:flex;align-items:center;justify-content:center;padding:18px';
+ const c=el('div');c.style.cssText='background:#0b0b0b;border:1px solid #E3C06A;border-radius:16px;max-width:420px;width:100%;padding:22px 20px;text-align:center;color:#eee;box-shadow:0 10px 50px rgba(0,0,0,.6)';
+ const t=(txt,css)=>{const d=el('div',null,txt);d.style.cssText=css||'';c.appendChild(d);return d;};
+ const st=Number(r.stage||1);
+ t('LUXELLA','font-size:11px;letter-spacing:.4em;color:#E3C06A');
+ if(r.photo_url){const im=el('img');im.src=r.photo_url;im.style.cssText='width:120px;height:120px;object-fit:cover;border-radius:10px;margin:14px auto 0;display:block;border:1px solid #3a3322';c.appendChild(im);}
+ t(st>=9?'Marked as received':'Your order has been delivered','font-size:22px;color:#F4E1A0;margin:14px 0 6px;font-family:Cormorant Garamond,Georgia,serif');
+ t((r.order_no?r.order_no+' · ':'')+r.item,'font-size:14px;opacity:.9');
+ const trk=r.local_tracking||r.intl_tracking_no;if(trk&&st<9)t((r.local_tracking?(r.local_courier||'India'):(r.intl_courier||'Tracking'))+' '+trk,'font-size:12px;opacity:.6;margin-top:4px');
+ const close=()=>ov.remove();
+ if(st>=9){t('Thank you. We have recorded that you received it.','font-size:13px;opacity:.75;margin:12px 0');}
+ else if(st<8){t('This order is still on its way. We will tell you as soon as it ships.','font-size:13px;opacity:.75;margin:12px 0');}
+ else{
+  t('Please confirm that it has reached you.','font-size:13px;opacity:.75;margin:12px 0 4px');
+  const rb=window.__lxRecBtn?window.__lxRecBtn(r):null;if(rb){rb.style.margin='10px 0 8px';c.appendChild(rb);}
+  const ny=el('button',null,'Not yet delivered');ny.type='button';ny.style.cssText='width:100%;padding:13px 20px;border-radius:10px;border:1px solid #E3C06A;background:transparent;color:#E3C06A;font:inherit;letter-spacing:.14em;text-transform:uppercase;font-size:12px;cursor:pointer';
+  ny.addEventListener('click',async()=>{if(!confirm('Tell Luxella that '+(r.item||'this order')+' has not reached you yet?'))return;ny.disabled=true;try{await photos.db.collection('case_msgs').add({case:'inbox',ref:'',text:'Not yet delivered: '+(r.order_no?r.order_no+' ':'')+r.item+' — I have not received this order yet.',files:[],voice:null,from:'client',at:nowIso()});say('Thank you. We have been told and will check right away.');ny.textContent='Luxella has been informed';}catch(e){ny.disabled=false;say('Could not send. Please try again.');}});
+  c.appendChild(ny);}
+ const x=el('button',null,'Close');x.type='button';x.style.cssText='margin-top:14px;background:none;border:0;color:#999;font:inherit;font-size:12px;cursor:pointer';x.onclick=close;c.appendChild(x);
+ ov.appendChild(c);ov.addEventListener('click',e=>{if(e.target===ov)close();});document.body.appendChild(ov);}
+window.__lxRecvByNo=no=>{try{const r=ordersData().find(x=>String(x.order_no).replace(/^#/,'')===String(no));if(r)recvCard(r);}catch(e){}};
+(function(){const m=String(location.hash||'').match(/^#recv:(\d{1,8})$/);if(!m)return;const no='#'+m[1];let n=0;const t=setInterval(()=>{if(++n>300){clearInterval(t);return;}try{const r=ordersData().find(x=>String(x.order_no)===no);if(r&&!(photos.canEdit)){clearInterval(t);recvCard(r);}}catch(e){}},600);})();
 function queueItems(){
  const q=[],t=todayS(),rows=ordersData().filter(r=>!isCancelled(r));
  rows.forEach(r=>{const open=!isDone(r);
@@ -610,6 +635,7 @@ document.addEventListener('click',function(ev){var b=ev.target.closest&&ev.targe
     else{b.disabled=false;b.textContent='\u2713 Received successfully';sayX(j.error||'Could not update. Please try again.');}}
    catch(x){b.disabled=false;b.textContent='\u2713 Received successfully';sayX('Could not update. Please try again.');}});
   wrap.appendChild(b);return wrap;}
+ window.__lxRecBtn=recBtn;
  function backBtn(r){
   const b=document.createElement('button');b.type='button';b.className='btn2';b.textContent='\u21a9 Move back to tracker';b.style.cssText='margin:12px 0';
   b.addEventListener('click',async e=>{e.stopPropagation();if(!confirm('Move '+(r.order_no||r.item)+' back to the tracker (Shipped, not delivered)?'))return;b.disabled=true;
