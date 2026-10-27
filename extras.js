@@ -290,7 +290,16 @@ function box(title){const b=el('div','xo-box');b.appendChild(el('div','lbl',titl
 function field(ph,type){const i=el('input');i.type=type||'text';i.placeholder=ph;i.className='xo-in';return i;}
 /* inline rating on every delivered order card (client rates; owner sees the rating) */
 window.__lxOA=function(r,bb){
- if(!isDone(r))return;const fid='fb-'+oslug(r.item);const fb=fbState.items[fid];
+ if(!isDone(r)){
+  if(Number(r.stage||1)!==8||String(r.order_type||'').includes('Local')&&false)return;
+  const q=el('div','lx-rate lx-await');q.dataset.no=String(r.order_no||'').replace(/^#/,'');q.style.cssText='flex:0 0 100%;width:100%;box-sizing:border-box;max-width:100%;margin:2px 0 10px;padding:14px;border:1px solid #E3C06A;border-radius:10px;background:rgba(227,192,106,.07);text-align:center';
+  const hd=el('div',null,'Awaiting confirmation');hd.style.cssText='font-size:11px;letter-spacing:.26em;text-transform:uppercase;color:#E3C06A;margin-bottom:6px';q.appendChild(hd);
+  const sub=el('div',null,'Has this order reached you?');sub.style.cssText='font-size:13px;opacity:.85;margin-bottom:10px';q.appendChild(sub);
+  const ownr=(()=>{try{return !!photos.canEdit;}catch(e){return false;}})();
+  if(ownr){const m=el('div',null,'Client ne abhi confirm nahi kiya');m.style.cssText='font-size:12px;opacity:.7;margin-bottom:8px';q.replaceChild(m,sub);const ab=el('button',null,'\uD83D\uDCE6 Ask client to confirm receipt');ab.type='button';ab.style.cssText='padding:10px 14px;border-radius:8px;font:inherit;font-size:12px;letter-spacing:.08em;cursor:pointer;border:1px solid #E3C06A;background:linear-gradient(135deg,#F4E1A0,#E3C06A 50%,#B8943F);color:#000;font-weight:700';ab.addEventListener('click',e=>{e.stopPropagation();if(window.__lxAsk)window.__lxAsk(r,8,'confirm');});q.appendChild(ab);}
+  else{const rb=window.__lxRecBtn?window.__lxRecBtn(r):null;if(rb){rb.style.margin='0 0 8px';q.appendChild(rb);}q.appendChild(notYetBtn(r));}
+  bb.insertBefore(q,bb.firstChild);return;}
+ const fid='fb-'+oslug(r.item);const fb=fbState.items[fid];
  const stars=n=>'★'.repeat(n||0)+'☆'.repeat(5-(n||0));
  const w=el('div','lx-rate');w.dataset.item=r.item;w.dataset.no=String(r.order_no||'').replace(/^#/,'');w.style.cssText='flex:0 0 100%;width:100%;box-sizing:border-box;max-width:100%;margin:2px 0 10px;padding:12px 14px;border:1px solid #E3C06A;border-radius:10px;background:rgba(227,192,106,.07)';
  const own=(()=>{try{return !!photos.canEdit;}catch(e){return false;}})();
@@ -354,6 +363,10 @@ function openOrder(item){const r=ordersData().find(x=>x.item===item);if(r&&typeo
 /* rating link: <client page>#rate:1024 opens that delivered order's drawer on the rating box (once, after login/data) */
 (function(){const m=String(location.hash||'').match(/^#rate:(\d{1,8})$/);if(!m)return;const no='#'+m[1];let n=0;const t=setInterval(()=>{if(++n>300){clearInterval(t);return;}try{const r=ordersData().find(x=>String(x.order_no)===no);if(r&&fbState.loaded){clearInterval(t);const tb=$('tab-al');if(tb)tb.click();let k=0;const w=setInterval(()=>{const x=[...document.querySelectorAll('.lx-rate')].find(e=>e.dataset.no===m[1]);if(x||++k>20){clearInterval(w);if(x){x.scrollIntoView({block:'center',behavior:'smooth'});x.style.boxShadow='0 0 0 2px #F4E1A0, 0 0 24px rgba(227,192,106,.5)';setTimeout(()=>{x.style.boxShadow='';},3500);}else if(typeof openDrawer==='function')openDrawer(r);}},300);}}catch(e){}},600);})();
 /* delivery confirmation card: <client page>#recv:1024 -> "Received successfully" / "Not yet delivered" */
+function notYetBtn(r){
+  const ny=el('button',null,'Not yet delivered');ny.type='button';ny.style.cssText='width:100%;padding:13px 20px;border-radius:10px;border:1px solid #E3C06A;background:transparent;color:#E3C06A;font:inherit;letter-spacing:.14em;text-transform:uppercase;font-size:12px;cursor:pointer';
+  ny.addEventListener('click',async()=>{if(!confirm('Tell Luxella that '+(r.item||'this order')+' has not reached you yet?'))return;ny.disabled=true;try{await photos.db.collection('case_msgs').add({case:'inbox',ref:'',text:'Not yet delivered: '+(r.order_no?r.order_no+' ':'')+r.item+' — I have not received this order yet.',files:[],voice:null,from:'client',at:nowIso()});say('Thank you. We have been told and will check right away.');ny.textContent='Luxella has been informed';}catch(e){ny.disabled=false;say('Could not send. Please try again.');}});
+  return ny;}
 function recvCard(r){
  const old=document.getElementById('lx-recv');if(old)old.remove();
  const ov=el('div');ov.id='lx-recv';ov.style.cssText='position:fixed;inset:0;z-index:99998;background:rgba(0,0,0,.78);display:flex;align-items:center;justify-content:center;padding:18px';
@@ -371,8 +384,7 @@ function recvCard(r){
  else{
   t('Please confirm that it has reached you.','font-size:13px;opacity:.75;margin:12px 0 4px');
   const rb=window.__lxRecBtn?window.__lxRecBtn(r):null;if(rb){rb.style.margin='10px 0 8px';c.appendChild(rb);}
-  const ny=el('button',null,'Not yet delivered');ny.type='button';ny.style.cssText='width:100%;padding:13px 20px;border-radius:10px;border:1px solid #E3C06A;background:transparent;color:#E3C06A;font:inherit;letter-spacing:.14em;text-transform:uppercase;font-size:12px;cursor:pointer';
-  ny.addEventListener('click',async()=>{if(!confirm('Tell Luxella that '+(r.item||'this order')+' has not reached you yet?'))return;ny.disabled=true;try{await photos.db.collection('case_msgs').add({case:'inbox',ref:'',text:'Not yet delivered: '+(r.order_no?r.order_no+' ':'')+r.item+' — I have not received this order yet.',files:[],voice:null,from:'client',at:nowIso()});say('Thank you. We have been told and will check right away.');ny.textContent='Luxella has been informed';}catch(e){ny.disabled=false;say('Could not send. Please try again.');}});
+  const ny=notYetBtn(r);
   c.appendChild(ny);}
  const x=el('button',null,'Close');x.type='button';x.style.cssText='margin-top:14px;background:none;border:0;color:#999;font:inherit;font-size:12px;cursor:pointer';x.onclick=close;c.appendChild(x);
  ov.appendChild(c);ov.addEventListener('click',e=>{if(e.target===ov)close();});document.body.appendChild(ov);}
