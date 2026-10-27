@@ -42,9 +42,9 @@
   let w=$('lxbrands');
   if(groups.length<1){if(w)w.remove();return;}
   const key=groups.map(g=>g.b+g.rows.length+g.open+pu(g.hero)).join('|');if(w&&key===lastKey)return;lastKey=key;
-  if(!w){w=document.createElement('section');w.id='lxbrands';w.className='lxbr';const ab=$('actionbar');if(ab&&ab.parentNode===pane)ab.after(w);else pane.insertBefore(w,pane.firstChild);}
+  if(!w){w=document.createElement('section');w.id='lxbrands';w.className='lxbr';}{const no=$('neworder');if(no&&no.parentNode){if(no.nextSibling!==w)no.after(w);}else if(!w.parentNode)pane.appendChild(w);}
   w.textContent='';
-  const hd=document.createElement('div');hd.className='lxbr-h';hd.textContent='Your houses';w.appendChild(hd);
+  const hd=document.createElement('div');hd.className='lxbr-h';hd.innerHTML='<span>Explore your houses</span>';w.appendChild(hd);
   const track=document.createElement('div');track.className='lxbr-t';w.appendChild(track);
   groups.forEach(g=>{
    const c=document.createElement('article');c.className='lxbr-c';

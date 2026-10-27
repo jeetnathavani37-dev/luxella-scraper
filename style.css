@@ -1889,3 +1889,29 @@ html.lx-ro #tb-switch,html.lx-ro #tb-out,html.lx-ro #top .who{display:none!impor
 .sw.sw.sw .hero h1,.sw.sw.sw #h1{font-family:'Lux Wide',sans-serif!important;font-weight:400!important;font-size:21px!important;line-height:1.35!important;letter-spacing:.08em!important;text-transform:uppercase!important}
 .sw.sw.sw #hero-cap{font-family:'Lux Wide',sans-serif!important;font-weight:300!important;font-size:14px!important;line-height:1.7!important;letter-spacing:.01em!important;color:#b9b0a1!important}
 .sw.sw.sw .lxbr-h,.sw.sw.sw .tiles .card>.lbl,.sw.sw.sw .card>.lbl:first-child,.sw.sw.sw .dpill small,.sw.sw.sw .lxbs-st small{font-family:'Lux Wide',sans-serif!important;font-weight:400!important;letter-spacing:.14em!important}
+/* houses header with flowing gold strip */
+.sw.sw.sw .lxbr{margin-top:22px}
+.sw.sw.sw .lxbr-h{position:relative;display:flex;align-items:center;gap:14px;margin:0 16px 16px;font-size:10px}
+.sw.sw.sw .lxbr-h::before,.sw.sw.sw .lxbr-h::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(201,169,106,0),rgba(201,169,106,.5) 30%,#FFF1C9 50%,rgba(201,169,106,.5) 70%,rgba(201,169,106,0)) 0 0/200% 100%;animation:lxpatti 3.6s linear infinite}
+.sw.sw.sw .lxbr-h::after{animation-direction:reverse}
+.sw.sw.sw .lxbr-h span{white-space:nowrap}
+@keyframes lxpatti{from{background-position:200% 0}to{background-position:0 0}}
+.sw.sw .lxbr-c.on{position:relative}
+.sw.sw .lxbr-c.on::after{content:'';position:absolute;inset:0;border-radius:28px;padding:1px;background:conic-gradient(from var(--lxa,0deg),rgba(227,192,106,0) 0deg,#F4E1A0 40deg,rgba(227,192,106,0) 90deg,rgba(227,192,106,0) 360deg);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;animation:lxring 5s linear infinite;pointer-events:none;z-index:3}
+@property --lxa{syntax:'<angle>';inherits:false;initial-value:0deg}
+@keyframes lxring{to{--lxa:360deg}}
+@media (prefers-reduced-motion:reduce){.sw .lxbr-h::before,.sw .lxbr-h::after,.sw .lxbr-c.on::after{animation:none}}
+/* overview: calmer type scale */
+.sw.sw.sw #pane-ov .card>h2,.sw.sw.sw #pane-ov section>h2{font-size:26px!important}
+.sw.sw.sw #pane-ov .ab-h{font-size:17px!important}
+.sw.sw.sw #pane-ov .ab-l b{font-size:19px!important}
+.sw.sw.sw #pane-ov .ab-l span{font-size:11.5px!important}
+.sw.sw.sw #pane-ov .big{font-size:19px!important;margin-top:8px!important}
+.sw.sw.sw #pane-ov #bn-t,.sw.sw.sw #pane-ov #nextdel .big{font-size:23px!important;line-height:1.12!important}
+.sw.sw.sw #pane-ov #neworder .nwo-ft h2{font-size:25px!important}
+.sw.sw.sw #pane-ov .note,.sw.sw.sw #pane-ov p{font-size:13px}
+.sw.sw.sw #pane-ov .lxbr-logo span{font-size:30px}
+.sw.sw.sw #pane-ov .lxbr-d{font-size:13.5px}
+.sw.sw.sw #pane-ov .lxbr-go{height:46px;line-height:46px;font-size:13.5px}
+.sw.sw.sw #pane-ov .rts-n,.sw.sw.sw #pane-ov .oc-it,.sw.sw.sw #pane-ov .dit{font-size:17px!important}
+.sw.sw.sw #pane-ov .btn,.sw.sw.sw #pane-ov .btn2,.sw.sw.sw #pane-ov .ab-b{min-height:36px!important;font-size:9.5px!important}
