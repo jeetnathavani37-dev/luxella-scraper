@@ -463,11 +463,12 @@ function buildUndoBar(){const pane=$('pane-tr');if(!pane||$('xo-undobar'))return
 /* isLocalO comes from app.js */
 const nextStage=r=>{let s=Number(r.stage||1)+1;if(isLocalO(r)&&s>=4&&s<=6)s=7;return Math.min(9,s);};
 const prevStage=r=>{let s=Number(r.stage||1)-1;if(isLocalO(r)&&s>=4&&s<=6)s=3;return Math.max(1,s);};
+window.__lxAsk=async function(r,k){try{const cl=window.lx.client();if(!window.lxStagePrompt)await new Promise(res=>{const x=document.createElement('script');x.src='stageprompt.js?v=1';x.onload=res;x.onerror=res;document.body.appendChild(x);});if(window.lxStagePrompt)window.lxStagePrompt({client:{id:cl.id,slug:cl.slug,name:cl.name},order:Object.assign({},r,{stage:k}),to:k,phone:'',addNotice:d=>photos.db.collection('notices').add(d),token:()=>window.lx.authToken()});}catch(e){}};
 window.__lxSetStage=async function(r0,k){
  const r=curOrder(r0.item)||r0;const cur=Number(r.stage||1);if(k===cur)return;
  const name=(window.stName?window.stName(r,k):STAGES[k-1]);
- const ok=await applyChange(r.item,{stage:k,status:name},n=>{const st=Object.assign({},n.stages||{});if(k<cur){Object.keys(st).forEach(x=>{if(Number(x)>k)delete st[x];});}else{for(let x=cur+1;x<=k;x++){if(x!==k&&isLocalO(r)&&x>=4&&x<=6)continue;if(!st[x])st[x]=todayS();}}if(!st[k])st[k]=todayS();const out=Object.assign(n,{order:r.item,items:n.items||[],stages:st});if(Number(out.stageOverride||0)>k)out.stageOverride=k;return out;},(r.order_no||r.item)+' → '+name);
- if(ok)say(name);
+ const ok=await applyChange(r.item,{stage:k,status:name,notify_hold:new Date().toISOString()},n=>{const st=Object.assign({},n.stages||{});if(k<cur){Object.keys(st).forEach(x=>{if(Number(x)>k)delete st[x];});}else{for(let x=cur+1;x<=k;x++){if(x!==k&&isLocalO(r)&&x>=4&&x<=6)continue;if(!st[x])st[x]=todayS();}}if(!st[k])st[k]=todayS();const out=Object.assign(n,{order:r.item,items:n.items||[],stages:st});if(Number(out.stageOverride||0)>k)out.stageOverride=k;return out;},(r.order_no||r.item)+' → '+name);
+ if(ok){say(name);if(k>cur)try{const cl=window.lx.client();const ld=()=>window.lxStagePrompt?Promise.resolve():new Promise(res=>{const x=document.createElement('script');x.src='stageprompt.js?v=1';x.onload=res;x.onerror=res;document.body.appendChild(x);});await ld();if(window.lxStagePrompt)window.lxStagePrompt({client:{id:cl.id,slug:cl.slug,name:cl.name},order:Object.assign({},r,{stage:k,status:name}),to:k,phone:'',addNotice:d=>photos.db.collection('notices').add(d),token:()=>window.lx.authToken()});}catch(e){}}
 };
 function detectIntl(n){n=String(n).replace(/\s+/g,'');if(/^1Z[0-9A-Z]{16}$/i.test(n))return 'ups';if(/^(92|93|94|95)\d{18,20}$/.test(n)||/^[A-Z]{2}\d{9}US$/i.test(n))return 'usps';if(/^\d{10}$/.test(n))return 'dhl';if(/^\d{12}$|^\d{15}$|^\d{20}$|^\d{22}$/.test(n))return 'fedex';return '';}
 function detectLocal(n){n=String(n).replace(/\s+/g,'');if(/^\d{11}$/.test(n))return 'bluedart';if(/^\d{13,14}$/.test(n))return 'delhivery';if(/^[A-Z]\d{8,10}$/i.test(n))return 'dtdc';if(/^[A-Z]{2}\d{9}IN$/i.test(n))return 'india-post';return '';}
@@ -490,7 +491,7 @@ window.__lxTrk=function(r,card){
   const wn=el('button','btn2','Notify on website');wn.type='button';
   wn.addEventListener('click',async()=>{wn.disabled=true;wn.textContent='Posting…';try{const desc=(typeof stepDesc==='function')?stepDesc(r,stage):'';await photos.db.collection('notices').add({title:stage>=9?'How was your order?':cur,body:(r.order_no?r.order_no+' · ':'')+item+(stage>=9?' — delivered. Please rate your order, it takes a few seconds.':(desc?' — '+desc:'')),item,stage,order_no:r.order_no||'',url:stage===7?'ad':'tr',rate:stage>=9,at:nowIso(),seen:false});wn.textContent='Notified ✓';say('Client will see a popup: '+cur);}catch(e){wn.textContent='Notify on website';wn.disabled=false;say('Could not post the notification');}});
   const pv=el('button','btn2','Preview popup');pv.type='button';pv.addEventListener('click',()=>{const desc=(typeof stepDesc==='function')?stepDesc(r,stage):'';if(window.lxShowNotices)window.lxShowNotices([{id:'preview',preview:true,d:{title:cur,body:(r.order_no?r.order_no+' · ':'')+item+(desc?' — '+desc:''),item,stage,url:stage===7?'ad':'tr',at:nowIso()}}]);});
-  cr.appendChild(em);cr.appendChild(wn);cr.appendChild(pv);box2.appendChild(cr);}
+  cr.appendChild(em);cr.appendChild(wn);cr.appendChild(pv);if(stage>=9){const rv=el('button','btn','⭐ Ask for review');rv.type='button';rv.addEventListener('click',()=>window.__lxAsk(r,9));cr.appendChild(rv);}box2.appendChild(cr);}
  /* row 2: tap-to-edit fields, auto-save */
  const f=el('div','xo-form');
  const lab=(t,i)=>{const l=el('label','xo-lbl');l.appendChild(el('span',null,t));l.appendChild(i);return l;};

@@ -335,13 +335,14 @@ function orderBoard(m,rows,name){
       const op=el('a','ad-b g','Open client page');op.href=base((clients.find(c=>c.id===r._c)||{}).slug||'');op.target='_blank';op.rel='noopener';rw.appendChild(op);
       const me=el('button','ad-b g','Send email');me.type='button';me.onclick=async()=>{if(!confirm('"'+STAGES[(Number(r.stage)||1)-1]+'" mail '+name(r._c)+' ko bhejein?'))return;me.disabled=true;try{const {data:{session}}=await sb.auth.getSession();const res=await fetch('https://qzripzgbstvxkfobzhyv.supabase.co/functions/v1/lx-push',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+(session&&session.access_token)},body:JSON.stringify({manual_stage:{client_id:r._c,item:r.item}})});const j=await res.json();toast(j.sent>0?'Email sent':'Email nahi gaya: '+(j.err||j.error||''));me.textContent=j.sent>0?'Email sent ✓':'Send email';}catch(e){toast('Email error');}me.disabled=false;};rw.appendChild(me);
       const mn=el('button','ad-b g','Notify popup');mn.type='button';mn.onclick=async()=>{const st=Number(r.stage)||1;const res=await sb.from('lx_docs').insert({client_id:r._c,collection:'notices',doc_id:'n-'+Date.now().toString(36),data:{title:STAGES[st-1],body:(r.order_no?r.order_no+' · ':'')+r.item,item:r.item,stage:st,url:st===7?'ad':'tr',at:new Date().toISOString(),seen:false}});toast(res.error?'Error: '+res.error.message:'Client ko popup chala gaya');if(!res.error)mn.textContent='Notified ✓';};rw.appendChild(mn);
+      if(st0>=9){const rv=el('button','ad-b','⭐ Ask for review');rv.type='button';rv.onclick=async()=>{const cl2=clients.find(c=>c.id===r._c)||{};if(!window.lxStagePrompt)await new Promise(res=>{const x=document.createElement('script');x.src='stageprompt.js?v=1';x.onload=res;x.onerror=res;document.body.appendChild(x);});if(window.lxStagePrompt)window.lxStagePrompt({client:{id:cl2.id||r._c,slug:cl2.slug||'',name:cl2.name||name(r._c)},order:Object.assign({},r,{stage:9}),to:9,phone:(addrOf(r)||{}).phone||'',addNotice:async d=>{const q=await sb.from('lx_docs').insert({client_id:r._c,collection:'notices',doc_id:'n-'+Date.now().toString(36),data:d});if(q.error)throw q.error;},token:async()=>{const {data:{session}}=await sb.auth.getSession();return session&&session.access_token;}});};rw.appendChild(rv);}
       det.appendChild(rw);
       sv.onclick=async()=>{
         const to=Number(ss.value);const patch={};
         if(to!==st0){
           if(to<st0&&!confirm('Stage peeche ('+st0+' → '+to+') jaa raha hai. Client ko push jaa sakta hai. Pakka?'))return;
           if(to>=st0+3&&!confirm('Stage '+st0+' se seedha '+to+' par jaa raha hai. Beech ke steps skip honge. Pakka?'))return;
-          patch.stage=to;patch.status=STAGES[to-1];
+          patch.stage=to;patch.status=STAGES[to-1];patch.notify_hold=new Date().toISOString();
         }
         const cmp=(k,val)=>{if(String(val||'')!==String(r[k]||''))patch[k]=val;};
         cmp('intl_courier',iCour.value.trim());cmp('intl_tracking_no',iTrk.value.trim());cmp('local_courier',iLc.value.trim());cmp('local_tracking',iLt.value.trim());
@@ -349,7 +350,9 @@ function orderBoard(m,rows,name){
         if(ps.value!==(r.payout_status||'Pending')){patch.payout_status=ps.value;if(ps.value==='Received'&&!r.payment_date)patch.payment_date=todayA();}
         if(!Object.keys(patch).length){toast('Kuch badla nahi.');return;}
         sv.disabled=true;
-        try{const next=await saveOrderPatch(r._c,r.item,patch,patch.stage);Object.assign(r,next);toast('Saved. Client ko update chala gaya.');draw();}
+        try{const next=await saveOrderPatch(r._c,r.item,patch,patch.stage);Object.assign(r,next);const fwd=patch.stage&&patch.stage>st0;toast(fwd?'Saved. Ab client ko kaise batana hai chuno.':'Saved. Client ko update chala gaya.');draw();
+          if(fwd){const cl2=clients.find(c=>c.id===r._c)||{};const ld=()=>window.lxStagePrompt?Promise.resolve():new Promise(res=>{const x=document.createElement('script');x.src='stageprompt.js?v=1';x.onload=res;x.onerror=res;document.body.appendChild(x);});await ld();
+           if(window.lxStagePrompt)window.lxStagePrompt({client:{id:cl2.id||r._c,slug:cl2.slug||'',name:cl2.name||name(r._c)},order:Object.assign({},r,{stage:patch.stage}),to:patch.stage,phone:(addrOf(r)||{}).phone||'',addNotice:async d=>{const q=await sb.from('lx_docs').insert({client_id:r._c,collection:'notices',doc_id:'n-'+Date.now().toString(36),data:d});if(q.error)throw q.error;},token:async()=>{const {data:{session}}=await sb.auth.getSession();return session&&session.access_token;}});}}
         catch(e){toast('Save nahi hua: '+e.message);sv.disabled=false;}
       };
       list.appendChild(det);
