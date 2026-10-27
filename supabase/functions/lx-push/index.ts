@@ -260,7 +260,7 @@ Deno.serve(async (req) => {
     return json({ sent: (r as any).sent || 0, err: (r as any).err || "", subject: em.subject });
   }
   if (p.received) {
-    // client taps "Received successfully": moves their own shipped order to Delivered. No automatic mail (notify_hold); owner gets a push.
+    // client taps "Received successfully": moves their own shipped order to Delivered. notify_hold stops the stage mail; then the delivered popup and rating email go out here.
     const token = (req.headers.get("Authorization") || "").replace(/^Bearer\s+/i, "");
     if (!token) return json({ error: "Sign in required" }, 401);
     const asUser = createClient(URL_, ANON, { global: { headers: { Authorization: "Bearer " + token } } });
@@ -285,7 +285,19 @@ Deno.serve(async (req) => {
     const n: any = (nr as any)?.data || { order: row.item, items: [] }; const stg: any = { ...(n.stages || {}) }; if (!stg[9]) stg[9] = today;
     await admin.from("lx_docs").upsert({ client_id: row.client_id, collection: "notes", doc_id: key, data: { ...n, order: row.item, items: n.items || [], stages: stg } }, { onConflict: "client_id,collection,doc_id" });
     await admin.from("lx_docs").insert({ client_id: row.client_id, collection: "received", doc_id: "rc-" + Date.now().toString(36), data: { order: row.item, order_no: d.order_no || "", at: now } });
-    return json({ ok: true });
+    // the client confirmed it themselves: send the delivered popup and email with the rating request automatically
+    const rno = String(d.order_no || "").replace(/^#/, ""); const numeric = /^\d{1,8}$/.test(rno);
+    const ref = row.item + (rno ? " (Order #" + rno + ")" : "");
+    let mailed = 0;
+    try {
+      await admin.from("lx_docs").insert({ client_id: row.client_id, collection: "notices", doc_id: "nt-" + Date.now().toString(36), data: { title: "Your order has been delivered", body: ref + " has been delivered. Thank you for confirming. We would love to hear how it went. It takes a few seconds.", item: row.item, stage: 9, order_no: d.order_no || "", url: "tr", rate: true, at: now, seen: false } });
+    } catch (e) { console.error("received notice", e); }
+    try {
+      const { data: cl } = await admin.from("lx_clients").select("slug,name").eq("id", row.client_id).maybeSingle();
+      const em: Em = { subject: "Your order has been delivered: " + row.item, headline: "Your order has been delivered", text: ref + " has been delivered. Thank you for confirming. We would be grateful if you could rate your experience.", cta: numeric ? ["Rate your order", "rate:" + rno] : ["Open your page", "ov"] };
+      const r = await emailClient(sec, row.client_id, (cl as any)?.slug || "", (cl as any)?.name || "", em); mailed = (r as any).sent || 0;
+    } catch (e) { console.error("received email", e); }
+    return json({ ok: true, mailed });
   }
   if (p.manual_msg) {
     // owner-edited message from the B2B portal: Jeet clicked Send, so this is an explicit owner action
