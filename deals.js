@@ -46,14 +46,14 @@
   paint();d.appendChild(b);w.appendChild(d);}
 
  /* ---------- requests ---------- */
- const ASK={price:'Price request',size:'Size check',availability:'Availability check',buy:'Wants this piece'};
+ const ASK={price:'Price request',size:'Size check',availability:'Availability check',buy:'Wants this piece',similar:'Find something similar'};
  function request(r,kind){const d=r.data||{};const sh=sheet();sh.box.appendChild(el('div','dl-sh-eb',ASK[kind]));sh.box.appendChild(el('div','dl-sh-t',[d.brand,d.title].filter(Boolean).join(' · ')));
   const sz=el('input','dl-in');sz.placeholder=kind==='size'?'Your size (e.g. UK 8, M)':'Size / colour (optional)';const nt=el('textarea','dl-in dl-ta');nt.rows=3;nt.placeholder='Anything else? (optional)';sh.box.appendChild(sz);sh.box.appendChild(nt);
   const go=el('button','btn dl-ask','Send request');go.type='button';sh.box.appendChild(go);
   go.addEventListener('click',async()=>{if(kind==='size'&&!sz.value.trim()){sz.focus();return;}go.disabled=true;
    const id='deal-'+Date.now().toString(36);const spec=[ASK[kind],'Key '+dealKey(),sz.value.trim()&&('Size: '+sz.value.trim()),d.sizes&&('Listed: '+d.sizes)].filter(Boolean).join(' · ');
    try{await photos.db.doc('requests/'+id).set({brand:d.brand||'',product:d.title||'',spec,qty:1,budget:num(d.price)||0,needBy:'',link:d.link||'',photo:d.img||'',note:nt.value.trim(),urgent:false,status:'Submitted',at:new Date().toISOString(),source:'deal',deal_id:r.id,ask:kind});
-    sh.close();say('Request sent. Luxella will reply here and on WhatsApp.');}
+    markReq(r.id,kind);sh.close();say('Request sent. Luxella will reply here and on WhatsApp.');render();}
    catch(e){const m='Hi Luxella, '+ASK[kind].toLowerCase()+' for '+[d.brand,d.title].filter(Boolean).join(' ')+(sz.value?' · size '+sz.value:'')+'.';window.open('https://wa.me/'+WA+'?text='+encodeURIComponent(m),'_blank','noopener');sh.close();}});}
  function sheet(){const ov=el('div','dl-sh');const box=el('div','dl-sh-b');const x=el('button','x','×');x.type='button';x.setAttribute('aria-label','Close');box.appendChild(x);ov.appendChild(box);const close=()=>{ov.classList.remove('in');setTimeout(()=>ov.remove(),300);};x.addEventListener('click',close);ov.addEventListener('click',e=>{if(e.target===ov)close();});(document.querySelector('.sw')||document.body).appendChild(ov);requestAnimationFrame(()=>ov.classList.add('in'));return {box,close};}
 
@@ -89,62 +89,205 @@
  function copyTxt(t,btn){const done=()=>{const o=btn.textContent;btn.textContent='Copied ✓';setTimeout(()=>btn.textContent=o,1600);};const fb=()=>{const ta=el('textarea');ta.value=t;ta.style.cssText='position:fixed;opacity:0';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');done();}catch(e){}ta.remove();};if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(done,fb);else fb();}
  async function toggleSave(id){if(SAVED.has(id))SAVED.delete(id);else SAVED.add(id);render();await savePref('deal_saved',{ids:[...SAVED]});}
 
- /* ---------- cards ---------- */
- function card(r){const d=r.data||{};const c=el('article','dl-c'+(d.sold?' sold':''));const t=today();
+ /* ---------- browse: categories, sorting, search, detail, PDF pieces ---------- */
+ const LS={get(k,d){try{const v=localStorage.getItem('lxd:'+k);return v==null?d:JSON.parse(v);}catch(e){return d;}},set(k,v){try{localStorage.setItem('lxd:'+k,JSON.stringify(v));}catch(e){}}};
+ const CATS=[['Bags',/\b(bag|tote|satchel|crossbody|shoulder|clutch|hobo|backpack|duffle|duffel|pouch|messenger|purse|handbag|bucket|baguette|sling)\b/i],['Shoes',/\b(shoe|sneaker|trainer|slide|sandal|boot|loafer|heel|pump|flat|mule|runner|espadrille|clog|slipper|speedcat|adizero)\b/i],['Watches',/\b(watch|chronograph|automatic|tissot|seiko|rolex|omega)\b/i],['Wallets',/\b(wallet|card ?case|card ?holder|billfold|coin|key ?case|wristlet|zip ?around)\b/i],['Clothing',/\b(shirt|t-shirt|tee|hoodie|jacket|coat|dress|polo|jeans|pant|trouser|short|sweater|cardigan|blazer|top|skirt|jumper|sweatshirt)\b/i],['Eyewear',/\b(sunglass|eyewear|glasses|frame)\b/i],['Fragrance',/\b(perfume|fragrance|eau de|edp|edt|cologne|parfum)\b/i],['Accessories',/\b(belt|cap|hat|scarf|bracelet|necklace|earring|ring|charm|keychain|key ?ring|strap|tie|socks|gloves)\b/i]];
+ const catOf=d=>{if(d.cat)return d.cat;const s=[d.title,d.note].join(' ');for(const [c,re] of CATS)if(re.test(s))return c;return 'Other';};
+ const PB=[['u10','Under ₹10k',0,10000],['10-25','₹10k – 25k',10000,25000],['25-50','₹25k – 50k',25000,50000],['50+','₹50k +',50000,1e12]];
+ Object.assign(F,LS.get('f',{}),{q:''});F.cat=F.cat||'';F.sort=F.sort||'new';F.pb=F.pb||'';F.flags=F.flags||[];F.view=F.view||'grid';
+ let PAGE=24,SEEN=new Set(LS.get('seen',[])),REQ=LS.get('req',{}),RECENT=LS.get('recent',[]);const LASTV=LS.get('lastv',null);
+ const saveF=()=>LS.set('f',{day:F.day,brand:F.brand,cat:F.cat,sort:F.sort,pb:F.pb,flags:F.flags,view:F.view});
+ const DISC='Prices, sizes and availability are as on the day of posting and can change after that. Tap Check before you order and Luxella will confirm.';
+ const isNew=r=>!own()&&LASTV&&r.created_at>LASTV;
+ const disc=d=>num(d.mrp)&&num(d.price)&&Number(d.mrp)>Number(d.price)?Math.round((1-Number(d.price)/Number(d.mrp))*100):0;
+ const qOk=r=>{const q=String(F.q||'').toLowerCase().trim();if(!q)return true;const d=r.data||{};const hay=[d.brand,d.title,d.sizes,d.note,catOf(d)].join(' ').toLowerCase();return q.split(/\s+/).every(w=>hay.includes(w));};
+ function inRange(day){const t=today();if(F.day==='today')return day===t;if(F.day==='yday')return day===addD(t,-1);if(F.day==='week')return day>=addD(t,-6);return true;}
+ function flagOk(r){const d=r.data||{};const t=today();for(const f of F.flags){if(f==='new'&&!isNew(r))return false;if(f==='ending'&&!(d.ends&&d.ends<=addD(t,1)&&d.ends>=t))return false;if(f==='few'&&!(num(d.stock)!=null&&Number(d.stock)<=3))return false;if(f==='off'&&!disc(d))return false;if(f==='avail'&&d.sold)return false;}return true;}
+ function pbOk(d){if(!F.pb)return true;const b=PB.find(x=>x[0]===F.pb);const p=num(d.price);return p!=null&&p>=b[2]&&p<b[3];}
+ function matches(r){const d=r.data||{};return r.kind==='deal'&&qOk(r)&&inRange(r.day)&&(!F.brand||d.brand===F.brand)&&(!F.cat||catOf(d)===F.cat)&&pbOk(d)&&flagOk(r)&&(!F.saved||SAVED.has(r.id));}
+ function sorted(list){const L=list.slice();const P=r=>num((r.data||{}).price);
+  if(F.sort==='lo')L.sort((a,b)=>(P(a)??1e12)-(P(b)??1e12));else if(F.sort==='hi')L.sort((a,b)=>(P(b)??-1)-(P(a)??-1));else if(F.sort==='off')L.sort((a,b)=>disc(b.data||{})-disc(a.data||{}));else if(F.sort==='end')L.sort((a,b)=>String((a.data||{}).ends||'9')<String((b.data||{}).ends||'9')?-1:1);else L.sort((a,b)=>a.day===b.day?(a.created_at<b.created_at?1:-1):(a.day<b.day?1:-1));
+  return L.sort((a,b)=>((a.data||{}).sold?1:0)-((b.data||{}).sold?1:0));}
+ function visibleDeals(){return sorted(rows.filter(r=>matches(r)&&!(r.data||{}).sold));}
+ function hl(text){const q=String(F.q||'').trim();const s=String(text||'');if(!q)return document.createTextNode(s);const f=document.createDocumentFragment();const words=q.split(/\s+/).filter(Boolean).map(w=>w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'));const re=new RegExp('('+words.join('|')+')','ig');s.split(re).forEach((p,i)=>{if(i%2)f.appendChild(el('mark',null,p));else if(p)f.appendChild(document.createTextNode(p));});return f;}
+ function dealText(d,withLink){const p=num(d.price);return [[d.brand,d.title].filter(Boolean).join(' '),d.sizes?'Size/colour: '+d.sizes:'',p!=null?'Price: '+inr(p)+(disc(d)?' ('+disc(d)+'% off)':''):'Price on request',d.note||'',withLink?'Luxella deals · '+location.origin+location.pathname:''].filter(Boolean).join('\n');}
+ function waShare(text){window.open('https://wa.me/?text='+encodeURIComponent(text),'_blank','noopener');}
+ function markReq(id,kind){REQ[id]=REQ[id]||[];if(!REQ[id].includes(kind))REQ[id].push(kind);LS.set('req',REQ);}
+ function addRecent(id){RECENT=[id,...RECENT.filter(x=>x!==id)].slice(0,12);LS.set('recent',RECENT);}
+ /* card */
+ function card(r){const d=r.data||{};const c=el('article','dl-c'+(d.sold?' sold':'')+(F.view==='list'?' row':''));const t=today();
   const ph=el('div','dl-ph');if(d.img){const im=el('img');im.src=d.img;im.alt=d.title||'';im.loading='lazy';ph.appendChild(im);}else{ph.classList.add('none');ph.textContent=(d.brand||'L').charAt(0);}
-  const tags=el('div','dl-tags');
-  if(d.sold)tags.appendChild(el('span','dl-tag sold','Sold out'));
-  else{if(num(d.mrp)&&num(d.price)&&Number(d.mrp)>Number(d.price))tags.appendChild(el('span','dl-tag off',Math.round((1-Number(d.price)/Number(d.mrp))*100)+'% off'));
-   if(d.ends&&d.ends===t)tags.appendChild(el('span','dl-tag hot','Ends today'));else if(d.ends&&d.ends>t)tags.appendChild(el('span','dl-tag','Till '+dayLabel(d.ends)));
-   if(num(d.stock)!=null&&Number(d.stock)<=3)tags.appendChild(el('span','dl-tag hot','Only '+d.stock+' left'));}
+  const tags=el('div','dl-tags');if(isNew(r)&&!SEEN.has(r.id))tags.appendChild(el('span','dl-tag new','New'));
+  if(d.sold)tags.appendChild(el('span','dl-tag sold','Sold out'));else{if(disc(d))tags.appendChild(el('span','dl-tag off',disc(d)+'% off'));if(d.ends&&d.ends===t)tags.appendChild(el('span','dl-tag hot','Ends today'));if(num(d.stock)!=null&&Number(d.stock)<=3)tags.appendChild(el('span','dl-tag hot','Only '+d.stock+' left'));}
   ph.appendChild(tags);
   if(!own()){const hv=el('button','dl-save'+(SAVED.has(r.id)?' on':''),SAVED.has(r.id)?'♥':'♡');hv.type='button';hv.setAttribute('aria-label','Save');hv.addEventListener('click',e=>{e.stopPropagation();toggleSave(r.id);});ph.appendChild(hv);}
-  c.appendChild(ph);
-  const bd=el('div','dl-bd');const br=el('div','dl-br');const lg=logo(d.brand);if(lg){const im=el('img');im.src=lg;im.alt=d.brand;br.appendChild(im);}br.appendChild(el('span',null,d.brand||'Luxella pick'));bd.appendChild(br);
-  bd.appendChild(el('div','dl-t',d.title||''));if(d.note)bd.appendChild(el('div','dl-n',d.note));
-  const pr=el('div','dl-pr');if(num(d.price)!=null){pr.appendChild(el('b',null,inr(d.price)));if(num(d.mrp)&&Number(d.mrp)>Number(d.price))pr.appendChild(el('s',null,inr(d.mrp)));}else pr.appendChild(el('em',null,'Price on request'));if(d.sizes)pr.appendChild(el('i',null,d.sizes));bd.appendChild(pr);
-  if(!own()&&M.on&&num(d.price)!=null){const q=quote(d.price);const yq=el('div','dl-yq');yq.appendChild(el('span',null,'Your price'));yq.appendChild(el('b',null,inr(q)));yq.appendChild(el('small',null,'+'+inr(q-Number(d.price))+' margin'));bd.appendChild(yq);}
+  ph.addEventListener('click',()=>detail(r));c.appendChild(ph);
+  const bd=el('div','dl-bd');const br=el('div','dl-br');const lg=logo(d.brand);if(lg){const im=el('img');im.src=lg;im.alt=d.brand;br.appendChild(im);}const bn=el('span');bn.appendChild(hl(d.brand||'Luxella pick'));br.appendChild(bn);br.appendChild(el('small','dl-cat',catOf(d)));bd.appendChild(br);
+  const tt=el('div','dl-t');tt.appendChild(hl(d.title||''));tt.addEventListener('click',()=>detail(r));bd.appendChild(tt);
+  const pr=el('div','dl-pr');if(num(d.price)!=null){pr.appendChild(el('b',null,inr(d.price)));if(disc(d))pr.appendChild(el('s',null,inr(d.mrp)));}else pr.appendChild(el('em',null,'Price on request'));if(d.sizes){const i=el('i');i.appendChild(hl(d.sizes));pr.appendChild(i);}bd.appendChild(pr);
+  if(!own()&&M.on&&num(d.price)!=null){const q=quote(d.price);const yq=el('div','dl-yq');yq.appendChild(el('span',null,'Your price'));yq.appendChild(el('b',null,inr(q)));yq.appendChild(el('small',null,'+'+inr(q-Number(d.price))));bd.appendChild(yq);}
   {const vl=validity(r);bd.appendChild(el('div','dl-val'+(/ended|Sold/.test(vl)?' off':(/today only/.test(vl)?' hot':'')),vl));}
-  if(d.link){const v=el('a','dl-lnk','View piece ↗');v.href=d.link;v.target='_blank';v.rel='noopener';bd.appendChild(v);}
-  const ac=el('div','dl-ac');
+  if(REQ[r.id]&&REQ[r.id].length)bd.appendChild(el('div','dl-rq','✓ Asked: '+REQ[r.id].map(k=>({buy:'want it',price:'price',size:'size',availability:'availability'})[k]||k).join(', ')));
+  bd.appendChild(actions(r,true));c.appendChild(bd);return c;}
+ function actions(r,compact){const d=r.data||{};const ac=el('div','dl-ac');
   if(own()){
    const ep=el('button','btn2','Edit price');ep.type='button';ep.addEventListener('click',async()=>{const v=prompt('Deal price ₹ (leave empty for "price on request")',d.price??'');if(v===null)return;const m=prompt('Usual price ₹ (optional)',d.mrp??'');const nd=Object.assign({},d,{price:num(v),mrp:m===null?d.mrp:num(m)});try{await window.lx.deals.update(r.id,nd);load();}catch(e){alert('Could not save.');}});ac.appendChild(ep);
    const so=el('button','btn2',d.sold?'Mark available':'Mark sold out');so.type='button';so.addEventListener('click',async()=>{try{await window.lx.deals.update(r.id,Object.assign({},d,{sold:!d.sold}));load();}catch(e){alert('Could not save.');}});ac.appendChild(so);
-   const x=el('button','btn2 dl-del','Remove');x.type='button';x.addEventListener('click',async()=>{if(!confirm('Remove this deal?'))return;try{await window.lx.deals.remove(r.id);load();}catch(e){alert('Could not remove.');}});ac.appendChild(x);
-  }else if(!d.sold){
-   const main=el('button','btn dl-ask',num(d.price)==null?'Request price':'I want this');main.type='button';main.addEventListener('click',()=>request(r,num(d.price)==null?'price':'buy'));ac.appendChild(main);
-   const sz=el('button','btn2','Check size');sz.type='button';sz.addEventListener('click',()=>request(r,'size'));ac.appendChild(sz);
-   const av=el('button','btn2','Availability');av.type='button';av.addEventListener('click',()=>request(r,'availability'));ac.appendChild(av);
-   if(M.on&&num(d.price)!=null){const qb=el('button','btn2 dl-qb','Share my quote');qb.type='button';qb.addEventListener('click',()=>shareQuote(r));ac.appendChild(qb);}
-  }else{ac.appendChild(el('div','dl-n','This piece is gone. Ask Luxella for something similar.'));}
-  bd.appendChild(ac);c.appendChild(bd);return c;}
+   const x=el('button','btn2 dl-del','Remove');x.type='button';x.addEventListener('click',async()=>{if(!confirm('Remove this deal?'))return;try{await window.lx.deals.remove(r.id);load();}catch(e){alert('Could not remove.');}});ac.appendChild(x);return ac;}
+  if(d.sold){const s=el('button','btn2','Ask for something similar');s.type='button';s.addEventListener('click',()=>request(r,'similar'));ac.appendChild(s);return ac;}
+  const main=el('button','btn dl-ask',num(d.price)==null?'Check price':'I want this');main.type='button';main.addEventListener('click',()=>request(r,num(d.price)==null?'price':'buy'));ac.appendChild(main);
+  const av=el('button','btn2','Availability');av.type='button';av.addEventListener('click',()=>request(r,'availability'));ac.appendChild(av);
+  const sz=el('button','btn2','Size');sz.type='button';sz.addEventListener('click',()=>request(r,'size'));ac.appendChild(sz);
+  const wa=el('button','btn2 dl-wa','Share');wa.type='button';wa.addEventListener('click',()=>{const p=M.on&&num(d.price)!=null?Object.assign({},d,{price:quote(d.price),mrp:null}):d;waShare(dealText(p,!M.on));});ac.appendChild(wa);
+  if(!compact){if(num(d.price)!=null&&!num(d.price)){}const cp=el('button','btn2','Copy');cp.type='button';cp.addEventListener('click',()=>copyTxt(dealText(d,false),cp));ac.appendChild(cp);if(M.on&&num(d.price)!=null){const qb=el('button','btn2','Quote card');qb.type='button';qb.addEventListener('click',()=>shareQuote(r));ac.appendChild(qb);}}
+  return ac;}
+ /* detail */
+ function detail(r){const d=r.data||{};SEEN.add(r.id);LS.set('seen',[...SEEN].slice(-3000));addRecent(r.id);
+  const sh=sheet();sh.box.classList.add('dl-dt');
+  const ph=el('div','dl-dt-ph');if(d.img){const im=el('img');im.src=d.img;im.alt=d.title||'';ph.appendChild(im);ph.addEventListener('click',()=>ph.classList.toggle('zoom'));}sh.box.appendChild(ph);
+  const br=el('div','dl-br');const lg=logo(d.brand);if(lg){const im=el('img');im.src=lg;br.appendChild(im);}br.appendChild(el('span',null,d.brand||'Luxella pick'));br.appendChild(el('small','dl-cat',catOf(d)));sh.box.appendChild(br);
+  sh.box.appendChild(el('div','dl-sh-t',d.title||''));
+  const pr=el('div','dl-pr');if(num(d.price)!=null){pr.appendChild(el('b',null,inr(d.price)));if(disc(d)){pr.appendChild(el('s',null,inr(d.mrp)));pr.appendChild(el('i',null,disc(d)+'% off'));}}else pr.appendChild(el('em',null,'Price on request'));sh.box.appendChild(pr);
+  if(!own()&&M.on&&num(d.price)!=null){const yq=el('div','dl-yq');yq.appendChild(el('span',null,'Your price'));yq.appendChild(el('b',null,inr(quote(d.price))));sh.box.appendChild(yq);}
+  const facts=el('div','dl-facts');const fa=(k,v)=>{if(!v)return;const x=el('div');x.appendChild(el('small',null,k));x.appendChild(el('b',null,v));facts.appendChild(x);};fa('Sizes / colours',d.sizes);fa('Pieces left',num(d.stock)!=null?String(d.stock):'');fa('Posted',dayLabel(r.day));fa('Offer',validity(r));sh.box.appendChild(facts);
+  if(d.note)sh.box.appendChild(el('p','dl-n',d.note));
+  sh.box.appendChild(el('p','dl-disc',DISC));
+  sh.box.appendChild(actions(r,false));
+  if(d.link){const v=el('a','dl-lnk','View on store ↗');v.href=d.link;v.target='_blank';v.rel='noopener';sh.box.appendChild(v);}
+  const sim=rows.filter(x=>x.kind==='deal'&&x.id!==r.id&&!(x.data||{}).sold&&((x.data||{}).brand===d.brand||catOf(x.data||{})===catOf(d))).slice(0,8);
+  if(sim.length){sh.box.appendChild(el('div','dl-sh-eb','Similar deals'));const s=el('div','dl-strip');sim.forEach(x=>s.appendChild(mini(x,()=>{sh.close();setTimeout(()=>detail(x),320);})));sh.box.appendChild(s);}
+  render();}
+ function mini(r,onclick){const d=r.data||{};const m=el('button','dl-mini');m.type='button';const ph=el('div','dl-mini-ph');if(d.img){const im=el('img');im.src=d.img;im.loading='lazy';ph.appendChild(im);}else ph.textContent=(d.brand||'L').charAt(0);m.appendChild(ph);m.appendChild(el('b',null,d.brand||''));m.appendChild(el('small',null,num(d.price)!=null?inr(d.price):'On request'));m.addEventListener('click',onclick||(()=>detail(r)));return m;}
+ /* PDF sheets with pieces */
+ function loadPdfJs(){return new Promise((res,rej)=>{if(window.pdfjsLib)return res(window.pdfjsLib);const s=el('script');s.src='vendor/pdf.min.js';s.onload=()=>{window.pdfjsLib.GlobalWorkerOptions.workerSrc='vendor/pdf.worker.min.js';res(window.pdfjsLib);};s.onerror=rej;document.head.appendChild(s);});}
+ const PDFC={};
+ async function pdfDoc(url){if(!PDFC[url]){const lib=await loadPdfJs();PDFC[url]=lib.getDocument({url}).promise;}return PDFC[url];}
+ async function pageImg(doc,n,w){const pg=await doc.getPage(n);const vp0=pg.getViewport({scale:1});const vp=pg.getViewport({scale:w/vp0.width});const c=document.createElement('canvas');c.width=Math.round(vp.width);c.height=Math.round(vp.height);await pg.render({canvasContext:c.getContext('2d'),viewport:vp}).promise;return c;}
+ function pdfRequest(r,n,kind,canvas){const d=r.data||{};const sh=sheet();sh.box.appendChild(el('div','dl-sh-eb',({price:'Check price',availability:'Availability check',size:'Size check',buy:'I want this'})[kind]));sh.box.appendChild(el('div','dl-sh-t',(d.title||'Deal sheet')+' · piece '+n));
+  if(canvas){const im=el('img','dl-rq-img');im.src=canvas.toDataURL('image/jpeg',.8);sh.box.appendChild(im);}
+  const sz=el('input','dl-in');sz.placeholder=kind==='size'?'Your size (e.g. UK 8, M)':'Size / colour (optional)';const nt=el('textarea','dl-in dl-ta');nt.rows=2;nt.placeholder='Anything else? (optional)';sh.box.appendChild(sz);sh.box.appendChild(nt);
+  const go=el('button','btn dl-ask','Send request');go.type='button';sh.box.appendChild(go);
+  go.addEventListener('click',async()=>{if(kind==='size'&&!sz.value.trim()){sz.focus();return;}go.disabled=true;const id='deal-'+Date.now().toString(36);
+   const spec=[({price:'Price request',availability:'Availability check',size:'Size check',buy:'Wants this piece'})[kind],'Key '+dealKey(),'Sheet: '+(d.title||'')+' · piece '+n,sz.value.trim()&&('Size: '+sz.value.trim())].filter(Boolean).join(' · ');
+   try{await photos.db.doc('requests/'+id).set({brand:'',product:(d.title||'Deal sheet')+' · piece '+n,spec,qty:1,budget:0,needBy:'',link:d.url+'#page='+n,photo:'',note:nt.value.trim(),urgent:false,status:'Submitted',at:new Date().toISOString(),source:'deal_pdf',deal_id:r.id,page:n,ask:kind});markReq(r.id+':'+n,kind);sh.close();say('Request sent. Luxella will reply here and on WhatsApp.');render();}
+   catch(e){window.open('https://wa.me/'+WA+'?text='+encodeURIComponent('Hi Luxella, '+spec),'_blank','noopener');sh.close();}});}
  function pdfRow(r){const d=r.data||{};const c=el('div','dl-pc');
   const top=el('a','dl-pdf');top.href=d.url;top.target='_blank';top.rel='noopener';
   top.appendChild(el('span','dl-pi','PDF'));const t=el('span','dl-pt');t.appendChild(el('b',null,d.title||'Deal sheet'));t.appendChild(el('small',null,dayLabel(r.day)+(d.pages?' · '+d.pages+' pages':'')+(d.size?' · '+d.size:'')));top.appendChild(t);top.appendChild(el('span','dl-pa','Open'));
   if(own()){const x=el('button','dl-px','×');x.type='button';x.title='Remove';x.addEventListener('click',async e=>{e.preventDefault();e.stopPropagation();if(!confirm('Remove this PDF?'))return;try{await window.lx.deals.remove(r.id);load();}catch(er){alert('Could not remove.');}});top.appendChild(x);}
   c.appendChild(top);if(d.msg){const m=el('div','dl-msgbox');m.textContent=d.msg;c.appendChild(m);}
+  const pcs=el('details','dl-pcs');const sm=el('summary');sm.appendChild(el('span',null,'View pieces one by one'));sm.appendChild(el('small',null,'Ask price, availability or size for any piece'));pcs.appendChild(sm);const grid=el('div','dl-pgrid');pcs.appendChild(grid);
+  let built=false;pcs.addEventListener('toggle',async()=>{if(!pcs.open||built)return;built=true;grid.textContent='Loading pieces…';try{const doc=await pdfDoc(d.url);grid.textContent='';sm.firstChild.textContent=doc.numPages+' pieces';
+    for(let n=1;n<=doc.numPages;n++){const it=el('div','dl-pg');const ph=el('div','dl-pg-ph');ph.textContent='…';it.appendChild(ph);it.appendChild(el('small','dl-pg-n','Piece '+n));const asked=REQ[r.id+':'+n];if(asked)it.appendChild(el('div','dl-rq','✓ Asked'));
+     const ac=el('div','dl-pg-ac');let cv=null;
+     const b=(t,k,cls)=>{const x=el('button',cls||'btn2',t);x.type='button';x.addEventListener('click',()=>{if(k==='share'){waShare((d.title||'Luxella deals')+' · piece '+n+'\n'+d.url+'#page='+n);return;}if(k==='save'){if(!cv)return;cv.toBlob(bl=>{const u=URL.createObjectURL(bl);const a=el('a');a.href=u;a.download=(d.title||'deal').replace(/[^\w\- ]+/g,'').trim()+'_'+n+'.jpg';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),4000);},'image/jpeg',.9);return;}pdfRequest(r,n,k,cv);});ac.appendChild(x);};
+     if(!own()){b('Check price','price','btn dl-ask');b('Availability','availability');b('Size','size');b('Share','share');}b('Save image','save');
+     it.appendChild(ac);grid.appendChild(it);
+     const io=new IntersectionObserver(async es=>{if(!es[0].isIntersecting)return;io.disconnect();try{cv=await pageImg(doc,n,520);const im=el('img');im.src=cv.toDataURL('image/jpeg',.82);ph.textContent='';ph.appendChild(im);ph.addEventListener('click',()=>{const z=sheet();z.box.classList.add('dl-zoom');const zi=el('img');zi.src=im.src;z.box.appendChild(zi);});}catch(e){ph.textContent='—';}},{rootMargin:'300px'});io.observe(it);}
+   if(own()){const pp=el('button','btn2 dl-pp','Post all pieces as deals');pp.type='button';pp.addEventListener('click',()=>postPieces(r,doc,pp));grid.appendChild(pp);}
+   }catch(e){grid.textContent='Could not open this PDF here. Use Open or Download.';}});
+  c.appendChild(pcs);
   const ac=el('div','dl-ac');const dbtn=el('button','btn dl-dlb','Download PDF');dbtn.type='button';dbtn.addEventListener('click',()=>dl(d.url,(d.title||'Luxella deals').replace(/[^\w\- ]+/g,'').trim()+'.pdf'));ac.appendChild(dbtn);
   if(d.msg){const cb=el('button','btn2 dl-cp','Copy message');cb.type='button';cb.addEventListener('click',()=>copyTxt(d.msg,cb));ac.appendChild(cb);}
+  if(!own()){const ws=el('button','btn2','Share');ws.type='button';ws.addEventListener('click',()=>waShare((d.title||'Luxella deals')+(d.msg?'\n'+d.msg:'')+'\n'+d.url));ac.appendChild(ws);}
   c.appendChild(ac);return c;}
-
- /* ---------- filters + render ---------- */
- const qOk=r=>{const q=String(F.q||'').toLowerCase().trim();if(!q)return true;const d=r.data||{};const hay=[d.brand,d.title,d.sizes,d.note].join(' ').toLowerCase();return q.split(/\s+/).every(w=>hay.includes(w));};
- function inRange(day){const t=today();if(F.day==='today')return day===t;if(F.day==='yday')return day===addD(t,-1);if(F.day==='week')return day>=addD(t,-6);return true;}
- function filters(deals){const wrap=el('div','dl-flw');const sr=el('div','dl-search');const si=el('input','dl-in');si.type='search';si.placeholder='Search brand, piece, size, colour…';si.value=F.q||'';sr.appendChild(si);let tm;si.addEventListener('input',()=>{clearTimeout(tm);tm=setTimeout(()=>{F.q=si.value;render();const n=document.querySelector('.dl-search input');if(n){n.focus();n.setSelectionRange(n.value.length,n.value.length);}},180);});wrap.appendChild(sr);const w=el('div','dl-fl');wrap.appendChild(w);[['all','All'],['today','Today'],['yday','Yesterday'],['week','This week']].forEach(([k,l])=>{const b=el('button','chip',l);b.type='button';b.setAttribute('aria-pressed',String(F.day===k));b.addEventListener('click',()=>{F.day=k;render();});w.appendChild(b);});
-  const brands=[...new Set(deals.map(r=>(r.data||{}).brand).filter(Boolean))].sort();if(brands.length>1){const s=el('select','dl-sel');const o0=el('option',null,'All brands');o0.value='';s.appendChild(o0);brands.forEach(b=>{const o=el('option',null,b);o.value=b;if(F.brand===b)o.selected=true;s.appendChild(o);});s.addEventListener('change',()=>{F.brand=s.value;render();});w.appendChild(s);}
-  if(!own()){const sv=el('button','chip','♥ Saved'+(SAVED.size?' · '+SAVED.size:''));sv.type='button';sv.setAttribute('aria-pressed',String(F.saved));sv.addEventListener('click',()=>{F.saved=!F.saved;render();});w.appendChild(sv);}
-  const tools=el('div','dl-tools');const cpa=el('button','btn2 dl-cpa','Copy all deals');cpa.type='button';cpa.addEventListener('click',()=>copyAll(cpa));tools.appendChild(cpa);const gp=el('button','btn dl-genb','✦ Generate PDF');gp.type='button';gp.addEventListener('click',genSheet);tools.appendChild(gp);wrap.appendChild(tools);
+ async function postPieces(r,doc,btn){const d=r.data||{};const brand=prompt('Brand for these pieces (leave empty to fill later)',(d.title||'').split(/ and | & |,/)[0].trim());if(brand===null)return;btn.disabled=true;
+  for(let n=1;n<=doc.numPages;n++){btn.textContent='Posting '+n+' / '+doc.numPages+'…';try{const cv=await pageImg(doc,n,1100);const bl=await new Promise(res=>cv.toBlob(res,'image/jpeg',.86));const up=await window.lx.deals.upload(new File([bl],'piece_'+n+'.jpg',{type:'image/jpeg'}));await window.lx.deals.add('deal',{brand:brand.trim(),title:(d.title||'Deal sheet')+' · piece '+n,price:null,mrp:null,sizes:'',note:'',img:up.url,sold:false,sheet:r.id,page:n},r.day);}catch(e){}}
+  btn.textContent='Posted ✓';load();}
+ /* ---------- daily drops: numbered posts (photo albums or PDFs) with swipe, message, actions ---------- */
+ const tmOf=r=>{try{return new Date(r.created_at).toLocaleTimeString('en-IN',{hour:'numeric',minute:'2-digit',hour12:true,timeZone:'Asia/Kolkata'});}catch(e){return '';}};
+ const longDay=d=>{try{return new Date(d+'T00:00:00Z').toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',timeZone:'UTC'});}catch(e){return d;}};
+ function slideImgUrl(sl){return sl.img||(sl.canvas?sl.canvas.toDataURL('image/jpeg',.85):'');}
+ function slidesOf(r){const d=r.data||{};const photos=Array.isArray(d.photos)?d.photos:[];return photos.length?Promise.resolve({n:photos.length,get:async i=>({img:photos[i]})}):pdfDoc(d.url).then(doc=>({n:doc.numPages,get:async i=>{const cv=await pageImg(doc,i+1,900);return {img:cv.toDataURL('image/jpeg',.84),canvas:cv};}}));}
+ function capOf(r,i){const d=r.data||{};const c=(d.caps||{})[i+1];return c||null;}
+ function postCard(r,idx){const d=r.data||{};const isPdf=r.kind==='pdf';const photos=Array.isArray(d.photos)?d.photos:[];
+  const c=el('article','dl-post');const hd=el('div','dl-post-h');hd.appendChild(el('span','dl-post-no',String(idx).padStart(2,'0')));const ht=el('div','dl-post-ht');ht.appendChild(el('b',null,d.title||(isPdf?'Deal sheet':'New pieces')));const cntTxt=photos.length?photos.length+' photos':(d.pages?d.pages+' pieces':'PDF');ht.appendChild(el('small',null,tmOf(r)+' · '+cntTxt));hd.appendChild(ht);
+  if(own()){const x=el('button','dl-px','×');x.type='button';x.title='Remove post';x.addEventListener('click',async e=>{e.stopPropagation();if(!confirm('Remove this post?'))return;try{await window.lx.deals.remove(r.id);load();}catch(er){alert('Could not remove.');}});hd.appendChild(x);}
+  c.appendChild(hd);
+  const cov=el('button','dl-cov');cov.type='button';const th=el('div','dl-cov-g');cov.appendChild(th);const op=el('span','dl-cov-o','Tap to view · swipe ›');cov.appendChild(op);c.appendChild(cov);
+  const fill=(urls,n)=>{th.textContent='';urls.slice(0,4).forEach((u,i)=>{const t=el('div','dl-cov-t');const im=el('img');im.src=u;im.loading='lazy';t.appendChild(im);if(i===3&&n>4)t.appendChild(el('span','dl-cov-m','+'+(n-4)));th.appendChild(t);});th.className='dl-cov-g n'+Math.min(4,urls.length);};
+  if(photos.length)fill(photos,photos.length);else{th.appendChild(el('div','dl-cov-pdf','PDF'));const io=new IntersectionObserver(async es=>{if(!es[0].isIntersecting)return;io.disconnect();try{const doc=await pdfDoc(d.url);const n=doc.numPages;const us=[];for(let i=1;i<=Math.min(4,n);i++){us.push((await pageImg(doc,i,260)).toDataURL('image/jpeg',.7));}fill(us,n);}catch(e){}},{rootMargin:'200px'});io.observe(c);}
+  cov.addEventListener('click',()=>viewer(r,0));
+  const row=el('div','dl-ac dl-post-ac');
+  if(d.msg){const cb=el('button','btn2','Copy message');cb.type='button';cb.addEventListener('click',()=>copyTxt(d.msg,cb));row.appendChild(cb);}
+  const wa=el('button','btn2','WhatsApp');wa.type='button';wa.addEventListener('click',()=>waShare((d.title||'Luxella deals')+(d.msg?'\n'+d.msg:'')+(isPdf?'\n'+d.url:'')));row.appendChild(wa);
+  if(isPdf){const db=el('button','btn2','Download');db.type='button';db.addEventListener('click',()=>dl(d.url,(d.title||'Luxella deals').replace(/[^\w\- ]+/g,'').trim()+'.pdf'));row.appendChild(db);}
+  else{const db=el('button','btn2','Download');db.type='button';db.addEventListener('click',async()=>{for(let i=0;i<photos.length;i++){await dl(photos[i],(d.title||'luxella').replace(/[^\w\- ]+/g,'').trim()+'_'+(i+1)+'.jpg');await new Promise(z=>setTimeout(z,350));}});row.appendChild(db);}
+  c.appendChild(row);
+  if(d.msg){const m=el('div','dl-post-msg');m.textContent=d.msg;c.appendChild(m);}
+  if(own()&&isPdf){const pp=el('button','btn2 dl-pp','Post pages as single deals');pp.type='button';pp.addEventListener('click',async()=>{const doc=await pdfDoc(d.url);postPieces(r,doc,pp);});c.appendChild(pp);}
+  return c;}
+ function genCaption(r,i){const d=r.data||{};const cp=capOf(r,i)||{};const res=!own()&&M.on;const p=num(cp.price);const shown=res&&p!=null?quote(p):p;
+  return [cp.title||d.title||'New arrival',cp.brand?cp.brand:'',cp.size?'Size: '+cp.size:'',shown!=null?'Price: '+inr(shown):(res?'DM for price':'Price on request'),dayLabel(r.day)==='Today'?'Today’s deal · limited stock':'Ask to confirm availability',res?'DM to order':'Reply to order · Luxella'].filter(Boolean).join('\n');}
+ function viewer(r,start){const d=r.data||{};const ov=el('div','dl-vw');const top=el('div','dl-vw-top');const back=el('button','dl-vw-x','‹ Back');back.type='button';top.appendChild(back);const tt=el('div','dl-vw-tt');tt.appendChild(el('b',null,d.title||'Deals'));const nn=el('small',null,'');tt.appendChild(nn);top.appendChild(tt);ov.appendChild(top);
+  const track=el('div','dl-vw-t');ov.appendChild(track);const info=el('div','dl-vw-info');ov.appendChild(info);
+  const acts=el('div','dl-vw-ac');ov.appendChild(acts);
+  (document.querySelector('.sw')||document.body).appendChild(ov);document.documentElement.style.overflow='hidden';requestAnimationFrame(()=>ov.classList.add('in'));
+  const close=()=>{ov.classList.remove('in');document.documentElement.style.overflow='';setTimeout(()=>ov.remove(),300);document.removeEventListener('keydown',kd);};back.addEventListener('click',close);
+  const S=[];let src=null;
+  const cur=()=>Math.round(track.scrollLeft/Math.max(1,track.clientWidth));
+  const go=i=>track.scrollTo({left:Math.max(0,Math.min(S.length-1,i))*track.clientWidth,behavior:'smooth'});
+  const kd=e=>{if(e.key==='ArrowRight')go(cur()+1);if(e.key==='ArrowLeft')go(cur()-1);if(e.key==='Escape')close();};document.addEventListener('keydown',kd);
+  const paintInfo=()=>{const i=cur();nn.textContent=(i+1)+' / '+S.length+' · '+tmOf(r);info.textContent='';const cp=capOf(r,i);
+   if(cp){if(cp.brand||cp.title)info.appendChild(el('b',null,[cp.brand,cp.title].filter(Boolean).join(' · ')));const ln=el('div','dl-vw-pr');if(num(cp.price)!=null){ln.appendChild(el('span','p',inr(cp.price)));if(!own()&&M.on)ln.appendChild(el('span','y','Your price '+inr(quote(cp.price))));}if(cp.size)ln.appendChild(el('span','s',cp.size));if(ln.childNodes.length)info.appendChild(ln);}
+   if(REQ[r.id+':'+(i+1)])info.appendChild(el('div','dl-rq','✓ You asked about this piece'));};
+  track.addEventListener('scroll',()=>requestAnimationFrame(paintInfo),{passive:true});
+  const B=(t,fn,cls)=>{const x=el('button',cls||'dl-vb',t);x.type='button';x.addEventListener('click',fn);acts.appendChild(x);};
+  const o=()=>S[cur()];
+  if(!own()){B('Check price',()=>postRequest(r,cur()+1,'price',o()),'dl-vb gold');B('Availability',()=>postRequest(r,cur()+1,'availability',o()));B('Size',()=>postRequest(r,cur()+1,'size',o()));}
+  B('WhatsApp',()=>{const i=cur();waShare(genCaption(r,i)+(r.kind==='pdf'?'\n'+d.url+'#page='+(i+1):(S[i]&&S[i].img?'\n'+S[i].img:'')));});
+  B('Caption',()=>{const i=cur();const sh=sheet();sh.box.appendChild(el('div','dl-sh-eb','Caption for piece '+String(i+1).padStart(2,'0')));const ta=el('textarea','dl-in dl-ta');ta.rows=7;ta.value=genCaption(r,i);sh.box.appendChild(ta);const ac=el('div','dl-ac');const c1=el('button','btn dl-ask','Copy caption');c1.type='button';c1.addEventListener('click',()=>copyTxt(ta.value,c1));const c2=el('button','btn2','Share');c2.type='button';c2.addEventListener('click',async()=>{const s0=S[i];try{if(s0&&navigator.canShare){const bl=await (await fetch(s0.img)).blob();const f=new File([bl],'luxella_'+(i+1)+'.jpg',{type:'image/jpeg'});if(navigator.canShare({files:[f]})){await navigator.share({files:[f],text:ta.value});return;}}}catch(e){}waShare(ta.value);});ac.appendChild(c1);ac.appendChild(c2);sh.box.appendChild(ac);});
+  B('Save',()=>{const s0=o();if(s0&&s0.img)dl(s0.img,(d.title||'luxella').replace(/[^\w\- ]+/g,'').trim()+'_'+(cur()+1)+'.jpg');});
+  if(own())B('Edit price / size',async()=>{const i=cur();const cp=Object.assign({},capOf(r,i)||{});const br=prompt('Brand',cp.brand||'');if(br===null)return;const ti=prompt('Piece name',cp.title||'');if(ti===null)return;const pr=prompt('Price ₹ (empty = on request)',cp.price??'');if(pr===null)return;const sz=prompt('Sizes / colours',cp.size||'');if(sz===null)return;const caps=Object.assign({},d.caps||{});caps[i+1]={brand:br.trim(),title:ti.trim(),price:num(pr),size:sz.trim()};d.caps=caps;try{await window.lx.deals.update(r.id,d);say('Saved for piece '+(i+1));paintInfo();}catch(e){alert('Could not save.');}});
+  slidesOf(r).then(sr=>{src=sr;for(let i=0;i<sr.n;i++){const sl=el('div','dl-vw-s');const ph=el('div','dl-vw-ph');ph.textContent='…';sl.appendChild(ph);track.appendChild(sl);const it={img:'',canvas:null};S.push(it);
+    const io=new IntersectionObserver(async es=>{if(!es.some(e=>e.isIntersecting))return;io.disconnect();try{const g=await sr.get(i);Object.assign(it,g);const im=el('img');im.src=g.img;ph.textContent='';ph.appendChild(im);}catch(e){ph.textContent='—';}},{root:track,rootMargin:'0px 200% 0px 200%'});io.observe(sl);}
+   requestAnimationFrame(()=>{track.scrollLeft=start*track.clientWidth;paintInfo();});}).catch(()=>{info.textContent='Preview not available. Use Download.';});}
+ function postRequest(r,n,kind,o){const d=r.data||{};const sh=sheet();sh.box.appendChild(el('div','dl-sh-eb',({price:'Check price',availability:'Availability check',size:'Size check'})[kind]));sh.box.appendChild(el('div','dl-sh-t',(d.title||'Deal post')+' · piece '+String(n).padStart(2,'0')));
+  const u=o&&slideImgUrl(o);if(u){const im=el('img','dl-rq-img');im.src=u;sh.box.appendChild(im);}
+  const sz=el('input','dl-in');sz.placeholder=kind==='size'?'Your size (e.g. UK 8, M)':'Size / colour (optional)';const nt=el('textarea','dl-in dl-ta');nt.rows=2;nt.placeholder='Anything else? (optional)';sh.box.appendChild(sz);sh.box.appendChild(nt);
+  const go=el('button','btn dl-ask','Send request');go.type='button';sh.box.appendChild(go);
+  go.addEventListener('click',async()=>{if(kind==='size'&&!sz.value.trim()){sz.focus();return;}go.disabled=true;const id='deal-'+Date.now().toString(36);
+   const spec=[({price:'Price request',availability:'Availability check',size:'Size check'})[kind],'Key '+dealKey(),(d.title||'Post')+' · piece '+n+' · '+dayLabel(r.day)+' '+tmOf(r),sz.value.trim()&&('Size: '+sz.value.trim())].filter(Boolean).join(' · ');
+   try{await photos.db.doc('requests/'+id).set({brand:'',product:(d.title||'Deal post')+' · piece '+n,spec,qty:1,budget:0,needBy:'',link:d.url?d.url+'#page='+n:'',photo:(o&&o.img)||'',note:nt.value.trim(),urgent:false,status:'Submitted',at:new Date().toISOString(),source:'deal_post',deal_id:r.id,page:n,ask:kind});markReq(r.id+':'+n,kind);sh.close();say('Request sent. Luxella will reply here and on WhatsApp.');}
+   catch(e){window.open('https://wa.me/'+WA+'?text='+encodeURIComponent('Hi Luxella, '+spec),'_blank','noopener');sh.close();}});}
+ function drops(list){const w=el('section','dl-drops');const days=[...new Set(list.map(r=>r.day))].sort().reverse();
+  days.forEach(dy=>{const L=list.filter(r=>r.day===dy).sort((a,b)=>a.created_at<b.created_at?-1:1);const sec=el('div','dl-dday');const h=el('div','dl-dday-h');h.appendChild(el('span','dl-dday-d',dayLabel(dy)==='Today'||dayLabel(dy)==='Yesterday'?dayLabel(dy):longDay(dy)));h.appendChild(el('small',null,(dayLabel(dy)==='Today'||dayLabel(dy)==='Yesterday'?longDay(dy)+' · ':'')+L.length+(L.length>1?' drops':' drop')));sec.appendChild(h);
+   sec.appendChild(el('p','dl-disc',dy===today()?'Prices, sizes and availability are as of today and may change.':'Posted '+longDay(dy)+'. Prices, sizes and availability may have changed since. Tap Check to confirm.'));
+   L.forEach((r,i)=>sec.appendChild(postCard(r,i+1)));w.appendChild(sec);});return w;}
+ /* filters bar */
+ function chip(label,on,fn,cls){const b=el('button','chip'+(cls?' '+cls:''),label);b.type='button';b.setAttribute('aria-pressed',String(!!on));b.addEventListener('click',fn);return b;}
+ function filters(all){const wrap=el('div','dl-flw');
+  const sr=el('div','dl-search');const si=el('input','dl-in');si.type='search';si.placeholder='Search brand, piece, size, colour…';si.value=F.q||'';sr.appendChild(si);let tm;si.addEventListener('input',()=>{clearTimeout(tm);tm=setTimeout(()=>{F.q=si.value;PAGE=24;render();const n=document.querySelector('.dl-search input');if(n){n.focus();n.setSelectionRange(n.value.length,n.value.length);}},180);});wrap.appendChild(sr);
+  const brands=[...new Set(all.map(r=>(r.data||{}).brand).filter(Boolean))].sort();
+  if(brands.length>1){const bs=el('div','dl-brands');bs.appendChild(chip('All houses',!F.brand,()=>{F.brand='';PAGE=24;saveF();render();}));brands.forEach(b=>{const n=all.filter(r=>(r.data||{}).brand===b).length;const c=chip('',F.brand===b,()=>{F.brand=F.brand===b?'':b;PAGE=24;saveF();render();},'dl-bchip');const lg=logo(b);if(lg){const im=el('img');im.src=lg;im.alt=b;c.appendChild(im);}c.appendChild(el('span',null,b));c.appendChild(el('small',null,String(n)));bs.appendChild(c);});wrap.appendChild(bs);}
+  const cats=[...new Set(all.map(r=>catOf(r.data||{})))];if(cats.length>1){const cs=el('div','dl-fl');cs.appendChild(chip('All',!F.cat,()=>{F.cat='';PAGE=24;saveF();render();}));CATS.map(x=>x[0]).concat(['Other']).filter(c=>cats.includes(c)).forEach(c=>cs.appendChild(chip(c+' · '+all.filter(r=>catOf(r.data||{})===c).length,F.cat===c,()=>{F.cat=F.cat===c?'':c;PAGE=24;saveF();render();})));wrap.appendChild(cs);}
+  const more=el('details','dl-more');const nAct=(F.day!=='all'?1:0)+(F.pb?1:0)+F.flags.length+(F.saved?1:0);const ms=el('summary');ms.appendChild(el('span',null,'Filter & sort'+(nAct?' · '+nAct:'')));const sel=el('select','dl-sel');[['new','Newest first'],['lo','Price: low to high'],['hi','Price: high to low'],['off','Biggest discount'],['end','Ending soonest']].forEach(([v,t])=>{const o=el('option',null,t);o.value=v;if(F.sort===v)o.selected=true;sel.appendChild(o);});sel.addEventListener('click',e=>e.stopPropagation());sel.addEventListener('change',()=>{F.sort=sel.value;saveF();render();});ms.appendChild(sel);more.appendChild(ms);more.open=!!LS.get('moreOpen',false);more.addEventListener('toggle',()=>LS.set('moreOpen',more.open));
+  const mb=el('div','dl-moreb');
+  const r1=el('div','dl-fl');[['all','All days'],['today','Today'],['yday','Yesterday'],['week','This week']].forEach(([k,l])=>r1.appendChild(chip(l,F.day===k,()=>{F.day=k;PAGE=24;saveF();render();})));mb.appendChild(r1);
+  const r2=el('div','dl-fl');PB.forEach(([k,l])=>r2.appendChild(chip(l,F.pb===k,()=>{F.pb=F.pb===k?'':k;PAGE=24;saveF();render();})));mb.appendChild(r2);
+  const r3=el('div','dl-fl');const FL=[['new','New for you'],['off','On discount'],['ending','Ending soon'],['few','Few left'],['avail','Available only']];FL.forEach(([k,l])=>r3.appendChild(chip(l,F.flags.includes(k),()=>{F.flags=F.flags.includes(k)?F.flags.filter(x=>x!==k):F.flags.concat(k);PAGE=24;saveF();render();})));if(!own())r3.appendChild(chip('♥ Saved'+(SAVED.size?' · '+SAVED.size:''),F.saved,()=>{F.saved=!F.saved;PAGE=24;render();}));mb.appendChild(r3);
+  const r4=el('div','dl-fl');r4.appendChild(chip('▦ Grid',F.view==='grid',()=>{F.view='grid';saveF();render();}));r4.appendChild(chip('☰ List',F.view==='list',()=>{F.view='list';saveF();render();}));if(nAct||F.brand||F.cat||F.q)r4.appendChild(chip('Clear all',false,()=>{Object.assign(F,{day:'all',brand:'',cat:'',pb:'',flags:[],saved:false,q:''});PAGE=24;saveF();render();},'dl-clr'));mb.appendChild(r4);
+  more.appendChild(mb);wrap.appendChild(more);
+  const tools=el('div','dl-tools');const cpa=el('button','btn2 dl-cpa','Copy deals');cpa.type='button';cpa.addEventListener('click',()=>copyAll(cpa));tools.appendChild(cpa);const gp=el('button','btn dl-genb','✦ Make PDF');gp.type='button';gp.addEventListener('click',genSheet);tools.appendChild(gp);wrap.appendChild(tools);
   return wrap;}
- function render(){const l=$('deals-list');if(!l)return;l.textContent='';
-  const all=rows.filter(r=>r.kind==='deal'),pdfs=rows.filter(r=>r.kind==='pdf');
+ function summary(all){const t=today();const td=all.filter(r=>r.day===t);const nw=all.filter(r=>isNew(r)&&!SEEN.has(r.id)).length;const end=all.filter(r=>(r.data||{}).ends===t&&!(r.data||{}).sold).length;const brands=new Set(td.map(r=>(r.data||{}).brand).filter(Boolean)).size;
+  const s=el('div','dl-sum');const it=(v,k)=>{const x=el('div');x.appendChild(el('b',null,String(v)));x.appendChild(el('small',null,k));s.appendChild(x);};it(td.length,'Today');if(!own())it(nw,'New for you');it(brands,'Houses today');it(end,'Ending today');return s;}
+ function render(){const l=$('deals-list');if(!l)return;const keepScroll=document.activeElement&&document.activeElement.closest&&document.activeElement.closest('.dl-search');l.textContent='';
+  const all=rows.filter(r=>r.kind==='deal'),pdfs=rows.filter(r=>r.kind==='pdf'||r.kind==='post');
   if(!all.length&&!pdfs.length){const e=el('div','dl-empty');e.appendChild(el('b',null,'Fresh deals land here every day.'));e.appendChild(el('span',null,'Check back this evening, or message Luxella for a specific piece.'));l.appendChild(e);return;}
-  if(all.length)l.appendChild(filters(all));
-  const deals=all.filter(r=>qOk(r)&&inRange(r.day)&&(!F.brand||(r.data||{}).brand===F.brand)&&(!F.saved||SAVED.has(r.id)));
-  if(all.length&&!deals.length)l.appendChild(el('p','dl-none',F.saved?'No saved deals yet. Tap ♡ on a piece to keep it here.':'No deals for this filter.'));
-  const days=[...new Set(deals.map(r=>r.day))];
-  days.forEach((d,i)=>{const list=deals.filter(r=>r.day===d).sort((a,b)=>((a.data||{}).sold?1:0)-((b.data||{}).sold?1:0));const sec=el('section','dl-day'+(i===0?' first':''));const h=el('div','dl-dh');h.appendChild(el('span',null,dayLabel(d)));h.appendChild(el('small',null,list.length+(list.length>1?' pieces':' piece')));sec.appendChild(h);const g=el('div','dl-g');list.forEach(r=>g.appendChild(card(r)));sec.appendChild(g);l.appendChild(sec);});
-  const pl=pdfs.filter(r=>inRange(r.day));
-  if(pl.length){const sec=el('section','dl-day dl-pdfs');const h=el('div','dl-dh');h.appendChild(el('span',null,'Deal sheets'));h.appendChild(el('small',null,pl.length+' PDFs'));sec.appendChild(h);const pg=el('div','dl-pg');pl.forEach(r=>pg.appendChild(pdfRow(r)));sec.appendChild(pg);l.appendChild(sec);}
+  const dl0=pdfs.filter(r=>inRange(r.day)&&(!F.q||[(r.data||{}).title,(r.data||{}).msg].join(' ').toLowerCase().includes(String(F.q).toLowerCase())));
+  if(dl0.length){const tg=el('div','dl-sec-h');tg.appendChild(el('span',null,'Daily drops'));tg.appendChild(el('small',null,'Swipe through every post · copy the message · ask about any piece'));l.appendChild(tg);l.appendChild(drops(dl0));}
+  if(all.length){const tg=el('div','dl-sec-h');tg.appendChild(el('span',null,'Single pieces'));tg.appendChild(el('small',null,'Search, filter and ask about any piece'));l.appendChild(tg);l.appendChild(summary(all));l.appendChild(filters(all));}
+  if(!own()&&RECENT.length&&!F.q){const rv=RECENT.map(id=>all.find(r=>r.id===id)).filter(Boolean).slice(0,10);if(rv.length>1){const sec=el('div','dl-recent');sec.appendChild(el('div','dl-sh-eb','Recently viewed'));const s=el('div','dl-strip');rv.forEach(r=>s.appendChild(mini(r)));sec.appendChild(s);l.appendChild(sec);}}
+  const list=sorted(all.filter(matches));
+  if(all.length){const cnt=el('div','dl-cnt');cnt.textContent=list.length+' of '+all.length+' pieces'+(F.q?' for “'+F.q+'”':'');l.appendChild(cnt);}
+  if(all.length&&!list.length)l.appendChild(el('p','dl-none',F.saved?'No saved deals yet. Tap ♡ on a piece to keep it here.':'Nothing matches. Try fewer filters, or ask Luxella to find it.'));
+  const shown=list.slice(0,PAGE);
+  if(F.sort==='new'){const days=[...new Set(shown.map(r=>r.day))];days.forEach(dy=>{const L=shown.filter(r=>r.day===dy);const sec=el('details','dl-day');sec.open=LS.get('closed:'+dy,false)!==true;sec.addEventListener('toggle',()=>LS.set('closed:'+dy,!sec.open));const h=el('summary','dl-dh');h.appendChild(el('span',null,dayLabel(dy)));h.appendChild(el('small',null,all.filter(r=>r.day===dy).length+' pieces'));sec.appendChild(h);sec.appendChild(el('p','dl-disc',dy===today()?'Prices, sizes and availability are as of today and may change.':'Posted '+dayLabel(dy)+'. Prices, sizes and availability may have changed since. Tap Check to confirm.'));const g=el('div','dl-g'+(F.view==='list'?' list':''));L.forEach(r=>g.appendChild(card(r)));sec.appendChild(g);l.appendChild(sec);});}
+  else{const g=el('div','dl-g'+(F.view==='list'?' list':''));shown.forEach(r=>g.appendChild(card(r)));l.appendChild(el('p','dl-disc',DISC));l.appendChild(g);}
+  if(list.length>PAGE){const mo=el('button','btn2 dl-loadmore','Show more · '+(list.length-PAGE)+' left');mo.type='button';mo.addEventListener('click',()=>{PAGE+=24;render();});l.appendChild(mo);}
+  l.appendChild(el('p','dl-disc foot',DISC+' Your deal key: '+dealKey()+'.'));
+  if(!own()){try{const mx=rows.reduce((m,r)=>r.created_at>m?r.created_at:m,'');if(mx&&!window.__lxdv){window.__lxdv=1;setTimeout(()=>LS.set('lastv',mx),4000);}}catch(e){}}
  }
 
  /* ---------- photos → PDF ---------- */
@@ -207,7 +350,6 @@
    doc.setTextColor(...MUTE);doc.setFont('helvetica','normal');doc.setFontSize(8);doc.text(res?('DM '+biz.toUpperCase()+' TO ORDER'):'ASK LUXELLA TO ORDER  ·  WHATSAPP +91 87240 79056',W/2,H-34,{align:'center',charSpace:1.2});}
   const fn=((res?biz:'Luxella')+' '+(opt.title||'Deals')+' '+today()).replace(/[^\w\- ]+/g,'').trim().replace(/\s+/g,'_')+'.pdf';
   return new File([doc.output('blob')],fn,{type:'application/pdf'});}
- function visibleDeals(){return rows.filter(r=>r.kind==='deal'&&qOk(r)&&inRange(r.day)&&(!F.brand||(r.data||{}).brand===F.brand)&&(!F.saved||SAVED.has(r.id))&&!(r.data||{}).sold);}
  function genSheet(){const list=visibleDeals();const sh=sheet();sh.box.classList.add('dl-gen');sh.box.appendChild(el('div','dl-sh-eb','Generate deals PDF'));
   sh.box.appendChild(el('div','dl-sh-t',list.length?list.length+(list.length>1?' pieces':' piece')+' · '+({all:'all days',today:'today',yday:'yesterday',week:'this week'})[F.day]+(F.brand?' · '+F.brand:''):'No deals in this filter'));
   if(!list.length){return;}
@@ -277,8 +419,8 @@
    st.textContent=sel.length+' deals posted.';host.textContent='';load();});}
  /* ---------- owner panel ---------- */
  function ownerPanel(){const w=$('deals-owner');if(!w||w.dataset.b||!own())return;w.dataset.b=1;
-  const f=el('details','dl-own');f.appendChild(el('summary',null,'Post a deal, PDF or photo sheet'));
-  const body=el('div','dl-ob');const mode=el('div','dl-mode');const MB=[['ai','✦ AI read'],['deal','Deal'],['pdf','PDF'],['photos','Photos→PDF']].map(([k,l])=>{const b=el('button','chip',l);b.type='button';b.dataset.k=k;mode.appendChild(b);return b;});body.appendChild(mode);
+  const f=el('details','dl-own');f.appendChild(el('summary',null,'Post today’s deals'));f.open=true;
+  const body=el('div','dl-ob');const mode=el('div','dl-mode');const MB=[['post','✦ New drop'],['ai','AI read'],['deal','Single piece'],['photos','Photos→PDF']].map(([k,l])=>{const b=el('button','chip',l);b.type='button';b.dataset.k=k;mode.appendChild(b);return b;});body.appendChild(mode);
   const inp=(ph,type)=>{const i=el('input','dl-in');i.placeholder=ph;if(type)i.type=type;return i;};
   const lab=(t,x,full)=>{const l=el('label','dl-l'+(full?' full':''));l.appendChild(el('span',null,t));l.appendChild(x);return l;};
   const fd=el('div','dl-form');const file=inp('','file');file.accept='image/*';const brand=inp('Brand (e.g. Coach)');const title=inp('Piece name');const price=inp('Empty = price on request','number');const mrp=inp('Usual price ₹','number');const sizes=inp('Sizes / colours');const stock=inp('Pieces left','number');const ends=inp('','date');const note=inp('One-line note');const link=inp('Link');const day=inp('','date');day.value=today();
@@ -288,13 +430,22 @@
   const hf=el('div','dl-form');const hfile=inp('','file');hfile.accept='image/*';hfile.multiple=true;const htitle=inp('Sheet title (e.g. Michael Kors outlet finds)');const hcap=el('textarea','dl-in dl-ta');hcap.rows=4;hcap.placeholder='Captions, one line per photo (optional)\ne.g. MK Jet Set tote · ₹14,500';const hmsg=el('textarea','dl-in dl-ta');hmsg.rows=4;hmsg.placeholder='Message for clients to copy (optional)';const hday=inp('','date');hday.value=today();const hcount=el('div','dl-msg full');
   hfile.addEventListener('change',()=>{hcount.textContent=hfile.files.length?hfile.files.length+' photos → '+hfile.files.length+'-page PDF':'';});
   [lab('Photos (select many)',hfile,1),hcount,lab('Title',htitle,1),lab('Captions',hcap,1),lab('Message',hmsg,1),lab('Date',hday)].forEach(x=>hf.appendChild(x));
+  const of=el('div','dl-form');const ofile=inp('','file');ofile.accept='image/*,application/pdf';ofile.multiple=true;const otitle=inp('Title (e.g. Coach outlet · new arrivals)');const omsg=el('textarea','dl-in dl-ta');omsg.rows=6;omsg.placeholder='Message for clients to copy and forward';const oday=inp('','date');oday.value=today();const ocount=el('div','dl-msg full');
+  ofile.addEventListener('change',()=>{const fs=[...ofile.files];const p=fs.filter(x=>x.type==='application/pdf').length,i=fs.length-p;ocount.textContent=fs.length?[i?i+' photos → one drop':'',p?p+' PDF'+(p>1?'s':'')+' → '+(p>1?'separate drops':'one drop'):''].filter(Boolean).join(' · '):'';});
+  [lab('Photos and/or PDF (select many)',ofile,1),ocount,lab('Title',otitle,1),lab('Message',omsg,1),lab('Date',oday)].forEach(x=>of.appendChild(x));
+  body.appendChild(of);
   const af=el('div','dl-form');const afile=inp('','file');afile.accept='image/*,application/pdf';afile.multiple=true;const apdf=el('label','dl-chk full');const apc=el('input');apc.type='checkbox';apc.checked=true;apdf.appendChild(apc);apdf.appendChild(el('span',null,'Also post uploaded PDFs as deal sheets'));const ahost=el('div','dl-ai full');
   [lab('Screenshots or PDF',afile,1),el('p','dl-n full','AI reads every product: brand, piece, size and price. You check the list, set your ₹ price and post in one tap.'),apdf,ahost].forEach(x=>af.appendChild(x));
   body.appendChild(af);body.appendChild(fd);body.appendChild(pf);body.appendChild(hf);
   const go=el('button','btn dl-ask','Post deal');go.type='button';const msg=el('div','dl-msg');body.appendChild(go);body.appendChild(msg);
-  let m='deal';const set=k=>{m=k;MB.forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.k===k)));af.hidden=k!=='ai';fd.hidden=k!=='deal';pf.hidden=k!=='pdf';hf.hidden=k!=='photos';go.textContent=k==='ai'?'Read with AI':(k==='deal'?'Post deal':(k==='pdf'?'Upload PDF':'Make PDF & post'));msg.textContent='';};MB.forEach(b=>b.addEventListener('click',()=>set(b.dataset.k)));set('ai');
+  let m='deal';const set=k=>{m=k;MB.forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.k===k)));of.hidden=k!=='post';af.hidden=k!=='ai';fd.hidden=k!=='deal';pf.hidden=k!=='pdf';hf.hidden=k!=='photos';go.textContent=k==='post'?'Post drop':k==='ai'?'Read with AI':(k==='deal'?'Post deal':(k==='pdf'?'Upload PDF':'Make PDF & post'));msg.textContent='';};MB.forEach(b=>b.addEventListener('click',()=>set(b.dataset.k)));set('post');
   const size=f0=>f0.size>1048576?(f0.size/1048576).toFixed(1)+' MB':Math.round(f0.size/1024)+' KB';
   go.addEventListener('click',async()=>{msg.textContent='';go.disabled=true;try{
+    if(m==='post'){const fs=[...ofile.files];if(!fs.length){msg.textContent='Choose photos or a PDF.';return;}const dy=oday.value||today();const ims=fs.filter(x=>x.type!=='application/pdf'),pdfs=fs.filter(x=>x.type==='application/pdf');
+     if(ims.length){const urls=[];for(let i=0;i<ims.length;i++){msg.textContent='Uploading photo '+(i+1)+' / '+ims.length+'…';const im=await fileImg(ims[i]);const bl=await (await fetch(im.data)).blob();urls.push((await window.lx.deals.upload(new File([bl],'drop_'+(i+1)+'.jpg',{type:'image/jpeg'}))).url);}
+      await window.lx.deals.add('post',{title:otitle.value.trim(),msg:omsg.value.trim(),photos:urls},dy);}
+     for(const p of pdfs){msg.textContent='Uploading '+p.name+'…';let pages=null;try{pages=(await pdfDoc(URL.createObjectURL(p))).numPages;}catch(e){}const up=await window.lx.deals.upload(p);await window.lx.deals.add('pdf',{title:otitle.value.trim()||p.name.replace(/\.pdf$/i,''),url:up.url,size:size(p),pages,msg:omsg.value.trim()},dy);}
+     ofile.value='';otitle.value='';omsg.value='';ocount.textContent='';msg.textContent='Drop posted.';load();return;}
     if(m==='ai'){const fs=[...afile.files];if(!fs.length){msg.textContent='Choose screenshots or a PDF.';return;}let items;try{items=await aiExtract(fs,msg);}catch(er){if(er.noai){aiConnect(ahost,msg);return;}throw er;}if(apc.checked){for(const p of fs.filter(x=>x.type==='application/pdf')){const up=await window.lx.deals.upload(p);await window.lx.deals.add('pdf',{title:p.name.replace(/\.pdf$/i,''),url:up.url,size:size(p),msg:''},today());}}aiReview(items,ahost,msg);afile.value='';return;}
     if(m==='deal'){if(!title.value.trim()){msg.textContent='Add the piece name.';return;}let img='';if(file.files[0]){msg.textContent='Uploading photo…';img=(await window.lx.deals.upload(file.files[0])).url;}
      await window.lx.deals.add('deal',{brand:brand.value.trim(),title:title.value.trim(),price:num(price.value),mrp:num(mrp.value),sizes:sizes.value.trim(),stock:num(stock.value),ends:ends.value||'',note:note.value.trim(),link:link.value.trim(),img,sold:false},day.value||today());
