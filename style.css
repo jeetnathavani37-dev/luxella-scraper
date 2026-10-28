@@ -3467,3 +3467,9 @@ body.cl-on{overflow:hidden}
 .mc-c span{position:absolute;z-index:2;left:12px;right:12px;bottom:12px;font:600 17px/1.12 'Lux Text',sans-serif;color:#fff;text-shadow:0 1px 8px rgba(0,0,0,.4)}
 .mc-tabs{margin-top:16px}.mc-tabs button{font-family:'Lux Text',sans-serif!important;letter-spacing:.04em!important;text-transform:none!important;font-size:14px!important}
 .mc-c img.ct{object-fit:contain;padding:10% 8% 30%;box-sizing:border-box;background:#f4f1ec}
+/* statement: no white box — product floats in a soft ivory light */
+.cl-stm:before{content:'';position:absolute;right:-12%;top:-6%;width:84%;height:86%;border-radius:50%;background:radial-gradient(closest-side,#f3efe9 0%,#efe8de 55%,rgba(239,232,222,.0) 100%);filter:blur(2px);pointer-events:none}
+.cl-stm img{background:none!important;padding:0!important;mix-blend-mode:multiply!important;transform:rotate(-4deg)!important;right:2%!important;top:8%!important;width:50%!important;height:56%!important;filter:none!important}
+.cl-stm b{color:#F7EFE2!important}
+.cl-stm:before{right:-22%!important;top:-18%!important;width:108%!important;height:118%!important;background:radial-gradient(closest-side,#efeeec 0%,#eeece9 68%,rgba(236,230,222,0) 100%)!important}
+.cl-stm img{width:44%!important;height:50%!important;right:8%!important;top:12%!important;transform:rotate(-3deg)!important}
