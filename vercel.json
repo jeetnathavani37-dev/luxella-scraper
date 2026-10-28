@@ -1,10 +1,35 @@
 {
-  "rewrites": [{ "source": "/:path*", "destination": "/index.html" }],
+  "rewrites": [
+    {
+      "source": "/p/lx/:code",
+      "destination": "https://qzripzgbstvxkfobzhyv.supabase.co/storage/v1/object/public/lx-assets/deals/pdf_:code.pdf"
+    },
+    {
+      "source": "/p/:slug/:code",
+      "destination": "https://qzripzgbstvxkfobzhyv.supabase.co/storage/v1/object/public/lx-assets/client-uploads/:slug/pdf_:code.pdf"
+    },
+    {
+      "source": "/:path*",
+      "destination": "/index.html"
+    }
+  ],
   "headers": [
-    { "source": "/(.*)", "headers": [
-      { "key": "X-Frame-Options", "value": "SAMEORIGIN" },
-      { "key": "X-Content-Type-Options", "value": "nosniff" },
-      { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" }
-    ] }
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Frame-Options",
+          "value": "SAMEORIGIN"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        }
+      ]
+    }
   ]
 }

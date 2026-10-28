@@ -107,6 +107,29 @@ Deno.serve(async (req) => {
       await db.from("lx_km_vault").upsert({ id: "ai", data: ai, updated_at: new Date().toISOString() });
       return J({ ok: true, connected: true, provider });
     }
+    if (body.action === "model_shot") {
+      const ai = await getAI(); if (!ai?.key) return J({ ok: false, error: "no_ai" });
+      if (ai.provider !== "gemini") return J({ ok: false, error: "Model shots need a Gemini key" });
+      const style = String(body.style || "editorial").slice(0, 40);
+      const looks: Record<string, string> = { editorial: "high-fashion editorial, soft directional light, neutral warm studio backdrop, Vogue-style composition", street: "luxury street-style photo in a European city at golden hour, candid walking pose", studio: "clean premium e-commerce studio shot on a model, seamless ivory background, soft shadows", night: "glamorous evening scene, warm bokeh city lights, cinematic" };
+      const prompt = `Create a photorealistic ${looks[style] || looks.editorial} of an elegant model naturally wearing or carrying the EXACT product shown in the reference image. Keep the product 100% identical: same shape, colour, material, logo placement, hardware and proportions — do not redesign it. The product must be clearly visible and in sharp focus. Vertical 4:5 framing. No text, no watermark, no extra logos.${body.hint ? " Product: " + String(body.hint).slice(0, 120) + "." : ""}`;
+      const models = [ai.imageModel, "gemini-2.5-flash-image", "gemini-3-pro-image-preview", "gemini-2.5-flash-image-preview", "gemini-flash-image-latest"].filter((x, i, a) => x && a.indexOf(x) === i);
+      let last = "";
+      for (const m of models) {
+        const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent`, { method: "POST", headers: { "Content-Type": "application/json", "x-goog-api-key": ai.key }, body: JSON.stringify({ contents: [{ role: "user", parts: [{ text: prompt }, { inline_data: { mime_type: body.image?.mime || "image/jpeg", data: body.image?.b64 || "" } }] }], generationConfig: { responseModalities: ["IMAGE", "TEXT"] } }) });
+        const j: any = await r.json().catch(() => ({}));
+        if (!r.ok) { last = "Gemini " + r.status + ": " + String(j?.error?.message || "").slice(0, 160); if (r.status === 404 || r.status === 400) continue; break; }
+        const part = (j?.candidates?.[0]?.content?.parts || []).find((p: any) => p.inline_data?.data || p.inlineData?.data);
+        const data = part?.inline_data?.data || part?.inlineData?.data; const mime = part?.inline_data?.mime_type || part?.inlineData?.mimeType || "image/png";
+        if (!data) { last = "No image returned"; continue; }
+        const bin = Uint8Array.from(atob(data), (ch) => ch.charCodeAt(0));
+        const path = `deals/model_${Date.now()}_${Math.random().toString(36).slice(2, 7)}.${mime.includes("jpeg") ? "jpg" : "png"}`;
+        const up = await db.storage.from("lx-assets").upload(path, bin, { contentType: mime, upsert: false });
+        if (up.error) return J({ ok: false, error: up.error.message });
+        return J({ ok: true, url: db.storage.from("lx-assets").getPublicUrl(path).data.publicUrl, model: m });
+      }
+      return J({ ok: false, error: last || "Image model unavailable" });
+    }
     if (body.action === "deals_identify") {
       const ai = await getAI(); if (!ai?.key) return J({ ok: false, error: "no_ai" });
       const hint = String(body.hint || "").slice(0, 300);

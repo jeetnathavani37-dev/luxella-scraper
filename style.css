@@ -2765,3 +2765,12 @@ html body #totop svg,html body #totop *{color:#E3C565!important;fill:currentColo
 .sw .dl-draft{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 12px;padding:10px 12px;border:1px dashed rgba(227,192,106,.55);border-radius:12px;background:rgba(227,192,106,.06)}
 .sw .dl-draft span{font:400 9px 'Lux Wide',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#E3C565}
 .sw.sw.sw .dl-draft .btn{min-height:36px;padding:0 14px!important;font-size:9px!important;white-space:nowrap}
+.sw .dl-dest{display:flex;flex-wrap:wrap;gap:8px}
+.sw.sw.sw .dl-dest-b{min-height:40px;padding:0 14px;border-radius:999px!important;border:1px solid rgba(227,192,106,.35);background:transparent;color:#F3ECDD;font:400 12px 'Lux Text',sans-serif;cursor:pointer;box-shadow:none;text-transform:none;letter-spacing:.01em}
+.sw.sw.sw .dl-dest-b[aria-pressed=true]{background:linear-gradient(135deg,#F7E7B4,#C99A45);color:#16120a;border-color:#F4E1A0}
+.sw.sw.sw .dl-dest-b.add{border-style:dashed;color:#E3C565}
+.sw .dl-dest-f{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.sw .dl-link{display:flex;align-items:center;gap:8px;justify-content:space-between;padding:10px 12px;border:1px solid rgba(227,192,106,.3);border-radius:12px;background:#100e0b}
+.sw .dl-link span{font:400 12px 'Lux Text',sans-serif;color:#F4E1A0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sw.sw.sw .dl-link .btn2{min-height:34px;padding:0 12px!important;font-size:9px!important;flex:none}
+.sw .dl-cbadge{margin:8px 0 0;font:400 9px 'Lux Wide',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#9fd3a2}.sw .dl-c .dl-draft{margin:8px}
