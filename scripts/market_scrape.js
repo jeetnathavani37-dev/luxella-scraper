@@ -31,7 +31,7 @@ const kgFor = t => { const s = String(t).toLowerCase();
   if (/bag|shoulder|hobo|bucket|clutch/.test(s)) return 0.9; if (/jacket|coat|dress|sweater|shirt|top|pant|skirt|hoodie|scarf|knit|jean|trouser/.test(s)) return 0.5; return 0.6; };
 function underCap(amount, cur, tax, text, step = 0.5) { const kg = Math.max(step, Math.ceil(kgFor(text) / step) * step); const landed = amount * FX[cur] * (1 + tax) + kg * 1250 + 150; return Math.ceil(landed * 1.25 / 100) * 100 <= 100000; }
 const SZ = ['XXS', 'XS', 'S', 'M', 'L', 'XL', 'XXL', '2XL', '3XL', 'XXXL'];
-const sortSizes = a => [...new Set(a)].filter(s => s && !/^(adults?|one size|os|o\/s|tu|no size)$/i.test(s)).sort((x, y) => { const i = SZ.indexOf(String(x).toUpperCase()), j = SZ.indexOf(String(y).toUpperCase()); if (i >= 0 && j >= 0) return i - j; const nx = parseFloat(String(x).replace(/^[A-Z]+\s*/i, '')), ny = parseFloat(String(y).replace(/^[A-Z]+\s*/i, '')); if (!isNaN(nx) && !isNaN(ny)) return nx - ny; return String(x).localeCompare(String(y)); });
+const sortSizes = a => [...new Set(a)].filter(s => s && !/^(adults?|one size|os|o\/s|tu|uni|no size)$/i.test(s)).sort((x, y) => { const i = SZ.indexOf(String(x).toUpperCase()), j = SZ.indexOf(String(y).toUpperCase()); if (i >= 0 && j >= 0) return i - j; const nx = parseFloat(String(x).replace(/^[A-Z]+\s*/i, '')), ny = parseFloat(String(y).replace(/^[A-Z]+\s*/i, '')); if (!isNaN(nx) && !isNaN(ny)) return nx - ny; return String(x).localeCompare(String(y)); });
 const trendOf = (pos, total, reviews) => { const r = 70 * (1 - Math.min(pos, total) / Math.max(1, total)); const v = reviews ? 30 * Math.min(1, Math.log10(1 + reviews) / 3.5) : 0; return Math.round((r + v) * 10) / 10; };
 
 async function send(items) {
