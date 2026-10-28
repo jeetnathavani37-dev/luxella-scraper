@@ -51,6 +51,12 @@ function canonBrand(vendor: string, title: string) {
   const ft = fold(vendor) + " " + fold(title); for (const [k, v] of BRF) if (k.length > 2 && (" " + ft + " ").includes(" " + k + " ")) return v;
   return vendor && !/^(slides|loafers|stockx|myntra|pink|trader joe|speed|track|christian|b22|bait|revenge|ftp|yeti|nnormal|kiprun|gymshark|wellipets|hebru)/i.test(vendor) ? vendor : "Other";
 }
+const kgFor = (cat: string, t: string) => { const s = (cat + " " + t).toLowerCase();
+  if (/wallet|card case|card holder|pouch|wristlet|key ?(fob|ring)|charm|coin/.test(s)) return 0.3; if (/watch/.test(s)) return 0.4; if (/necklace|bracelet|earring|\bring\b|jewel/.test(s)) return 0.3;
+  if (/boot/.test(s)) return 1.8; if (/sneaker|trainer|shoe|sandal|loafer|heel|pump|flat|mule|slide|espadrille/.test(s)) return 1.2;
+  if (/tote|satchel|carryall|backpack|duffle|weekender|large|briefcase/.test(s)) return 1.2; if (/crossbody|mini|small|camera|belt bag|phone/.test(s)) return 0.6;
+  if (/bag|shoulder|hobo|bucket|clutch/.test(s)) return 0.9; if (/jacket|coat|dress|sweater|shirt|top|pant|skirt|hoodie|scarf/.test(s)) return 0.5; return 0.6; };
+const quoteUsd = (usd: number, kg: number, fx = 95.5) => { const k = Math.max(0.5, Math.ceil(kg * 2) / 2); const landed = usd * fx + k * 1250 + 150; return { landed: Math.round(landed), price: Math.ceil(landed * 1.25 / 100) * 100, kg: k }; };
 const ent = (x: any) => typeof x === "string" ? { h: x, v: "", seg: "luxury" } : { h: String(x.h), v: String(x.v || ""), seg: String(x.seg || "luxury") };
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: CORS });
@@ -67,6 +73,21 @@ Deno.serve(async (req) => {
       for (let i = 0; i < rows.length; i += 200) { const e = await db.from("lx_catalog").upsert(rows.slice(i, i + 200), { onConflict: "id", ignoreDuplicates: false }); if (e.error) return J({ ok: false, error: e.error.message }); await db.from("lx_catalog_src").upsert(srcs.slice(i, i + 200)); }
       return J({ ok: true, fetched: P.length, saved: rows.length, more: P.length === 250 });
     }
+    if (body.action === "ingest") {
+      const items: any[] = Array.isArray(body.items) ? body.items.slice(0, 500) : []; const fx = Number(c.fx || 95.5);
+      const rows: any[] = [], srcs: any[] = [];
+      for (const it of items) {
+        const usd = Number(it.usd); if (!usd || !it.id || !it.title || !(it.images || []).length) continue;
+        const cat = CAT1((String(it.category || "") + " " + it.title).toLowerCase()) || String(it.category || "Other");
+        const q = quoteUsd(usd, kgFor(cat, it.title), fx);
+        const sizes = (it.sizes && it.sizes.length ? it.sizes : ["One size"]).slice(0, 30).map((sz: string) => ({ s: String(sz).slice(0, 30), p: q.price }));
+        rows.push({ id: String(it.id).slice(0, 80), brand: canonBrand(String(it.brand || ""), String(it.title)), title: String(it.title).slice(0, 160), category: cat, gender: String(it.gender || ""), price: q.price, mrp: null, sizes, images: (it.images || []).slice(0, 8), ship: "eta", eta: String(it.eta || "2–3 weeks"), descr: String(it.descr || "").slice(0, 1200), colours: (it.colours || []).slice(0, 12), sku: String(it.sku || "").slice(0, 60), src_kind: "outlet", segment: "luxury", active: true, seen_at: new Date().toISOString() });
+        srcs.push({ id: String(it.id).slice(0, 80), src_handle: String(it.url || "").slice(0, 400), src_prices: [["usd", usd], ["regular_usd", Number(it.regular_usd) || null], ["store", String(it.store || "")]], chk: { at: new Date().toISOString(), store: it.store, url: it.url, usd, kg: q.kg, landed: q.landed, our_price: q.price, margin: Math.round((q.price - q.landed) / q.landed * 1000) / 10, verdict: "ok" }, checked_at: new Date().toISOString(), updated_at: new Date().toISOString() });
+      }
+      for (let i = 0; i < rows.length; i += 200) { const e = await db.from("lx_catalog").upsert(rows.slice(i, i + 200), { onConflict: "id" }); if (e.error) return J({ ok: false, error: e.error.message }); await db.from("lx_catalog_src").upsert(srcs.slice(i, i + 200)); }
+      return J({ ok: true, saved: rows.length });
+    }
+    if (body.action === "retire") { const cut = String(body.before || ""); const store = String(body.prefix || ""); if (!cut || !store) return J({ ok: false }); const { count } = await db.from("lx_catalog").update({ active: false }, { count: "exact" }).like("id", store + "%").lt("seen_at", cut).eq("active", true); return J({ ok: true, retired: count }); }
     if (body.action === "tick") {
       const day = new Date(Date.now() + 5.5 * 3600e3).toISOString().slice(0, 10); const cols: any[] = (c.collections || ["shop-luxury"]).map(ent);
       let cur: any = c.cursor || {}; if (cur.day !== day) cur = { day, ci: 0, page: 1, done: false, saved: 0 };
@@ -80,11 +101,11 @@ Deno.serve(async (req) => {
         cur.saved += rows.length; log.push([col, cur.page, rows.length]);
         if (P.length === 250) cur.page++; else { cur.ci++; cur.page = 1; if (cur.ci >= cols.length) cur.done = true; }
       }
-      if (cur.done) { const cut = new Date(Date.now() - 2 * 864e5).toISOString(); await db.from("lx_catalog").update({ active: false }).lt("seen_at", cut).eq("active", true); }
+      if (cur.done) { const cut = new Date(Date.now() - 2 * 864e5).toISOString(); await db.from("lx_catalog").update({ active: false }).lt("seen_at", cut).eq("active", true).eq("src_kind", "partner"); }
       await db.from("lx_km_vault").update({ data: { ...c, cursor: cur } }).eq("id", "catalogcfg");
       return J({ ok: true, cursor: cur, log });
     }
-    if (body.action === "sweep") { const cut = new Date(Date.now() - (Number(body.days) || 3) * 864e5).toISOString(); const { error, count } = await db.from("lx_catalog").update({ active: false }, { count: "exact" }).lt("seen_at", cut).eq("active", true); return J({ ok: !error, deactivated: count, error: error?.message }); }
+    if (body.action === "sweep") { const cut = new Date(Date.now() - (Number(body.days) || 3) * 864e5).toISOString(); const { error, count } = await db.from("lx_catalog").update({ active: false }, { count: "exact" }).lt("seen_at", cut).eq("active", true).eq("src_kind", "partner"); return J({ ok: !error, deactivated: count, error: error?.message }); }
     if (body.action === "stats") { const { count } = await db.from("lx_catalog").select("id", { count: "exact", head: true }).eq("active", true); return J({ ok: true, active: count }); }
     return J({ ok: false, error: "unknown action" }, 400);
   } catch (e) { return J({ ok: false, error: String((e as Error).message || e) }); }
