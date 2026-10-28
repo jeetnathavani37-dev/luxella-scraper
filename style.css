@@ -3856,3 +3856,4 @@ body:has(.ed-sh) .ed-pill{display:none}
 .pd-faq h4{margin:6px 0 8px;font:italic 400 26px 'Lux Display','Lx Playfair',Georgia,serif;color:#f7efe2;font-weight:400}
 .pd-faq summary span{font:400 14px/1.4 'Lux Text',sans-serif;color:#f3ecdd}
 .pd-faq details p{margin:0 0 16px;font:400 13px/1.6 'Lux Text',sans-serif;color:#bfb39f}
+.cl-sz .cl-sz-o{display:block;font:400 9px 'Lux Label',sans-serif;letter-spacing:.06em;color:#8f846f;font-style:normal;margin:1px 0 2px}
