@@ -3058,3 +3058,6 @@ body.cl-on{overflow:hidden}
 .dl-grp-c.on{box-shadow:0 0 0 3px #fff inset,0 0 0 5px #d8b46a}
 .dl-grp-c small{position:absolute;left:6px;bottom:6px;background:rgba(10,9,8,.75);color:#E9D3A6;font:400 10px 'Lux Num',sans-serif;padding:2px 6px;border-radius:999px}
 .dl-grp-c i{position:absolute;right:6px;top:6px;width:20px;height:20px;border-radius:50%;background:#d8b46a;color:#140f08;display:grid;place-items:center;font:600 10px 'Lux Num',sans-serif;font-style:normal}
+.cl-seg{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;border:1px solid rgba(201,169,106,.25);border-radius:999px;margin:4px 0 10px}
+.cl-seg-b{background:none;border:0;border-radius:999px;padding:9px;color:#cfc4b0;font:300 8.5px 'Lux Wide',sans-serif;letter-spacing:.22em;text-transform:uppercase}
+.cl-seg-b.on{background:linear-gradient(135deg,#f2dc9c,#c9a24f);color:#140f08}
