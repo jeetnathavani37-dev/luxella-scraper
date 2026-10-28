@@ -3573,3 +3573,4 @@ body.cl-on{overflow:hidden}
 .bq-cap{background:none!important;padding:0 18px 20px!important}
 .bq-bars i{background:rgba(255,255,255,.25)!important}.bq-bars u{background:#F4E1A0!important}
 .pe:before{background:radial-gradient(60% 40% at 50% 100%,rgba(0,0,0,.35),transparent)!important}
+.dr-gta{height:clamp(34px,10vw,52px);width:auto;margin-bottom:2px;filter:drop-shadow(0 4px 8px rgba(0,0,0,.6))}
