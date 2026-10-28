@@ -675,7 +675,7 @@ document.getElementById('f-reset').addEventListener('click',()=>{state.from=stat
  ['f-from','f-to','f-brand','f-type','q'].forEach(id=>document.getElementById(id).value='');
  [...document.getElementById('chips').children].forEach(c=>c.setAttribute('aria-pressed',String(c.textContent==='All')));render();});
 document.querySelectorAll('#ordT th').forEach(th=>th.addEventListener('click',()=>{const k=th.getAttribute('data-k');state.asc=state.k===k?!state.asc:true;state.k=k;render();}));
-function tabs(){const ids=['ov','deals','rts','tr','al','pay','ad','msg','st','pol','help'];
+function tabs(){const ids=['ov','deals','ig','rts','tr','al','pay','ad','msg','st','pol','help'];
  const sel=(x)=>{ids.forEach(k=>{document.getElementById('tab-'+k).setAttribute('aria-selected',String(k===x));document.getElementById('pane-'+k).hidden=k!==x;});};
  ids.forEach(k=>document.getElementById('tab-'+k).addEventListener('click',()=>sel(k)));}
 tabs();
