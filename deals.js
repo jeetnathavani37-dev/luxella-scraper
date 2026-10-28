@@ -628,7 +628,7 @@
   ph.addEventListener('click',()=>viewer(r,p.i));
   if(isNew(r)&&!SEEN.has(r.id+':'+p.i))c.appendChild(el('span','dl-pc-new','New'));
   const b=el('div','dl-pc-b');const br=el('div','dl-br');const lg=logo(p.brand);if(lg){const im=el('img');im.src=lg;br.appendChild(im);}br.appendChild(el('span',null,p.brand));b.appendChild(br);
-  b.appendChild(el('div','dl-t',p.title));const pv=num(cp.price);const pr=el('div','dl-pr');if(pv!=null){pr.appendChild(el('b',null,inr(pv)));const mr=num(cp.mrp);if(mr&&mr>pv){pr.appendChild(el('s',null,inr(mr)));pr.appendChild(el('i',null,Math.round((1-pv/mr)*100)+'% off retail'));}}else pr.appendChild(el('em',null,'Price on request'));b.appendChild(pr);if(!own()&&M.on&&pv!=null)b.appendChild(profitBox(pv,r.id+':'+(p.i+1),p.title,true,r.id));
+  if(cp.title)b.appendChild(el('div','dl-t',p.title));else b.appendChild(el('div','dl-pc-no','N° '+String(p.i+1).padStart(2,'0')));const pv=num(cp.price);const pr=el('div','dl-pr');if(pv!=null){pr.appendChild(el('b',null,inr(pv)));const mr=num(cp.mrp);if(mr&&mr>pv){pr.appendChild(el('s',null,inr(mr)));pr.appendChild(el('i',null,Math.round((1-pv/mr)*100)+'% off retail'));}}else pr.appendChild(el('em',null,'Price on request'));b.appendChild(pr);if(!own()&&M.on&&pv!=null)b.appendChild(profitBox(pv,r.id+':'+(p.i+1),p.title,true,r.id));
   if(cp.size)b.appendChild(el('small','dl-pc-sz',cp.size));
   const ac=el('div','dl-pc-ac');const B=(t,k,cls)=>{const x=el('button',cls||'btn2',t);x.type='button';x.addEventListener('click',()=>postRequest(r,p.i+1,k,o));ac.appendChild(x);return x;};
   if(!own()){B('Buy now','buy','btn dl-ask');B('Price','price');B('In stock?','availability');if(!holdLeft(r.id+':'+(p.i+1)))B('Hold 2h','hold');}
@@ -641,7 +641,7 @@
   const s=el('div','dl-shelf-s');L.slice(0,16).forEach(r=>s.appendChild(r.r?pieceCard(r):card(r)));sec.appendChild(s);return sec;}
  function storeHead(b,L){const w=el('div','dl-store');const bk=el('button','dl-store-bk','‹ All houses');bk.type='button';bk.addEventListener('click',()=>{F.brand='';PAGE=24;saveF();render();});w.appendChild(bk);const lg=logo(b);if(lg){const m=el('div','dl-store-m');const im=el('img');im.src=lg;im.alt=b;m.appendChild(im);w.appendChild(m);}w.appendChild(el('div','dl-store-t'+(lg?'':' big'),b));const fb=followBtn(b);if(fb)w.appendChild(fb);const fp=fromPrice(L);w.appendChild(el('small',null,L.length+(L.length>1?' pieces':' piece')+(fp!=null?' · from '+inr(fp):'')+' · curated by Luxella'));
   const cats={};L.forEach(x=>{const c=x.r?pieceCat(x):catOf(x.data||{});cats[c]=(cats[c]||0)+1;});const ck=Object.keys(cats).filter(c=>c!=='Other');if(ck.length){const cr=el('div','dl-store-cats');const mk=(t,v,n)=>{const c=el('button','chip'+(F.cat===v||(!F.cat&&!v)?' on':''),t+(n?' · '+n:''));c.type='button';c.setAttribute('aria-pressed',String((F.cat||'')===(v||'')));c.addEventListener('click',()=>{F.cat=v;PAGE=24;saveF();render();});cr.appendChild(c);};mk('All','',L.length);ck.forEach(c=>mk(c,c,cats[c]));w.appendChild(cr);}
-  w.appendChild(askBox(b));return w;}
+  {const ab=askBox(b);ab.hidden=true;w.appendChild(ab);}return w;}
  /* ---------- Ask Luxella: natural-language finder ("which one under 20k?", "black bags", "UK 8 sneakers") ---------- */
  function parseAsk(q){q=String(q||'').toLowerCase();const o={q,max:null,min:null,cat:'',words:[],size:''};
   const num2=s=>{s=s.replace(/[,₹\s]/g,'');let m=s.match(/^(\d+(?:\.\d+)?)(k|l|lakh|lac)?$/);if(!m)return null;let v=parseFloat(m[1]);if(m[2]==='k')v*=1000;else if(m[2])v*=100000;else if(v<1000)v*=1000;return v;};
@@ -676,9 +676,14 @@
  function shopView(l,all){const PP=dropPieces();
   if(!all.length&&!PP.length){const e=el('div','dl-empty');e.appendChild(el('b',null,'The shop opens with the next pieces.'));e.appendChild(el('span',null,'Each piece will sit under its house with price, sizes and comments.'));l.appendChild(e);return;}
   const fake=PP.map(p=>({id:'p:'+p.r.id+':'+p.i,kind:'deal',day:p.r.day,created_at:p.r.created_at,data:{brand:p.brand,title:p.title,price:p.cp.price}}));
-  if(all.length)l.appendChild(summary(all));l.appendChild(filters(all.concat(fake)));
+  {const top=el('div','dl-shop-top');const ab=el('button','dl-shop-ask','✦ Ask Luxella');ab.type='button';const fb=el('button','dl-shop-fl','Search & filter'+((F.q||F.cat||F.pb||(F.flags||[]).length||F.saved||F.day!=='all')?' · on':''));fb.type='button';top.appendChild(ab);top.appendChild(fb);l.appendChild(top);
+   const tools=el('div','dl-tools');tools.hidden=!LS.get('shopTools',false);if(all.length)tools.appendChild(summary(all));tools.appendChild(filters(all.concat(fake)));l.appendChild(tools);
+   const ask=F.brand?null:askBox('');if(ask){ask.hidden=!LS.get('shopAsk',false);l.appendChild(ask);}
+   fb.setAttribute('aria-expanded',String(!tools.hidden));ab.setAttribute('aria-expanded',String(ask?!ask.hidden:false));
+   fb.addEventListener('click',()=>{tools.hidden=!tools.hidden;LS.set('shopTools',!tools.hidden);fb.setAttribute('aria-expanded',String(!tools.hidden));});
+   ab.addEventListener('click',()=>{if(F.brand){const sa=document.querySelector('.dl-store .dl-askb');if(sa){sa.hidden=!sa.hidden;if(!sa.hidden)sa.querySelector('input').focus();}return;}ask.hidden=!ask.hidden;LS.set('shopAsk',!ask.hidden);ab.setAttribute('aria-expanded',String(!ask.hidden));if(!ask.hidden)ask.querySelector('input').focus();});}
   const list=sorted(all.filter(matches));const pl=PP.filter(pieceOk);const plain=!F.brand&&!F.q&&!F.cat&&!F.pb&&!(F.flags||[]).length&&!F.saved&&F.day==='all';
-  if(F.brand)l.appendChild(storeHead(F.brand,all.filter(r=>(r.data||{}).brand===F.brand).concat(PP.filter(p=>p.brand===F.brand))));else l.appendChild(askBox(''));
+  if(F.brand)l.appendChild(storeHead(F.brand,all.filter(r=>(r.data||{}).brand===F.brand).concat(PP.filter(p=>p.brand===F.brand))));
   if(plain){const by={};list.concat(pl).forEach(r=>{const b=r.r?r.brand:((r.data||{}).brand||'Luxella picks');(by[b]=by[b]||[]).push(r);});Object.keys(by).sort((a,b)=>(FOL.has(b)-FOL.has(a))||by[b].length-by[a].length||a.localeCompare(b)).forEach(b=>l.appendChild(shelf(b,by[b])));l.appendChild(el('p','dl-disc foot',DISC+' Your deal key: '+dealKey()+'.'));return;}
   const tot=list.length+pl.length;const cnt=el('div','dl-cnt');cnt.textContent=tot+' of '+(all.length+PP.length)+' pieces'+(F.q?' for “'+F.q+'”':'');l.appendChild(cnt);
   if(!tot)l.appendChild(el('p','dl-none',F.saved?'No saved pieces yet. Tap ♡ on a piece to keep it here.':'Nothing matches. Try fewer filters, or ask Luxella to find it.'));
@@ -724,10 +729,11 @@
   try{const mn=document.querySelector('.sw .mini');document.documentElement.style.setProperty('--miniH',(mn&&mn.offsetParent?Math.round(mn.getBoundingClientRect().height):0)+'px');}catch(e){}
   try{const dk=$('deals');['deals','shop','reqs'].forEach(v=>dk.classList.toggle('dl-on-'+v,VIEW===v));}catch(e){}
   l.appendChild(viewSwitch(pdfs.length,all.length+dropPieces().length));
-  storiesBar(l);
-  if(!own()){autoReady(l);const sb=el('button','btn2 dl-stu-b','✦ Catalogue studio · make my PDF');sb.type='button';sb.addEventListener('click',()=>studio());l.appendChild(sb);}
+  if(!own())autoReady(l);
   if(VIEW==='shop'){shopView(l,all);return;}
   if(VIEW==='reqs'){requestsView(l);return;}
+  storiesBar(l);
+  if(!own()){const sb=el('button','btn2 dl-stu-b','✦ Catalogue studio · make my PDF');sb.type='button';sb.addEventListener('click',()=>studio());l.appendChild(sb);}
   const dl0=pdfs.filter(r=>inRange(r.day)&&(!F.q||[(r.data||{}).title,(r.data||{}).msg].join(' ').toLowerCase().includes(String(F.q).toLowerCase())));
   if(!dl0.length){const e=el('div','dl-empty');e.appendChild(el('b',null,'Today’s drops land here.'));e.appendChild(el('span',null,'Meanwhile, browse every piece by house in the Shop.'));const sb3=el('button','btn2','Open the Shop');sb3.type='button';sb3.addEventListener('click',()=>{VIEW='shop';LS.set('view','shop');render();});e.appendChild(sb3);l.appendChild(e);}
   if(dl0.length){const tg=el('div','dl-sec-h');tg.appendChild(el('span',null,'Daily drops'));tg.appendChild(el('small',null,'Swipe through every post · copy the message · ask about any piece'));l.appendChild(tg);l.appendChild(drops(dl0));}

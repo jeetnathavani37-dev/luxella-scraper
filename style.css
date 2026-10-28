@@ -2736,3 +2736,13 @@ html body #totop svg,html body #totop *{color:#E3C565!important;fill:currentColo
 .sw .dl-askb-a b{display:block;font:400 13px 'Lux Text',sans-serif;color:#F4E1A0}.sw .dl-askb-a small{display:block;margin-top:3px;font:400 11px 'Lux Text',sans-serif;color:#a39c90;line-height:1.45}
 .sw .dl-askb-r{margin:10px 0}
 .sw .dl-askb-o .dl-ac{display:grid;gap:8px}
+/* shop: calm default */
+.sw .dl-shop-top{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 0 16px}
+.sw.sw.sw .dl-shop-ask,.sw.sw.sw .dl-shop-fl{min-height:44px;border-radius:999px!important;font:400 9.5px 'Lux Wide',sans-serif;letter-spacing:.18em;text-transform:uppercase;cursor:pointer;box-shadow:none;padding:0 12px}
+.sw.sw.sw .dl-shop-ask{border:1px solid #F4E1A0;background:linear-gradient(135deg,#F7E7B4,#E8C774 40%,#C99A45);color:#16120a}
+.sw.sw.sw .dl-shop-fl{border:1px solid rgba(227,192,106,.35);background:transparent;color:#E3C565}
+.sw.sw.sw .dl-shop-fl[aria-expanded=true],.sw.sw.sw .dl-shop-ask[aria-expanded=true]{box-shadow:0 0 0 1px #F4E1A0 inset}
+.sw .dl-tools{margin:-6px 0 16px;animation:lxst .35s ease both}
+.sw .dl-askb[hidden],.sw .dl-tools[hidden]{display:none!important}
+.sw .dl-askb{animation:lxst .35s ease both}
+.sw .dl-pc-no{font:400 9px 'Lux Num',sans-serif;letter-spacing:.14em;color:#8d867a}
