@@ -66,17 +66,18 @@ async function ssense(b) {
       let kept = 0;
       for (const x of L) { pos++; const br = keepBrand(x.brand && x.brand.name); const price = Number(x.offers && x.offers.price); if (!br || !price || seen.has(x.productID)) continue;
         if (!/InStock/i.test(String(x.offers.availability || ''))) continue; if (!underCap(price, 'CAD', 0.13, cat + ' ' + x.name, 1)) continue;
-        seen.add(x.productID); kept++; found.push({ x, br, g, cat, pos }); }
+        seen.add(x.productID); kept++; found.push({ x, br, g, cat, pos, list: g + '/' + cat }); }
       log('ssense', g, cat, 'page', page, 'products', L.length, 'kept', kept); if (L.length < 60) break;
     }
     await ctx.close().catch(() => {});
   }
-  const total = Math.max(...found.map(f => f.pos), 1);
-  found.sort((a, b) => a.pos / total - b.pos / total);
+  // Rank within each list (its own featured order) so women/men and every category share the top, not just the first list.
+  const tot = {}; for (const f of found) tot[f.list] = Math.max(tot[f.list] || 1, f.pos); for (const f of found) f.r = f.pos / tot[f.list];
+  found.sort((a, b) => a.r - b.r); const total = 1;
   const pick = found.slice(0, CAP); let saved = 0, batch = [], ctx = await newCtx(b), p = await ctx.newPage(), n = 0;
   for (const f of pick) {
     const x = f.x; const img = s => String(x.image || '').replace('__IMAGE_PARAMS__', 'f_auto,c_limit,h_1100').replace(/_1(\.jpg|\/)/, '_' + s + '$1');
-    const it = { id: 'ss_' + x.productID, sku: x.sku, brand: f.br, title: clean(x.name), category: f.cat, gender: f.g === 'men' ? 'Men' : 'Women', price: Number(x.offers.price), cur: 'CAD', tax: 0.13, regular: null, images: [img(1), img(2), img(3)], colours: [], sizes: [], story: '', details: [], url: x.url, store: 'ssense.com', eta: '3–4 weeks', trend: trendOf(f.pos, total, 0) };
+    const it = { id: 'ss_' + x.productID, sku: x.sku, brand: f.br, title: clean(x.name), category: f.cat, gender: f.g === 'men' ? 'Men' : 'Women', price: Number(x.offers.price), cur: 'CAD', tax: 0.13, regular: null, images: [img(1), img(2), img(3)], colours: [], sizes: [], story: '', details: [], url: x.url, store: 'ssense.com', eta: '3–4 weeks', trend: trendOf(f.r, total, 0) };
     // Product page: in-stock sizes, description bullets, real image count (fresh browser context every 20 pages to stay polite).
     if (n && n % 20 === 0) { await ctx.close().catch(() => {}); ctx = await newCtx(b); p = await ctx.newPage(); }
     n++;
@@ -184,19 +185,19 @@ async function tedbaker(b) {
       for (const x of j.products) {
         pos++; if (seen.has(x.id)) continue; const av = (x.variants || []).filter(v => v.available && Number(v.price) > 0); if (!av.length) continue;
         const opts = (x.options || []).map(o => String(o.name || o).toLowerCase()); const si = opts.findIndex(o => /size/.test(o)), ci = opts.findIndex(o => /colou?r/.test(o));
-        const price = Math.min(...av.map(v => Number(v.price))); const title = clean(String(x.title).replace(/\s*\|\s*/, ' — '));
+        const price = Math.min(...av.map(v => Number(v.price))); const [nm, colName] = String(x.title).split('|').map(t => clean(t)); const tc = t => String(t || '').toLowerCase().replace(/\b\w/g, m => m.toUpperCase()); const ptype = clean(x.product_type).replace(/s$/i, '').replace(/Polos Shirt/i, 'Polo Shirt'); const title = [tc(nm), ptype].filter(Boolean).join(' ');
         if (!underCap(price, 'USD', 0, x.product_type + ' ' + h + ' ' + title)) continue;
         const sizes = si >= 0 ? sortSizes(av.map(v => v['option' + (si + 1)])) : [];
-        const colour = ci >= 0 ? av[0]['option' + (ci + 1)] : '';
+        const colour = tc(colName || (ci >= 0 ? av[0]['option' + (ci + 1)] : '')); const best = (x.tags || []).some(t => /bestseller/i.test(t));
         const lis = String(x.body_html || '').match(/<li>([\s\S]*?)<\/li>/g) || [];
         seen.add(x.id); kept++;
-        items.push({ id: 'tk_' + x.id, sku: (av[0].sku || '').split('-')[0] || String(x.id), brand: 'Ted Baker', title, category: (x.product_type || h.replace(/-/g, ' ')) + ' ' + title, gender: g, price, cur: 'USD', tax: 0, regular: Math.max(0, ...av.map(v => Number(v.compare_at_price) || 0)) || null, images: (x.images || []).slice(0, 8).map(i => String(i.src).split('?')[0] + '?width=1100'), colours: colour ? [{ n: colour }] : [], sizes, story: lis.length ? '' : clean(x.body_html).slice(0, 600), details: lis.map(clean).filter(Boolean).slice(0, 12), url: 'https://www.tedbaker.com/products/' + x.handle, store: 'tedbaker.com', eta: '2–3 weeks', detail_ok: true, _pos: pos });
+        items.push({ id: 'tk_' + x.id, sku: (av[0].sku || '').split('-')[0] || String(x.id), brand: 'Ted Baker', title, category: (x.product_type || h.replace(/-/g, ' ')) + ' ' + title, gender: g, price, cur: 'USD', tax: 0, regular: Math.max(0, ...av.map(v => Number(v.compare_at_price) || 0)) || null, images: (x.images || []).slice(0, 8).map(i => String(i.src).split('?')[0] + '?width=1100'), colours: colour ? [{ n: colour }] : [], sizes, story: lis.length ? '' : clean(x.body_html).slice(0, 600), details: lis.map(clean).filter(Boolean).slice(0, 12), url: 'https://www.tedbaker.com/products/' + x.handle, store: 'tedbaker.com', eta: '2–3 weeks', detail_ok: true, _pos: pos, _best: best });
       }
       log('tedbaker', h, 'page', page, 'products', j.products.length, 'kept', kept); if (j.products.length < 250) break;
     }
   }
   await ctx.close().catch(() => {});
-  const total = Math.max(pos, 1); items.forEach(it => { it.trend = trendOf(it._pos, total, 0); delete it._pos; });
+  const total = Math.max(pos, 1); items.forEach(it => { it.trend = Math.min(100, trendOf(it._pos, total, 0) + (it._best ? 25 : 0)); delete it._pos; delete it._best; });
   return send(items.slice(0, CAP));
 }
 
