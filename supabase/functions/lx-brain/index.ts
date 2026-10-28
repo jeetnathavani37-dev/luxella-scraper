@@ -38,9 +38,9 @@ async function callGemini(ai: any, sys: string, text: string, image?: any, audio
 }
 async function callClaude(ai: any, sys: string, text: string, image?: any) {
   const content: any[] = [];
-  if (image?.b64) content.push({ type: "image", source: { type: "base64", media_type: image.mime || "image/jpeg", data: image.b64 } });
+  if (image?.b64) content.push(image.mime === "application/pdf" ? { type: "document", source: { type: "base64", media_type: "application/pdf", data: image.b64 } } : { type: "image", source: { type: "base64", media_type: image.mime || "image/jpeg", data: image.b64 } });
   content.push({ type: "text", text: "INPUT TEXT:\n" + (text || "(none)") });
-  const r = await fetch("https://api.anthropic.com/v1/messages", { method: "POST", headers: { "Content-Type": "application/json", "x-api-key": ai.key, "anthropic-version": "2023-06-01" }, body: JSON.stringify({ model: ai.model || "claude-haiku-5-5", max_tokens: 2000, system: sys, messages: [{ role: "user", content }] }) });
+  const r = await fetch("https://api.anthropic.com/v1/messages", { method: "POST", headers: { "Content-Type": "application/json", "x-api-key": ai.key, "anthropic-version": "2023-06-01" }, body: JSON.stringify({ model: ai.model || "claude-haiku-5-5", max_tokens: 6000, system: sys, messages: [{ role: "user", content }] }) });
   const j: any = await r.json().catch(() => ({}));
   if (!r.ok) throw new Error("Claude " + r.status + ": " + String(j?.error?.message || "").slice(0, 160));
   return (j?.content || []).map((c: any) => c.text || "").join("");
@@ -60,6 +60,18 @@ Deno.serve(async (req) => {
       try { const t = provider === "gemini" ? await callGemini(ai, 'Reply {"ok":true}', "") : await callClaude(ai, 'Reply {"ok":true}', "ping"); parseJSON(t); } catch (e) { return J({ ok: false, error: String((e as Error).message || e) }); }
       await db.from("lx_km_vault").upsert({ id: "ai", data: ai, updated_at: new Date().toISOString() });
       return J({ ok: true, connected: true, provider });
+    }
+    if (body.action === "deals_extract") {
+      const ai = await getAI(); if (!ai?.key) return J({ ok: false, error: "no_ai" });
+      const isPdf = body.image?.mime === "application/pdf";
+      const sys = `You read luxury-fashion deal material for Luxella (India): store screenshots, outlet sale pages, WhatsApp forwards, catalogue PDFs.
+Extract EVERY distinct product you can see. For each product return:
+brand (house name, e.g. Coach, Michael Kors, Kate Spade, Marc Jacobs, Tory Burch), title (clean product name, no brand repeated, Title Case), sizes (sizes or colours shown, short), price (the selling/sale price as a number) and currency ("USD" | "INR" | "EUR" | "GBP" | "CAD"), mrp (original/compare-at price as a number if shown, else null), note (very short, e.g. "Extra 20% off at checkout"), confidence 0-1${isPdf ? `, page (1-based page number)` : `, box: the product PHOTO bounding box as [ymin, xmin, ymax, xmax] normalised 0-1000 (photo only, not the text)`}.
+Never invent prices or products. If a field is not visible use null. Reply with ONLY JSON: {"summary":"<1 line Hinglish>","items":[{...}]}`;
+      const raw = ai.provider === "gemini" ? await callGemini(ai, sys, body.text || "", body.image) : await callClaude(ai, sys, body.text || "", body.image);
+      const out = parseJSON(raw);
+      out.items = (Array.isArray(out.items) ? out.items : []).slice(0, 60).map((it: any) => ({ brand: String(it.brand || "").slice(0, 60), title: String(it.title || "").slice(0, 160), sizes: it.sizes ? String(it.sizes).slice(0, 80) : "", price: Number(it.price) || null, currency: String(it.currency || "").toUpperCase().slice(0, 3) || null, mrp: Number(it.mrp) || null, note: it.note ? String(it.note).slice(0, 120) : "", confidence: Number(it.confidence) || 0, page: Number(it.page) || null, box: Array.isArray(it.box) && it.box.length === 4 ? it.box.map((n: any) => Math.max(0, Math.min(1000, Number(n) || 0))) : null })).filter((it: any) => it.title);
+      return J({ ok: true, provider: ai.provider, summary: out.summary || "", items: out.items });
     }
     if (body.action === "analyze") {
       const ai = await getAI(); if (!ai?.key) return J({ ok: false, error: "no_ai" });

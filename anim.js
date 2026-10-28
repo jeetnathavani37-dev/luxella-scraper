@@ -64,7 +64,7 @@
   if(!root||root.nodeType!==1)return;
   const xs=root.matches&&root.matches(SEL)?[root]:[...root.querySelectorAll(SEL)];
   xs.forEach(x=>{const host=x.parentElement;if(!host||host.querySelector(':scope>.lx-backbar'))return;
-   const fx=x.closest('.drawer,#lxbs,#lx-recv,.ps-ov,.ps-wrap,[class*="sheet"],[style*="position:fixed"]')||(getComputedStyle(host).position==='fixed'?host:null);if(!fx)return;
+   const fx=x.closest('.drawer,#lxbs,#lx-recv,.ps-ov,.ps-wrap,.dl-sh,[class*="sheet"],[style*="position:fixed"]')||(getComputedStyle(host).position==='fixed'?host:null);if(!fx)return;
    const bar=document.createElement('div');bar.className='lx-backbar';const b=document.createElement('button');b.type='button';b.className='lx-back';b.innerHTML='<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Back</span>';b.addEventListener('click',e=>{e.stopPropagation();x.click();});bar.appendChild(b);host.insertBefore(bar,host.firstChild);x.classList.add('lx-xhide');});
  }
  new MutationObserver(ms=>ms.forEach(m=>m.addedNodes.forEach(add))).observe(document.body,{childList:true,subtree:true});
