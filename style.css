@@ -3752,3 +3752,23 @@ body.cl-on{overflow:hidden}
 .cu[data-g="Men"] .cu-gta{display:block;height:clamp(76px,24vw,128px)}
 .lk .cl-card .cl-br{color:#8a6a25!important}.lk .cl-card .cl-ti{color:#17110b!important}.lk .cl-card .cl-pr span{color:#17110b!important}.lk .cl-card .cl-pr em{color:#7a6a55!important}
 .lk .cl-card .cl-ph{background:#f1ece4!important}
+/* Luxella promise — velvet, gold tray, sealed card */
+.pm{position:relative;margin:30px -16px 6px;padding:26px 18px 28px;overflow:hidden;background:radial-gradient(70% 50% at 50% 30%,#5a0f2c 0%,#320717 55%,#1a030b 100%);text-align:center}
+.pm::before{content:'';position:absolute;inset:0;background:repeating-radial-gradient(circle at 30% 20%,rgba(255,255,255,.015) 0 1px,transparent 1px 3px);mix-blend-mode:screen;pointer-events:none}
+.pm-v{max-width:360px;margin:0 auto}.pm-svg{width:100%;height:auto;display:block}
+.pm-l1{font:italic 400 19px 'Lux Display','Lx Playfair',Georgia,serif;fill:#2a1c12}
+.pm-l2{font:italic 400 23px 'Lux Display','Lx Playfair',Georgia,serif;fill:#7a1438}
+.pm-l3{font:400 6.5px 'Lx Bodoni',Georgia,serif;letter-spacing:3px;fill:#8a6a25}
+.pm-wm{font:400 11px 'Lx Bodoni',Georgia,serif;letter-spacing:6px;fill:#f1d58e}
+.pm-sl{font:400 13px 'Lx Bodoni',Georgia,serif;fill:#6b4a12}
+.pm-svg *{transform-box:fill-box}
+.pm-card{animation:pmCard 6s cubic-bezier(.22,1,.36,1) infinite}
+@keyframes pmCard{0%,8%{transform:translateY(40px)}30%,78%{transform:translateY(-30px)}96%,100%{transform:translateY(40px)}}
+.pm-seal{transform-origin:50% 50%;animation:pmSeal 6s ease infinite}
+@keyframes pmSeal{0%,6%{transform:translate(0,58px) scale(1)}12%{transform:translate(0,58px) scale(1.12)}18%,100%{transform:translate(0,58px) scale(1)}}
+.pm-t{position:relative;margin-top:10px}
+.pm-t small{display:block;font:400 9px 'Lx Bodoni',Georgia,serif;letter-spacing:.42em;text-transform:uppercase;color:#E9C98A}
+.pm-t h3{margin:10px 0 10px;font:400 30px/1.12 'Lx Bodoni',Georgia,serif;color:#fbf3e3;letter-spacing:.01em}
+.pm-t h3 em{font:italic 400 32px 'Lux Display','Lx Playfair',Georgia,serif;color:#f1d58e}
+.pm-t span{display:block;max-width:320px;margin:0 auto;font:400 12.5px/1.55 'Lux Text',sans-serif;color:#cdb9b0}
+@media (prefers-reduced-motion:reduce){.pm-card,.pm-seal{animation:none}}
