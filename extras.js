@@ -172,16 +172,18 @@ async function verifySub(sub){
 }
 async function rejectSub(sub){const reason=prompt('Reason shown to the client (e.g. amount not received, wrong reference):','Not received in our account yet. Please check the reference and resubmit.');if(reason===null)return;try{await photos.db.doc('paysub/'+sub.id).set(Object.assign({},sub,{status:'Rejected',reason,reviewedAt:nowIso()}));say('Marked as rejected.');}catch(e){say('Could not update.');}}
 
+function payBanner(P){let b=$('xpay-bn');if(!isOwner()||!P.length){if(b)b.remove();return;}const pn=$('pane-ov');if(!pn)return;if(!b){b=el('section','xpay-bn');b.id='xpay-bn';pn.insertBefore(b,pn.firstChild);}b.textContent='';b.appendChild(el('small',null,'Payment submitted · '+P.length+' to confirm'));P.forEach(x=>{const r=el('div','xpay-r');const t=el('div');t.appendChild(el('b',null,inr(x.amount)));t.appendChild(el('span',null,x.order));t.appendChild(el('em',null,[x.method,x.ref?'ref '+x.ref:'',hm(x.at)].filter(Boolean).join(' · ')));if(x.proof){const a=el('a',null,'View proof ↗');a.href=x.proof;a.target='_blank';a.rel='noopener';t.appendChild(a);}r.appendChild(t);const v=el('button','btn','✓ Payment received');v.type='button';v.addEventListener('click',async()=>{v.disabled=true;await verifySub(x);});const n=el('button','btn2','Not received');n.type='button';n.addEventListener('click',()=>rejectSub(x));const a2=el('div','xpay-a');a2.appendChild(v);a2.appendChild(n);r.appendChild(a2);b.appendChild(r);});}
 function renderPaySub(){
  const host=$('paysub-list');if(!host)return;host.textContent='';
  const list=Object.values(psState.subs).sort((a,b)=>String(b.at||'')<String(a.at||'')?-1:1);
  const pend=list.filter(x=>x.status==='Pending verification').reduce((s,x)=>s+Number(x.amount||0),0);
  const sm=$('paysub-sum');if(sm)sm.textContent=pend?inr(pend)+' awaiting verification. It is not counted as received until Luxella confirms it.':'';
  const pb=$('tab-pay');if(pb&&isOwner()){let b=pb.querySelector('.xbdg');const n=list.filter(x=>x.status==='Pending verification').length;if(n){if(!b){b=el('span','bdg xbdg');pb.appendChild(b);}b.textContent=String(n);}else if(b)b.remove();}
+ try{payBanner(list.filter(x=>x.status==='Pending verification'));}catch(e){}
  if(!list.length){host.appendChild(el('p','lbl','No submissions yet.'));return;}
  list.forEach(x=>{const row=el('div','xps');const l=el('div','xps-l');l.appendChild(el('div','xps-t',inr(x.amount)+' · '+x.order));l.appendChild(el('div','lbl',(x.method||'')+(x.ref?' · ref '+x.ref:'')+' · '+hm(x.at)));if(x.status==='Rejected'&&x.reason)l.appendChild(el('div','xc-n',x.reason));if(x.proof){const a=el('a','xc-th');a.href=x.proof;a.target='_blank';a.rel='noopener';const im=el('img');im.src=x.proof;im.alt='Proof';im.loading='lazy';a.appendChild(im);l.appendChild(a);}row.appendChild(l);
   const c=el('span','xchip '+(x.status==='Verified'?'x-resolved':x.status==='Rejected'?'x-reopened':''),x.status);row.appendChild(c);
-  if(isOwner()&&x.status==='Pending verification'){const o=el('div','xc-own owner');const v=el('button','btn','Verify');v.type='button';v.addEventListener('click',()=>verifySub(x));const r=el('button','btn2','Reject');r.type='button';r.addEventListener('click',()=>rejectSub(x));o.appendChild(v);o.appendChild(r);row.appendChild(o);}
+  if(isOwner()&&x.status==='Pending verification'){const o=el('div','xc-own owner');const v=el('button','btn','✓ Payment received');v.type='button';v.addEventListener('click',()=>verifySub(x));const r=el('button','btn2','Not received');r.type='button';r.addEventListener('click',()=>rejectSub(x));o.appendChild(v);o.appendChild(r);row.appendChild(o);}
   host.appendChild(row);});
 }
 
