@@ -2762,3 +2762,6 @@ html body #totop svg,html body #totop *{color:#E3C565!important;fill:currentColo
 .sw .dl-pc-ac{grid-template-columns:1fr 1fr!important}
 .sw .dl-srch-f{display:block;width:100%}.sw.sw.sw .dl-srch-f .dl-in{width:100%!important;max-width:none!important;box-sizing:border-box}
 .sw .dl-srch{min-height:70vh}
+.sw .dl-draft{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 12px;padding:10px 12px;border:1px dashed rgba(227,192,106,.55);border-radius:12px;background:rgba(227,192,106,.06)}
+.sw .dl-draft span{font:400 9px 'Lux Wide',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#E3C565}
+.sw.sw.sw .dl-draft .btn{min-height:36px;padding:0 14px!important;font-size:9px!important;white-space:nowrap}

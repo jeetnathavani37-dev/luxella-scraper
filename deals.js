@@ -17,7 +17,7 @@
  let M={on:false,mode:'pct',val:15,round:true};let SAVED=new Set();let prefsHooked=false;
 
  /* ---------- data ---------- */
- async function load(){if(busy||!window.lx||!window.lx.deals)return;busy=true;try{rows=await window.lx.deals.list();render();badge();}catch(e){const l=$('deals-list');if(l&&!rows.length)l.textContent='Arrivals could not load. Pull to refresh.';}busy=false;}
+ async function load(){if(busy||!window.lx||!window.lx.deals)return;busy=true;try{rows=(await window.lx.deals.list()).filter(r=>own()||!(r.data||{}).draft);render();badge();}catch(e){const l=$('deals-list');if(l&&!rows.length)l.textContent='Arrivals could not load. Pull to refresh.';}busy=false;}
  function badge(){const t=$('tab-deals');if(!t)return;let b=t.querySelector('span');const n=rows.filter(r=>r.kind==='deal'&&r.day===today()).length;if(!n){if(b)b.remove();return;}if(!b){b=el('span','bdg');t.appendChild(b);}b.textContent=n;}
  function hookPrefs(){if(prefsHooked||own())return;try{photos.db.collection('prefs').onSnapshot(s=>{s.docs.forEach(d=>{if(!d.exists)return;const x=d.data()||{};if(d.id==='deal_margin')M=Object.assign(M,x);if(d.id==='deal_saved')SAVED=new Set(x.ids||[]);if(d.id==='pdf_studio')ST=Object.assign({},ST,x);if(d.id==='deal_follow')FOL=new Set(x.brands||[]);});marginPanel(true);render();},()=>{});prefsHooked=true;}catch(e){}}
  async function savePref(id,data){try{await photos.db.doc('prefs/'+id).set(data);}catch(e){}}
@@ -232,6 +232,7 @@
   else{const db=el('button','btn2','Download');db.type='button';db.addEventListener('click',async()=>{for(let i=0;i<photos.length;i++){await dl(photos[i],(d.title||'luxella').replace(/[^\w\- ]+/g,'').trim()+'_'+(i+1)+'.jpg');await new Promise(z=>setTimeout(z,350));}});row.appendChild(db);}
   c.appendChild(row);
   if(d.msg){const m=el('div','dl-post-msg');m.textContent=d.msg;c.appendChild(m);}
+  if(own()&&d.draft){const dr=el('div','dl-draft');dr.appendChild(el('span',null,'Draft · only you can see this'+(d.source==='shortcut'?' · from Shortcut':'')));const pb=el('button','btn dl-ask','Publish to clients');pb.type='button';pb.addEventListener('click',async()=>{pb.disabled=true;try{const nd=Object.assign({},d);delete nd.draft;await window.lx.deals.update(r.id,nd);await load();const nr=rows.find(x=>x.id===r.id);if(nr)notifySheet(nr);}catch(e){pb.disabled=false;alert('Could not publish.');}});dr.appendChild(pb);c.insertBefore(dr,c.children[1]||null);}
   if(!own()&&M.on){const dp=dropProfit(r);if(dp)c.appendChild(dp);}
   if(!own()){const mb=el('button','btn dl-ask dl-ntb','✦ Make my PDF');mb.type='button';mb.addEventListener('click',()=>studio(r));c.appendChild(mb);}
   {const rb=el('button','btn2 dl-ntb','🎬 Make reel');rb.type='button';rb.addEventListener('click',()=>reelMaker(r));c.appendChild(rb);}
