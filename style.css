@@ -3821,3 +3821,23 @@ body.cl-on{overflow:hidden}
 /* Rolex-like label caps */
 .cl-dt .dl-sh-eb{font:500 11px 'Lux Label',sans-serif!important;letter-spacing:.16em!important;text-transform:uppercase;color:#E9C98A!important}
 .ft2 .ft-ov .ft-br,.sv-c b,.ft-h small,.lk-ih span,.mc2-in small,.cu-hero figcaption small,.pm-t small,.cl-br{font-family:'Lux Label',sans-serif!important;font-weight:500!important;letter-spacing:.16em!important}
+/* Your edit */
+.ed-pill{position:fixed;right:14px;bottom:calc(88px + env(safe-area-inset-bottom));z-index:60;display:flex;align-items:center;gap:8px;padding:9px 14px 9px 9px;border:1px solid rgba(241,213,142,.6);background:rgba(12,9,6,.86);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);color:#f1d58e;font:500 10px 'Lux Label',sans-serif;letter-spacing:.16em;text-transform:uppercase;box-shadow:0 10px 26px rgba(0,0,0,.5)}
+.ed-pill i{font-style:normal;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#f7e3a3,#c9a35e);color:#140f08;font:600 11px 'Lux Label',sans-serif;letter-spacing:0}
+.ed-pill.bump{animation:edBump .5s cubic-bezier(.22,1.6,.36,1)}@keyframes edBump{40%{transform:scale(1.12)}}
+.ed-fly{position:fixed;width:60px;height:60px;object-fit:contain;background:#f4f1ec;z-index:200;transition:transform .7s cubic-bezier(.65,0,.35,1),opacity .7s;pointer-events:none;border:1px solid #c9a35e}
+.ed-sh .ed-hd small{display:block;font:500 10px 'Lux Label',sans-serif;letter-spacing:.18em;text-transform:uppercase;color:#C9A35E}
+.ed-sh .ed-hd h3{margin:6px 0 14px;font:italic 400 26px 'Lux Display','Lx Playfair',Georgia,serif;color:#f7efe2}
+.ed-list{display:grid;gap:10px}
+.ed-i{display:grid;grid-template-columns:76px 1fr auto;gap:12px;align-items:center;padding:8px;border:1px solid rgba(201,163,94,.22);background:#120e0a}
+.ed-i img{width:76px;height:76px;object-fit:contain;background:#f4f1ec}
+.ed-i small{display:block;font:500 9px 'Lux Label',sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#C9A35E}
+.ed-i b{display:block;font:400 13px/1.3 'Lux Text',sans-serif;color:#f3ecdd;font-weight:400}
+.ed-i span{display:block;font:400 11px 'Lux Text',sans-serif;color:#a99d8a;margin-top:2px}
+.ed-i em{display:block;font:400 14px 'Lux Num',sans-serif;font-style:normal;color:#F1D58E;margin-top:4px}
+.ed-rm{background:none;border:0;color:#a99d8a;font:500 9px 'Lux Label',sans-serif;letter-spacing:.14em;text-transform:uppercase;text-decoration:underline}
+.ed-tot{display:flex;justify-content:space-between;align-items:baseline;margin:16px 0 10px;padding-top:12px;border-top:1px solid rgba(201,163,94,.25)}
+.ed-tot span{font:500 10px 'Lux Label',sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#a99d8a}.ed-tot b{font:400 22px 'Lux Num',sans-serif;color:#F1D58E;font-weight:400}
+.ed-go{width:100%}.ed-note{font:400 11.5px/1.5 'Lux Text',sans-serif;color:#a99d8a;margin:10px 0 0;text-align:center}
+.ed-empty{font:italic 400 16px/1.5 'Lux Display','Lx Playfair',Georgia,serif;color:#cfc3ad;text-align:center;padding:24px 8px}
+body:has(.ed-sh) .ed-pill{display:none}
