@@ -3473,3 +3473,49 @@ body.cl-on{overflow:hidden}
 .cl-stm b{color:#F7EFE2!important}
 .cl-stm:before{right:-22%!important;top:-18%!important;width:108%!important;height:118%!important;background:radial-gradient(closest-side,#efeeec 0%,#eeece9 68%,rgba(236,230,222,0) 100%)!important}
 .cl-stm img{width:44%!important;height:50%!important;right:8%!important;top:12%!important;transform:rotate(-3deg)!important}
+/* lookbook · get the look */
+.lk{margin:30px -16px 6px;padding:24px 0 18px;background:linear-gradient(180deg,#f5f1ea,#ece4d7);color:#17110b}
+.lk>small,.lk>h3,.lk>p{padding:0 16px}.lk>small{display:block;font:300 7.5px 'Lux Wide',sans-serif;letter-spacing:.3em;text-transform:uppercase;color:#8a6a25}
+.lk>h3{font:italic 400 30px/1.1 'Lx Playfair','Lux Display',Georgia,serif;color:#17110b;margin:8px 0 4px;text-transform:none;letter-spacing:0}.lk .cl-sub{color:#6b5d48}
+.lk-car{display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;padding:10px 15% 14px;scrollbar-width:none}.lk-car::-webkit-scrollbar{display:none}
+.lk-c{position:relative;flex:0 0 70%;margin:0;aspect-ratio:3/4.3;border-radius:18px;overflow:hidden;background:#fff;scroll-snap-align:center;opacity:.45;transform:scale(.92);transition:opacity .4s,transform .5s cubic-bezier(.22,1,.36,1),box-shadow .4s;cursor:pointer}
+.lk-c.on{opacity:1;transform:none;box-shadow:0 22px 44px rgba(60,40,15,.25)}
+.lk-c img{width:100%;height:100%;object-fit:cover;object-position:center top}
+.lk-c figcaption{position:absolute;left:0;right:0;bottom:0;padding:30px 14px 12px;background:linear-gradient(transparent,rgba(15,10,6,.7));color:#fff}
+.lk-c small{display:block;font:400 10px 'Lx Bodoni',Georgia,serif;letter-spacing:.3em;text-transform:uppercase;color:#F1D58E}.lk-c b{font:italic 400 22px 'Lx Playfair',Georgia,serif;font-weight:400}
+.lk-go{display:block;width:calc(100% - 32px);margin:4px 16px 12px;background:#0b0907!important;color:#F4E1A0!important;border:0}
+.lk-list{display:grid;gap:10px;padding:0 16px}
+.lk-i{display:grid;grid-template-columns:86px 1fr;gap:14px;align-items:center;border:0;background:#fff;border-radius:14px;padding:8px;text-align:left;color:#17110b}
+.lk-i img{width:86px;height:86px;object-fit:contain;border-radius:10px;background:#f4f1ec}
+.lk-i small{display:block;font:400 9.5px 'Lx Bodoni',Georgia,serif;letter-spacing:.26em;text-transform:uppercase;color:#8a6a25}.lk-i b{display:block;font:400 13.5px/1.3 'Lux Text',sans-serif;font-weight:500;margin:2px 0}.lk-i em{font:normal 400 14px 'Lux Num',sans-serif;color:#3a2a14}
+/* concierge */
+.cc{position:relative;margin:30px -16px 6px;padding:26px 18px 24px;display:grid;grid-template-columns:110px 1fr;gap:16px;align-items:start;background:radial-gradient(120% 100% at 0% 0%,#4d1420 0%,#26080e 60%,#140508 100%);border-top:1px solid rgba(201,163,94,.25);border-bottom:1px solid rgba(201,163,94,.25)}
+.cc-d svg{width:110px;height:110px;filter:drop-shadow(0 10px 18px rgba(0,0,0,.5))}.cc-d .sc-dial-r{transform-origin:0 0;animation:ccDial 3.2s cubic-bezier(.36,.07,.19,.97) 1s both}
+@keyframes ccDial{0%{transform:rotate(0)}35%{transform:rotate(-110deg)}70%{transform:rotate(0)}}
+.cc-t small{font:300 7.5px 'Lux Wide',sans-serif;letter-spacing:.3em;text-transform:uppercase;color:#E9C98A}.cc-t h3{font:italic 400 24px/1.15 'Lx Playfair','Lux Display',Georgia,serif;color:#F7EFE2;margin:8px 0 12px;text-transform:none;letter-spacing:0}
+.cc-l{display:grid;gap:8px;margin-bottom:14px}.cc-l b{display:block;font:400 11px 'Lx Bodoni',Georgia,serif;letter-spacing:.3em;text-transform:uppercase;color:#F1D58E}.cc-l span{font:400 12.5px/1.45 'Lux Text',sans-serif;color:#d8c8b0}
+.cc-ac{display:grid;grid-template-columns:1.3fr 1fr;gap:8px}.cc-ac a{display:flex;align-items:center;justify-content:center;text-decoration:none}
+@media(max-width:380px){.cc{grid-template-columns:1fr}}
+/* the luxella drip */
+.dr{margin:30px -16px 6px;padding:24px 16px 18px;background:#0a0a0a radial-gradient(90% 60% at 80% 0%,rgba(201,163,94,.16),transparent 60%);border-top:1px solid #222;border-bottom:1px solid #222}
+.dr-h{display:flex;flex-direction:column;align-items:flex-start}.dr-h small{font:400 12px 'Lx Bodoni',Georgia,serif;letter-spacing:.42em;text-transform:uppercase;color:#E9C98A}
+.dr-h b{font:900 clamp(64px,22vw,120px)/.82 'Lux Wide',sans-serif;letter-spacing:-.03em;text-transform:uppercase;background:linear-gradient(180deg,#fff 0%,#d9d9d9 40%,#8a8a8a 55%,#f5f5f5 70%,#bdbdbd 100%);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 6px 14px rgba(0,0,0,.6));font-style:italic;transform:skewX(-6deg);margin:4px 0 6px}
+.dr-h span{font:500 9px 'Lux Wide',sans-serif;letter-spacing:.3em;text-transform:uppercase;color:#bdbdbd}
+.dr-tk{margin:16px -16px 14px;overflow:hidden;background:#F1D58E;padding:8px 0;transform:rotate(-1.5deg)}.dr-tk>div{display:inline-flex;white-space:nowrap;animation:bqTick 40s linear infinite}.dr-tk b{font:900 13px 'Lux Wide',sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#0a0a0a}.dr-tk i{margin:0 14px;font-style:normal;color:#0a0a0a;font-size:10px}
+.dr-tabs{display:flex;gap:8px;overflow-x:auto;margin-bottom:12px;scrollbar-width:none}.dr-tabs::-webkit-scrollbar{display:none}.dr-tabs button{flex:none;border:1px solid #333;background:#111;color:#cfcfcf;border-radius:999px;padding:9px 16px;font:700 10px 'Lux Wide',sans-serif;letter-spacing:.14em;text-transform:uppercase}.dr-tabs button.on{background:#fff;color:#000;border-color:#fff}
+.dr-rail .cl-br{color:#cfcfcf!important}.dr-va{background:none;border:0;margin-top:10px;color:#F1D58E;font:700 9px 'Lux Wide',sans-serif;letter-spacing:.2em;text-transform:uppercase}
+/* house ticker: editorial italic, no shouting caps */
+.bq-tin b{font:italic 400 19px 'Lx Playfair','Lux Display',Georgia,serif!important;letter-spacing:.01em!important;text-transform:none!important;color:#EADBB8!important}
+.bq-tin i{display:inline-block;width:5px;height:5px;margin:0 22px!important;border-radius:50%;background:#8a6a25;vertical-align:middle}
+.oc-t i,.cl-eg2 i{font:400 11px 'Lux Num',sans-serif!important;font-style:normal!important;letter-spacing:.1em;color:#C9A35E}
+/* size tiles with price */
+.cl-dt .cl-pz{display:flex;flex-wrap:nowrap;overflow-x:auto;gap:8px;margin:0 -18px;padding:2px 18px 6px;scrollbar-width:none}.cl-dt .cl-pz::-webkit-scrollbar{display:none}
+.cl-sz{flex:none;min-width:84px;padding:12px 10px!important;border-radius:14px!important;border:1px solid rgba(201,169,106,.28)!important;background:#100e0b!important;display:flex;flex-direction:column;align-items:center;gap:4px}
+.cl-sz b{font:500 15px 'Lux Text',sans-serif;color:#F3ECDD}.cl-sz small{font:400 12px 'Lux Num',sans-serif;color:#a99d8a}
+.cl-sz.on{background:#100e0b!important;border:1.5px solid #F4E1A0!important;box-shadow:0 0 0 3px rgba(244,225,160,.12)}.cl-sz.on b{color:#F4E1A0}.cl-sz.on small{color:#E9D3A6}
+/* persistent purchase bar */
+.cl-stk{display:grid!important;grid-template-columns:1fr auto 1.15fr;gap:10px;align-items:center;transform:none!important}
+.cl-stk-p b{display:block;font:400 19px 'Lux Num',sans-serif;color:#F4E1A0}.cl-stk-s{background:none;border:0;padding:2px 0;font:400 12px 'Lux Text',sans-serif;color:#cfc4b0}
+.cl-stk-h{border:1px solid rgba(201,169,106,.4);background:#1a1712;color:#F3ECDD;border-radius:14px;padding:14px 16px;font:400 13px 'Lux Text',sans-serif;letter-spacing:.04em}
+.cl-stk-r{border-radius:14px!important;padding:14px 10px!important;min-width:0!important;font:600 13px 'Lux Text',sans-serif!important;letter-spacing:.06em!important;text-transform:none!important}
+.cl-stk small{display:none}
