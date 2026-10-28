@@ -3857,3 +3857,19 @@ body:has(.ed-sh) .ed-pill{display:none}
 .pd-faq summary span{font:400 14px/1.4 'Lux Text',sans-serif;color:#f3ecdd}
 .pd-faq details p{margin:0 0 16px;font:400 13px/1.6 'Lux Text',sans-serif;color:#bfb39f}
 .cl-sz .cl-sz-o{display:block;font:400 9px 'Lux Label',sans-serif;letter-spacing:.06em;color:#8f846f;font-style:normal;margin:1px 0 2px}
+/* Luxella standard — five cards */
+.std{margin:30px -16px 6px;padding:28px 0 22px;background:radial-gradient(120% 70% at 50% 0%,#1c150e,#0a0806 70%);border-top:1px solid rgba(201,163,94,.2);border-bottom:1px solid rgba(201,163,94,.2);text-align:center}
+.std>small{display:block;font:500 10px 'Lux Label',sans-serif;letter-spacing:.2em;text-transform:uppercase;color:#C9A35E}
+.std>h3{margin:8px 16px 6px;font:italic 400 30px/1.12 'Lux Display','Lx Playfair',Georgia,serif;color:#f7efe2}
+.std-sub{margin:0 24px 16px;font:400 12.5px/1.5 'Lux Text',sans-serif;color:#b9ad97}
+.std-line{position:relative;height:1px;margin:0 22px;background:rgba(201,163,94,.25)}.std-line i{position:absolute;left:0;top:-.5px;height:2px;width:20%;background:linear-gradient(90deg,#8a6a25,#f1d58e);transition:width .6s cubic-bezier(.22,1,.36,1)}
+.std-steps{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin:10px 14px 14px}
+.std-steps button{background:none;border:0;padding:0;color:#7d7362;display:flex;flex-direction:column;align-items:center;gap:3px;transition:color .3s}
+.std-steps b{font:italic 400 17px 'Lux Display','Lx Playfair',Georgia,serif;font-weight:400}
+.std-steps span{font:500 7px/1.25 'Lux Label',sans-serif;letter-spacing:.08em;text-transform:uppercase}
+.std-steps button.on{color:#f1d58e}.std-steps button.done{color:#a8925e}
+.std-tr{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;overscroll-behavior-x:contain}.std-tr::-webkit-scrollbar{display:none}
+.std-c{flex:0 0 100%;margin:0;scroll-snap-align:center;padding:0 14px;box-sizing:border-box}
+.std-c img{width:100%;height:auto;display:block;box-shadow:0 18px 40px rgba(0,0,0,.55);transform:scale(.94);opacity:.6;transition:transform .7s cubic-bezier(.22,1,.36,1),opacity .7s}
+.std-c.on img{transform:none;opacity:1}
+.std-end{margin:18px 16px 0;font:500 9.5px 'Lux Label',sans-serif;letter-spacing:.22em;text-transform:uppercase;color:#C9A35E}
