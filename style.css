@@ -2118,3 +2118,11 @@ html.lx-ro #tb-switch,html.lx-ro #tb-out,html.lx-ro #top .who{display:none!impor
 .sw .dl-pa{font:400 9.5px 'Lux Wide',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#C9A35E}
 .sw .dl-px{all:unset;cursor:pointer;color:#8d867a;font-size:18px;padding:0 4px}
 .sw.sw.sw.sw.sw.sw .btn.dl-ask{background:linear-gradient(135deg,#F7E7B4 0%,#E8C774 38%,#C99A45 72%,#E3C06A 100%)!important;border:1px solid #F4E1A0!important;color:#16120a!important}
+
+.sw .dl-pg{display:flex;flex-direction:column;gap:14px}
+.sw.sw .dl-pc{border:1px solid rgba(201,169,106,.18);border-radius:16px!important;padding:12px;background:rgba(255,255,255,.02)}
+.sw.sw .dl-pc .dl-pdf{border:0!important;padding:4px 2px 10px!important;margin:0!important;background:none!important}
+.sw .dl-msgbox{white-space:pre-wrap;font:400 12px/1.7 'Lux Text','Jost',sans-serif;color:#d9d1c2;background:#0e0c09;border:1px solid rgba(201,169,106,.15);padding:12px 14px;margin:0 0 10px;max-height:220px;overflow:auto;user-select:text;-webkit-user-select:text}
+.sw .dl-ta{resize:vertical;min-height:90px}
+.sw .dl-pf-msg{grid-column:1/-1}
+.sw.sw.sw.sw.sw.sw .btn.dl-dlb{background:linear-gradient(135deg,#F7E7B4 0%,#E8C774 38%,#C99A45 72%,#E3C06A 100%)!important;border:1px solid #F4E1A0!important;color:#16120a!important}

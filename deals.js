@@ -24,16 +24,24 @@
   if(d.link){const v=el('a','btn2 dl-view','View piece');v.href=d.link;v.target='_blank';v.rel='noopener';ac.appendChild(v);}
   if(own()){const x=el('button','btn2 dl-del','Remove');x.type='button';x.addEventListener('click',async()=>{if(!confirm('Remove this deal?'))return;try{await window.lx.deals.remove(r.id);load();}catch(e){alert('Could not remove.');}});ac.appendChild(x);}
   bd.appendChild(ac);c.appendChild(bd);return c;}
- function pdfRow(r){const d=r.data||{};const a=el('a','dl-pdf');a.href=d.url;a.target='_blank';a.rel='noopener';
-  const ic=el('span','dl-pi','PDF');a.appendChild(ic);const t=el('span','dl-pt');t.appendChild(el('b',null,d.title||'Deal sheet'));t.appendChild(el('small',null,dayLabel(r.day)+(d.size?' · '+d.size:'')));a.appendChild(t);a.appendChild(el('span','dl-pa','Open'));
-  if(own()){const x=el('button','dl-px','×');x.type='button';x.title='Remove';x.addEventListener('click',async e=>{e.preventDefault();e.stopPropagation();if(!confirm('Remove this PDF?'))return;try{await window.lx.deals.remove(r.id);load();}catch(er){alert('Could not remove.');}});a.appendChild(x);}
-  return a;}
+ async function dl(url,name){try{const r=await fetch(url);const b=await r.blob();const u=URL.createObjectURL(b);const a=el('a');a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),4000);}catch(e){window.open(url,'_blank','noopener');}}
+ function copyTxt(t,btn){const done=()=>{const o=btn.textContent;btn.textContent='Copied ✓';setTimeout(()=>btn.textContent=o,1600);};if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(done,()=>{fb();});}else fb();function fb(){const ta=el('textarea');ta.value=t;ta.style.cssText='position:fixed;opacity:0';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');done();}catch(e){}ta.remove();}}
+ function pdfRow(r){const d=r.data||{};const c=el('div','dl-pc');
+  const top=el('a','dl-pdf');top.href=d.url;top.target='_blank';top.rel='noopener';
+  top.appendChild(el('span','dl-pi','PDF'));const t=el('span','dl-pt');t.appendChild(el('b',null,d.title||'Deal sheet'));t.appendChild(el('small',null,dayLabel(r.day)+(d.size?' · '+d.size:'')));top.appendChild(t);top.appendChild(el('span','dl-pa','Open'));
+  if(own()){const x=el('button','dl-px','×');x.type='button';x.title='Remove';x.addEventListener('click',async e=>{e.preventDefault();e.stopPropagation();if(!confirm('Remove this PDF?'))return;try{await window.lx.deals.remove(r.id);load();}catch(er){alert('Could not remove.');}});top.appendChild(x);}
+  c.appendChild(top);
+  if(d.msg){const m=el('div','dl-msgbox');m.textContent=d.msg;c.appendChild(m);}
+  const ac=el('div','dl-ac');
+  const dbtn=el('button','btn dl-dlb','Download PDF');dbtn.type='button';dbtn.addEventListener('click',()=>dl(d.url,(d.title||'Luxella deals').replace(/[^\w\- ]+/g,'').trim()+'.pdf'));ac.appendChild(dbtn);
+  if(d.msg){const cb=el('button','btn2 dl-cp','Copy message');cb.type='button';cb.addEventListener('click',()=>copyTxt(d.msg,cb));ac.appendChild(cb);}
+  c.appendChild(ac);return c;}
  function render(){const l=$('deals-list');if(!l)return;l.textContent='';
   const deals=rows.filter(r=>r.kind==='deal'),pdfs=rows.filter(r=>r.kind==='pdf');
   if(!deals.length&&!pdfs.length){const e=el('div','dl-empty');e.appendChild(el('b',null,'Fresh deals land here every day.'));e.appendChild(el('span',null,'Check back this evening, or message Luxella for a specific piece.'));l.appendChild(e);return;}
   const days=[...new Set(deals.map(r=>r.day))];
   days.forEach((d,i)=>{const sec=el('section','dl-day'+(i===0?' first':''));const h=el('div','dl-dh');h.appendChild(el('span',null,dayLabel(d)));h.appendChild(el('small',null,deals.filter(r=>r.day===d).length+' pieces'));sec.appendChild(h);const g=el('div','dl-g');deals.filter(r=>r.day===d).forEach(r=>g.appendChild(card(r)));sec.appendChild(g);l.appendChild(sec);});
-  if(pdfs.length){const sec=el('section','dl-day dl-pdfs');const h=el('div','dl-dh');h.appendChild(el('span',null,'Deal sheets'));h.appendChild(el('small',null,pdfs.length+' PDFs'));sec.appendChild(h);pdfs.forEach(r=>sec.appendChild(pdfRow(r)));l.appendChild(sec);}
+  if(pdfs.length){const sec=el('section','dl-day dl-pdfs');const h=el('div','dl-dh');h.appendChild(el('span',null,'Deal sheets'));h.appendChild(el('small',null,pdfs.length+' PDFs'));sec.appendChild(h);const pg=el('div','dl-pg');pdfs.forEach(r=>pg.appendChild(pdfRow(r)));sec.appendChild(pg);l.appendChild(sec);}
  }
  function ownerPanel(){const w=$('deals-owner');if(!w||w.dataset.b||!own())return;w.dataset.b=1;
   const f=el('details','dl-own');const s=el('summary',null,'Post a deal or PDF');f.appendChild(s);
@@ -41,9 +49,9 @@
   const inp=(ph,type)=>{const i=el('input','dl-in');i.placeholder=ph;if(type)i.type=type;return i;};
   const fd=el('div','dl-form');const file=inp('','file');file.accept='image/*';const brand=inp('Brand (e.g. Coach)');const title=inp('Piece name');const price=inp('Deal price ₹','number');const mrp=inp('Usual price ₹ (optional)','number');const sizes=inp('Sizes / colour (optional)');const note=inp('One-line note (optional)');const link=inp('Link (optional)');const day=inp('','date');day.value=today();
   const lab=(t,x)=>{const l=el('label','dl-l');l.appendChild(el('span',null,t));l.appendChild(x);return l;};
-  const pf=el('div','dl-form');pf.hidden=true;const pfile=inp('','file');pfile.accept='application/pdf';const ptitle=inp('Title (e.g. Coach outlet sheet, 28 Oct)');const pday=inp('','date');pday.value=today();
+  const pf=el('div','dl-form');pf.hidden=true;const pfile=inp('','file');pfile.accept='application/pdf';const ptitle=inp('Title (e.g. Coach outlet sheet, 28 Oct)');const pmsg=el('textarea','dl-in dl-ta');pmsg.rows=5;pmsg.placeholder='Message for clients to copy (optional)';const pday=inp('','date');pday.value=today();
   [lab('Photo',file),lab('Brand',brand),lab('Piece',title),lab('Deal price',price),lab('Usual price',mrp),lab('Sizes / colour',sizes),lab('Note',note),lab('Link',link),lab('Date',day)].forEach(x=>fd.appendChild(x));
-  [lab('PDF file',pfile),lab('Title',ptitle),lab('Date',pday)].forEach(x=>pf.appendChild(x));
+  [lab('PDF file',pfile),lab('Title',ptitle),lab('Message',pmsg),lab('Date',pday)].forEach(x=>pf.appendChild(x));
   body.appendChild(fd);body.appendChild(pf);
   const go=el('button','btn dl-go','Post deal');go.type='button';const msg=el('div','dl-msg');body.appendChild(go);body.appendChild(msg);
   b1.addEventListener('click',()=>{m='deal';b1.setAttribute('aria-pressed','true');b2.setAttribute('aria-pressed','false');fd.hidden=false;pf.hidden=true;go.textContent='Post deal';});
@@ -53,7 +61,7 @@
      await window.lx.deals.add('deal',{brand:brand.value.trim(),title:title.value.trim(),price:price.value?Number(price.value):null,mrp:mrp.value?Number(mrp.value):null,sizes:sizes.value.trim(),note:note.value.trim(),link:link.value.trim(),img},day.value||today());
      [file,brand,title,price,mrp,sizes,note,link].forEach(i=>i.value='');msg.textContent='Posted.';}
     else{const pfl=pfile.files[0];if(!pfl){msg.textContent='Choose a PDF.';return;}msg.textContent='Uploading PDF…';const up=await window.lx.deals.upload(pfl);const kb=pfl.size>1048576?(pfl.size/1048576).toFixed(1)+' MB':Math.round(pfl.size/1024)+' KB';
-     await window.lx.deals.add('pdf',{title:ptitle.value.trim()||pfl.name.replace(/\.pdf$/i,''),url:up.url,size:kb},pday.value||today());pfile.value='';ptitle.value='';msg.textContent='Uploaded.';}
+     await window.lx.deals.add('pdf',{title:ptitle.value.trim()||pfl.name.replace(/\.pdf$/i,''),url:up.url,size:kb,msg:pmsg.value.trim()},pday.value||today());pfile.value='';ptitle.value='';pmsg.value='';msg.textContent='Uploaded.';}
     load();}catch(e){msg.textContent='Could not save: '+(e.message||e);}finally{go.disabled=false;}});
   f.appendChild(body);w.appendChild(f);}
  function boot(){if(!$('pane-deals'))return;ownerPanel();load();}
