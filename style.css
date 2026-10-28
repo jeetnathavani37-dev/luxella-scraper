@@ -3772,3 +3772,25 @@ body.cl-on{overflow:hidden}
 .pm-t h3 em{font:italic 400 32px 'Lux Display','Lx Playfair',Georgia,serif;color:#f1d58e}
 .pm-t span{display:block;max-width:320px;margin:0 auto;font:400 12.5px/1.55 'Lux Text',sans-serif;color:#cdb9b0}
 @media (prefers-reduced-motion:reduce){.pm-card,.pm-seal{animation:none}}
+.cu-gta{filter:none!important;animation:none!important}
+/* featured scenes v2 — richer light */
+.ft-rouge .ft-bg{background:
+ radial-gradient(50% 38% at 50% 8%,rgba(255,190,170,.30),transparent 70%),
+ linear-gradient(90deg,rgba(0,0,0,.55),rgba(0,0,0,0) 28%,rgba(0,0,0,0) 72%,rgba(0,0,0,.6)),
+ linear-gradient(180deg,rgba(0,0,0,.15),rgba(0,0,0,0) 35%,rgba(0,0,0,.45) 100%),
+ repeating-linear-gradient(90deg,#4a0a12 0 2px,#a3313a 2px 4px,#8a2129 4px 12px,#7a1a22 12px 26px,#5e1018 26px 34px,#3a060c 34px 36px)}
+.ft-rouge{--by:27%}.ft-rouge .ft-prop svg{width:88%;height:auto}
+.ft-st::after{content:'';position:absolute;inset:0;pointer-events:none;z-index:3;background:radial-gradient(120% 90% at 50% 40%,transparent 55%,rgba(0,0,0,.45)),url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .07 0'/></filter><rect width='160' height='160' filter='url(%23n)'/></svg>");mix-blend-mode:normal}
+.ft-bag{filter:drop-shadow(0 22px 18px rgba(0,0,0,.5)) drop-shadow(0 4px 4px rgba(0,0,0,.35))}
+.ft-shd{height:3.4%;width:46%;bottom:calc(var(--by,30%) - 1.4%);background:radial-gradient(closest-side,rgba(0,0,0,.7),transparent)}
+/* Femme / Gentleman's edit titles */
+.cu .cu-t{display:block!important;text-transform:none!important;letter-spacing:0!important}
+.cu .cu-t .cu-f{display:block;font:italic 400 22px 'Lux Display','Lx Playfair',Georgia,serif!important;letter-spacing:.04em!important;text-transform:none!important;color:#d8cdb8;margin:0 0 -4px}
+.cu .cu-t em{display:block;font:400 clamp(58px,18vw,100px)/.95 'Lx Bodoni',Georgia,serif!important;font-style:normal!important;letter-spacing:.03em;background:linear-gradient(180deg,#fff3d6 0%,#f1d58e 38%,#c9a35e 68%,#8a6a25 100%);-webkit-background-clip:text;background-clip:text;color:transparent!important}
+.cu[data-g="Men"] .cu-t em{font-size:clamp(40px,12.6vw,70px)!important;letter-spacing:.06em;text-transform:uppercase}
+.cu[data-g="Women"] .cu-t em{text-transform:uppercase;letter-spacing:.08em}
+.cu .cu-t .cu-e{display:block;font:italic 400 34px/1 'Lux Display','Lx Playfair',Georgia,serif;color:#f7efe2;margin:2px 0 0 4px}
+.cu[data-g="Women"] .cu-t .cu-e{color:#f2d6dc}
+.cu-tg button{font-size:7.5px!important}
+.cu[data-g="Men"] .cu-t em{font-size:clamp(36px,11vw,64px)!important;letter-spacing:.03em!important}
+.cu .cu-t .cu-e{text-transform:none!important;letter-spacing:0!important;font-family:'Lux Display','Lx Playfair',Georgia,serif!important}
