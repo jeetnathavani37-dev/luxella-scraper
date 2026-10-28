@@ -2562,3 +2562,37 @@ html.lx-ro #tb-switch,html.lx-ro #tb-out,html.lx-ro #top .who{display:none!impor
 .sw.sw.sw.sw.sw.sw.sw .dl-sh-b .chip[aria-pressed=true],.sw.sw.sw.sw.sw.sw.sw .dl-stu .chip[aria-pressed=true]{background:linear-gradient(135deg,#F7E7B4 0%,#E8C774 38%,#C99A45 72%,#E3C06A 100%)!important;border-color:#F4E1A0!important;color:#16120a!important}
 .sw .dl-vs{grid-template-columns:repeat(3,1fr)!important;border-radius:16px!important}.sw.sw.sw .dl-vs-b{border-radius:12px!important;flex-direction:column;gap:2px}
 .sw.sw .dl-mkb{width:100%;margin:0 0 10px}
+/* stories */
+.sw .dl-stories{display:flex;gap:14px;overflow-x:auto;scrollbar-width:none;padding:4px 2px 14px;margin:0 0 6px}.sw .dl-stories::-webkit-scrollbar{display:none}
+.sw.sw.sw .dl-story{flex:none;display:flex;flex-direction:column;align-items:center;gap:6px;width:72px;border:0;background:none;padding:0;cursor:pointer;min-height:0;box-shadow:none}
+.sw .dl-story-r{width:66px;height:66px;border-radius:50%;padding:2.5px;background:conic-gradient(from 200deg,#F7E7B4,#C99A45,#8C6E16,#E3C06A,#F7E7B4);display:block;animation:dlRing 3s linear infinite}
+.sw .dl-story.seen .dl-story-r{background:#3a342a;animation:none}
+.sw .dl-story-ph{display:grid;place-items:center;width:100%;height:100%;border-radius:50%;overflow:hidden;background:#fff;border:2.5px solid #0b0a08;font:italic 22px 'Lux Display',serif;color:#C9A227}
+.sw .dl-story-ph img{width:100%;height:100%;object-fit:cover}
+.sw .dl-story small{font:400 8.5px 'Lux Wide',sans-serif;letter-spacing:.08em;color:#cfc6b6;max-width:72px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-transform:uppercase}
+@keyframes dlRing{to{filter:hue-rotate(0deg) brightness(1.15)}}
+.dl-sto{position:fixed;inset:0;z-index:2147481000;background:#000;display:flex;flex-direction:column;opacity:0;transform:scale(.96);transition:opacity .3s,transform .3s}
+.dl-sto.in{opacity:1;transform:none}
+.dl-sto-bars{display:flex;gap:3px;padding:calc(env(safe-area-inset-top,0px) + 10px) 10px 0}
+.dl-sto-bars i{flex:1;height:2.5px;background:rgba(255,255,255,.25);border-radius:2px;overflow:hidden}
+.dl-sto-bars span{display:block;height:100%;width:0;background:linear-gradient(90deg,#F7E7B4,#E3C06A)}
+.dl-sto-top{display:flex;justify-content:space-between;align-items:center;padding:10px 14px}
+.dl-sto-top b{font:italic 400 18px 'Lux Display',serif;color:#F3ECDD}
+.sw.sw.sw .dl-sto-x{all:unset;width:36px;height:36px;font:300 28px/36px sans-serif;color:#fff;text-align:center;cursor:pointer}
+.dl-sto-st{flex:1;display:grid;place-items:center;overflow:hidden;touch-action:none;user-select:none}
+.dl-sto-st img{max-width:100%;max-height:100%;object-fit:contain;animation:dlStoK 4.5s ease-out both}
+@keyframes dlStoK{from{transform:scale(1.04)}to{transform:scale(1)}}
+.dl-sto-in{display:flex;flex-direction:column;gap:3px;padding:12px 18px 8px;background:linear-gradient(0deg,rgba(0,0,0,.9),rgba(0,0,0,0))}
+.dl-sto-br{font:400 9.5px 'Lux Wide',sans-serif;letter-spacing:.22em;text-transform:uppercase;color:#C9A35E}
+.dl-sto-in b{font:400 13px 'Lux Text',sans-serif;color:#F3ECDD}
+.dl-sto-in em{font:400 20px 'Lux Num',sans-serif;font-style:normal;color:#F4E1A0}
+.dl-sto-ac{display:grid;grid-template-columns:2fr 1fr 1fr;gap:8px;padding:6px 14px calc(env(safe-area-inset-bottom,0px) + 14px)}
+.sw.sw.sw .dl-sto-ac button{min-height:44px;font-size:10px!important;padding:0 6px!important}
+/* hold + follow */
+.sw .dl-hold{display:inline-block;align-self:flex-start;padding:4px 10px;border-radius:999px;background:rgba(227,192,106,.14);border:1px solid rgba(227,192,106,.45);color:#F4E1A0;font:400 9px 'Lux Wide',sans-serif;letter-spacing:.12em;text-transform:uppercase}
+.sw.sw.sw .dl-fol{border:1px solid rgba(201,169,106,.45);background:transparent;color:#E3C565;border-radius:999px!important;padding:5px 11px;font:400 8.5px 'Lux Wide',sans-serif;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;min-height:0;white-space:nowrap;box-shadow:none}
+.sw.sw.sw .dl-fol.on{background:linear-gradient(135deg,#F7E7B4,#C99A45);color:#16120a;border-color:#F4E1A0}
+.sw .dl-pc-ac{grid-template-columns:1fr 1fr 1fr}
+.sw.sw.sw.sw .dl-story-r{border-radius:50%!important}
+.sw.sw.sw.sw .dl-story-ph{border-radius:50%!important}
+.sw.sw.sw.sw .dl-story-ph img{border-radius:50%!important;border:0!important;padding:0!important;background:#fff!important;width:100%!important;height:100%!important;object-fit:cover!important}
