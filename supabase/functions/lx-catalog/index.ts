@@ -13,17 +13,18 @@ async function allowed(req: Request, c: any) {
   const { data } = await db.auth.getUser(a.slice(7)); return OWNERS.includes(String(data?.user?.email || "").toLowerCase());
 }
 const CAT1 = (s: string) => {
-  if (/watch/.test(s)) return "Watches"; if (/sunglass|eyewear/.test(s)) return "Eyewear";
+  if (/\bwatch(es)?\b/.test(s)) return "Watches"; if (/sunglass|eyewear|optical/.test(s)) return "Eyewear";
+  if (/legging|sports bra|\bbra\b|bralette|\btank\b|jogger|bodysuit|unitard|bike short|yoga|activewear|athletic|running short|sweatpant/.test(s)) return "Activewear";
   if (/wallet|card holder|cardholder|card case|pouch|key ?ring|keychain/.test(s)) return "Small leather goods";
   if (/\bbag|tote|clutch|backpack|crossbody|shoulder|hobo|satchel|hourglass|shopper|duffle|messenger/.test(s)) return "Bags";
-  if (/loafer|boot|sandal|slide|heel|pump|mule|espadrille|ballet|flat|derby|oxford|moccasin|slipper/.test(s)) return "Shoes";
-  if (/sneaker|trainer|runner|\bshoe/.test(s)) return "Sneakers";
+  if (/sneaker|trainer|runner/.test(s)) return "Sneakers";
+  if (/loafer|boot|sandal|slide|heel|pump|mule|clog|espadrille|ballet|flat|derby|oxford|moccasin|slipper|\bshoes?\b|footwear/.test(s)) return "Shoes";
   if (/belt|scarf|muffler|\bcap\b|hat|\btie\b|jewel|bracelet|necklace|\bring\b|earring|perfume|fragrance|glove/.test(s)) return "Accessories";
   if (/shirt|tee|t-shirt|hoodie|sweat|jacket|coat|dress|trouser|pant|jean|short|skirt|knit|polo|blazer|suit|\btop\b|cardigan|jumper|vest|gilet/.test(s)) return "Clothing";
   return "";
 };
 const CAT = (t: string, tags: string[], title: string) => CAT1((t + " " + title).toLowerCase()) || CAT1(tags.join(" ").toLowerCase()) || t || "Other";
-function mapProduct(p: any, disc: number, seg = "luxury", vend = "", on = true) {
+function mapProduct(p: any, disc: number, seg = "luxury", vend = "", on = true, pos = 0, maxP = 100000) {
   if (vend && !String(p.vendor || "").toLowerCase().includes(vend.toLowerCase())) return null;
   const tags: string[] = Array.isArray(p.tags) ? p.tags : String(p.tags || "").split(",").map((x: string) => x.trim());
   const av = (p.variants || []).filter((v: any) => v.available && Number(v.price) > 0);
@@ -40,12 +41,13 @@ function mapProduct(p: any, disc: number, seg = "luxury", vend = "", on = true) 
   const title = String(p.title || "").replace(/kicks ?machine/ig, "").replace(/\s+/g, " ").trim().slice(0, 160);
   const images = (p.images || []).slice(0, 6).map((i: any) => String(i.src || "").split("?")[0]).filter(Boolean);
   if (!images.length) return null;
-  return { row: { id: "c" + p.id, brand, title, category: CAT(String(p.product_type || ""), tags, title), gender, price, mrp: null && mrp, sizes, images, ship, segment: seg, active: on && !OUTLET_BRANDS.has(brand), seen_at: new Date().toISOString() }, src: { id: "c" + p.id, src_handle: String(p.handle || ""), src_prices: av.map((v: any) => [v.title, Number(v.price)]), updated_at: new Date().toISOString() } };
+  return { row: { id: "c" + p.id, brand, title, category: CAT(String(p.product_type || ""), tags, title), gender, price, mrp: null && mrp, sizes, images, ship, segment: seg, active: on && !OUTLET_BRANDS.has(brand) && price <= maxP, trend: Math.round(70 * Math.exp(-pos / 1500) * 10) / 10 + (hash(String(p.id)) % 100) / 1000, seen_at: new Date().toISOString() }, src: { id: "c" + p.id, src_handle: String(p.handle || ""), src_prices: av.map((v: any) => [v.title, Number(v.price)]), updated_at: new Date().toISOString() } };
 }
 const BR = ["Hermès","Louis Vuitton","Chanel","Dior","Gucci","Prada","Miu Miu","Bottega Veneta","Saint Laurent","Celine","Fendi","Loewe","Balenciaga","Valentino Garavani","Valentino","Givenchy","Versace","Burberry","Ferragamo","Tod's","Loro Piana","Brunello Cucinelli","Zegna","Moncler","Alexander McQueen","Alexander Wang","Balmain","Lanvin","Chloé","Jacquemus","Jil Sander","Maison Margiela","Marni","Off-White","Amiri","Rick Owens","Golden Goose","Christian Louboutin","Jimmy Choo","Goyard","MCM","Mulberry","Longchamp","Tory Burch","Coach","Michael Kors","Kate Spade","Karl Lagerfeld","Marc Jacobs","Polo Ralph Lauren","Ralph Lauren","Ted Baker","Emporio Armani","Giorgio Armani","Armani Exchange","EA7","Armani","Kenzo","Ami Paris","Alaïa","Dolce & Gabbana","Philipp Plein","Tom Ford","Rimowa","Montblanc","Bvlgari","Cartier","Rolex","Omega","Tag Heuer","Rado","Hamilton","Citizen","Tissot","Longines","Swatch","Gentle Monster","Ganni","RM Williams","Maison Mihara Yasuhiro","Denim Tears","Sp5der","KAWS","Hellstar","Supreme","Rhude","A.P.C.","Mastermind","Godspeed","On","Lululemon","UGG","Dr. Martens","JW Pei","Converse","Salomon","Autry","Sprayground","New Era","Matin Kim","Diesel","Hugo Boss","Calvin Klein","Tommy Hilfiger"];
 const fold = (x: string) => x.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9&]+/g, " ").trim();
 const BRF = BR.map((b) => [fold(b), b] as [string, string]).sort((a, b) => b[0].length - a[0].length);
 const FIX: Record<string, string> = { "hermes": "Hermès", "louisvuitton": "Louis Vuitton", "blalenciaga": "Balenciaga", "chloe": "Chloé", "off white": "Off-White", "offwhite": "Off-White", "dr martens": "Dr. Martens", "maison mihara yasuhio": "Maison Mihara Yasuhiro", "alaia": "Alaïa", "bulgari": "Bvlgari" };
+const hash = (x: string) => { let h = 0; for (let i = 0; i < x.length; i++) h = (h * 31 + x.charCodeAt(i)) | 0; return Math.abs(h); };
 const OUTLET_BRANDS = new Set(["Michael Kors", "Coach", "Kate Spade"]);
 function canonBrand(vendor: string, title: string) {
   for (const s of [vendor, title]) { const f = fold(s); if (FIX[f]) return FIX[f]; for (const [k, v] of BRF) if (f === k || f.startsWith(k + " ")) return v; for (const [k, v] of Object.entries(FIX)) if (f.startsWith(k + " ")) return v; }
@@ -57,7 +59,8 @@ const kgFor = (cat: string, t: string) => { const s = (cat + " " + t).toLowerCas
   if (/boot/.test(s)) return 1.8; if (/sneaker|trainer|shoe|sandal|loafer|heel|pump|flat|mule|slide|espadrille/.test(s)) return 1.2;
   if (/tote|satchel|carryall|backpack|duffle|weekender|large|briefcase/.test(s)) return 1.2; if (/crossbody|mini|small|camera|belt bag|phone/.test(s)) return 0.6;
   if (/bag|shoulder|hobo|bucket|clutch/.test(s)) return 0.9; if (/jacket|coat|dress|sweater|shirt|top|pant|skirt|hoodie|scarf/.test(s)) return 0.5; return 0.6; };
-const quoteUsd = (usd: number, kg: number, fx = 95.5) => { const k = Math.max(0.5, Math.ceil(kg * 2) / 2); const landed = usd * fx + k * 1250 + 150; return { landed: Math.round(landed), price: Math.ceil(landed * 1.25 / 100) * 100, kg: k }; };
+const FX: Record<string, number> = { USD: 95.5, CAD: 70, GBP: 129, EUR: 110 };
+const quoteUsd = (usd: number, kg: number, fx = 95.5, tax = 0, step = 0.5) => { const k = Math.max(step, Math.ceil(kg / step) * step); const landed = usd * fx * (1 + tax) + k * 1250 + 150; return { landed: Math.round(landed), price: Math.ceil(landed * 1.25 / 100) * 100, kg: k }; };
 const ent = (x: any) => typeof x === "string" ? { h: x, v: "", seg: "luxury" } : { h: String(x.h), v: String(x.v || ""), seg: String(x.seg || "luxury") };
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: CORS });
@@ -70,20 +73,27 @@ Deno.serve(async (req) => {
       const r = await fetch(`${SRC}/collections/${col}/products.json?limit=250&page=${page}`, { headers: { "User-Agent": "Mozilla/5.0 (compatible; LuxellaCatalog/1.0)", "Accept": "application/json" } });
       if (!r.ok) return J({ ok: false, error: "source " + r.status });
       const j: any = await r.json(); const P = j.products || [];
-      const rows: any[] = [], srcs: any[] = []; const E1 = ent(body.entry || col); const on1 = E1.seg !== "lifestyle" || !!c.lifestyleOn; for (const p of P) { const m = mapProduct(p, disc, E1.seg, E1.v, on1); if (m) { rows.push(m.row); srcs.push(m.src); } }
+      const rows: any[] = [], srcs: any[] = []; const E1 = ent(body.entry || col); const on1 = E1.seg !== "lifestyle" || !!c.lifestyleOn; const maxP = Number(c.maxPrice || 100000); P.forEach((p: any, i: number) => { const m = mapProduct(p, disc, E1.seg, E1.v, on1, (page - 1) * 250 + i, maxP); if (m) { rows.push(m.row); srcs.push(m.src); } });
       for (let i = 0; i < rows.length; i += 200) { const e = await db.from("lx_catalog").upsert(rows.slice(i, i + 200), { onConflict: "id", ignoreDuplicates: false }); if (e.error) return J({ ok: false, error: e.error.message }); await db.from("lx_catalog_src").upsert(srcs.slice(i, i + 200)); }
       return J({ ok: true, fetched: P.length, saved: rows.length, more: P.length === 250 });
     }
     if (body.action === "ingest") {
-      const items: any[] = Array.isArray(body.items) ? body.items.slice(0, 500) : []; const fx = Number(c.fx || 95.5);
+      const items: any[] = Array.isArray(body.items) ? body.items.slice(0, 500) : []; const maxP = Number(c.maxPrice || 100000);
+      const ids = items.map((it) => String(it.id || "").slice(0, 80)).filter(Boolean);
+      const old: Record<string, any> = {}; if (ids.length) { const { data } = await db.from("lx_catalog").select("id,descr,details,story,sizes,colours,trend").in("id", ids); for (const r of data || []) old[r.id] = r; }
       const rows: any[] = [], srcs: any[] = [];
       for (const it of items) {
-        const usd = Number(it.usd); if (!usd || !it.id || !it.title || !(it.images || []).length) continue;
-        const cat = CAT1((String(it.category || "") + " " + it.title).toLowerCase()) || String(it.category || "Other");
-        const q = quoteUsd(usd, kgFor(cat, it.title), fx);
-        const sizes = (it.sizes && it.sizes.length ? it.sizes : ["One size"]).slice(0, 30).map((sz: string) => ({ s: String(sz).slice(0, 30), p: q.price }));
-        rows.push({ id: String(it.id).slice(0, 80), brand: canonBrand(String(it.brand || ""), String(it.title)), title: String(it.title).slice(0, 160), category: cat, gender: String(it.gender || ""), price: q.price, mrp: null, sizes, images: (it.images || []).slice(0, 8), ship: "eta", eta: String(it.eta || "2–3 weeks"), descr: String(it.descr || "").slice(0, 1200), colours: (it.colours || []).slice(0, 12), sku: String(it.sku || "").slice(0, 60), src_kind: "outlet", segment: "luxury", active: true, seen_at: new Date().toISOString() });
-        srcs.push({ id: String(it.id).slice(0, 80), src_handle: String(it.url || "").slice(0, 400), src_prices: [["usd", usd], ["regular_usd", Number(it.regular_usd) || null], ["store", String(it.store || "")]], chk: { at: new Date().toISOString(), store: it.store, url: it.url, usd, kg: q.kg, landed: q.landed, our_price: q.price, margin: Math.round((q.price - q.landed) / q.landed * 1000) / 10, verdict: "ok" }, checked_at: new Date().toISOString(), updated_at: new Date().toISOString() });
+        const amt = Number(it.price ?? it.usd); if (!amt || !it.id || !it.title || !(it.images || []).length) continue;
+        const id = String(it.id).slice(0, 80); const o = old[id] || {};
+        const curr = String(it.cur || "USD").toUpperCase(); const fx = Number(it.fx || (c.fx && c.fx[curr]) || FX[curr] || 95.5); const tax = Number(it.tax || 0);
+        const cat = CAT1(String(it.title).toLowerCase()) || CAT1(String(it.category || "").toLowerCase()) || "Other";
+        const q = quoteUsd(amt, kgFor(cat, it.title), fx, tax, curr === "CAD" ? 1 : 0.5);
+        const hasSz = Array.isArray(it.sizes) && it.sizes.length; const szs = hasSz ? it.sizes : null;
+        const sizes = szs ? szs.slice(0, 40).map((sz: any) => ({ s: String(typeof sz === "string" ? sz : sz.s).slice(0, 30), p: q.price })) : (o.sizes && o.sizes.length && it.detail_ok !== true ? o.sizes.map((x: any) => ({ s: x.s, p: q.price })) : [{ s: "One size", p: q.price }]);
+        const details = Array.isArray(it.details) && it.details.length ? it.details.slice(0, 20).map((x: any) => String(x).slice(0, 200)) : (o.details || []);
+        const colours = Array.isArray(it.colours) && it.colours.length ? it.colours.slice(0, 16) : (o.colours || []);
+        rows.push({ id, brand: canonBrand(String(it.brand || ""), String(it.title)), title: String(it.title).slice(0, 160), category: cat, gender: String(it.gender || ""), price: q.price, mrp: null, sizes, images: (it.images || []).slice(0, 10), ship: "eta", eta: String(it.eta || "2–3 weeks"), descr: String(it.descr || o.descr || "").slice(0, 1200), story: String(it.story || o.story || "").slice(0, 1500), details, colours, sku: String(it.sku || "").slice(0, 60), src_kind: "outlet", segment: String(it.segment || "luxury"), trend: it.trend != null ? Number(it.trend) + (hash(id) % 100) / 1000 : (o.trend || 0), active: q.price <= maxP && it.active !== false, seen_at: new Date().toISOString() });
+        srcs.push({ id, src_handle: String(it.url || "").slice(0, 400), src_prices: [[curr.toLowerCase(), amt], ["regular", Number(it.regular_usd ?? it.regular) || null], ["store", String(it.store || "")]], chk: { at: new Date().toISOString(), store: it.store, url: it.url, cur: curr, amt, tax, kg: q.kg, landed: q.landed, our_price: q.price, margin: Math.round((q.price - q.landed) / q.landed * 1000) / 10, verdict: "ok" }, checked_at: new Date().toISOString(), updated_at: new Date().toISOString() });
       }
       for (let i = 0; i < rows.length; i += 200) { const e = await db.from("lx_catalog").upsert(rows.slice(i, i + 200), { onConflict: "id" }); if (e.error) return J({ ok: false, error: e.error.message }); await db.from("lx_catalog_src").upsert(srcs.slice(i, i + 200)); }
       return J({ ok: true, saved: rows.length });
@@ -97,7 +107,7 @@ Deno.serve(async (req) => {
       for (let n = 0; n < 4 && !cur.done; n++) {
         const E2 = cols[cur.ci]; const col = E2.h; const r = await fetch(`${SRC}/collections/${col}/products.json?limit=250&page=${cur.page}`, { headers: { "User-Agent": "Mozilla/5.0 (compatible; LuxellaCatalog/1.0)", "Accept": "application/json" } });
         let P: any[] = []; if (r.ok) { const j: any = await r.json(); P = j.products || []; }
-        const rows: any[] = [], srcs: any[] = []; for (const p of P) { const m = mapProduct(p, disc, E2.seg, E2.v, E2.seg !== "lifestyle" || !!c.lifestyleOn); if (m) { rows.push(m.row); srcs.push(m.src); } }
+        const rows: any[] = [], srcs: any[] = []; const maxP = Number(c.maxPrice || 100000); P.forEach((p: any, i: number) => { const m = mapProduct(p, disc, E2.seg, E2.v, E2.seg !== "lifestyle" || !!c.lifestyleOn, (cur.page - 1) * 250 + i, maxP); if (m) { rows.push(m.row); srcs.push(m.src); } });
         for (let i = 0; i < rows.length; i += 200) { await db.from("lx_catalog").upsert(rows.slice(i, i + 200), { onConflict: "id" }); await db.from("lx_catalog_src").upsert(srcs.slice(i, i + 200)); }
         cur.saved += rows.length; log.push([col, cur.page, rows.length]);
         if (P.length === 250) cur.page++; else { cur.ci++; cur.page = 1; if (cur.ci >= cols.length) cur.done = true; }
