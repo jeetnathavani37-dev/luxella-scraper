@@ -6,7 +6,7 @@ self.addEventListener('push', e => {
   let d = {}; try { d = e.data ? e.data.json() : {}; } catch (x) { d = { body: e.data && e.data.text() }; }
   const title = d.title || 'Luxella';
   e.waitUntil(self.registration.showNotification(title, {
-    body: d.body || '', tag: d.tag || 'lx', renotify: true,
+    body: d.body || '', tag: d.tag || 'lx', renotify: true, image: d.image || undefined,
     icon: BASE + 'assets/apple-touch-icon.png', badge: BASE + 'assets/badge.png',
     data: { url: /^https?:/.test(d.url || '') ? d.url : BASE + (d.url || '') }, vibrate: [60, 30, 60]
   }));

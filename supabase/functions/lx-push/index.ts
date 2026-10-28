@@ -1,5 +1,4 @@
-import "jsr:@supabase/functions-js/edge-runtime.d.ts";
-import { createClient } from "jsr:@supabase/supabase-js@2";
+import { createClient } from "npm:@supabase/supabase-js@2.45.4";
 import webpush from "npm:web-push@3.6.7";
 import nodemailer from "npm:nodemailer@6.9.14";
 import { Buffer } from "node:buffer";
@@ -138,7 +137,7 @@ function compose(p: any): Msg | null {
     }
     if (c === "quotes" && p.op === "INSERT") return { audience: "client", cat: "quotes", title: "New quote ready", body: (d.item || "Your piece") + (d.price ? " · ₹" + d.price : "") + " — review and approve it.", url: "ov", em: { subject: "Your quote is ready: " + (d.item || "your piece"), headline: "Your quote is ready", text: "We have prepared a quote for " + (d.item || "your piece") + (d.price ? " at ₹" + d.price : "") + ".", next: "Open your page, review the details and approve or decline it. We place the order only after you approve.", cta: ["Review quote", "ov"] } };
     if (c === "quote_resp" && p.op === "INSERT") return { audience: "owner", cat: "owner", title: "Quote " + (d.decision === "approved" ? "approved" : "declined"), body: (d.item || "Quote") + (d.total ? " · ₹" + d.total : ""), url: "ov" };
-    if (c === "requests" && p.op === "INSERT") return { audience: "owner", cat: "owner", title: "New product request", body: [d.brand, d.product].filter(Boolean).join(" ") + (d.urgent ? " · URGENT" : ""), url: "ov" };
+    if (c === "requests" && p.op === "INSERT") { const AK: Record<string, string> = { price: "💰 Price request", size: "📏 Size check", availability: "📦 Availability check", buy: "🛍️ Wants this piece", similar: "🔎 Find similar" }; const ttl = (d.ask && AK[d.ask]) || "New product request"; return { audience: "owner", cat: "owner", title: ttl, body: [d.brand, d.product].filter(Boolean).join(" ") + (d.spec ? " · " + String(d.spec).replace(/^[^·]*· /, "") : "") + (d.urgent ? " · URGENT" : ""), url: "ov", image: /^https:\/\//.test(String(d.photo || "")) ? String(d.photo) : undefined } as any; }
     if (c === "requests" && p.op === "UPDATE" && d.status !== od.status) return { audience: "client", cat: "quotes", title: "Request update", body: [d.brand, d.product].filter(Boolean).join(" ") + ": " + d.status, url: "ov", em: { subject: "Update on your request: " + [d.brand, d.product].filter(Boolean).join(" "), headline: "Update on your request", text: "Your request for " + [d.brand, d.product].filter(Boolean).join(" ") + " is now: " + d.status + ".", next: "Open your page to see the details.", cta: ["Open your page", "ov"] } };
     if (c === "cases" && p.op === "INSERT") return { audience: "owner", cat: "owner", title: "New support case " + (d.ref || ""), body: (d.type || "Issue") + (d.order ? " · " + d.order : ""), url: "help" };
     if (c === "cases" && p.op === "UPDATE" && d.status !== od.status) {
@@ -227,13 +226,13 @@ async function ownerFrom(req: Request) {
   return OWNERS.includes(em) ? em : null;
 }
 
-async function pushTo(sec: Record<string, string>, audience: "client" | "owner", clientId: string | null, title: string, body: string, url: string) {
+async function pushTo(sec: Record<string, string>, audience: "client" | "owner", clientId: string | null, title: string, body: string, url: string, image?: string) {
   let q = admin.from("lx_push_subs").select("id,endpoint,sub,user_email,client_id");
   q = audience === "client" ? q.eq("client_id", clientId) : q.is("client_id", null);
   const { data: subs } = await q;
   if (!subs || !subs.length) return { sent: 0, removed: 0 };
   webpush.setVapidDetails("mailto:luxella.in@gmail.com", sec.vapid_public, sec.vapid_private);
-  const payload = JSON.stringify({ title, body, url, tag: "lx-" + (clientId || "x") + "-" + url });
+  const payload = JSON.stringify({ title, body, url, image, tag: "lx-" + (clientId || "x") + "-" + url + (image ? "-" + Date.now() : "") });
   let sent = 0; const dead: string[] = [];
   await Promise.all(subs.map(async (s: any) => { try { await webpush.sendNotification(s.sub, payload, { TTL: 86400 }); sent++; } catch (e: any) { if (e && (e.statusCode === 404 || e.statusCode === 410)) dead.push(s.id); } }));
   if (dead.length) await admin.from("lx_push_subs").delete().in("id", dead);
@@ -335,6 +334,6 @@ Deno.serve(async (req) => {
   if (msg.audience === "client") { const { data: mu } = await admin.from("lx_docs").select("data").eq("client_id", clientId).eq("collection", "meta").eq("doc_id", "mute").maybeSingle(); muted = !!(mu?.data as any)?.email; }
   if (msg.audience === "client" && !msg.noEmail && !muted) { const em: Em = msg.em || { subject: msg.title, headline: msg.title, text: msg.body, cta: ["Open your page", msg.url] }; const job = emailClient(sec, clientId, slug, client?.name || "", em).catch((e) => console.error("email", e)); try { (globalThis as any).EdgeRuntime.waitUntil(job); } catch (_e) { /* fall through */ } }
   const title = msg.audience === "owner" && client ? client.name + ": " + msg.title : msg.title;
-  const r = await pushTo(sec, msg.audience, clientId, title, msg.body, slug + "#" + msg.url);
+  const r = await pushTo(sec, msg.audience, clientId, title, msg.body, slug + "#" + msg.url, (msg as any).image);
   return json({ sent: r.sent, removed: r.removed, ownerSent });
 });

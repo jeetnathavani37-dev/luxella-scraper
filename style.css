@@ -2357,3 +2357,13 @@ html.lx-ro #tb-switch,html.lx-ro #tb-out,html.lx-ro #top .who{display:none!impor
 .dl-vb{all:unset;flex:none;cursor:pointer;padding:11px 14px;border:1px solid rgba(201,169,106,.4);font:400 9.5px 'Lux Wide','Jost',sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#E9D3A0;white-space:nowrap}
 .dl-vb.gold{background:linear-gradient(135deg,#F7E7B4 0%,#E8C774 38%,#C99A45 72%,#E3C06A 100%);color:#16120a;border-color:#F4E1A0}
 .dl-vw~.dl-sh,.sw .dl-sh{z-index:2147481500}
+.sw .dl-ph.multi{padding:0!important}
+.sw .dl-gal{display:flex;width:100%;height:100%;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none}
+.sw .dl-gal::-webkit-scrollbar{display:none}
+.sw .dl-gal-s{flex:0 0 100%;scroll-snap-align:center;display:flex;align-items:center;justify-content:center;padding:14px;box-sizing:border-box;background:#fff}
+.sw .dl-gal-s img{max-width:100%;max-height:100%;object-fit:contain}
+.sw .dl-gal-d{position:absolute;left:0;right:0;bottom:8px;display:flex;justify-content:center;gap:5px;pointer-events:none}
+.sw.sw .dl-gal-d i{width:5px;height:5px;border-radius:3px!important;background:rgba(20,17,12,.25);transition:width .3s}
+.sw .dl-gal-d i.on{width:16px;background:#C99A45}
+.sw.sw .dl-gal-n{position:absolute;bottom:8px;right:10px;padding:2px 8px;border-radius:999px!important;background:rgba(10,9,7,.7);font:400 9px 'Lux Num',sans-serif;color:#F4E1A0}
+.sw .dl-dt-ph.multi{display:block;height:52vh}
