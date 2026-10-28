@@ -31,3 +31,8 @@ Exact match only: brand + model + colour + size. Note stock / sale end.
 ## 5. Live search for clients
 - Portal "Search US boutiques" → edge function `lx-source` → results with quote (needs the AI key for live Google search).
 - No AI key / nothing found → a job is queued (`lx_b2b` kind `srcjob`) and the Sourcing Desk agent answers within the hour with a draft post.
+
+## 6. Michael Kors — hamesha MK Outlet se compare (Jeet, 2026-10-28)
+- Har Michael Kors piece ka price PEHLE https://www.michaelkors.com/outlet/ pe dhoondho (exact model + colour). Wahi landed ka base hai.
+- Outlet pe na mile tabhi michaelkors.com (full price / sale) dekho, aur note me likho "not on outlet".
+- Tracking/affiliate parameters wale links kabhi save mat karo — sirf clean product URL.

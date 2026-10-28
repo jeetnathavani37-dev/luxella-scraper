@@ -16,3 +16,5 @@ Never: eBay, Poshmark, Mercari, Amazon 3rd-party, resellers.
 
 ## Output
 price_check on order + item. NO/TIGHT within accept window → polite counter-ask draft to Maanvesh (internal costs mat batao; "item full price pe hai / limited stock").
+
+**Michael Kors:** hamesha pehle https://www.michaelkors.com/outlet/ (exact item) — Jeet ka rule.
