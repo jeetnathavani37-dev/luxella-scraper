@@ -3524,3 +3524,52 @@ body.cl-on{overflow:hidden}
 .shp-c{scroll-snap-align:start;border:0;background:none;padding:0;text-align:left;color:#F3ECDD}
 .shp-c figure{margin:0;aspect-ratio:1;background:#f1eeea;border-radius:4px;overflow:hidden}.shp-c img{width:100%;height:100%;object-fit:contain;padding:10%;box-sizing:border-box;transition:transform .6s cubic-bezier(.22,1,.36,1)}.shp-c:active img{transform:scale(1.06)}
 .shp-c div{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-top:10px}.shp-c span{font:300 19px/1.1 'Lux Display',Georgia,serif;color:#F3ECDD}.shp-c i{font-style:normal;color:#C9A35E;font-size:16px}
+/* scroll reveal */
+.lxr{opacity:0;transform:translate3d(0,28px,0);transition:opacity .9s cubic-bezier(.22,1,.36,1),transform 1s cubic-bezier(.22,1,.36,1);transition-delay:var(--lxd,0ms)}
+.lxr.in{opacity:1;transform:none}
+@media (prefers-reduced-motion: reduce){.lxr{opacity:1;transform:none;transition:none}}
+/* page opening: velvet curtain */
+.pcur{position:fixed;inset:0;z-index:3000;pointer-events:none}
+.pcur i{position:absolute;top:0;bottom:0;width:50.5%;background:linear-gradient(90deg,rgba(0,0,0,.35),transparent 30%,rgba(255,255,255,.04) 50%,transparent 70%,rgba(0,0,0,.3)),repeating-linear-gradient(90deg,#3d0d16 0,#5e1825 16px,#7a2232 26px,#561521 38px,#3a0c15 52px);transition:transform 1s cubic-bezier(.77,0,.18,1) .35s}
+.pcur-l{left:0;transform-origin:left}.pcur-r{right:0}
+.pcur.go .pcur-l{transform:translateX(-102%)}.pcur.go .pcur-r{transform:translateX(102%)}
+.pcur-t{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);text-align:center;transition:opacity .35s ease .3s}
+.pcur.go .pcur-t{opacity:0}
+.pcur-t small{display:block;font:400 11px 'Lx Bodoni',Georgia,serif;letter-spacing:.42em;text-transform:uppercase;color:#F1D58E}
+.pcur-t b{display:block;margin-top:6px;font:italic 400 30px 'Lx Playfair','Lux Display',Georgia,serif;color:#F7EFE2;white-space:nowrap}
+/* art bands */
+.art{display:grid;grid-template-columns:42% 1fr;gap:16px;align-items:center;margin:30px -16px 6px;padding:22px 18px;background:radial-gradient(90% 90% at 0% 50%,#2a1a0c,#0c0a08 70%);border-top:1px solid rgba(201,163,94,.18);border-bottom:1px solid rgba(201,163,94,.18);overflow:hidden}
+.art-pic{display:flex;align-items:center;justify-content:center;min-height:150px}
+.art-pic svg{width:100%;max-width:170px;height:auto;filter:drop-shadow(0 14px 22px rgba(0,0,0,.55))}
+.art-hanger .art-pic svg{max-width:110px}.art-hanger{background:radial-gradient(90% 90% at 0% 50%,#4a1420,#140508 70%)}
+.art-glove .art-pic{min-height:0}.art-glove .art-pic img{width:100%;aspect-ratio:4/5;object-fit:cover;object-position:50% 35%;border-radius:4px;box-shadow:0 18px 30px rgba(0,0,0,.5)}
+.art-tx small{font:300 7.5px 'Lux Wide',sans-serif;letter-spacing:.3em;text-transform:uppercase;color:#E9C98A}
+.art-tx b{display:block;margin:8px 0 6px;font:italic 400 22px/1.15 'Lx Playfair','Lux Display',Georgia,serif;color:#F7EFE2;font-weight:400}
+.art-tx span{font:400 12.5px/1.5 'Lux Text',sans-serif;color:#bfb39f}
+.art-gift-t{font:400 11px 'Lx Bodoni',Georgia,serif;letter-spacing:4px;fill:#C9A35E}
+.art-lid{transform-origin:110px 76px}.art.in .art-lid{animation:artLid 2.4s cubic-bezier(.36,.07,.19,.97) .3s both}
+@keyframes artLid{0%{transform:none}35%{transform:translateY(-16px) rotate(-6deg)}60%{transform:translateY(-12px) rotate(-4deg)}100%{transform:none}}
+.art.in .sc-hg-card{animation:hgSwing 2.6s cubic-bezier(.36,.07,.19,.97) both}
+.art-letter .sc-flap{transform-origin:160px 40px}.art.in.art-letter .sc-flap{animation:artFlap 2.2s cubic-bezier(.65,0,.35,1) .4s both}
+@keyframes artFlap{0%{transform:none}40%,70%{transform:scaleY(-1)}100%{transform:none}}
+/* Private Edit v2: refined, no envelope */
+.pe{padding:34px 22px 28px!important;text-align:center}
+.pe-dear{font-size:34px!important}
+.pe-t span{letter-spacing:.04em!important}
+.pe-s{font:italic 400 17px/1.4 'Lx Playfair','Lux Display',Georgia,serif!important;letter-spacing:0!important;text-transform:none!important;color:#EAD9BC!important;margin-top:4px!important}
+.pe-d{font:300 7.5px 'Lux Wide',sans-serif!important;font-style:normal!important;letter-spacing:.3em!important;text-transform:uppercase!important;color:#C9A35E!important;margin-top:10px!important}
+.pe-strip{position:relative;z-index:2;display:flex;justify-content:center;align-items:flex-end;gap:0;margin:26px auto 6px;height:200px}
+.pe-strip figure{position:relative;width:31%;max-width:132px;aspect-ratio:4/5;margin:0 -4px;background:#f6f2ec;border:1px solid rgba(201,163,94,.65);outline:4px solid rgba(20,6,10,.6);box-shadow:0 18px 30px rgba(0,0,0,.45);transform:rotate(calc((var(--i) - 1)*5deg)) translateY(calc((var(--i) - 1)*(var(--i) - 1)*10px));opacity:0;animation:peUp .9s cubic-bezier(.22,1,.36,1) forwards;animation-delay:calc(.25s + var(--i)*.12s)}
+.pe-strip figure:nth-child(2){z-index:2;width:36%;max-width:150px}
+.pe-strip img{width:100%;height:100%;object-fit:contain;padding:9%;box-sizing:border-box}
+@keyframes peUp{from{opacity:0;transform:translateY(30px)}to{opacity:1}}
+.pe-cta{margin-top:22px!important}
+/* Boutique hero v3: full-bleed campaign photography */
+.bq-stage{aspect-ratio:4/5.2!important;background:#0b0907!important;box-shadow:0 30px 60px rgba(0,0,0,.6)!important;border-radius:2px}
+.bq-sl:after{display:none!important}
+.bq-sl img{inset:0!important;width:100%!important;height:100%!important;padding:0!important;object-fit:cover!important;object-position:50% 22%!important;background:#0b0907!important;border:0!important;box-shadow:none!important;transform:scale(1.08)!important;transition:transform 7s ease-out!important}
+.bq-sl.on img{transform:scale(1)!important}
+.bq-stage:before{content:'';position:absolute;inset:0;z-index:2;pointer-events:none;background:linear-gradient(180deg,rgba(8,6,4,.35),transparent 22%,transparent 55%,rgba(8,6,4,.85));box-shadow:inset 0 0 0 1px rgba(201,163,94,.35)}
+.bq-cap{background:none!important;padding:0 18px 20px!important}
+.bq-bars i{background:rgba(255,255,255,.25)!important}.bq-bars u{background:#F4E1A0!important}
+.pe:before{background:radial-gradient(60% 40% at 50% 100%,rgba(0,0,0,.35),transparent)!important}
