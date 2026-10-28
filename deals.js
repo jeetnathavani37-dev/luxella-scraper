@@ -1433,6 +1433,10 @@
   const T=[['Hyped',{brands:DRIP},{q:''}],['Sneakers',{cat:'Sneakers'},{cat:'Sneakers'}],['Streetwear',{brands:DRIP,cat:'Clothing'},{cat:'Clothing'}],['Under ₹20K',{cat:'Sneakers',max:20000},{cat:'Sneakers',max:20000}]];let seq=0;
   const load=async(o,g,t)=>{const my=++seq;rl.textContent='';try{const r=await window.lx.deals.catalog(Object.assign({sort:'trend',limit:16,nocount:true},o));if(my!==seq)return;r.rows.forEach(it=>rl.appendChild(colCard(it)));}catch(e){}va.textContent='View all '+t.toLowerCase()+' →';va.onclick=()=>go(g);};
   T.forEach(([t,o,g],i)=>{const b=el('button',i?null:'on',t);b.type='button';b.addEventListener('click',()=>{[...tabs.children].forEach(x=>x.classList.toggle('on',x===b));load(o,g,t);});tabs.appendChild(b);});load(T[0][1],T[0][2],T[0][0]);hm.appendChild(s);}
+
+ function shapes(hm,go){const s=el('section','cl-sec shp');const h=el('div','cl-sh');h.appendChild(el('h3',null,'Shop by shape'));s.appendChild(h);const row=el('div','shp-row');s.appendChild(row);
+  [['Tote bags','tote'],['Shoulder / Hobo','hobo'],['Crossbody','crossbody'],['Mini bags','mini'],['Top handle','satchel'],['Bucket','bucket'],['Clutch','clutch'],['Backpack','backpack']].forEach(([t,q],i)=>{const c=el('button','shp-c');c.type='button';const f=el('figure');c.appendChild(f);const lb=el('div');lb.appendChild(el('span',null,t));lb.appendChild(el('i',null,'→'));c.appendChild(lb);c.addEventListener('click',()=>go({q,cat:'Bags'}));row.appendChild(c);
+   window.lx.deals.catalog({q,cat:'Bags',segment:'luxury',sort:'trend',limit:1,offset:i%3,nocount:true}).then(r=>{const it=(r.rows||[])[0];if(!it)return;const im=el('img');im.src=cimg(it.images[0],500);im.alt='';f.appendChild(im);}).catch(()=>{});});hm.appendChild(s);}
  function colHome(hm,H,go,viewAll){const BR=H.brands||[];
   const sec=(t,more)=>{const s=el('section','cl-sec');const h=el('div','cl-sh');h.appendChild(el('h3',null,t));if(more){const b=el('button','cl-va',more[0]);b.type='button';b.addEventListener('click',more[1]);h.appendChild(b);}s.appendChild(h);hm.appendChild(s);return s;};
   const rail=async(s,o)=>{const r=el('div','cl-rail');s.appendChild(r);try{const x=await window.lx.deals.catalog(Object.assign({limit:14,nocount:true},o));x.rows.forEach(it=>r.appendChild(colCard(it)));}catch(e){}};
@@ -1449,6 +1453,7 @@
   giftEdit(hm,go);
   interlude(hm,'Quiet luxury,','sourced loudly.','Every piece bought at the house — never a reseller');
   const s3=sec('Shop by house',['All houses',()=>brandIndex(BR,b=>go({brand:b}))]);const hw=el('div','cl-houses');BR.slice(0,16).forEach(([b,n])=>{const x=el('button','cl-house');x.type='button';x.appendChild(el('span',null,b));x.appendChild(el('small',null,Number(n).toLocaleString('en-IN')+' pieces'));x.addEventListener('click',()=>go({brand:b}));hw.appendChild(x);});s3.appendChild(hw);
+  shapes(hm,go);
   occasions(hm,go);
   const s4=sec('Shop by category');const cw=el('div','cl-cats');(H.cats||[]).forEach(([c,n,img])=>{const x=el('button','cl-cat');x.type='button';if(img){const im=el('img');im.src=cimg(img,400);im.alt='';im.loading='lazy';x.appendChild(im);}x.appendChild(el('b',null,c));x.appendChild(el('small',null,Number(n).toLocaleString('en-IN')));x.addEventListener('click',()=>go({cat:c}));cw.appendChild(x);});s4.appendChild(cw);
   const s6=sec('The icons',['View all',()=>go({cat:'Bags',min:30000})]);s6.appendChild(el('p','cl-sub','The bags the houses are known for — the ones that never go quiet.'));rail(s6,{cat:'Bags',min:30000,sort:'trend'});
