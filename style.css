@@ -3841,3 +3841,18 @@ body.cl-on{overflow:hidden}
 .ed-go{width:100%}.ed-note{font:400 11.5px/1.5 'Lux Text',sans-serif;color:#a99d8a;margin:10px 0 0;text-align:center}
 .ed-empty{font:italic 400 16px/1.5 'Lux Display','Lx Playfair',Georgia,serif;color:#cfc3ad;text-align:center;padding:24px 8px}
 body:has(.ed-sh) .ed-pill{display:none}
+/* product page — accordion + FAQ */
+.pd-acc{margin:18px 0 6px;border-top:1px solid rgba(201,163,94,.25)}
+.pd-acc details,.pd-faq details{border-bottom:1px solid rgba(201,163,94,.2)}
+.pd-acc summary,.pd-faq summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:17px 2px;cursor:pointer}
+.pd-acc summary::-webkit-details-marker,.pd-faq summary::-webkit-details-marker{display:none}
+.pd-acc summary span{font:500 11.5px 'Lux Label',sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#f3ecdd}
+.pd-acc summary i,.pd-faq summary i{flex:none;width:9px;height:9px;border-right:1.4px solid #c9a35e;border-bottom:1.4px solid #c9a35e;transform:rotate(45deg) translate(-2px,-2px);transition:transform .3s}
+.pd-acc details[open] summary i,.pd-faq details[open] summary i{transform:rotate(-135deg)}
+.pd-c{padding:0 2px 16px;animation:pdIn .35s ease}.pd-c p{margin:0 0 10px;font:400 13px/1.6 'Lux Text',sans-serif;color:#cfc3ad}
+@keyframes pdIn{from{opacity:0;transform:translateY(-4px)}}
+.pd-faq{margin:22px -18px 6px;padding:22px 18px 10px;background:radial-gradient(120% 80% at 0% 0%,#1d1610,#0b0907 70%);border-top:1px solid rgba(201,163,94,.25)}
+.pd-faq small{display:block;font:500 10px 'Lux Label',sans-serif;letter-spacing:.18em;text-transform:uppercase;color:#C9A35E}
+.pd-faq h4{margin:6px 0 8px;font:italic 400 26px 'Lux Display','Lx Playfair',Georgia,serif;color:#f7efe2;font-weight:400}
+.pd-faq summary span{font:400 14px/1.4 'Lux Text',sans-serif;color:#f3ecdd}
+.pd-faq details p{margin:0 0 16px;font:400 13px/1.6 'Lux Text',sans-serif;color:#bfb39f}
