@@ -142,6 +142,37 @@ async function tb(b) {
   total += await send(batch.splice(0)); await ctx.close(); return total;
 }
 
+
+// ---------- Valentino · Bicester Village boutique (UK, price on request) ----------
+async function val(b) {
+  const ctx = await newCtx(b); const p = await ctx.newPage(); let H = null, total = 0;
+  p.on('request', r => { if (/vxp-api.*selections/.test(r.url())) H = r.headers(); });
+  await p.goto('https://myv-experience.valentino.com/0040000542/OUTLET%20BICESTER/VAL', { timeout: 90000, waitUntil: 'domcontentloaded' }); await sleep(9000);
+  if (!H) { console.log('val: no token'); await ctx.close(); return 0; }
+  const hh = { authorization: H.authorization, 'content-type': 'application/json', accept: 'application/json' };
+  const api = (u, body) => p.evaluate(async ([u, h, bd]) => { try { const r = await fetch(u, { method: bd ? 'POST' : 'GET', headers: h, body: bd ? JSON.stringify(bd) : undefined }); if (!r.ok) return { err: r.status }; return await r.json(); } catch (e) { return { err: String(e) }; } }, [u, hh, body]);
+  const hier = await api('https://vxp-api.valentino.ws/hierarchies/all'); const LBL = {}; const walk = n => { for (const x of n || []) { LBL[x.id] = x.label; walk(x.children); } }; walk(hier);
+  const tc = s => String(s || '').toLowerCase().replace(/\b\w/g, m => m.toUpperCase());
+  const img = g => `https://valentino-cdn.thron.com/delivery/public/image/valentino/${g.id}/${g.pkey}/std/1000x1000/valentino.jpg`;
+  for (const brand of ['VAL', 'VMA']) for (const lb of ['L', 'S', 'T', 'E', 'B', 'A']) {
+    const j = await api('https://vxp-api.valentino.ws/catalog/search/products', { brand, level1b: lb });
+    const P = (j && j.products) || []; if (j && j.err) { console.log('val', brand, lb, 'err', j.err); continue; }
+    const by = new Map(); for (const x of P) { const k = x.sapid; if (!by.has(k)) by.set(k, []); by.get(k).push(x); }
+    const items = []; let pos = 0;
+    for (const [sap, V] of by) {
+      const x = V[0]; const inStock = V.some(v => (v.sizes || []).some(z => z.quantity > 0)); if (!inStock) continue;
+      const imgs = [...new Set(V.flatMap(v => (v.galleryIdsPkeys || []).map(img)))].slice(0, 8); if (!imgs.length) continue;
+      const kind = LBL[x.level4] || LBL[x.level3] || LBL[x.level1b] || '';
+      const title = (tc(x.family) + ' ' + tc(kind)).replace(/\s+/g, ' ').trim();
+      const sizes = [...new Set(V.flatMap(v => (v.sizes || []).filter(z => z.quantity > 0).map(z => String(z.size).replace(/\/+$/, '').trim())).filter(z => z && z !== 'UNI'))];
+      const men = brand === 'VMA';
+      items.push({ id: 'vb_' + sap, sku: sap, brand: 'Valentino Garavani', title, category: tc(LBL[x.level1b] || '') + ' ' + kind, gender: men ? 'Men' : 'Women', por: true, cur: 'GBP', tax: 0, images: imgs, colours: V.map(v => ({ n: tc(v.description), img: (v.galleryIdsPkeys && v.galleryIdsPkeys[0]) ? img(v.galleryIdsPkeys[0]).replace('1000x1000', '120x120') : undefined })).slice(0, 10), sizes, story: '', details: [x.composition ? 'Composition: ' + String(x.composition).replace(/%/g, '% ').trim() : '', x.collection ? 'Collection: ' + tc(x.collection) : '', 'Style ' + sap].filter(Boolean), url: 'https://myv-experience.valentino.com/0040000542/OUTLET%20BICESTER/VAL', store: 'Valentino Bicester', eta: '3–4 weeks', segment: 'luxury', detail_ok: true, trend: Math.round(60 * (1 - pos++ / Math.max(1, by.size)) * 10) / 10 });
+    }
+    const s2 = await send(items); total += s2; console.log(new Date().toISOString().slice(11, 19), 'val', brand, LBL[lb] || lb, 'products', P.length, 'saved', s2);
+  }
+  await ctx.close(); return total;
+}
+
 // ---------- Shopify brand stores (official sites; /products.json) ----------
 // [key, Brand, domain, currency, segment, eta]
 const SHOPS = [
@@ -207,11 +238,12 @@ async function shopify(only) {
   const which = (process.argv[2] || 'shopify,coach,ks,tb,mk').split(',');
   const started = new Date().toISOString(); const res = {};
   if (which.includes('shopify')) res.shopify = await shopify(process.env.SHOPS ? process.env.SHOPS.split(',') : null).catch(e => (console.log('shopify fail', e.message), 0));
-  const needB = which.some(w => ['coach', 'ks', 'mk', 'tb'].includes(w));
+  const needB = which.some(w => ['coach', 'ks', 'mk', 'tb', 'val'].includes(w));
   const b = needB ? await chromium.launch({ executablePath: EXE, args: ['--no-sandbox', '--headless=new', '--disable-blink-features=AutomationControlled'] }) : null;
   if (which.includes('coach')) res.coach = await tapestry(b, { store: 'coachoutlet.com', brand: 'Coach', prefix: 'co_', landing: 'https://www.coachoutlet.com/shop/women/view-all', api: 'https://www.coach.com/api/get-shop/', invBase: 'https://www.coach.com', pdpBase: 'https://www.coach.com', site: 'https://www.coachoutlet.com', paths: ['outlet/women/view-all', 'outlet/men/view-all'] }).catch(e => (console.log('coach fail', e.message), 0));
   if (which.includes('ks')) res.ks = await tapestry(b, { store: 'katespadeoutlet.com', brand: 'Kate Spade', prefix: 'ks_', gender: 'Women', landing: 'https://www.katespadeoutlet.com/shop/handbags/view-all', api: 'https://www.katespadeoutlet.com/api/get-shop/', invBase: 'https://www.katespadeoutlet.com', pdpBase: 'https://www.katespadeoutlet.com', site: 'https://www.katespadeoutlet.com', paths: ['handbags/view-all', 'wallets/view-all', 'shoes/view-all', 'jewelry/view-all', 'clothing/view-all', 'accessories/view-all'] }).catch(e => (console.log('ks fail', e.message), 0));
   if (which.includes('tb')) res.tb = await tb(b).catch(e => (console.log('tb fail', e.message), 0));
+  if (which.includes('val')) res.val = await val(b).catch(e => (console.log('val fail', e.message), 0));
   if (which.includes('mk')) res.mk = await mk(b, process.env.MK_CATS ? process.env.MK_CATS.split(',').map(c => [c, '']) : null).catch(e => (console.log('mk fail', e.message), 0));
   console.log('DONE', JSON.stringify(res), 'started', started);
   if (b) await b.close();
