@@ -3929,3 +3929,10 @@ body:has(.ed-sh) .ed-pill{display:none}
 .ft2 .ft-go{background:#17110b!important;color:#f1d58e!important;border:0!important;backdrop-filter:none!important}
 .ft2 .ft-nav{padding:16px 18px 0}.ft2 .ft-ct{color:#6b5a45}.ft2 .ft-dots i{background:rgba(23,17,11,.2)}.ft2 .ft-dots i.on{background:#17110b}
 .ed-pill{bottom:calc(150px + env(safe-area-inset-bottom))!important}
+/* edit hero v3 — no frame, Luxella type */
+.cu-fr{display:none!important}
+.cu-hero figcaption small{font:italic 400 18px 'Lx Playfair','Lux Display',Georgia,serif!important;letter-spacing:.01em!important;text-transform:none!important;color:#f1d58e!important}
+.cu-hero figcaption b{font:400 clamp(22px,6.6vw,30px)/1.08 'Lx Bodoni',Georgia,serif!important;font-style:normal!important;text-transform:uppercase;letter-spacing:.06em;background:linear-gradient(180deg,#fffaf0 0%,#f6e3b0 55%,#d9b765 100%);-webkit-background-clip:text;background-clip:text;color:transparent!important;text-shadow:none!important;filter:drop-shadow(0 2px 10px rgba(0,0,0,.55))}
+.cu-hero figcaption span{font:500 9px 'Lux Label',sans-serif!important;letter-spacing:.22em!important;color:#e9dcc0!important;padding-top:8px;border-top:1px solid rgba(241,213,142,.45);display:inline-block!important;margin-top:4px}
+.cu-hero{box-shadow:0 24px 50px rgba(0,0,0,.5)}
+.cu[data-g="Women"] .cu-hero img{object-position:30% 25%!important}
