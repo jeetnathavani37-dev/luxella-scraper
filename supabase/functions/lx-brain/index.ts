@@ -30,11 +30,18 @@ async function callGemini(ai: any, sys: string, text: string, image?: any, audio
   const parts: any[] = [{ text: sys }, { text: "INPUT TEXT:\n" + (text || "(none)") }];
   if (image?.b64) parts.push({ inline_data: { mime_type: image.mime || "image/jpeg", data: image.b64 } });
   if (audio?.b64) parts.push({ inline_data: { mime_type: audio.mime || "audio/webm", data: audio.b64 } });
-  const m = ai.model || "gemini-2.5-flash";
-  const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${ai.key}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ contents: [{ role: "user", parts }], generationConfig: { responseMimeType: "application/json", temperature: 0.1 } }) });
-  const j: any = await r.json().catch(() => ({}));
-  if (!r.ok) throw new Error("Gemini " + r.status + ": " + String(j?.error?.message || "").slice(0, 160));
-  return j?.candidates?.[0]?.content?.parts?.map((p: any) => p.text || "").join("") || "";
+  const tried = [ai.model, "gemini-flash-latest", "gemini-3.8-flash", "gemini-3-flash", "gemini-2.5-flash"].filter((x, i, a) => x && a.indexOf(x) === i);
+  let last = "";
+  for (const m of tried) {
+    const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent`, { method: "POST", headers: { "Content-Type": "application/json", "x-goog-api-key": ai.key }, body: JSON.stringify({ contents: [{ role: "user", parts }], generationConfig: { responseMimeType: "application/json", temperature: 0.1 } }) });
+    const j: any = await r.json().catch(() => ({}));
+    if (r.ok) { ai.model = m; return j?.candidates?.[0]?.content?.parts?.map((p: any) => p.text || "").join("") || ""; }
+    last = "Gemini " + r.status + ": " + String(j?.error?.message || "").slice(0, 160);
+    if (r.status !== 404 && r.status !== 400) break;
+    const sug = String(j?.error?.message || "").match(/models\/(gemini-[\w.-]+)/g);
+    if (sug) for (const x of sug) { const n = x.replace("models/", ""); if (!tried.includes(n)) tried.push(n); }
+  }
+  throw new Error(last);
 }
 async function callClaude(ai: any, sys: string, text: string, image?: any) {
   const content: any[] = [];
@@ -56,7 +63,7 @@ Deno.serve(async (req) => {
     if (body.action === "setkey") {
       const provider = body.provider === "anthropic" ? "anthropic" : "gemini"; const key = String(body.key || "").trim();
       if (!key) { await db.from("lx_km_vault").delete().eq("id", "ai"); return J({ ok: true, connected: false }); }
-      const ai = { provider, key, model: String(body.model || "").trim() || null };
+      const ai: any = { provider, key, model: String(body.model || "").trim() || null };
       try { const t = provider === "gemini" ? await callGemini(ai, 'Reply {"ok":true}', "") : await callClaude(ai, 'Reply {"ok":true}', "ping"); parseJSON(t); } catch (e) { return J({ ok: false, error: String((e as Error).message || e) }); }
       await db.from("lx_km_vault").upsert({ id: "ai", data: ai, updated_at: new Date().toISOString() });
       return J({ ok: true, connected: true, provider });
