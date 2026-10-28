@@ -107,6 +107,45 @@ Deno.serve(async (req) => {
       await db.from("lx_km_vault").upsert({ id: "ai", data: ai, updated_at: new Date().toISOString() });
       return J({ ok: true, connected: true, provider });
     }
+    if (body.action === "video_start") {
+      const ai = await getAI(); if (!ai?.key) return J({ ok: false, error: "no_ai" });
+      if (ai.provider !== "gemini") return J({ ok: false, error: "AI video needs a Gemini key" });
+      const T: Record<string, string> = {
+        unboxing: "Close-up vertical video: elegant hands with neat manicure slowly untie a satin ribbon and lift the lid of a luxury gift box, revealing the exact product from the reference image nestled in tissue paper; soft warm window light, shallow depth of field, slow cinematic push-in, premium ASMR feel.",
+        handheld: "Vertical video in a luxury boutique: a hand holds the exact product from the reference image and slowly turns it to show front, side and details; marble and brass interior softly blurred behind, warm golden light, smooth handheld motion.",
+        model: "Vertical fashion video: an elegant model walks towards camera on a Parisian street at golden hour carrying or wearing the exact product from the reference image, slow motion, editorial film look, the product stays clearly visible.",
+        spin: "Vertical studio video: the exact product from the reference image rotates slowly on a round plinth, seamless ivory backdrop, soft studio lighting, subtle reflections, smooth 360° turn.",
+        flatlay: "Vertical top-down video: a styled flat lay on cream linen with dried flowers and a perfume bottle; the exact product from the reference image is gently placed in the centre by a hand; soft daylight, calm editorial mood."
+      };
+      const prompt = (T[String(body.tpl)] || T.handheld) + " Keep the product 100% identical to the reference — same shape, colour, material, logos and hardware. No text, no captions, no watermark." + (body.hint ? " Product: " + String(body.hint).slice(0, 120) + "." : "");
+      const models = [ai.videoModel, "veo-3.1-fast-generate-preview", "veo-3.0-fast-generate-001", "veo-3.1-generate-preview", "veo-3.0-generate-001", "veo-2.0-generate-001"].filter((x, i, a) => x && a.indexOf(x) === i);
+      let last = "";
+      for (const m of models) {
+        const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:predictLongRunning`, { method: "POST", headers: { "Content-Type": "application/json", "x-goog-api-key": ai.key }, body: JSON.stringify({ instances: [{ prompt, image: { bytesBase64Encoded: body.image?.b64 || "", mimeType: body.image?.mime || "image/jpeg" } }], parameters: { aspectRatio: "9:16" } }) });
+        const j: any = await r.json().catch(() => ({}));
+        if (r.ok && j?.name) return J({ ok: true, op: j.name, model: m });
+        last = "Veo " + r.status + ": " + String(j?.error?.message || "").slice(0, 200);
+        if (r.status === 404 || r.status === 400) continue; break;
+      }
+      return J({ ok: false, error: last || "Video model unavailable" });
+    }
+    if (body.action === "video_status") {
+      const ai = await getAI(); if (!ai?.key) return J({ ok: false, error: "no_ai" });
+      const op = String(body.op || ""); if (!/^models\/[\w.-]+\/operations\/[\w-]+$/.test(op)) return J({ ok: false, error: "bad op" });
+      const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/${op}`, { headers: { "x-goog-api-key": ai.key } });
+      const j: any = await r.json().catch(() => ({}));
+      if (!r.ok) return J({ ok: false, error: "Veo " + r.status + ": " + String(j?.error?.message || "").slice(0, 200) });
+      if (!j.done) return J({ ok: true, done: false });
+      if (j.error) return J({ ok: false, error: String(j.error.message || "Video failed").slice(0, 200) });
+      const uri = j?.response?.generateVideoResponse?.generatedSamples?.[0]?.video?.uri || j?.response?.generatedVideos?.[0]?.video?.uri;
+      if (!uri) return J({ ok: false, error: "No video returned (it may have been blocked by safety filters)" });
+      const v = await fetch(uri, { headers: { "x-goog-api-key": ai.key } }); if (!v.ok) return J({ ok: false, error: "Download failed " + v.status });
+      const bin = new Uint8Array(await v.arrayBuffer());
+      const path = `deals/aivideo_${Date.now()}_${Math.random().toString(36).slice(2, 7)}.mp4`;
+      const up = await db.storage.from("lx-assets").upload(path, bin, { contentType: "video/mp4", upsert: false });
+      if (up.error) return J({ ok: false, error: up.error.message });
+      return J({ ok: true, done: true, url: db.storage.from("lx-assets").getPublicUrl(path).data.publicUrl });
+    }
     if (body.action === "model_shot") {
       const ai = await getAI(); if (!ai?.key) return J({ ok: false, error: "no_ai" });
       if (ai.provider !== "gemini") return J({ ok: false, error: "Model shots need a Gemini key" });
