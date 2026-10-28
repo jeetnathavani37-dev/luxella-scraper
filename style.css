@@ -3065,3 +3065,6 @@ body.cl-on{overflow:hidden}
 .cl-find small{font:300 7.5px 'Lux Wide',sans-serif;letter-spacing:.3em;text-transform:uppercase;color:#d8b46a}
 .cl-find b{font:italic 400 22px 'Lux Display',Georgia,serif;color:#F3ECDD}
 .cl-find span{font:400 12.5px/1.45 'Lux Text',sans-serif;color:#cfc4b0}
+.dl-shelf-s .dl-shelf-cl{flex:none;width:min(46vw,210px);scroll-snap-align:start}
+.dl-shelf-s .cl-more-c{flex:none;width:min(46vw,210px);aspect-ratio:4/5;display:grid;place-items:center;border:1px solid rgba(201,169,106,.35);border-radius:12px;background:linear-gradient(150deg,#1c160e,#0b0a08)}
+.dl-shelf-s .cl-more-c b{font:italic 400 20px 'Lux Display',Georgia,serif;color:#E9D3A6;text-align:center;padding:0 12px}
