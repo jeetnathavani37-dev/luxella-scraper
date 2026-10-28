@@ -1048,7 +1048,8 @@
   stickTop();if(!window.__stk){window.__stk=1;let q=0;const f=()=>{if(q)return;q=requestAnimationFrame(()=>{q=0;stickTop();});};document.addEventListener('scroll',f,{passive:true,capture:true});addEventListener('resize',f);}
   try{const dk=$('deals');['deals','shop','reqs'].forEach(v=>dk.classList.toggle('dl-on-'+v,VIEW===v));}catch(e){}
   {const sp=el('button','dl-srch-pill');sp.type='button';sp.appendChild(el('span','dl-srch-ic','⌕'));sp.appendChild(el('span',null,'Search brands, pieces, budget, size…'));sp.addEventListener('click',()=>searchSheet());l.appendChild(sp);}
-  l.appendChild(viewSwitch(pdfs.length,all.length+dropPieces().length));
+  if(!COLF&&!window.__colf){window.__colf=1;window.lx.deals.catalogFacets().then(f=>{COLF=f;render();}).catch(()=>{});}
+  {const nS=all.length+dropPieces().length+((COLF&&COLF.total)||0);l.appendChild(viewSwitch(pdfs.length,nS>=10000?(Math.floor(nS/100)/10)+'k':nS));}
   if(!own())autoReady(l);
   if(VIEW==='shop'){shopView(l,all);return;}
   if(VIEW==='reqs'){requestsView(l);return;}
