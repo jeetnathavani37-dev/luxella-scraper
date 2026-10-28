@@ -3873,3 +3873,29 @@ body:has(.ed-sh) .ed-pill{display:none}
 .std-c img{width:100%;height:auto;display:block;box-shadow:0 18px 40px rgba(0,0,0,.55);transform:scale(.94);opacity:.6;transition:transform .7s cubic-bezier(.22,1,.36,1),opacity .7s}
 .std-c.on img{transform:none;opacity:1}
 .std-end{margin:18px 16px 0;font:500 9.5px 'Lux Label',sans-serif;letter-spacing:.22em;text-transform:uppercase;color:#C9A35E}
+/* Standard v2 — animated deck */
+.std2 .std-bars{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin:0 22px}
+.std-bars i{position:relative;height:2px;background:rgba(201,163,94,.22);overflow:hidden}
+.std-bars i b{position:absolute;inset:0;width:0;background:linear-gradient(90deg,#8a6a25,#f1d58e)}
+.std-bars i.done b{width:100%}.std-bars i.run b{animation:stdRun var(--t,5s) linear forwards}
+@keyframes stdRun{to{width:100%}}
+.std2 .std-steps{margin:10px 14px 8px}
+.std-stage{position:relative;margin:6px 18px 0;aspect-ratio:1312/1240;perspective:1100px;touch-action:pan-y;--rx:0deg;--ry:0deg;--mx:50%;cursor:grab}
+.std-k{position:absolute;inset:0;margin:0;transform-style:preserve-3d;transition:transform .9s cubic-bezier(.22,1,.36,1),opacity .7s,filter .7s;transform:translate3d(0,calc(var(--d)*-14px),calc(var(--d)*-60px)) scale(calc(1 - var(--d)*.05));opacity:calc(1 - var(--d)*.28);filter:brightness(calc(1 - var(--d)*.25))}
+.std-k img{width:100%;height:100%;object-fit:cover;display:block;box-shadow:0 26px 60px rgba(0,0,0,.65);user-select:none;-webkit-user-drag:none}
+.std-k.on{transform:translateX(var(--drag,0px)) rotateX(var(--rx)) rotateY(var(--ry)) rotateZ(calc(var(--drag,0px) / 40));transition:transform .5s cubic-bezier(.22,1,.36,1),opacity .6s}
+.std-k.on img{animation:stdRise 1s cubic-bezier(.22,1,.36,1) both,stdZoom 6s ease-out both}
+@keyframes stdRise{from{transform:translateY(40px) scale(.96);opacity:.2;filter:blur(3px)}}
+@keyframes stdZoom{to{transform:scale(1.035)}}
+.std-k.out{animation:stdOut .8s cubic-bezier(.65,0,.35,1) both;z-index:9!important}
+@keyframes stdOut{0%{transform:none;opacity:1}100%{transform:translate3d(-120%,-30px,0) rotateZ(-14deg);opacity:0}}
+.std-sheen{position:absolute;inset:0;pointer-events:none;background:linear-gradient(110deg,transparent 30%,rgba(255,236,190,.20) 48%,transparent 62%);background-size:220% 100%;background-position:var(--mx) 0;mix-blend-mode:screen;opacity:0;transition:opacity .4s}
+.std-k.on .std-sheen{opacity:1;animation:stdSheen 3.2s .5s ease-in-out}
+@keyframes stdSheen{from{background-position:140% 0}to{background-position:-40% 0}}
+.std-cap{display:flex;align-items:baseline;justify-content:center;gap:12px;margin-top:18px}
+.std-cap em{font:500 10px 'Lux Label',sans-serif;letter-spacing:.2em;color:#8f846f;font-style:normal}
+.std-cap b{font:italic 400 22px 'Lux Display','Lx Playfair',Georgia,serif;color:#f1d58e;font-weight:400}
+.std-cap.in>*{animation:capIn .7s cubic-bezier(.22,1,.36,1) both}.std-cap.in b{animation-delay:.08s}
+@keyframes capIn{from{opacity:0;transform:translateY(10px)}}
+.std>small{font:700 15px 'Lux Label',sans-serif!important;letter-spacing:.22em!important;background:linear-gradient(180deg,#fff3d6 0%,#f1d58e 40%,#c9a35e 70%,#8a6a25 100%);-webkit-background-clip:text;background-clip:text;color:transparent!important;filter:drop-shadow(0 2px 6px rgba(241,213,142,.25))}
+@media (prefers-reduced-motion:reduce){.std-k,.std-k.on img,.std-k.out,.std-sheen{animation:none!important;transition:none!important}}
