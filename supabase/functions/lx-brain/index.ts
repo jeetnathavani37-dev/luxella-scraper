@@ -52,6 +52,45 @@ async function callClaude(ai: any, sys: string, text: string, image?: any) {
   if (!r.ok) throw new Error("Claude " + r.status + ": " + String(j?.error?.message || "").slice(0, 160));
   return (j?.content || []).map((c: any) => c.text || "").join("");
 }
+
+async function identifyGemini(ai: any, prompt: string, image: any) {
+  const parts: any[] = [{ text: prompt }];
+  if (image?.b64) parts.push({ inline_data: { mime_type: image.mime || "image/jpeg", data: image.b64 } });
+  const tried = [ai.model, "gemini-flash-latest", "gemini-3.8-flash", "gemini-3-flash", "gemini-2.5-flash"].filter((x, i, a) => x && a.indexOf(x) === i);
+  let last = "";
+  for (const m of tried) {
+    const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent`, { method: "POST", headers: { "Content-Type": "application/json", "x-goog-api-key": ai.key }, body: JSON.stringify({ contents: [{ role: "user", parts }], tools: [{ google_search: {} }], generationConfig: { temperature: 0.1 } }) });
+    const j: any = await r.json().catch(() => ({}));
+    if (r.ok) { const c = j?.candidates?.[0]; const txt = c?.content?.parts?.map((p: any) => p.text || "").join("") || ""; const src = (c?.groundingMetadata?.groundingChunks || []).map((g: any) => g?.web?.uri).filter(Boolean).slice(0, 6); return { txt, src }; }
+    last = "Gemini " + r.status + ": " + String(j?.error?.message || "").slice(0, 160);
+    if (r.status !== 404 && r.status !== 400) break;
+  }
+  throw new Error(last);
+}
+async function identifyClaude(ai: any, prompt: string, image: any) {
+  const content: any[] = [];
+  if (image?.b64) content.push({ type: "image", source: { type: "base64", media_type: image.mime || "image/jpeg", data: image.b64 } });
+  content.push({ type: "text", text: prompt });
+  const r = await fetch("https://api.anthropic.com/v1/messages", { method: "POST", headers: { "Content-Type": "application/json", "x-api-key": ai.key, "anthropic-version": "2023-06-01" }, body: JSON.stringify({ model: ai.model || "claude-haiku-5-5", max_tokens: 3000, tools: [{ type: "web_search_20250305", name: "web_search", max_uses: 6 }], messages: [{ role: "user", content }] }) });
+  const j: any = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error("Claude " + r.status + ": " + String(j?.error?.message || "").slice(0, 160));
+  const txt = (j?.content || []).filter((c: any) => c.type === "text").map((c: any) => c.text || "").join("");
+  return { txt, src: [] as string[] };
+}
+async function mirrorImage(url: string) {
+  try {
+    if (!/^https:\/\//i.test(url)) return "";
+    const r = await fetch(url, { headers: { "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1", "Accept": "image/avif,image/webp,image/jpeg,image/*,*/*;q=0.8" } });
+    const ct = r.headers.get("content-type") || "";
+    if (!r.ok || !ct.startsWith("image/")) return "";
+    const b = new Uint8Array(await r.arrayBuffer()); if (b.length < 3000 || b.length > 8e6) return "";
+    const ext = ct.includes("png") ? "png" : ct.includes("webp") ? "webp" : "jpg";
+    const path = `deals/official_${Date.now()}_${Math.random().toString(36).slice(2, 7)}.${ext}`;
+    const up = await db.storage.from("lx-assets").upload(path, b, { contentType: ct, upsert: false });
+    if (up.error) return "";
+    return db.storage.from("lx-assets").getPublicUrl(path).data.publicUrl;
+  } catch (_) { return ""; }
+}
 function parseJSON(s: string) { const a = s.indexOf("{"), b = s.lastIndexOf("}"); if (a < 0 || b < 0) throw new Error("AI ne JSON nahi diya"); return JSON.parse(s.slice(a, b + 1)); }
 
 Deno.serve(async (req) => {
@@ -67,6 +106,21 @@ Deno.serve(async (req) => {
       try { const t = provider === "gemini" ? await callGemini(ai, 'Reply {"ok":true}', "") : await callClaude(ai, 'Reply {"ok":true}', "ping"); parseJSON(t); } catch (e) { return J({ ok: false, error: String((e as Error).message || e) }); }
       await db.from("lx_km_vault").upsert({ id: "ai", data: ai, updated_at: new Date().toISOString() });
       return J({ ok: true, connected: true, provider });
+    }
+    if (body.action === "deals_identify") {
+      const ai = await getAI(); if (!ai?.key) return J({ ok: false, error: "no_ai" });
+      const hint = String(body.hint || "").slice(0, 300);
+      const prompt = `You are a luxury retail product identifier. Look at the photo (a store / outlet / reseller photo or screenshot).${hint ? " Extra hint from the seller: " + hint + "." : ""}
+1) Identify the brand and the exact product (model name, colourway/material, style code if visible).
+2) Use web search to find this exact product on the brand's OFFICIAL website first (e.g. burberry.com, coach.com, us.puma.com, philipp-plein.com). If not on the official site, use a major authorised retailer (Farfetch, Nordstrom, Saks, Mytheresa, NAP, SSENSE).
+3) Return ONLY JSON, no markdown:
+{"brand":"","title":"clean product name in Title Case, no brand","colour":"","style_code":"","url":"product page URL","retail_price":number|null,"currency":"USD|INR|EUR|GBP|...","image_url":"direct URL of the main product image on that page (jpg/png/webp) or empty","category":"bags|shoes|clothing|wallets|accessories|watches|eyewear|fragrance","match":"exact|similar|guess","confidence":0-1,"note":"one short line"}
+Never invent a URL or price. If unsure, set match to "guess" and leave unknown fields empty.`;
+      const out = ai.provider === "gemini" ? await identifyGemini(ai, prompt, body.image) : await identifyClaude(ai, prompt, body.image);
+      let it: any = {}; try { it = parseJSON(out.txt); } catch (_) { return J({ ok: false, error: "AI could not identify this piece" }); }
+      const res: any = { brand: String(it.brand || "").slice(0, 60), title: String(it.title || "").slice(0, 160), colour: String(it.colour || "").slice(0, 60), style_code: String(it.style_code || "").slice(0, 40), url: /^https?:\/\//.test(it.url || "") ? String(it.url).slice(0, 500) : "", retail_price: Number(it.retail_price) || null, currency: String(it.currency || "").toUpperCase().slice(0, 3) || null, category: String(it.category || "").slice(0, 20), match: ["exact", "similar", "guess"].includes(it.match) ? it.match : "guess", confidence: Number(it.confidence) || 0, note: String(it.note || "").slice(0, 160), sources: out.src };
+      res.image = it.image_url ? await mirrorImage(String(it.image_url)) : "";
+      return J({ ok: true, provider: ai.provider, item: res });
     }
     if (body.action === "deals_extract") {
       const ai = await getAI(); if (!ai?.key) return J({ ok: false, error: "no_ai" });
