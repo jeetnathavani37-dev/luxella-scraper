@@ -150,7 +150,7 @@ async function popUpload(e){const fl=Array.from((e.target.files)||[]);const r=ph
  for(const f of fl){if(f.size>10*1024*1024){alertMsg(f.name+' is over 10 MB.');return;}}
  try{alertMsg('Uploading…');const key=pslug(r.item);const cur=((photos.pop[key]&&photos.pop[key].files)||[]).slice();for(const f of fl){const a=await photos.assets.upload(f);cur.push({id:a.id,url:a.url,name:f.name,at:new Date().toISOString().slice(0,10)});}
   await photos.db.doc('pop/'+key).set({order:r.item,files:cur});alertMsg('Proof of purchase added.');
-  setTimeout(()=>{const hs=Array.from(document.querySelectorAll('.pop-card')).filter(c=>c.dataset.k===key);const h=hs[0]||host;if(h&&h.isConnected)popMsgBox(r,h);else{const t=document.querySelector('.pop-card');if(t)popMsgBox(r,t);}},700);
+  setTimeout(()=>{const hs=Array.from(document.querySelectorAll('.pop-card')).filter(c=>c.dataset.k===key);const h=hs[0]||host;const hh=(h&&h.isConnected)?h:document.querySelector('.pop-card');if(hh){popMsgBox(r,hh);const wa=hh.querySelector('.pop-msg a.addph');if(wa){wa.classList.add('pop-wa');let ok=null;try{ok=window.open(wa.href,'_blank');}catch(e){}if(!ok)alertMsg('Tap "Send on WhatsApp" to send the message.');}}},700);
  }catch(err){alertMsg('Could not upload.');}}
 function updatesEl(r){const key=pslug(r.item);const items=((photos.notes[key]&&photos.notes[key].items)||[]).slice().reverse();const w=document.createElement('div');
  if(items.length){const ul=document.createElement('ul');ul.className='upd';items.slice(0,5).forEach(n=>{const li=document.createElement('li');const d=document.createElement('span');d.className='d';d.textContent=fd(n.at);const t=document.createElement('span');t.textContent=n.text;li.appendChild(d);li.appendChild(t);ul.appendChild(li);});w.appendChild(ul);}
