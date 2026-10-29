@@ -938,11 +938,11 @@ dash.onData(()=>{
   const step=(n,h,el)=>{const s=mk('div','hv-step');s.appendChild(mk('i',null,String(n)));const c=mk('div');c.appendChild(mk('b',null,h));if(el)c.appendChild(el);s.appendChild(c);box.appendChild(s);};
   const cbtn=(lbl,t)=>{const b=mk('button','hv-cp',lbl);b.type='button';b.onclick=()=>copy(t,b);return b;};
   const url=BASE()+'?ask=';
-  if(!standalone()){const w=mk('div');if(installEv){const ib=mk('button','hv-go','Install Luxella app');ib.type='button';ib.onclick=async()=>{installEv.prompt();try{await installEv.userChoice;}catch(e){}installEv=null;ib.textContent='Installed ✓';};w.appendChild(ib);}else w.appendChild(mk('small',null,isIOS?'Safari: tap Share ⬆, then “Add to Home Screen”.':'Browser menu ⋮, then “Add to Home screen” / “Install app”.'));step(1,'Add Luxella to your home screen',w);}
+  if(!standalone()&&!isIOS){const w=mk('div');if(installEv){const ib=mk('button','hv-go','Install Luxella app');ib.type='button';ib.onclick=async()=>{installEv.prompt();try{await installEv.userChoice;}catch(e){}installEv=null;ib.textContent='Installed ✓';};w.appendChild(ib);}else w.appendChild(mk('small',null,isIOS?'Safari: tap Share ⬆, then “Add to Home Screen”.':'Browser menu ⋮, then “Add to Home screen” / “Install app”.'));step(1,'Add Luxella to your home screen',w);}
   const vt=(()=>{try{return ((window.__lxAdmin.S.docs.meta||{}).voice_token||{}).token||'';}catch(e){return '';}})();
   const api='https://qzripzgbstvxkfobzhyv.supabase.co/functions/v1/lx-voice?t='+vt+'&q=';const heyUrl=BASE()+'?hey=1';
-  if(isIOS){box.insertBefore(mk('h3','hv-h','Siri answers you out loud'),box.querySelector('.hv-step'));
-   const n0=standalone()?0:1;
+  if(isIOS){box.appendChild(mk('h3','hv-h','Siri answers you out loud'));
+   const n0=0;
    if(vt){const w2=mk('div');w2.appendChild(mk('small',null,'Shortcuts app → + → add these 3 actions in order:'));const ol=mk('ol','hv-ol');['Dictate Text','Get Contents of URL — paste your link, then tap at the end and insert “Dictated Text”','Speak Text — choose “Contents of URL”'].forEach(t=>ol.appendChild(mk('li',null,t)));w2.appendChild(ol);w2.appendChild(cbtn('Copy my Siri link',api));step(n0+1,'Build the Siri shortcut (1 minute)',w2);}
    else{const w2=mk('div');w2.appendChild(mk('small',null,'Shortcuts app → + → “Dictate Text”, then “Open URLs”: paste this link and insert “Dictated Text” right after it.'));w2.appendChild(cbtn('Copy Luxella link',BASE()+'?ask='));step(n0+1,'Build the Siri shortcut',w2);}
    step(n0+2,'Name it “Luxella”',mk('small',null,'Say “Hey Siri, Luxella” → “Where is my Coach bag?” Siri replies out loud. No need to open anything.'));}
