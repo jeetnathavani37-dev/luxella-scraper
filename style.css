@@ -4255,3 +4255,4 @@ body:has(.ed-sh) .ed-pill{display:none}
 .hv-fab{right:auto;left:max(16px,env(safe-area-inset-left,0px));bottom:calc(max(16px,env(safe-area-inset-bottom,0px)) + 52px)}
 .hv-ol{margin:4px 0 10px 18px;padding:0;font:400 12.5px/1.55 'Lux Text',sans-serif;color:#d9cbb0}.hv-ol li{margin:2px 0}
 .hv-ol{margin:4px 0 10px 18px;padding:0;font:400 12.5px/1.55 'Lux Text',sans-serif;color:#d9cbb0}.hv-ol li{margin:2px 0}
+.pop-go.pop-sm{display:block;margin-top:10px}
