@@ -1,8 +1,6 @@
 name: Deploy portal
 on:
-  push:
-    branches: [main]
-  workflow_dispatch:
+  workflow_dispatch:   # GitHub Pages mirror is retired (production = Vercel); manual only
 permissions:
   contents: write
 concurrency:

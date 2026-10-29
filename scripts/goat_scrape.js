@@ -4,7 +4,7 @@
 // Usage: LX_CAT_KEY=... node scripts/goat_scrape.js [maxProducts]
 const { chromium } = require('playwright');
 const KEY = process.env.LX_CAT_KEY || (process.env.LX_CAT_KEY_FILE ? require('fs').readFileSync(process.env.LX_CAT_KEY_FILE, 'utf8').trim() : ''); const FN = 'https://qzripzgbstvxkfobzhyv.supabase.co/functions/v1/lx-catalog';
-const EXE = process.env.CHROME || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
+const EXE = process.env.CHROME || undefined;
 const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36';
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const SHIP_USD = 15;            // GOAT US shipping to the forwarder

@@ -22,7 +22,7 @@ def load(p, d):
     except Exception: return d
 
 ORD = load(os.path.join(HERE, 'fixtures/orders.json'), [])
-CAT = load(os.path.join(HERE, '.fixtures/cat.json'), [])
+CAT = load(os.path.join(HERE, '.fixtures/cat.json'), []) or load(os.path.join(HERE, 'fixtures/cat_sample.json'), [])
 DEALS = load(os.path.join(HERE, '.fixtures/deals.json'), [])
 
 # ---------- production smoke ----------
@@ -88,16 +88,20 @@ def handle(route, req):
     if '/storage/v1/' in u and req.method != 'GET': return J(route, {'Key': 'qa'})
     return route.continue_()
 
-STEPS = [
-    ('home', "()=>window.scrollTo(0,0)"),
-    ('home-scrolled', "()=>window.scrollTo(0,1600)"),
-    ('edit-arrivals', "()=>{const t=document.getElementById('tab-deals');t&&t.click()}"),
-    ('boutique', "()=>{const b=[...document.querySelectorAll('.dl-vs-b')].find(x=>/boutique/i.test(x.textContent));b&&b.click()}"),
-    ('boutique-mid', "()=>{const p=document.getElementById('pane-deals');p&&p.scrollTo(0,4000)}"),
-    ('boutique-deep', "()=>{const p=document.getElementById('pane-deals');p&&p.scrollTo(0,9000)}"),
-    ('product', "()=>{const c=[...document.querySelectorAll('.cl-card')].find(x=>x.querySelector('img'));c&&c.click()}"),
-    ('product-swipe', "()=>{const g=document.querySelector('.cl-dt .cl-gal');if(g){window.__gl=g.scrollLeft;g.scrollTo({left:g.clientWidth,behavior:'instant'})}}"),
-]
+TABS = ['ov','deals','ig','rts','tr','al','pay','ad','msg','st','pol','help']
+def steps_for(role):
+    st=[('home',"()=>window.scrollTo(0,0)")]
+    for t in TABS:
+        st.append((f'tab-{t}',"()=>{const b=document.getElementById('tab-%s');if(b&&b.offsetParent!==null)b.click();window.scrollTo(0,0)}"%t))
+        st.append((f'tab-{t}-bottom',"()=>{const p=document.getElementById('pane-deals');const fx=p&&getComputedStyle(p).position==='fixed'&&!p.hidden;if(fx)p.scrollTo(0,p.scrollHeight);else window.scrollTo(0,document.body.scrollHeight)}"))
+    st+=[('edit',"()=>{const t=document.getElementById('tab-deals');t&&t.click()}"),
+     ('boutique',"()=>{const b=[...document.querySelectorAll('.dl-vs-b')].find(x=>/boutique/i.test(x.textContent));b&&b.click()}"),
+     ('boutique-mid',"()=>{const p=document.getElementById('pane-deals');p&&p.scrollTo(0,4000)}"),
+     ('boutique-deep',"()=>{const p=document.getElementById('pane-deals');p&&p.scrollTo(0,9000)}"),
+     ('product',"()=>{const c=[...document.querySelectorAll('.cl-card')].find(x=>x.querySelector('img'));c&&c.click()}"),
+     ('product-swipe',"()=>{const g=document.querySelector('.cl-dt .cl-gal');if(g){g.scrollTo({left:g.clientWidth,behavior:'instant'})}}"),
+     ('search-type',"()=>{document.querySelectorAll('.dl-sh .x,.cl-dt .x').forEach(x=>x.click());const i=document.querySelector('input[type=search]');if(i){i.focus();i.value='coach bag under 30k';i.dispatchEvent(new Event('input',{bubbles:true}))}}")]
+    return st
 PROBE = """()=>{
  const vis=e=>{const r=e.getBoundingClientRect();return r.width>0&&r.height>0&&r.bottom>0&&r.top<innerHeight};
  const imgs=[...document.images].filter(vis);
@@ -110,9 +114,19 @@ PROBE = """()=>{
    galleryScrolls:g?(g.scrollLeft>0||g.scrollWidth<=g.clientWidth+2):null,undefinedText:/\\bundefined\\b|\\bNaN\\b|\\[object Object\\]/.test(txt)};
 }"""
 summary = []
+import re as _re
+_m=_re.search(r"owner=\['([^']+)'",open(os.path.join(ROOT,'shim.js')).read())
+OWNER=_m.group(1) if _m else ''
+def session(email):
+    j=b64({'alg':'HS256','typ':'JWT'})+'.'+b64({'sub':'qa','email':email,'exp':exp,'role':'authenticated','aud':'authenticated'})+'.x'
+    return {'access_token':j,'token_type':'bearer','expires_in':86400,'expires_at':exp,'refresh_token':'r','user':{'id':'qa','email':email,'aud':'authenticated','role':'authenticated'}}
 with sync_playwright() as p:
     engines = ['webkit', 'chromium'] if ENG == 'both' else [ENG]
+    roles=[('client','qa@example.com')]+([('owner',OWNER)] if OWNER else [])
     for eng in engines:
+      for role,email in roles:
+        if role=='owner' and eng=='webkit' and len(engines)>1: continue
+        sess=session(email)
         b = getattr(p, eng).launch()
         ctx = b.new_context(**p.devices['iPhone 14']) if eng == 'webkit' else b.new_context(viewport={'width': 390, 'height': 844}, is_mobile=True, has_touch=True)
         ctx.add_init_script("localStorage.setItem('sb-qzripzgbstvxkfobzhyv-auth-token',%s)" % json.dumps(json.dumps(sess)))
@@ -121,26 +135,26 @@ with sync_playwright() as p:
         pg.on('pageerror', lambda e: errs.append(str(e)[:240]))
         pg.on('crash', lambda *_: errs.append('PAGE CRASH'))
         pg.on('response', lambda r: bad.append(f'{r.status} {r.url[:140]}') if r.status >= 400 and '127.0.0.1' in r.url else None)
-        t0 = time.time()
+        t0 = time.time(); tag=f'{eng}-{role}'
         try:
             pg.goto('http://127.0.0.1:8139/?c=qa', timeout=60000); pg.wait_for_timeout(4500)
             pg.evaluate("()=>{document.querySelectorAll('button').forEach(b=>{if(/got it/i.test(b.textContent))b.click()});document.querySelectorAll('.nt-ov,.lx-sheet-back').forEach(x=>x.remove())}")
         except Exception as e: errs.append('LOAD ' + str(e)[:200])
-        notes.append(f'{eng} first paint+settle {round(time.time() - t0, 1)}s')
-        for name, js in STEPS:
+        notes.append(f'{tag} first paint+settle {round(time.time() - t0, 1)}s')
+        for name, js in steps_for(role):
             try:
-                pg.evaluate(js); pg.wait_for_timeout(3500 if name in ('boutique', 'product') else 1600)
-                r = pg.evaluate(PROBE); r['step'] = name; r['engine'] = eng; summary.append(r)
-                pg.screenshot(path=os.path.join(OUT, f'{eng}-{name}.png'))
-                if r['broken']: problems.append(f'{eng}/{name}: broken images {r["broken"][:3]}')
-                if r['overflowX']: problems.append(f'{eng}/{name}: page scrolls sideways (layout overflow)')
-                if r['undefinedText']: problems.append(f'{eng}/{name}: "undefined/NaN/[object Object]" visible in text')
-                if r['infiniteAnims'] > 40: problems.append(f'{eng}/{name}: {r["infiniteAnims"]} endless animations running (jank risk)')
-                if name == 'product-swipe' and r['galleryScrolls'] is False: problems.append(f'{eng}: product photo gallery does not swipe')
-                if r['nodes'] > 25000: problems.append(f'{eng}/{name}: {r["nodes"]} DOM nodes (crash risk on iPhone)')
-            except Exception as e: problems.append(f'{eng}/{name}: step failed {str(e)[:160]}')
-        for e in errs: problems.append(f'{eng} JS error: {e}')
-        for x in bad[:10]: problems.append(f'{eng} local 4xx/5xx: {x}')
+                pg.evaluate("()=>{document.querySelectorAll('button').forEach(b=>{if(/^\\s*got it\\s*$/i.test(b.textContent))b.click()})}"); pg.evaluate(js); pg.wait_for_timeout(3500 if name in ('boutique', 'product') else 1300)
+                r = pg.evaluate(PROBE); r['step'] = name; r['engine'] = tag; summary.append(r)
+                pg.screenshot(path=os.path.join(OUT, f'{tag}-{name}.png'))
+                if r['broken']: problems.append(f'{tag}/{name}: broken images {r["broken"][:3]}')
+                if r['overflowX']: problems.append(f'{tag}/{name}: page scrolls sideways (layout overflow)')
+                if r['undefinedText']: problems.append(f'{tag}/{name}: "undefined/NaN/[object Object]" visible in text')
+                if r['infiniteAnims'] > 40: problems.append(f'{tag}/{name}: {r["infiniteAnims"]} endless animations running (jank risk)')
+                if name == 'product-swipe' and r['galleryScrolls'] is False: problems.append(f'{tag}: product photo gallery does not swipe')
+                if r['nodes'] > 25000: problems.append(f'{tag}/{name}: {r["nodes"]} DOM nodes (crash risk on iPhone)')
+            except Exception as e: problems.append(f'{tag}/{name}: step failed {str(e)[:160]}')
+        for e in sorted(set(errs)): problems.append(f'{tag} JS error: {e}')
+        for x2 in sorted(set(bad))[:10]: problems.append(f'{tag} local 4xx/5xx: {x2}')
         b.close()
 srv.shutdown()
 rep = {'at': time.strftime('%Y-%m-%d %H:%M:%S'), 'problems': problems, 'notes': notes, 'steps': summary}

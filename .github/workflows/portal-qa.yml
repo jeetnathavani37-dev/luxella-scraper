@@ -1,0 +1,44 @@
+name: Portal QA & deploy
+on:
+  push:
+    branches: [main]
+    paths-ignore: ['tools/qa/panel/**', 'tools/agents/memory/**', 'scripts/**', 'hq/**', 'b2b-site/**', 'supabase/**', '.github/workflows/catalog-sync.yml']
+  schedule:
+    - cron: '7 * * * *'      # every hour: full iPhone + Chrome walk of the live code
+  workflow_dispatch:
+concurrency:
+  group: portal-qa-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+      - run: pip install playwright pillow && python -m playwright install --with-deps webkit chromium
+      - name: JS syntax
+        run: for f in app.js deals.js shim.js voice-core.js lux-motion.js; do node -e "new Function(require('fs').readFileSync('$f','utf8'))" || exit 1; done
+      - name: Walk every screen (client + owner, iPhone WebKit + Chromium)
+        run: python tools/qa/check.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: { name: qa-report, path: tools/qa/out, retention-days: 7 }
+  deploy:
+    needs: qa
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      VT: ${{ secrets.VERCEL_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy to Vercel (production)
+        run: |
+          if [ -z "$VT" ]; then echo "::warning::VERCEL_TOKEN secret not set — skipping deploy"; exit 0; fi
+          python3 tools/qa/deploy.py
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+      - name: Production smoke after deploy
+        run: python3 tools/qa/check.py --prod-only

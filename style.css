@@ -4442,3 +4442,6 @@ body.lxm-down .hv-fab,body.lxm-down #hv-fab{transform:translateY(calc(100% + 40p
 .cl-ph .cl-alt,.cl-card:hover .cl-alt,.cl-card:active .cl-alt,.cl-card:focus .cl-alt{opacity:0!important}
 @media (hover:hover) and (pointer:fine){.cl-card:hover .cl-alt{opacity:1!important}}
 .mc2-tk figure img,.cl-eg2 figure img,.cl-spot-st img{animation:none!important}
+/* no sideways page scroll on phones */
+html,body{overflow-x:clip;max-width:100%}
+.sw #ledger{display:block;max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
