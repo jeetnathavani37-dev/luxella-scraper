@@ -973,3 +973,7 @@ dash.onData(()=>{
  const fab=()=>{if(document.getElementById('hv-fab'))return;if(!document.getElementById('chatfab'))return setTimeout(fab,600);const b=mk('button','hv-fab');b.id='hv-fab';b.type='button';b.setAttribute('aria-label','Hey Luxella, ask by voice');b.innerHTML='<svg viewBox="0 0 40 40" width="30" height="30"><text x="16.5" y="27.5" text-anchor="middle" font-family="Lx Playfair,Georgia,serif" font-style="italic" font-size="23" fill="#1a1208">L</text><path d="M27 14.5v11M31 12v16M23.5 17.5v5" stroke="#1a1208" stroke-width="2" stroke-linecap="round"/></svg><span class="hv-live">LIVE</span>';b.onclick=()=>openVoice();document.body.appendChild(b);};fab();
  try{const u=new URL(location.href);if(u.searchParams.get('hey')){u.searchParams.delete('hey');history.replaceState(null,'',u.pathname+u.search+u.hash);setTimeout(()=>openVoice(),1500);}}catch(e){}
 })();
+/* Performance: lazy/async images inside The Edit */
+(function(){try{const fix=n=>{if(n.tagName==='IMG'){if(!n.getAttribute('loading'))n.loading='lazy';n.decoding='async';}else if(n.querySelectorAll)n.querySelectorAll('img:not([loading])').forEach(i=>{i.loading='lazy';i.decoding='async';});};
+ const go=()=>{const p=document.getElementById('pane-deals')||document.body;fix(p);new MutationObserver(ms=>ms.forEach(m=>m.addedNodes.forEach(n=>{if(n.nodeType===1)fix(n);}))).observe(p,{childList:true,subtree:true});};
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',go);else go();}catch(e){}})();

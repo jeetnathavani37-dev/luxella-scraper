@@ -4321,3 +4321,9 @@ body:has(.ed-sh) .ed-pill{display:none}
 .hv-live{position:absolute;bottom:-7px;left:50%;transform:translateX(-50%);padding:2px 6px;border-radius:999px;background:#0b0906;border:1px solid rgba(233,201,138,.6);color:#F1D58E;font:700 7px 'Lux Label',sans-serif;letter-spacing:.2em}
 @keyframes hvRing{0%{transform:scale(.9);opacity:.9}100%{transform:scale(1.35);opacity:0}}
 @keyframes hvGlow{50%{box-shadow:0 12px 28px rgba(0,0,0,.55),0 0 0 7px rgba(233,201,138,.22),0 0 34px rgba(233,201,138,.5)}}
+/* ===== Performance: skip rendering off-screen Edit sections ===== */
+.std,.pm,.pe,.mc2,.lk,.il,.gf,.ft2,.dr,.dl-shelf,.dl-drops,.cu,.cl-stm,.cl-spot,.cl-care,.cc,.bq-hero,.art,.dl-post{content-visibility:auto;contain-intrinsic-size:auto 640px}
+.dl-post{contain-intrinsic-size:auto 420px}
+.hv-fab{animation-iteration-count:3!important}.hv-fab::after{animation-iteration-count:4!important}
+.dl-deck-sk{animation-iteration-count:3!important}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
