@@ -4218,3 +4218,4 @@ body:has(.ed-sh) .ed-pill{display:none}
 
 /* iOS stability: no heavy blur/backdrop layers */
 .lk-ar,.cl-gc,.ft2 .ft-go{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+.pop-go.pop-sm{margin-top:8px;padding:8px 13px;font-size:8.5px;letter-spacing:.1em;white-space:nowrap;text-decoration:none;cursor:pointer}
