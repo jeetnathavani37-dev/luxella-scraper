@@ -171,8 +171,9 @@
  /* PDF sheets with pieces */
  function loadPdfJs(){return new Promise((res,rej)=>{if(window.pdfjsLib)return res(window.pdfjsLib);const s=el('script');s.src='vendor/pdf.min.js';s.onload=()=>{window.pdfjsLib.GlobalWorkerOptions.workerSrc='vendor/pdf.worker.min.js';res(window.pdfjsLib);};s.onerror=rej;document.head.appendChild(s);});}
  const PDFC={};
+ const LXQ=(()=>{let q=Promise.resolve();return f=>(q=q.then(f,f));})();
  async function pdfDoc(url){if(!PDFC[url]){const lib=await loadPdfJs();PDFC[url]=lib.getDocument({url}).promise;}return PDFC[url];}
- async function pageImg(doc,n,w){const pg=await doc.getPage(n);const vp0=pg.getViewport({scale:1});const vp=pg.getViewport({scale:w/vp0.width});const c=document.createElement('canvas');c.width=Math.round(vp.width);c.height=Math.round(vp.height);await pg.render({canvasContext:c.getContext('2d'),viewport:vp}).promise;return c;}
+ async function pageImg(doc,n,w){const pg=await doc.getPage(n);const vp0=pg.getViewport({scale:1});const vp=pg.getViewport({scale:w/vp0.width});const c=document.createElement('canvas');c.width=Math.round(vp.width);c.height=Math.round(vp.height);await pg.render({canvasContext:c.getContext('2d'),viewport:vp}).promise;try{pg.cleanup&&pg.cleanup();}catch(e){}return c;}
  function pdfRequest(r,n,kind,canvas){const d=r.data||{};const sh=sheet();sh.box.appendChild(el('div','dl-sh-eb',({price:'Enquire',availability:'Availability check',size:'Size check',buy:'I want this'})[kind]));sh.box.appendChild(el('div','dl-sh-t',(d.title||'Deal sheet')+' · piece '+n));
   if(canvas){const im=el('img','dl-rq-img');im.src=canvas.toDataURL('image/jpeg',.8);sh.box.appendChild(im);}
   const sz=el('input','dl-in');sz.placeholder=kind==='size'?'Your size (e.g. UK 8, M)':'Size / colour (optional)';const nt=el('textarea','dl-in dl-ta');nt.rows=2;nt.placeholder='Anything else? (optional)';sh.box.appendChild(sizePick(sz,(capOf(r,n-1)||{}).size));sh.box.appendChild(sz);sh.box.appendChild(nt);
@@ -215,14 +216,14 @@
   const c=el('article','dl-post');const hd=el('div','dl-post-h');hd.appendChild(el('span','dl-post-no',String(idx).padStart(2,'0')));const ht=el('div','dl-post-ht');ht.appendChild(el('b',null,d.title||(isPdf?'Deal sheet':'New pieces')));const cntTxt=photos.length?photos.length+' photos':(d.pages?d.pages+' pieces':'PDF');ht.appendChild(el('small',null,tmOf(r)+' · '+cntTxt));hd.appendChild(ht);
   if(own()){const x=el('button','dl-px','×');x.type='button';x.title='Remove post';x.addEventListener('click',async e=>{e.stopPropagation();if(!confirm('Remove this post?'))return;try{await window.lx.deals.remove(r.id);load();}catch(er){alert('Could not remove.');}});hd.appendChild(x);}
   c.appendChild(hd);
-  const deck=el('div','dl-deck');c.appendChild(deck);const MAXC=40;
+  const deck=el('div','dl-deck');c.appendChild(deck);const MAXC=8;
   const cardAt=(i,n)=>{const k=el('button','dl-deck-c');k.type='button';k.style.animationDelay=Math.min(i,8)*60+'ms';const ph=el('div','dl-deck-ph');ph.appendChild(el('span','dl-deck-sk'));k.appendChild(ph);k.appendChild(el('span','dl-deck-n',String(i+1).padStart(2,'0')));if(REQ[r.id+':'+(i+1)])k.appendChild(el('span','dl-deck-q','✓ Asked'));k.addEventListener('click',()=>viewer(r,i));deck.appendChild(k);return ph;};
   const setImg=(ph,u)=>{ph.textContent='';const im=el('img');im.src=u;im.loading='lazy';im.alt='';ph.appendChild(im);};
   const more=(n)=>{if(n<=MAXC)return;const k=el('button','dl-deck-c dl-deck-more');k.type='button';k.appendChild(el('b',null,'+'+(n-MAXC)));k.appendChild(el('small',null,'View all'));k.addEventListener('click',()=>viewer(r,MAXC));deck.appendChild(k);};
   if(photos.length){photos.slice(0,MAXC).forEach((u,i)=>setImg(cardAt(i,photos.length),u));more(photos.length);}
   else{const n0=Math.max(1,Math.min(MAXC,d.pages||4));const P=[];for(let i=0;i<n0;i++)P.push(cardAt(i));
    const io=new IntersectionObserver(async es=>{if(!es[0].isIntersecting)return;io.disconnect();try{const doc=await pdfDoc(d.url);const n=doc.numPages;for(let i=P.length;i<Math.min(n,MAXC);i++)P.push(cardAt(i));while(P.length>n){const x=P.pop();x.parentNode.remove();}more(n);
-     for(let i=0;i<P.length;i++){try{setImg(P[i],(await pageImg(doc,i+1,320)).toDataURL('image/jpeg',.72));}catch(e){}}}catch(e){deck.textContent='';const t=el('button','dl-deck-c');t.type='button';t.appendChild(el('b',null,'PDF'));t.addEventListener('click',()=>viewer(r,0));deck.appendChild(t);}},{rootMargin:'300px'});io.observe(c);}
+     await LXQ(async()=>{for(let i=0;i<P.length;i++){try{const cv=await pageImg(doc,i+1,240);setImg(P[i],cv.toDataURL('image/jpeg',.7));cv.width=cv.height=0;}catch(e){}}try{doc.cleanup&&doc.cleanup();}catch(e){}});}catch(e){deck.textContent='';const t=el('button','dl-deck-c');t.type='button';t.appendChild(el('b',null,'PDF'));t.addEventListener('click',()=>viewer(r,0));deck.appendChild(t);}},{rootMargin:'300px'});io.observe(c);}
   c.appendChild(el('div','dl-deck-hint','Swipe the cards · tap one to open'));
   const row=el('div','dl-ac dl-post-ac');
   if(d.msg){const cb=el('button','btn2','Copy message');cb.type='button';cb.addEventListener('click',()=>copyTxt(d.msg,cb));row.appendChild(cb);}
