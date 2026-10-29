@@ -2,7 +2,7 @@
 // Same item format as scripts/outlet_scrape.js; the lx-catalog edge function prices each item (currency/tax aware) and caps at ₹1L.
 // Usage: LX_CAT_KEY=... CHROME=... node scripts/more_scrape.js [shopify,sephora,macys,strath,furla]   (SHOPS=karlparis,dkny to limit Shopify brands)
 const { chromium } = require('playwright');
-const KEY = process.env.LX_CAT_KEY; const FN = 'https://qzripzgbstvxkfobzhyv.supabase.co/functions/v1/lx-catalog';
+const KEY = process.env.LX_CAT_KEY || (process.env.LX_CAT_KEY_FILE ? require('fs').readFileSync(process.env.LX_CAT_KEY_FILE, 'utf8').trim() : ''); const FN = 'https://qzripzgbstvxkfobzhyv.supabase.co/functions/v1/lx-catalog';
 const EXE = process.env.CHROME || undefined;
 const UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0 Safari/537.36';
 const sleep = ms => new Promise(r => setTimeout(r, ms));

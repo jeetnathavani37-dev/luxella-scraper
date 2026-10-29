@@ -5,7 +5,7 @@
 // details (bullets), SKU, product URL, ETA and a trend score (0–100) from the store's own popularity order + reviews.
 // Usage: LX_CAT_KEY=... node scripts/outlet_scrape.js [coach,ks,mk,tb,shopify]   (SHOPS=alo,polene to limit Shopify brands)
 const { chromium } = require('playwright');
-const KEY = process.env.LX_CAT_KEY; const FN = 'https://qzripzgbstvxkfobzhyv.supabase.co/functions/v1/lx-catalog';
+const KEY = process.env.LX_CAT_KEY || (process.env.LX_CAT_KEY_FILE ? require('fs').readFileSync(process.env.LX_CAT_KEY_FILE, 'utf8').trim() : ''); const FN = 'https://qzripzgbstvxkfobzhyv.supabase.co/functions/v1/lx-catalog';
 const EXE = process.env.CHROME || undefined;
 const UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0 Safari/537.36';
 const sleep = ms => new Promise(r => setTimeout(r, ms));

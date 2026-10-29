@@ -4,7 +4,7 @@
 // Usage: LX_CAT_KEY=... CHROME=/path/to/chrome node scripts/market_scrape.js ssense,flannels,rack,tedbaker
 const fs = require('fs'); const path = require('path');
 const { chromium } = require('playwright');
-const KEY = process.env.LX_CAT_KEY; const FN = 'https://qzripzgbstvxkfobzhyv.supabase.co/functions/v1/lx-catalog';
+const KEY = process.env.LX_CAT_KEY || (process.env.LX_CAT_KEY_FILE ? require('fs').readFileSync(process.env.LX_CAT_KEY_FILE, 'utf8').trim() : ''); const FN = 'https://qzripzgbstvxkfobzhyv.supabase.co/functions/v1/lx-catalog';
 const EXE = process.env.CHROME || undefined; const CAP = Number(process.env.CAP || 1500);
 const UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0 Safari/537.36';
 const sleep = ms => new Promise(r => setTimeout(r, ms));
