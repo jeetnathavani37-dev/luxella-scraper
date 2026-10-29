@@ -4436,3 +4436,9 @@ body.lxm-down .hv-fab,body.lxm-down #hv-fab{transform:translateY(calc(100% + 40p
 .lxm-vis>img:first-of-type,.lxm-vis img:not(.cl-alt):first-child{animation:none!important}
 .cl-ph img,.sw .dl-c .dl-ph img,.dl-c .dl-ph img,.shp-c img,.mc2-tk figure img,.sw .dl-pc-ph img,.cl-gal img,.cl-dt .cl-gal img,.cl-sgp figure img,.lk .lk-c img:not(.lk-bg){
  mix-blend-mode:multiply!important;filter:brightness(1.12) contrast(1.12) saturate(1.06)!important;padding:8% 8% 12%!important;object-position:center!important}
+/* calm cards: no bobbing, second photo only on real mouse hover */
+.cl-ph img,.dl-c .dl-ph img,.shp-c img,.mc2-tk figure img,.sw .dl-pc-ph img{animation:none!important;translate:none!important}
+.cl-ph::after,.dl-c .dl-ph::after{animation:none!important}
+.cl-ph .cl-alt,.cl-card:hover .cl-alt,.cl-card:active .cl-alt,.cl-card:focus .cl-alt{opacity:0!important}
+@media (hover:hover) and (pointer:fine){.cl-card:hover .cl-alt{opacity:1!important}}
+.mc2-tk figure img,.cl-eg2 figure img,.cl-spot-st img{animation:none!important}
