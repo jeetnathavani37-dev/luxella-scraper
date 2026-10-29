@@ -8,3 +8,5 @@
 - Product photos with coloured/grey backgrounds show a rectangle on the studio panel.
 
 ## Inbox
+- (watchdog) CI deploy step should fail, not warn, when VERCEL_TOKEN is missing — otherwise green runs ship nothing.
+- (watchdog) Updates strip "SHOW ALL 1" button label is clipped on iPhone (webkit-client-home.png).
