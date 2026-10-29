@@ -4354,3 +4354,13 @@ body.lxm-down .hv-fab,body.lxm-down #hv-fab{transform:translateY(calc(100% + 40p
 #pane-deals,.cl-sc{scroll-behavior:smooth;-webkit-overflow-scrolling:touch;overscroll-behavior-y:contain}
 .sw section.dl-fresh>.dl-deck-n,section.dl-fresh>.dl-deck-n{position:static!important;background:none!important;backdrop-filter:none!important;padding:0!important;text-align:right;margin-top:6px;font:400 11px "Lux Num",sans-serif;letter-spacing:.2em;color:#C9A35E}
 .ed-pill{transition:transform .5s cubic-bezier(.22,1,.36,1),opacity .35s ease!important}body.lxm-down .ed-pill{transform:translateY(calc(100% + 60px))!important;opacity:0!important;pointer-events:none}
+/* ===== full-bleed product photos: no frames, no padding, no white boxes ===== */
+.cl-ph,.shp-c,.mc2-tk figure,.pe-cards figure,.pe-strip figure,.cl-gal,.cl-dt .cl-gal,.cl-sgp figure,.sw .dl-pc-ph,.cl-teaser .cl-t-ph figure{background:#1a1712!important;box-shadow:none!important}
+.cl-ph img,.cl-gal img,.cl-dt .cl-gal img,.shp-c img,.mc2-tk figure img,.mc2-pic,.pe-cards img,.pe-strip img,.ivh-fan img,.cl-sgp figure img,.sw .dl-pc-ph img,.mc-c img.ct,.cl-teaser .cl-t-ph figure img,.cl-t-ph img,.lk .lk-c img:not(.lk-bg),.sw .dl-sl-ph img,.lk-i img,.ed-i img{
+ object-fit:cover!important;object-position:center!important;padding:0!important;background:transparent!important;mix-blend-mode:normal!important;filter:none!important;box-sizing:border-box}
+.mc2-pic{inset:0!important}
+.lk .lk-c .lk-bg{display:none!important}
+.cl-cat img{object-fit:cover!important;padding:0!important}
+.bq-sl img{inset:0!important;width:100%!important;height:100%!important;padding:0!important;object-fit:cover!important;background:transparent!important;mix-blend-mode:normal!important;box-shadow:none!important}
+.sw .dl-c .dl-ph,.dl-c .dl-ph{padding:0!important;background:#1a1712!important}
+.sw .dl-c .dl-ph img,.dl-deck .dl-c .dl-ph img,.dl-c .dl-ph img{width:100%!important;height:100%!important;max-width:none!important;max-height:none!important;object-fit:cover!important;background:transparent!important}
