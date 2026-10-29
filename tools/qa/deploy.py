@@ -22,7 +22,7 @@ def call(method,path,body=None):
     sys.exit('gave up '+path)
 files=[]
 for dp,_,fs in os.walk('.'):
-    if any(x in dp.split(os.sep) for x in ('.git','.github','b2b-site','supabase','hq','tools')): continue
+    if any(x in dp.split(os.sep) for x in ('.git','.github','b2b-site','supabase','hq','tools','scripts')): continue
     for f in fs:
         if f in('README.md','.gitignore') or (f.endswith('.png') and dp=='.'): continue
         p=os.path.relpath(os.path.join(dp,f),'.');b=open(p,'rb').read();files.append({'file':p,'sha':hashlib.sha1(b).hexdigest(),'size':len(b)})
