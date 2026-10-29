@@ -4426,3 +4426,13 @@ body.lxm-down .hv-fab,body.lxm-down #hv-fab{transform:translateY(calc(100% + 40p
 /* product gallery must swipe */
 .cl-gal,.cl-dt .cl-gal{overflow-x:auto!important;overflow-y:hidden!important;scroll-snap-type:x mandatory!important;-webkit-overflow-scrolling:touch;touch-action:pan-x pan-y!important;isolation:auto!important;transform:none!important}
 .cl-gal img,.cl-dt .cl-gal img{position:relative!important;inset:auto!important;flex:none!important;scroll-snap-align:center!important;touch-action:pan-x pan-y}
+/* ===== refined: clean gallery panel, no plinth (Maison style) ===== */
+.cl-ph,.sw .dl-c .dl-ph,.dl-c .dl-ph,.shp-c,.mc2-tk figure,.sw .dl-pc-ph,.mc2 .cl-rail .cl-card .cl-ph,.lk .cl-card .cl-ph,.cl-card .cl-ph,.dr-gtx .cl-card .cl-ph,.cl-dt .cl-gal,.cl-gal{
+ background:#f3f2f0!important;
+ box-shadow:inset 0 0 0 1px rgba(201,163,94,.55),inset 0 0 40px rgba(60,55,48,.10),0 14px 30px rgba(0,0,0,.45)!important;border-radius:2px!important}
+.cl-ph::after,.dl-c .dl-ph::after,.shp-c::after,.mc2-tk figure::after,.sw .dl-pc-ph::after{
+ left:26%!important;right:26%!important;bottom:10%!important;height:4%!important;border-radius:50%!important;box-shadow:none!important;
+ background:radial-gradient(closest-side,rgba(30,25,18,.28),rgba(30,25,18,0))!important;animation:none!important;filter:blur(2px)}
+.lxm-vis>img:first-of-type,.lxm-vis img:not(.cl-alt):first-child{animation:none!important}
+.cl-ph img,.sw .dl-c .dl-ph img,.dl-c .dl-ph img,.shp-c img,.mc2-tk figure img,.sw .dl-pc-ph img,.cl-gal img,.cl-dt .cl-gal img,.cl-sgp figure img,.lk .lk-c img:not(.lk-bg){
+ mix-blend-mode:multiply!important;filter:brightness(1.12) contrast(1.12) saturate(1.06)!important;padding:8% 8% 12%!important;object-position:center!important}
