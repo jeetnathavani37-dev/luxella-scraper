@@ -11,7 +11,7 @@ Make the client portal (luxellaclients.duckdns.org) feel like a ₹1,000-crore l
 - Every push to `main` runs **Portal QA & deploy** (GitHub Actions): JS syntax → `tools/qa/check.py` walks every tab as a client and as the owner on iPhone WebKit + Chrome (scroll, type, product page, photo swipe) → deploys to Vercel only if QA passes. It also runs every hour on its own.
 - Read results: `gh api repos/jeetnathavani37-dev/luxella-scraper/actions/workflows/portal-qa.yml/runs?per_page=5`, job logs via `gh api .../actions/jobs/<id>/logs`, screenshots via `gh run download <run_id> -n qa-report -D /tmp/qa` (then Read the PNGs). If `gh run download` is refused, use the job log + `report.json` text.
 - After you push, wait for the run, confirm it is green and the deploy step printed READY. If it fails because of you, fix forward or `git revert` your commit within the same run.
-- Small commits, one idea each, message prefix = your role (`watchdog:`, `panel:`, `design:`, `backend:`, `growth:`, `chief:`). Max 3 code commits per run, max 12 files per commit. `git pull --rebase` right before every push; never force-push, never rewrite history.
+- Small commits, one idea each, message prefix = your role (`watchdog:`, `panel:`, `design:`, `frontend:`, `security:`, `backend:`, `growth:`, `chief:`). Max 3 code commits per run, max 12 files per commit. `git pull --rebase` right before every push; never force-push, never rewrite history.
 - The CI **guard** rejects any agent commit that touches protected paths: `.github/`, `tools/qa/` (tests, deploy, guard), `tools/agents/CONSTITUTION.md`, `TEAM.md`, `supabase/`, `vercel.json`, or that contains anything that looks like a secret. Don't try to get around it — propose the change under "Needs Jeet".
 - Never weaken a test, skip a step, raise a budget or delete a check to make CI pass. A red CI means the change is wrong.
 - If production breaks after a deploy, CI rolls back automatically. If the same fix fails twice, stop and report — no third attempt.
@@ -33,7 +33,7 @@ You may, without asking: fix bugs, broken layouts, overlaps, slow code, copy/typ
 - Evidence over opinion: cite the screenshot/log/query behind every claim. Never invent numbers.
 
 ## 6. Heartbeats — nobody watches nobody
-- Expected runs per day: watchdog 24, backend 4, panel 1, growth 1, chief 1, design (Tue/Fri) 1.
+- Expected runs per day: watchdog 24, backend 4, panel 1, frontend 1, security 1, growth 1, chief 1, design (Tue/Fri) 1.
 - Product Chief checks every other agent ran and finished `ok`; Backend checks the Chief and the Catalogue sync ran. A missed or failed run twice in a row → urgent `lx_report` to Jeet with the exact error.
 - Every agent's final line is its status; never claim something worked without the evidence (CI run id, query result, screenshot).
 

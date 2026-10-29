@@ -5,7 +5,7 @@ import subprocess, sys, re
 before, after = (sys.argv[1:3] + ['', ''])[:2]
 if not before or set(before) == {'0'}: before = after + '~1'
 def git(*a): return subprocess.run(['git', *a], capture_output=True, text=True).stdout
-AGENT = re.compile(r'^(watchdog|panel|design|backend|growth|chief)\s*:', re.I)
+AGENT = re.compile(r'^(watchdog|panel|design|frontend|security|backend|growth|chief)\s*:', re.I)
 PROTECTED = ('.github/', 'tools/agents/CONSTITUTION.md', 'tools/agents/TEAM.md', 'tools/qa/', 'supabase/', 'vercel.json')
 SECRET = re.compile(r'(vcp_[A-Za-z0-9_]{20,}|sb_secret_[A-Za-z0-9_-]{10,}|eyJhbGciOi[A-Za-z0-9._-]{60,}|AIza[0-9A-Za-z_-]{30,}|ghp_[A-Za-z0-9]{30,}|sk_live_[A-Za-z0-9]{10,})')
 bad = []
