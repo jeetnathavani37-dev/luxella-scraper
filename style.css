@@ -4364,3 +4364,33 @@ body.lxm-down .hv-fab,body.lxm-down #hv-fab{transform:translateY(calc(100% + 40p
 .bq-sl img{inset:0!important;width:100%!important;height:100%!important;padding:0!important;object-fit:cover!important;background:transparent!important;mix-blend-mode:normal!important;box-shadow:none!important}
 .sw .dl-c .dl-ph,.dl-c .dl-ph{padding:0!important;background:#1a1712!important}
 .sw .dl-c .dl-ph img,.dl-deck .dl-c .dl-ph img,.dl-c .dl-ph img{width:100%!important;height:100%!important;max-width:none!important;max-height:none!important;object-fit:cover!important;background:transparent!important}
+/* ===== Luxella Studio: every product sits on a lit stone set (white photo backgrounds melt away) ===== */
+.cl-ph,.sw .dl-c .dl-ph,.dl-c .dl-ph,.shp-c,.mc2-tk figure,.pe-cards figure,.cl-sgp figure,.sw .dl-pc-ph,.cl-gal,.cl-dt .cl-gal,.cl-teaser .cl-t-ph figure,.lk .lk-c{
+ position:relative;overflow:hidden;isolation:isolate;
+ background:
+  radial-gradient(120% 70% at 50% 92%,rgba(30,28,25,.14),transparent 60%),
+  linear-gradient(180deg,transparent 0 74%,rgba(40,38,35,.10) 74.2%,rgba(255,255,255,.0) 75%,transparent 100%),
+  radial-gradient(85% 75% at 50% 30%,#fafafa 0%,#ecebea 50%,#cfcdcb 100%)!important;
+ box-shadow:inset 0 0 0 1px rgba(201,163,94,.45),inset 0 -30px 60px rgba(30,28,25,.10),0 18px 36px rgba(0,0,0,.45)!important;border-radius:4px!important}
+/* soft floor shadow under the piece */
+.cl-ph::after,.dl-c .dl-ph::after,.shp-c::after,.mc2-tk figure::after,.sw .dl-pc-ph::after,.cl-sgp figure::after{content:'';position:absolute;left:22%;right:22%;bottom:9%;height:7%;border-radius:50%;background:radial-gradient(closest-side,rgba(40,28,12,.32),transparent);z-index:-1;pointer-events:none}
+/* gold corner monogram */
+.cl-ph::before,.dl-c .dl-ph::before{content:'L';position:absolute;right:9px;bottom:7px;font:italic 400 13px 'Playfair Display',Georgia,serif;color:rgba(160,120,50,.55);z-index:3;pointer-events:none;letter-spacing:0}
+.cl-ph img,.cl-gal img,.cl-dt .cl-gal img,.shp-c img,.mc2-tk figure img,.pe-cards img,.cl-sgp figure img,.sw .dl-pc-ph img,.cl-teaser .cl-t-ph figure img,.lk .lk-c img:not(.lk-bg),.sw .dl-c .dl-ph img,.dl-c .dl-ph img{
+ object-fit:contain!important;object-position:center 46%!important;padding:9% 9% 13%!important;background:transparent!important;mix-blend-mode:multiply!important;filter:contrast(1.04) saturate(1.05)!important;box-sizing:border-box!important}
+.sw .dl-c .dl-ph img,.dl-c .dl-ph img{width:100%!important;height:100%!important}
+.cl-sgp figure img{padding:6%!important}
+.cl-cat img{object-fit:contain!important;padding:12%!important;background:radial-gradient(80% 80% at 50% 35%,#fafafa,#cfcdcb)!important;mix-blend-mode:normal!important}
+.lk .lk-c{border-radius:6px!important}
+.cl-ph img,.cl-gal img,.cl-dt .cl-gal img,.shp-c img,.mc2-tk figure img,.pe-cards img,.cl-sgp figure img,.sw .dl-pc-ph img,.cl-teaser .cl-t-ph figure img,.lk .lk-c img:not(.lk-bg),.sw .dl-c .dl-ph img,.dl-c .dl-ph img{filter:brightness(1.06) contrast(1.08) saturate(1.05)!important}
+.sw .dl-c .dl-ph img,.dl-c .dl-ph img{padding:5% 5% 10%!important;scale:1.12}
+.cl-ph img{padding:7% 7% 12%!important}
+/* statement: product in a lit studio frame instead of a white blob */
+.cl-stm:before{right:5%!important;top:7%!important;width:50%!important;height:66%!important;border-radius:3px!important;filter:none!important;
+ background:radial-gradient(120% 70% at 50% 95%,rgba(60,45,25,.18),transparent 60%),radial-gradient(85% 75% at 50% 30%,#fafafa 0%,#ecebea 50%,#cfcdcb 100%)!important;
+ box-shadow:0 0 0 1px rgba(201,163,94,.6),0 0 0 6px rgba(20,8,10,.6),0 0 0 7px rgba(201,163,94,.35),0 24px 50px rgba(0,0,0,.6)!important;z-index:0}
+.cl-stm img{z-index:1!important;right:7%!important;top:9%!important;width:46%!important;height:58%!important;transform:none!important;padding:8% 8% 12%!important;box-sizing:border-box!important;object-fit:contain!important;mix-blend-mode:multiply!important;filter:brightness(1.06) contrast(1.08)!important;animation:none!important}
+.cl-stm div{max-width:100%!important}
+.cl-stm{min-height:470px!important}
+.cl-stm:before{top:22px!important;height:250px!important;right:auto!important;left:50%!important;width:62%!important;transform:translateX(-50%)}
+.cl-stm img{top:28px!important;height:238px!important;right:auto!important;left:50%!important;width:58%!important;transform:translateX(-50%)!important}
