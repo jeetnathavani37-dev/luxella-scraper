@@ -2,7 +2,7 @@ name: Portal QA & deploy
 on:
   push:
     branches: [main]
-    paths-ignore: ['tools/qa/panel/**', 'tools/agents/memory/**', 'scripts/**', 'hq/**', 'b2b-site/**', 'supabase/**', '.github/workflows/catalog-sync.yml']
+    paths-ignore: ['tools/agents/**', 'scripts/**', 'hq/**', 'b2b-site/**', 'supabase/**', '.github/workflows/catalog-sync.yml']
   schedule:
     - cron: '7 * * * *'      # every hour: full iPhone + Chrome walk of the live code
   workflow_dispatch:
