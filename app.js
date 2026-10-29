@@ -939,14 +939,18 @@ dash.onData(()=>{
   const cbtn=(lbl,t)=>{const b=mk('button','hv-cp',lbl);b.type='button';b.onclick=()=>copy(t,b);return b;};
   const url=BASE()+'?ask=';
   if(!standalone()){const w=mk('div');if(installEv){const ib=mk('button','hv-go','Install Luxella app');ib.type='button';ib.onclick=async()=>{installEv.prompt();try{await installEv.userChoice;}catch(e){}installEv=null;ib.textContent='Installed ✓';};w.appendChild(ib);}else w.appendChild(mk('small',null,isIOS?'Safari: tap Share ⬆, then “Add to Home Screen”.':'Browser menu ⋮, then “Add to Home screen” / “Install app”.'));step(1,'Add Luxella to your home screen',w);}
-  if(isIOS){box.insertBefore(mk('h3','hv-h','Siri: “Hey Siri, Luxella”'),box.querySelector('.hv-step'));
-   const w2=mk('div');w2.appendChild(mk('small',null,'Open the Shortcuts app → + → add “Dictate Text”, then “Open URLs”. In Open URLs paste this link and add “Dictated Text” right after it:'));w2.appendChild(cbtn('Copy Luxella link',url));step(standalone()?1:2,'Make the Siri shortcut (one minute)',w2);
-   step(standalone()?2:3,'Name the shortcut “Luxella”',mk('small',null,'Now say “Hey Siri, Luxella”, then ask: “where is my Coach bag?” or “show my proof of purchase”.'));}
-  else if(isAnd){box.insertBefore(mk('h3','hv-h',isSam?'Bixby: “Hi Bixby, Luxella orders”':'Ask with your voice'),box.querySelector('.hv-step'));
-   step(standalone()?1:2,'Long-press the Luxella icon',mk('small',null,'You get one-tap shortcuts: Where are my orders · Proof of purchase · What do I owe.'));
-   const w3=mk('div');w3.appendChild(mk('small',null,(isSam?'Bixby → Quick commands → + . Name it, then “Type a command” and paste:':'Google app → Settings → Routines → New. Set a phrase, then “Add action → Try adding your own” and paste:')));
-   [['Orders','where are my orders'],['Proof','show my proof of purchase'],['Dues','what do I owe']].forEach(([l,q])=>w3.appendChild(cbtn('Copy “'+l+'” command','open '+url+encodeURIComponent(q))));step(standalone()?2:3,isSam?'Bixby voice command (optional)':'“Hey Google” command (optional)',w3);}
-  else{box.insertBefore(mk('h3','hv-h','Open this page on your phone'),box.querySelector('.hv-step'));const w4=mk('div');w4.appendChild(cbtn('Copy portal link',BASE()));step(2,'Then tap “Hey Luxella” there',w4);}
+  const vt=(()=>{try{return ((window.__lxAdmin.S.docs.meta||{}).voice_token||{}).token||'';}catch(e){return '';}})();
+  const api='https://qzripzgbstvxkfobzhyv.supabase.co/functions/v1/lx-voice?t='+vt+'&q=';const heyUrl=BASE()+'?hey=1';
+  if(isIOS){box.insertBefore(mk('h3','hv-h','Siri answers you out loud'),box.querySelector('.hv-step'));
+   const n0=standalone()?0:1;
+   if(vt){const w2=mk('div');w2.appendChild(mk('small',null,'Shortcuts app → + → add these 3 actions in order:'));const ol=mk('ol','hv-ol');['Dictate Text','Get Contents of URL — paste your link, then tap at the end and insert “Dictated Text”','Speak Text — choose “Contents of URL”'].forEach(t=>ol.appendChild(mk('li',null,t)));w2.appendChild(ol);w2.appendChild(cbtn('Copy my Siri link',api));step(n0+1,'Build the Siri shortcut (1 minute)',w2);}
+   else{const w2=mk('div');w2.appendChild(mk('small',null,'Shortcuts app → + → “Dictate Text”, then “Open URLs”: paste this link and insert “Dictated Text” right after it.'));w2.appendChild(cbtn('Copy Luxella link',BASE()+'?ask='));step(n0+1,'Build the Siri shortcut',w2);}
+   step(n0+2,'Name it “Luxella”',mk('small',null,'Say “Hey Siri, Luxella” → “Where is my Coach bag?” Siri replies out loud. No need to open anything.'));}
+  else if(isAnd){box.insertBefore(mk('h3','hv-h',isSam?'“Hi Bixby, Luxella”':'“Hey Google, Luxella”'),box.querySelector('.hv-step'));const n0=standalone()?0:1;
+   const w3=mk('div');w3.appendChild(mk('small',null,isSam?'Bixby → ☰ → Quick commands → + . Say “Luxella”, then Add action → Type a command, and paste:':'Google app → Settings → Routines → New. Phrase “Luxella”, then Add action → Try adding your own, and paste:'));w3.appendChild(cbtn('Copy command','open '+heyUrl));step(n0+1,'One voice command, any question',w3);
+   step(n0+2,'Now just say it',mk('small',null,(isSam?'“Hi Bixby, Luxella”':'“Hey Google, Luxella”')+' — Luxella opens already listening. Ask anything: “where is my Coach bag?”, “show my proof of purchase”.'));
+   step(n0+3,'Or long-press the Luxella icon',mk('small',null,'“Hey Luxella” · Orders · Proof · Dues — one tap each.'));}
+  else{box.insertBefore(mk('h3','hv-h','Open this page on your phone'),box.querySelector('.hv-step'));const w4=mk('div');w4.appendChild(cbtn('Copy portal link',BASE()));step(2,'Then tap the gold mic there',w4);}
   box.appendChild(mk('p','hv-note','Fastest anytime: open Luxella and tap the gold mic.'));}
  window.__lxHey=open;
  const fab=()=>{if(document.getElementById('hv-fab'))return;if(!document.getElementById('chatfab'))return setTimeout(fab,600);const b=mk('button','hv-fab');b.id='hv-fab';b.type='button';b.setAttribute('aria-label','Hey Luxella, ask by voice');b.innerHTML='<svg viewBox="0 0 24 24" width="22" height="22"><rect x="9" y="3" width="6" height="11.5" rx="3" fill="currentColor"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';b.onclick=open;document.body.appendChild(b);};fab();

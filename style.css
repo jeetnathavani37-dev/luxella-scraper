@@ -4253,3 +4253,4 @@ body:has(.ed-sh) .ed-pill{display:none}
 .hv-cp{display:inline-block;margin:0 6px 6px 0;border:1px solid rgba(233,201,138,.5);border-radius:999px;background:rgba(233,201,138,.08);color:#E9C98A;padding:8px 12px;font:600 9.5px 'Lux Label',sans-serif;letter-spacing:.1em}
 .hv-note{margin:14px 0 0;font:italic 400 13px 'Lx Playfair',Georgia,serif;color:#a8987e}
 .hv-fab{right:auto;left:max(16px,env(safe-area-inset-left,0px));bottom:calc(max(16px,env(safe-area-inset-bottom,0px)) + 52px)}
+.hv-ol{margin:4px 0 10px 18px;padding:0;font:400 12.5px/1.55 'Lux Text',sans-serif;color:#d9cbb0}.hv-ol li{margin:2px 0}
