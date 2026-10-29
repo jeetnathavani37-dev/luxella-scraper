@@ -3990,3 +3990,9 @@ body:has(.ed-sh) .ed-pill{display:none}
 .cu[data-g="Men"] .cu-rg b{background:radial-gradient(circle at 32% 24%,#0f6b43,#03241a 72%)}
 .cu-hc:active .cu-rg,.cu-hc:hover .cu-rg{transform:scale(1.07)}
 .cu-hc span{max-width:84px;font:500 8px/1.25 'Lux Label',sans-serif;letter-spacing:.14em;text-transform:uppercase;text-align:center;color:#e6dcc8}
+/* brand circles: real brand names inside the ring */
+.cu-hc{width:88px}.cu-rg{width:88px;height:88px}
+.cu-rg b{padding:0 7px;text-align:center;font:500 10.5px/1.2 'Lux Label',sans-serif!important;letter-spacing:.1em!important;text-transform:uppercase;color:#F1D58E;overflow-wrap:anywhere}
+.cu-rg b.lg{font-size:9px!important;letter-spacing:.06em!important}
+.cu-rg b.xl{font-size:7.6px!important;letter-spacing:.03em!important}
+.cu-hc span{display:none}
