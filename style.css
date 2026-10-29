@@ -4219,3 +4219,7 @@ body:has(.ed-sh) .ed-pill{display:none}
 /* iOS stability: no heavy blur/backdrop layers */
 .lk-ar,.cl-gc,.ft2 .ft-go{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
 .pop-go.pop-sm{margin-top:8px;padding:8px 13px;font-size:8.5px;letter-spacing:.1em;white-space:nowrap;text-decoration:none;cursor:pointer}
+/* voice ask */
+.chat-mic{flex:none;width:42px;height:42px;border-radius:50%;border:1px solid rgba(233,201,138,.5);background:rgba(233,201,138,.1);font-size:18px;line-height:1;cursor:pointer;margin-right:6px}
+.chat-mic.on{background:linear-gradient(145deg,#f7e2a6,#b8892b);box-shadow:0 0 0 0 rgba(233,201,138,.6);animation:micPulse 1.2s infinite}
+@keyframes micPulse{70%{box-shadow:0 0 0 12px rgba(233,201,138,0)}100%{box-shadow:0 0 0 0 rgba(233,201,138,0)}}
