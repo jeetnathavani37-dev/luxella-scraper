@@ -4075,3 +4075,45 @@ body:has(.ed-sh) .ed-pill{display:none}
 .lk .cl-card .cl-pr span{color:#F1D58E!important}
 .lk .cl-card .cl-pr em{color:#a8987e!important}
 .lk .lk-go{margin:20px 16px 0!important;width:calc(100% - 32px)!important;padding:19px 16px!important;border:0!important;border-radius:2px!important;background:linear-gradient(100deg,#b8892b,#f7e2a6 45%,#e9c98a 60%,#b8892b)!important;color:#1a1208!important;font:600 11px 'Lux Label',sans-serif!important;letter-spacing:.28em!important;text-transform:uppercase;box-shadow:0 12px 28px rgba(201,163,94,.28),inset 0 0 0 1px rgba(255,255,255,.35)}
+
+/* ===== Luxella Pictures — 3D private cinema ===== */
+.mc2-th{position:relative;margin:10px -16px 0;padding-bottom:6px;isolation:isolate}
+.mc2-th::before{content:'';position:absolute;left:-10%;right:-10%;bottom:70px;height:140px;z-index:-1;background:radial-gradient(50% 100% at 50% 100%,rgba(233,201,138,.26),transparent 72%)}
+.mc2-val{position:absolute;left:0;right:0;top:0;height:34px;z-index:8;background:linear-gradient(180deg,#240308,#5e0f1c 55%,#8a1a2c);border-bottom:2px solid #c9a35e;box-shadow:0 8px 18px rgba(0,0,0,.55)}
+.mc2-val::after{content:'';position:absolute;left:0;right:0;bottom:-9px;height:9px;background:radial-gradient(circle at 50% 0,#c9a35e 0 4.5px,transparent 5px) 0 0/14px 9px repeat-x}
+.mc2-cu{position:absolute;top:0;width:15%;height:332px;z-index:7;pointer-events:none;background:linear-gradient(180deg,rgba(0,0,0,.05),rgba(0,0,0,.6)),repeating-linear-gradient(90deg,#2c040c 0,#8a1a2c 9px,#5e0f1c 16px,#2c040c 25px)}
+.mc2-cl{left:0;clip-path:polygon(0 0,100% 0,58% 100%,0 100%);box-shadow:inset -8px 0 14px rgba(0,0,0,.5)}
+.mc2-cr{right:0;clip-path:polygon(0 0,100% 0,100% 100%,42% 100%)}
+.mc2-scr{position:relative;margin:44px 12.5% 0;aspect-ratio:1/1;background:#050403;overflow:hidden;box-shadow:0 0 0 3px #17100a,0 0 0 4px #c9a35e,0 0 0 8px #080604,0 0 0 9px rgba(233,201,138,.4),0 0 80px rgba(255,226,160,.22),0 34px 50px rgba(0,0,0,.65);z-index:2}
+.mc2-bk{position:absolute;inset:-12%;width:124%;height:124%;object-fit:cover;filter:blur(24px) saturate(1.2) brightness(.55)}
+.mc2-pic{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:9% 9% 24%;box-sizing:border-box;filter:drop-shadow(0 14px 22px rgba(0,0,0,.45))}
+.mc2-scr.go .mc2-pic{animation:mcKB 9s ease-out both}
+@keyframes mcKB{0%{opacity:0;transform:scale(1.0) translateY(8px)}9%{opacity:1}100%{opacity:1;transform:scale(1.1) translateY(-4px)}}
+.mc2-lt{position:absolute;inset:0;pointer-events:none;background:radial-gradient(120% 90% at 50% 22%,rgba(255,236,190,.14),transparent 55%),radial-gradient(130% 110% at 50% 45%,transparent 48%,rgba(0,0,0,.75))}
+.mc2-gr{position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(255,255,255,.05) 0 1px,transparent 1px 3px);mix-blend-mode:overlay;animation:mcFlick .12s steps(2) infinite}
+@keyframes mcFlick{50%{opacity:.6}}
+.mc2-scr::after{content:'';position:absolute;inset:0;pointer-events:none;background:linear-gradient(115deg,rgba(255,255,255,.12),transparent 30%)}
+.mc2-np{position:absolute;left:12px;top:12px;z-index:3;display:flex;align-items:center;gap:7px;font:400 7.5px 'Lux Num',sans-serif;letter-spacing:.2em;text-transform:uppercase;color:#E9C98A}
+.mc2-np::before{content:'';width:6px;height:6px;border-radius:50%;background:#e23b3b;box-shadow:0 0 8px #e23b3b;animation:mcRec 1.4s ease-in-out infinite}
+@keyframes mcRec{50%{opacity:.25}}
+.mc2-sub{position:absolute;left:0;right:0;bottom:0;z-index:3;text-align:center;padding:60px 14px 18px;background:linear-gradient(transparent,rgba(0,0,0,.88) 62%)}
+.mc2-scr.go .mc2-sub{animation:mcSub .9s .25s cubic-bezier(.22,1,.36,1) both}@keyframes mcSub{from{opacity:0;transform:translateY(12px)}}
+.mc2-sub b{display:block;font:400 clamp(26px,8vw,34px)/1 'Lx Bodoni',Georgia,serif;color:#F7EFE2;letter-spacing:.01em;text-shadow:0 2px 12px rgba(0,0,0,.7)}
+.mc2-sub em{display:block;margin-top:6px;font:italic 400 13.5px 'Lx Playfair',Georgia,serif;color:#E9C98A}
+.mc2-pj{position:absolute;left:50%;top:0;width:96%;height:560px;transform:translateX(-50%);z-index:1;pointer-events:none;clip-path:polygon(44% 0,56% 0,100% 100%,0 100%);background:linear-gradient(180deg,rgba(255,236,190,.20),rgba(255,236,190,.05) 55%,transparent);mix-blend-mode:screen;animation:mcPj 3.2s ease-in-out infinite}
+@keyframes mcPj{50%{opacity:.72}}
+.mc2-fl{position:relative;height:318px;margin-top:30px;perspective:1000px;z-index:3;touch-action:pan-y;-webkit-user-select:none;user-select:none}
+.mc2-fl .mc2-tk{position:absolute;left:50%;top:0;width:54%;margin-left:-27%;--st:48px;transform-style:preserve-3d;transition:transform .8s cubic-bezier(.22,1,.36,1),opacity .6s,filter .6s;will-change:transform}
+.mc2-fl{counter-reset:tk}
+.mc2-fl .mc2-tk figure{margin:10px 10px 0;aspect-ratio:1/1.02}
+.mc2-fl .mc2-tk::before{top:14px;left:14px;font-size:7px;padding:4px 7px 3px}
+.mc2-fl .mc2-tx{padding:10px 12px 8px}.mc2-fl .mc2-tx small{display:none}
+.mc2-fl .mc2-tx b{font-size:19px;margin-top:0}.mc2-fl .mc2-tx em{font-size:11.5px;margin-top:3px}
+.mc2-fl .mc2-stub{padding:0 12px}.mc2-fl .mc2-stub span:first-child{font-size:13px}.mc2-fl .mc2-stub span:last-child{font-size:6.5px;padding:4px 7px}
+.mc2-fl .mc2-tk.act{filter:drop-shadow(0 0 22px rgba(233,201,138,.38)) drop-shadow(0 20px 22px rgba(0,0,0,.65))}
+.mc2-fl .mc2-tk:not(.act){filter:brightness(.62) saturate(.85) drop-shadow(0 14px 16px rgba(0,0,0,.6))}
+.mc2-cta{position:relative;z-index:3;display:flex;align-items:center;justify-content:space-between;width:calc(100% - 32px);margin:10px 16px 0;padding:17px 18px;border:0;border-radius:2px;background:linear-gradient(100deg,#b8892b,#f7e2a6 45%,#e9c98a 60%,#b8892b);color:#1a1208;box-shadow:0 12px 28px rgba(201,163,94,.28),inset 0 0 0 1px rgba(255,255,255,.35)}
+.mc2-cta span{font:600 10.5px 'Lux Label',sans-serif;letter-spacing:.26em;text-transform:uppercase}
+.mc2-cta i{font:italic 400 15px 'Lx Playfair',Georgia,serif}
+@media (prefers-reduced-motion:reduce){.mc2-gr,.mc2-pj,.mc2-np::before,.mc2-scr.go .mc2-pic{animation:none}}
+.mc2-mq{margin-bottom:40px!important}
