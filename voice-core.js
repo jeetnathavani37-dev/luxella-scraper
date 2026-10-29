@@ -27,7 +27,7 @@ var css='.lv-ov{position:fixed;inset:0;z-index:9998;display:flex;flex-direction:
 '.lv-orb.rec{transform:scale(1.08)}.lv-orb.think{animation:lvSpin 1.2s linear infinite}.lv-orb.talk::before{animation:lvTalk .9s ease-in-out infinite}'+
 '@keyframes lvSpin{50%{filter:brightness(.8)}}@keyframes lvTalk{50%{transform:scale(1.18)}}'+
 '.lv-row{display:flex;align-items:center;gap:22px}.lv-side{width:44px;height:44px;border-radius:50%;border:1px solid rgba(233,201,138,.35);background:rgba(255,255,255,.04);color:#E9C98A;font-size:17px;display:grid;place-items:center}'+
-'.lv-hint{margin-top:12px;font:500 10px "Lux Label",system-ui,sans-serif;letter-spacing:.2em;color:#a8987e;text-transform:uppercase}'+
+'.lv-hint{margin-top:26px;font:500 10px "Lux Label",system-ui,sans-serif;letter-spacing:.2em;color:#a8987e;text-transform:uppercase}'+
 '.lv-f{display:none;gap:8px;width:100%;max-width:520px;margin-top:12px}.lv-f.on{display:flex}.lv-f input{flex:1;min-width:0;border-radius:999px;border:1px solid rgba(233,201,138,.4);background:rgba(255,255,255,.05);color:#F3ECDD;padding:12px 16px;font-size:15px;outline:0}'+
 '.lv-setup{margin-top:10px;border:0;background:none;color:#C9A35E;font:600 10px "Lux Label",system-ui,sans-serif;letter-spacing:.16em;text-transform:uppercase}';
 function mk(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e;}
