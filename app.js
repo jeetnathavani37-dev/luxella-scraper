@@ -903,3 +903,52 @@ dash.onData(()=>{
 
 /* Voice / Siri / Google Assistant deep link: ?ask=where is my coach bag */
 (function(){let q='';try{const u=new URL(location.href);q=u.searchParams.get('ask')||'';if(!q&&location.hash.indexOf('#ask=')===0)q=decodeURIComponent(location.hash.slice(5));if(q){u.searchParams.delete('ask');history.replaceState(null,'',u.pathname+(u.search||'')+(location.hash.indexOf('#ask=')===0?'':location.hash));}}catch(e){}if(!q)return;let n=0;const t=setInterval(()=>{n++;let ok=false;try{ok=window.__lxVoiceAsk&&dash.data('orders').status==='ok';}catch(e){}if(ok){clearInterval(t);setTimeout(()=>window.__lxVoiceAsk(q.replace(/\+/g,' '),true),600);}else if(n>60)clearInterval(t);},500);})();
+/* ===== Hey Luxella: one-tap voice assistant + device setup ===== */
+(function(){if(window.__lxVoice)return;window.__lxVoice=1;
+ const SR=window.SpeechRecognition||window.webkitSpeechRecognition;const UA=navigator.userAgent;
+ const isIOS=/iPhone|iPad|iPod/.test(UA)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);const isSam=/SamsungBrowser|SM-|Samsung/i.test(UA);const isAnd=/Android/i.test(UA);
+ const standalone=()=>window.matchMedia('(display-mode: standalone)').matches||navigator.standalone;
+ let installEv=null;window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();installEv=e;});
+ const BASE=()=>location.origin+'/';
+ const mk=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e;};
+ const SUG=['Where are my orders?','Show my proof of purchase','What do I owe?','When will my next order arrive?'];
+ function ask(q){q=String(q||'').trim();if(!q)return;close();const go=()=>{if(window.__lxVoiceAsk)window.__lxVoiceAsk(q,true);else setTimeout(go,300);};go();}
+ let ov=null,rec=null;
+ function close(){if(rec){try{rec.abort();}catch(e){}rec=null;}if(ov){ov.remove();ov=null;}}
+ function listen(st,tx,orb){if(!SR){st.textContent='Type your question below';return;}try{rec=new SR();}catch(e){st.textContent='Type your question below';return;}rec.lang='en-IN';rec.interimResults=true;let fin='';
+  rec.onstart=()=>{orb.classList.add('on');st.textContent='Listening… ask anything';};
+  rec.onresult=e=>{let t='';for(const x of e.results)t+=x[0].transcript;tx.textContent='“'+t+'”';if(e.results[e.results.length-1].isFinal)fin=t;};
+  rec.onerror=e=>{orb.classList.remove('on');st.textContent=e&&e.error==='not-allowed'?'Allow the microphone, then tap the mic':'Tap the mic and try again';};
+  rec.onend=()=>{orb.classList.remove('on');rec=null;if(fin.trim())ask(fin);else if(ov&&!/Allow|again/.test(st.textContent))st.textContent='Tap the mic and speak';};
+  try{rec.start();}catch(e){}}
+ function open(){close();ov=mk('div','hv-ov');const box=mk('div','hv-box');ov.appendChild(box);
+  const x=mk('button','hv-x','×');x.type='button';x.onclick=close;box.appendChild(x);
+  box.appendChild(mk('small','hv-ey','HEY LUXELLA'));
+  const orb=mk('button','hv-orb');orb.type='button';orb.setAttribute('aria-label','Speak');orb.innerHTML='<svg viewBox="0 0 24 24" width="34" height="34"><rect x="9" y="3" width="6" height="11.5" rx="3" fill="currentColor"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M8.5 21h7" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>';box.appendChild(orb);
+  const st=mk('div','hv-st','Tap the mic and speak');box.appendChild(st);const tx=mk('div','hv-tx');box.appendChild(tx);
+  const f=mk('form','hv-f');const inp=mk('input');inp.placeholder='…or type: where is my Coach bag?';inp.setAttribute('enterkeyhint','send');const sb=mk('button','hv-go','Ask');sb.type='submit';f.appendChild(inp);f.appendChild(sb);f.onsubmit=e=>{e.preventDefault();ask(inp.value);};box.appendChild(f);
+  const sg=mk('div','hv-sg');SUG.forEach(s=>{const b=mk('button','hv-c',s);b.type='button';b.onclick=()=>ask(s);sg.appendChild(b);});box.appendChild(sg);
+  const su=mk('button','hv-setup',isIOS?'Use with Siri  ›':isSam?'Use with Bixby  ›':isAnd?'Use with Google / home screen  ›':'Use from your phone  ›');su.type='button';su.onclick=setup;box.appendChild(su);
+  orb.onclick=()=>{if(rec){try{rec.stop();}catch(e){}return;}listen(st,tx,orb);};
+  ov.addEventListener('click',e=>{if(e.target===ov)close();});document.body.appendChild(ov);
+  if(SR)listen(st,tx,orb);else{orb.classList.add('off');st.textContent='Type your question below';setTimeout(()=>inp.focus(),200);}}
+ const copy=async(t,b)=>{try{await navigator.clipboard.writeText(t);}catch(e){const a=mk('textarea');a.value=t;document.body.appendChild(a);a.select();document.execCommand('copy');a.remove();}const o=b.textContent;b.textContent='Copied ✓';setTimeout(()=>b.textContent=o,1600);};
+ function setup(){const box=ov&&ov.querySelector('.hv-box');if(!box)return;box.textContent='';const x=mk('button','hv-x','×');x.type='button';x.onclick=close;box.appendChild(x);
+  const bk=mk('button','hv-bk','‹ Back');bk.type='button';bk.onclick=open;box.appendChild(bk);
+  const step=(n,h,el)=>{const s=mk('div','hv-step');s.appendChild(mk('i',null,String(n)));const c=mk('div');c.appendChild(mk('b',null,h));if(el)c.appendChild(el);s.appendChild(c);box.appendChild(s);};
+  const cbtn=(lbl,t)=>{const b=mk('button','hv-cp',lbl);b.type='button';b.onclick=()=>copy(t,b);return b;};
+  const url=BASE()+'?ask=';
+  if(!standalone()){const w=mk('div');if(installEv){const ib=mk('button','hv-go','Install Luxella app');ib.type='button';ib.onclick=async()=>{installEv.prompt();try{await installEv.userChoice;}catch(e){}installEv=null;ib.textContent='Installed ✓';};w.appendChild(ib);}else w.appendChild(mk('small',null,isIOS?'Safari: tap Share ⬆, then “Add to Home Screen”.':'Browser menu ⋮, then “Add to Home screen” / “Install app”.'));step(1,'Add Luxella to your home screen',w);}
+  if(isIOS){box.insertBefore(mk('h3','hv-h','Siri: “Hey Siri, Luxella”'),box.querySelector('.hv-step'));
+   const w2=mk('div');w2.appendChild(mk('small',null,'Open the Shortcuts app → + → add “Dictate Text”, then “Open URLs”. In Open URLs paste this link and add “Dictated Text” right after it:'));w2.appendChild(cbtn('Copy Luxella link',url));step(standalone()?1:2,'Make the Siri shortcut (one minute)',w2);
+   step(standalone()?2:3,'Name the shortcut “Luxella”',mk('small',null,'Now say “Hey Siri, Luxella”, then ask: “where is my Coach bag?” or “show my proof of purchase”.'));}
+  else if(isAnd){box.insertBefore(mk('h3','hv-h',isSam?'Bixby: “Hi Bixby, Luxella orders”':'Ask with your voice'),box.querySelector('.hv-step'));
+   step(standalone()?1:2,'Long-press the Luxella icon',mk('small',null,'You get one-tap shortcuts: Where are my orders · Proof of purchase · What do I owe.'));
+   const w3=mk('div');w3.appendChild(mk('small',null,(isSam?'Bixby → Quick commands → + . Name it, then “Type a command” and paste:':'Google app → Settings → Routines → New. Set a phrase, then “Add action → Try adding your own” and paste:')));
+   [['Orders','where are my orders'],['Proof','show my proof of purchase'],['Dues','what do I owe']].forEach(([l,q])=>w3.appendChild(cbtn('Copy “'+l+'” command','open '+url+encodeURIComponent(q))));step(standalone()?2:3,isSam?'Bixby voice command (optional)':'“Hey Google” command (optional)',w3);}
+  else{box.insertBefore(mk('h3','hv-h','Open this page on your phone'),box.querySelector('.hv-step'));const w4=mk('div');w4.appendChild(cbtn('Copy portal link',BASE()));step(2,'Then tap “Hey Luxella” there',w4);}
+  box.appendChild(mk('p','hv-note','Fastest anytime: open Luxella and tap the gold mic.'));}
+ window.__lxHey=open;
+ const fab=()=>{if(document.getElementById('hv-fab'))return;if(!document.getElementById('chatfab'))return setTimeout(fab,600);const b=mk('button','hv-fab');b.id='hv-fab';b.type='button';b.setAttribute('aria-label','Hey Luxella, ask by voice');b.innerHTML='<svg viewBox="0 0 24 24" width="22" height="22"><rect x="9" y="3" width="6" height="11.5" rx="3" fill="currentColor"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';b.onclick=open;document.body.appendChild(b);};fab();
+ try{const u=new URL(location.href);if(u.searchParams.get('hey')){u.searchParams.delete('hey');history.replaceState(null,'',u.pathname+u.search+u.hash);setTimeout(open,1500);}}catch(e){}
+})();
