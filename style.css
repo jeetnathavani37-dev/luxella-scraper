@@ -3998,3 +3998,50 @@ body:has(.ed-sh) .ed-pill{display:none}
 .cu-hc span{display:none}
 /* Gentleman's — classic engraved serif, gold */
 .cu[data-g="Men"] .cu-t em{font:400 clamp(29px,8.6vw,43px)/1.1 'Lx Cinzel','Lx Bodoni',Georgia,serif!important;letter-spacing:.07em!important;text-transform:uppercase;-webkit-text-stroke:.7px rgba(138,106,37,.9);filter:drop-shadow(0 2px 0 rgba(0,0,0,.55)) drop-shadow(0 0 16px rgba(241,213,142,.3))!important}
+
+/* ===== Starring YOU — premium cinema ===== */
+.mc.mc2{padding:34px 16px 24px;background:radial-gradient(90% 46% at 50% 0%,rgba(201,163,94,.20),transparent 70%),radial-gradient(120% 70% at 50% 0%,#3a0a14 0%,#14050a 55%,#080304 100%);border-top:1px solid rgba(233,201,138,.5);border-bottom:1px solid rgba(233,201,138,.5)}
+.mc.mc2::after{content:'';position:absolute;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(rgba(255,226,160,.16) 1px,transparent 1.5px) 0 0/34px 34px,radial-gradient(rgba(255,226,160,.10) 1px,transparent 1.5px) 17px 17px/34px 34px;-webkit-mask:linear-gradient(#000,transparent 60%);mask:linear-gradient(#000,transparent 60%)}
+.mc2-mq{max-width:380px;padding:18px 14px;background:linear-gradient(180deg,#120d08,#080604);border:1px solid #c9a35e;box-shadow:0 0 0 5px #0a0705,0 0 0 6px rgba(233,201,138,.55),0 0 0 11px #0a0705,0 0 0 12px rgba(233,201,138,.22),0 26px 50px rgba(0,0,0,.7),0 0 60px rgba(201,163,94,.12)}
+.mc2-mq::before{content:'';position:absolute;inset:16px;border:1px solid rgba(233,201,138,.32);pointer-events:none}
+.mc2-bulbs{inset:4px;filter:drop-shadow(0 0 3px rgba(255,214,130,.85))}
+.mc2-in{padding:22px 8px 18px}
+.mc2-in small{display:flex;align-items:center;justify-content:center;gap:10px;font:500 8.5px 'Lux Label',sans-serif;letter-spacing:.3em;color:#E9C98A}
+.mc2-in small::before,.mc2-in small::after{content:'';flex:0 0 26px;height:1px;background:linear-gradient(90deg,transparent,#E9C98A)}.mc2-in small::after{transform:scaleX(-1)}
+.mc2-t{margin:14px 0 8px}
+.mc2-t i{font:italic 400 34px/1 'Lx Playfair',Georgia,serif;color:#f6e7c6;letter-spacing:.02em;margin-bottom:-6px;text-shadow:0 2px 14px rgba(233,201,138,.35)}
+.mc2-t b{font:400 clamp(84px,27vw,132px)/.92 'Lx Bodoni',Georgia,serif;letter-spacing:.02em;background:linear-gradient(180deg,#fffaf0 0%,#f7e2a6 28%,#e9c98a 52%,#b8892b 78%,#8a6a25 100%);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:none;filter:drop-shadow(0 4px 0 rgba(0,0,0,.6)) drop-shadow(0 0 26px rgba(241,213,142,.35))}
+.mc2-in span{font:italic 400 14.5px 'Lx Playfair',Georgia,serif;color:#cdb98a;letter-spacing:.02em}
+/* tickets */
+.mc2-row{grid-auto-columns:64%;gap:16px;padding:6px 2px 16px}
+.mc2-tk{--st:62px;counter-increment:tk;color:#f7efe2;background:linear-gradient(165deg,#1d150d 0%,#0e0a07 60%,#140d08 100%);box-shadow:inset 0 0 0 1px #c9a35e,inset 0 0 0 5px #0e0a07,inset 0 0 0 6px rgba(233,201,138,.4);-webkit-mask:radial-gradient(circle 10px at 0 calc(100% - var(--st)),transparent 98%,#000),radial-gradient(circle 10px at 100% calc(100% - var(--st)),transparent 98%,#000);-webkit-mask-composite:source-in;mask:radial-gradient(circle 10px at 0 calc(100% - var(--st)),transparent 98%,#000),radial-gradient(circle 10px at 100% calc(100% - var(--st)),transparent 98%,#000);mask-composite:intersect;filter:drop-shadow(0 14px 18px rgba(0,0,0,.55));transition:transform .35s cubic-bezier(.22,1,.36,1)}
+.mc2-row{counter-reset:tk}
+.mc2-tk:active{transform:translateY(-3px) scale(.99)}
+.mc2-tk::before{content:'Nº 0' counter(tk);position:absolute;z-index:3;top:16px;left:16px;padding:5px 9px 4px;font:500 8px/1 'Lux Num',sans-serif;letter-spacing:.2em;color:#0e0a07;background:linear-gradient(180deg,#f7e2a6,#c9a35e);border-radius:2px}
+.mc2-tk figure{margin:14px 14px 0;aspect-ratio:4/4.3;background:radial-gradient(90% 70% at 50% 35%,#fbf5e8,#e6dac0 75%,#d8c9a8);position:relative}
+.mc2-tk figure::after{content:'';position:absolute;inset:0;box-shadow:inset 0 0 0 1px rgba(138,106,37,.35),inset 0 -30px 40px -30px rgba(90,66,22,.25);pointer-events:none}
+.mc2-tx{padding:14px 16px 14px}
+.mc2-tx small{font:500 7px 'Lux Label',sans-serif;letter-spacing:.28em;color:#C9A35E!important;text-transform:uppercase}
+.mc2-tx b{margin-top:7px;font:400 24px/1.02 'Lx Bodoni',Georgia,serif;color:#F7EFE2!important;text-transform:none;letter-spacing:.005em}
+.mc2-tx em{margin-top:6px;font:italic 400 13.5px/1.25 'Lx Playfair',Georgia,serif;color:#bfa978!important}
+.mc2-stub{height:var(--st);padding:0 16px;margin-top:auto;border-top:1.5px dashed rgba(233,201,138,.55);background:linear-gradient(180deg,#0a0705,#120c07);gap:8px;flex-wrap:nowrap}
+.mc2-stub span{white-space:nowrap;font:400 7px 'Lux Num',sans-serif;letter-spacing:.14em;color:#d9be83}
+.mc2-stub span:first-child{font:italic 400 15px 'Lx Playfair',Georgia,serif;letter-spacing:.01em;color:#E9C98A;text-transform:none}
+.mc2-stub span:nth-child(2){flex:1;text-align:center;color:#a8987e}
+.mc2-stub span:last-child{padding:5px 8px;border:1px solid rgba(233,201,138,.55);border-radius:999px;color:#E9C98A;letter-spacing:.16em}
+/* category reel */
+.mc2-reel{margin:20px -16px 16px;padding:4px 16px;border:0!important;background:none!important;gap:10px}
+.mc2-reel button{border:1px solid rgba(233,201,138,.35);border-radius:999px;padding:11px 18px;color:#d9cbb0;background:rgba(0,0,0,.35);letter-spacing:.22em;font:500 9px 'Lux Label',sans-serif;transition:all .3s}
+.mc2-reel button.on{color:#1a1208;background:linear-gradient(180deg,#fff0b8,#e9c98a 55%,#b8892b);border-color:#f1d58e;box-shadow:0 6px 18px rgba(201,163,94,.3)}
+/* product rail on the dark stage */
+.mc2 .cl-rail .cl-card{background:transparent!important}
+.mc2 .cl-rail .cl-card .cl-ph{background:radial-gradient(90% 70% at 50% 35%,#fbf5e8,#e6dac0)!important;border-radius:3px!important;box-shadow:0 0 0 1px rgba(201,163,94,.5),0 12px 24px rgba(0,0,0,.45)}
+.mc2 .cl-rail .cl-card .cl-br{color:#C9A35E!important;letter-spacing:.2em}
+.mc2 .cl-rail .cl-card .cl-ti{color:#F3ECDD!important}
+.mc2 .cl-rail .cl-card .cl-pr span{color:#F1D58E!important}
+.mc2-t i{margin-bottom:2px!important;position:relative;z-index:1}
+.mc2-t b{margin-top:-4px}
+.mc2-tk{box-shadow:none!important}
+.mc2-tk::after{content:'';position:absolute;inset:0;z-index:4;pointer-events:none;box-shadow:inset 0 0 0 1px #c9a35e,inset 0 0 0 5px rgba(14,10,7,.0)}
+.mc2-stub span:nth-child(2){display:none}
+.mc2-stub{justify-content:space-between}
