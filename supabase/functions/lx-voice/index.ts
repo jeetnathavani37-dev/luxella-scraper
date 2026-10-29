@@ -51,7 +51,7 @@ ORDERS: ${JSON.stringify(facts(rows, hasPop))}`;
   if (audio) parts.push({ inline_data: { mime_type: (mime || "audio/webm").split(";")[0], data: audio } }, { text: "The client's voice message is attached. First transcribe it accurately (it may be English, Hindi or Hinglish; brand words like Coach, MK / Michael Kors, Tissot, Marc Jacobs are common). Put the transcript in heard (Roman script), then answer in English." });
   else parts.push({ text: q });
   const contents = [...(hist || []).slice(-6).map((h: any) => ({ role: h.role === "a" ? "model" : "user", parts: [{ text: String(h.text || "").slice(0, 500) }] })), { role: "user", parts }];
-  const ms = ["gemini-3.5-flash", ai.model && /gemini/.test(ai.model) ? ai.model : "gemini-3.5-flash", "gemini-3.1-flash-lite", "gemini-3.5-flash-lite", "gemini-flash-lite-latest"].filter((x, i, a) => a.indexOf(x) === i);
+  const ms = ["gemini-3.1-flash-lite", "gemini-3.5-flash", ai.model && /gemini/.test(ai.model) ? ai.model : "gemini-3.5-flash", "gemini-3.1-flash-lite", "gemini-3.5-flash-lite", "gemini-flash-lite-latest"].filter((x, i, a) => a.indexOf(x) === i);
   let err = "";
   for (const m of ms) {
     try {
