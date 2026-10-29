@@ -532,6 +532,14 @@ window.__lxSetStage=async function(r0,k){
  const ok=await applyChange(r.item,{stage:k,status:name,notify_hold:new Date().toISOString()},n=>{const st=Object.assign({},n.stages||{});if(k<cur){Object.keys(st).forEach(x=>{if(Number(x)>k)delete st[x];});}else{for(let x=cur+1;x<=k;x++){if(x!==k&&isLocalO(r)&&x>=4&&x<=6)continue;if(!st[x])st[x]=todayS();}}if(!st[k])st[k]=todayS();const out=Object.assign(n,{order:r.item,items:n.items||[],stages:st});if(Number(out.stageOverride||0)>k)out.stageOverride=k;return out;},(r.order_no||r.item)+' → '+name);
  if(ok){say(name);if(k>cur)try{const cl=window.lx.client();const ld=()=>window.lxStagePrompt?Promise.resolve():new Promise(res=>{const x=document.createElement('script');x.src='stageprompt.js?v=1';x.onload=res;x.onerror=res;document.body.appendChild(x);});await ld();if(window.lxStagePrompt)window.lxStagePrompt({client:{id:cl.id,slug:cl.slug,name:cl.name},order:Object.assign({},r,{stage:k,status:name}),to:k,phone:'',addNotice:d=>photos.db.collection('notices').add(d),token:()=>window.lx.authToken()});}catch(e){}}
 };
+/* Payment: owner taps "Payment successful" → confirm → marked paid (or back to pending) */
+window.__lxSetPaid=async function(r0){
+ const r=curOrder(r0.item)||r0;const paid=r.payout_status==='Received';const who=r.order_no||r.item;
+ const n=Number(String(r.payout||'').replace(/[^0-9.]/g,''));const amt=n?(' of ₹'+n.toLocaleString('en-IN')):'';
+ const q=paid?('Mark '+who+' as NOT paid?\n\nIt will show as pending again.'):('Are you sure you have received the payment'+amt+' for '+who+'?\n\nCheck your bank/UPI first. The client will see it as received.');
+ if(!confirm(q))return false;
+ const ok=await applyChange(r.item,paid?{payout_status:'Pending',payment_date:''}:{payout_status:'Received',payment_date:todayS()},null,who+(paid?': marked unpaid':': payment received'));
+ if(ok)say(paid?'Marked as pending':'Payment received ✓');return ok;};
 function detectIntl(n){n=String(n).replace(/\s+/g,'');if(/^1Z[0-9A-Z]{16}$/i.test(n))return 'ups';if(/^(92|93|94|95)\d{18,20}$/.test(n)||/^[A-Z]{2}\d{9}US$/i.test(n))return 'usps';if(/^\d{10}$/.test(n))return 'dhl';if(/^\d{12}$|^\d{15}$|^\d{20}$|^\d{22}$/.test(n))return 'fedex';return '';}
 function detectLocal(n){n=String(n).replace(/\s+/g,'');if(/^\d{11}$/.test(n))return 'bluedart';if(/^\d{13,14}$/.test(n))return 'delhivery';if(/^[A-Z]\d{8,10}$/i.test(n))return 'dtdc';if(/^[A-Z]{2}\d{9}IN$/i.test(n))return 'india-post';return '';}
 window.__lxTrk=function(r,card){
@@ -543,7 +551,7 @@ window.__lxTrk=function(r,card){
  const back=el('button','btn2','◀');back.type='button';back.title='Go back one step';back.disabled=stage<=1;back.addEventListener('click',()=>window.__lxSetStage(r,prevStage(r)));
  const nxs=nextStage(r);const nx=el('button','btn',stage>=9?'Delivered ✓':'Next: '+(window.stName?window.stName(r,nxs):STAGES[nxs-1])+' ▶');nx.type='button';nx.disabled=stage>=9;nx.addEventListener('click',()=>window.__lxSetStage(r,nxs));
  const paid=r.payout_status==='Received';
- const pb=el('button','btn2',paid?'✓ Paid':'Mark paid');pb.type='button';pb.addEventListener('click',()=>applyChange(item,paid?{payout_status:'Pending',payment_date:''}:{payout_status:'Received',payment_date:todayS()},null,(r.order_no||item)+(paid?': marked unpaid':': marked paid')));
+ const pb=el('button','btn2',paid?'✓ Paid':'Mark paid');pb.type='button';pb.addEventListener('click',()=>window.__lxSetPaid(r));
  row.appendChild(back);row.appendChild(nx);row.appendChild(pb);box2.appendChild(row);
  /* row 1b: confirmations for the current stage */
  {const cr=el('div','xo-row xo-conf');const cur=(window.stName?window.stName(r,stage):STAGES[stage-1]);
