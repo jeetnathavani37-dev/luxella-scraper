@@ -4045,3 +4045,33 @@ body:has(.ed-sh) .ed-pill{display:none}
 .mc2-tk::after{content:'';position:absolute;inset:0;z-index:4;pointer-events:none;box-shadow:inset 0 0 0 1px #c9a35e,inset 0 0 0 5px rgba(14,10,7,.0)}
 .mc2-stub span:nth-child(2){display:none}
 .mc2-stub{justify-content:space-between}
+
+/* ===== Curated looks — dark gold atelier ===== */
+.lk{background:radial-gradient(100% 38% at 50% 0%,rgba(201,163,94,.16),transparent 70%),linear-gradient(180deg,#0e0a07,#080604 60%,#0d0906);color:#F3ECDD;padding:34px 0 26px;border-top:1px solid rgba(233,201,138,.5);border-bottom:1px solid rgba(233,201,138,.5)}
+.lk>small{display:flex;align-items:center;gap:10px;font:500 8.5px 'Lux Label',sans-serif!important;letter-spacing:.3em;color:#E9C98A;text-transform:uppercase}
+.lk>small::after{content:'';flex:0 0 40px;height:1px;background:linear-gradient(90deg,#E9C98A,transparent)}
+.lk>h3{font:400 clamp(40px,12vw,56px)/1 'Lx Bodoni',Georgia,serif!important;font-style:normal!important;margin:12px 0 8px;background:linear-gradient(180deg,#fffaf0,#f1d58e 55%,#b8892b);-webkit-background-clip:text;background-clip:text;color:transparent!important;letter-spacing:.005em}
+.lk>.cl-sub{font:italic 400 14.5px/1.45 'Lx Playfair',Georgia,serif!important;color:#c8b88f!important}
+.lk-tabs{padding:14px 16px 4px!important;gap:10px!important}
+.lk-tabs button{border:1px solid rgba(233,201,138,.35)!important;border-radius:999px!important;background:rgba(0,0,0,.35)!important;color:#d9cbb0!important;padding:10px 16px!important;font:500 9px 'Lux Label',sans-serif!important;letter-spacing:.2em!important;transition:all .3s}
+.lk-tabs button.on{color:#1a1208!important;background:linear-gradient(180deg,#fff0b8,#e9c98a 55%,#b8892b)!important;border-color:#f1d58e!important;box-shadow:0 6px 18px rgba(201,163,94,.28)}
+.lk-n{padding:16px 16px 0!important;font:400 9px 'Lux Num',sans-serif!important;letter-spacing:.24em;text-transform:uppercase;color:#b9a06a!important}
+.lk-stage{margin:12px 16px 0!important;background:#050403;box-shadow:0 0 0 1px #c9a35e,0 0 0 6px #080604,0 0 0 7px rgba(233,201,138,.3),0 26px 46px rgba(0,0,0,.65)}
+.lk .lk-c{background:#0a0705!important;aspect-ratio:4/5.1!important}
+.lk .lk-c .lk-bg{position:absolute;inset:-8%;width:116%;height:116%;object-fit:cover;filter:blur(26px) saturate(1.1) brightness(.75);z-index:0}
+.lk .lk-c img:not(.lk-bg){position:relative;z-index:1;object-fit:contain!important;filter:drop-shadow(0 10px 22px rgba(0,0,0,.35))}
+.lk .lk-c::after{content:'';position:absolute;inset:10px;border:1px solid rgba(233,201,138,.5);z-index:3;pointer-events:none}
+.lk .lk-c figcaption{z-index:2;background:linear-gradient(transparent,rgba(6,4,2,.94) 70%)!important;padding:70px 22px 24px!important}
+.lk .lk-c small{color:#E9C98A!important;font:500 9px 'Lux Label',sans-serif!important;letter-spacing:.32em!important}
+.lk .lk-c figcaption b{display:block;margin-top:6px;font:italic 400 36px/1 'Lx Playfair',Georgia,serif!important;color:#F7EFE2;text-shadow:0 2px 14px rgba(0,0,0,.6)}
+.lk-ar{background:rgba(8,6,4,.72)!important;color:#E9C98A!important;border:1px solid rgba(233,201,138,.6)!important;backdrop-filter:blur(6px);z-index:4}
+.lk-ih{padding:26px 16px 12px!important}
+.lk-ih b{font:italic 400 26px 'Lx Playfair',Georgia,serif!important;color:#F7EFE2!important}
+.lk-ih span{color:#1a1208!important;background:linear-gradient(180deg,#f7e2a6,#c9a35e);padding:6px 11px 5px;border-radius:999px;font:500 8px 'Lux Label',sans-serif!important;letter-spacing:.2em!important}
+.lk .cl-card{background:transparent!important}
+.lk .cl-card .cl-ph{background:radial-gradient(90% 70% at 50% 35%,#fbf5e8,#e6dac0)!important;border-radius:3px!important;box-shadow:0 0 0 1px rgba(201,163,94,.5),0 12px 24px rgba(0,0,0,.45)}
+.lk .cl-card .cl-br{color:#C9A35E!important;letter-spacing:.2em}
+.lk .cl-card .cl-ti{color:#F3ECDD!important}
+.lk .cl-card .cl-pr span{color:#F1D58E!important}
+.lk .cl-card .cl-pr em{color:#a8987e!important}
+.lk .lk-go{margin:20px 16px 0!important;width:calc(100% - 32px)!important;padding:19px 16px!important;border:0!important;border-radius:2px!important;background:linear-gradient(100deg,#b8892b,#f7e2a6 45%,#e9c98a 60%,#b8892b)!important;color:#1a1208!important;font:600 11px 'Lux Label',sans-serif!important;letter-spacing:.28em!important;text-transform:uppercase;box-shadow:0 12px 28px rgba(201,163,94,.28),inset 0 0 0 1px rgba(255,255,255,.35)}
