@@ -15,6 +15,10 @@ jobs:
     timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
+        with: { fetch-depth: 50 }
+      - name: Guard (agents may not touch protected areas; no secrets in code)
+        if: github.event_name == 'push'
+        run: python3 tools/qa/guard.py "${{ github.event.before }}" "${{ github.sha }}"
       - uses: actions/setup-python@v5
         with: { python-version: '3.12' }
       - run: pip install playwright pillow && python -m playwright install --with-deps webkit chromium
@@ -34,6 +38,7 @@ jobs:
       VT: ${{ secrets.VERCEL_TOKEN }}
     steps:
       - uses: actions/checkout@v4
+        with: { fetch-depth: 2 }
       - name: Deploy to Vercel (production)
         run: |
           if [ -z "$VT" ]; then echo "::warning::VERCEL_TOKEN secret not set — skipping deploy"; exit 0; fi
@@ -41,4 +46,12 @@ jobs:
       - uses: actions/setup-python@v5
         with: { python-version: '3.12' }
       - name: Production smoke after deploy
+        id: smoke
         run: python3 tools/qa/check.py --prod-only
+      - name: Auto-rollback to the previous commit if production broke
+        if: failure() && steps.smoke.outcome == 'failure' && github.event_name == 'push' && env.VT != ''
+        run: |
+          git fetch --depth 2 origin "${{ github.event.before }}" && git checkout -f "${{ github.event.before }}"
+          python3 tools/qa/deploy.py
+          echo "::error::Production smoke failed after deploy — rolled back to ${{ github.event.before }}"
+          exit 1

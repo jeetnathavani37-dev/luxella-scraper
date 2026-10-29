@@ -11,10 +11,13 @@ Make the client portal (luxellaclients.duckdns.org) feel like a ₹1,000-crore l
 - Every push to `main` runs **Portal QA & deploy** (GitHub Actions): JS syntax → `tools/qa/check.py` walks every tab as a client and as the owner on iPhone WebKit + Chrome (scroll, type, product page, photo swipe) → deploys to Vercel only if QA passes. It also runs every hour on its own.
 - Read results: `gh api repos/jeetnathavani37-dev/luxella-scraper/actions/workflows/portal-qa.yml/runs?per_page=5`, job logs via `gh api .../actions/jobs/<id>/logs`, screenshots via `gh run download <run_id> -n qa-report -D /tmp/qa` (then Read the PNGs). If `gh run download` is refused, use the job log + `report.json` text.
 - After you push, wait for the run, confirm it is green and the deploy step printed READY. If it fails because of you, fix forward or `git revert` your commit within the same run.
-- Small commits, one idea each, message prefix = your role (`watchdog:`, `panel:`, `design:`, `backend:`). Never force-push. Never rewrite history.
+- Small commits, one idea each, message prefix = your role (`watchdog:`, `panel:`, `design:`, `backend:`, `growth:`, `chief:`). Max 3 code commits per run, max 12 files per commit. `git pull --rebase` right before every push; never force-push, never rewrite history.
+- The CI **guard** rejects any agent commit that touches protected paths: `.github/`, `tools/qa/` (tests, deploy, guard), `tools/agents/CONSTITUTION.md`, `TEAM.md`, `supabase/`, `vercel.json`, or that contains anything that looks like a secret. Don't try to get around it — propose the change under "Needs Jeet".
+- Never weaken a test, skip a step, raise a budget or delete a check to make CI pass. A red CI means the change is wrong.
+- If production breaks after a deploy, CI rolls back automatically. If the same fix fails twice, stop and report — no third attempt.
 
 ## 3. Autonomy — do it, don't wait
-You may, without asking: fix bugs, broken layouts, overlaps, slow code, copy/typo, contrast, spacing, broken images, crashes; hide a catalogue piece (`update lx_catalog set active=false where id=…`) whose images are missing/broken or price is null/0; improve scraper scripts; add tests/checks to `tools/qa`.
+You may, without asking: fix bugs, broken layouts, overlaps, slow code, copy/typo, contrast, spacing, broken images, crashes; hide a catalogue piece (`update lx_catalog set active=false where id=…`) whose images are missing/broken or price is null/0; improve scraper scripts. New tests or checks for `tools/qa` → propose them in BACKLOG.md (that folder is protected).
 
 ## 4. GUARDED — never do these; put them under "Needs Jeet" in your report
 - Anything touching **orders, order status/updates, payments, payouts, client records, requests/enquiry replies** (`lx_orders`, `lx_docs`, `lx_clients`, `lx_client_users`, `lx_recon`, `lx_b2b` orders).
@@ -29,7 +32,12 @@ You may, without asking: fix bugs, broken layouts, overlaps, slow code, copy/typ
 - Luxury tone: calm, few words, no exclamation marks, no emoji in client UI, serif headlines, gold used sparingly.
 - Evidence over opinion: cite the screenshot/log/query behind every claim. Never invent numbers.
 
-## 6. Memory & coordination
+## 6. Heartbeats — nobody watches nobody
+- Expected runs per day: watchdog 24, backend 4, panel 1, growth 1, chief 1, design (Tue/Fri) 1.
+- Product Chief checks every other agent ran and finished `ok`; Backend checks the Chief and the Catalogue sync ran. A missed or failed run twice in a row → urgent `lx_report` to Jeet with the exact error.
+- Every agent's final line is its status; never claim something worked without the evidence (CI run id, query result, screenshot).
+
+## 7. Memory & coordination
 - Your notebook: `tools/agents/memory/<role>.md` — read it first, append what you learned (dated, 1–3 lines), keep it under 150 lines.
 - Shared backlog: `tools/agents/BACKLOG.md` — the Product Chief owns order; anyone may add items under "Inbox".
 - Ledger: first SQL `select lx_agent_start('<role>');`, last `select lx_agent_done('<role>','<one line>','<ok|error>');` (ignore if they error).

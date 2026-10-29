@@ -100,6 +100,10 @@ def steps_for(role):
      ('boutique-deep',"()=>{const p=document.getElementById('pane-deals');p&&p.scrollTo(0,9000)}"),
      ('product',"()=>{const c=[...document.querySelectorAll('.cl-card')].find(x=>x.querySelector('img'));c&&c.click()}"),
      ('product-swipe',"()=>{const g=document.querySelector('.cl-dt .cl-gal');if(g){g.scrollTo({left:g.clientWidth,behavior:'instant'})}}"),
+     ('voice-open',"()=>{document.querySelectorAll('.dl-sh .x,.cl-dt .x,.dl-imm-bk').forEach(x=>x.click());const f=document.getElementById('hv-fab');f&&f.click()}"),
+     ('voice-close',"()=>{[...document.querySelectorAll('.lv-x,[aria-label=Close],.x')].filter(x=>x.offsetParent!==null).forEach(x=>x.click());document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}))}"),
+     ('chat-open',"()=>{const c=document.getElementById('chatfab');c&&c.click()}"),
+     ('chat-close',"()=>{const x=document.querySelector('.chat .x,.cm .x,[aria-label=Close]');x&&x.click()}"),
      ('search-type',"()=>{document.querySelectorAll('.dl-sh .x,.cl-dt .x').forEach(x=>x.click());const i=document.querySelector('input[type=search]');if(i){i.focus();i.value='coach bag under 30k';i.dispatchEvent(new Event('input',{bubbles:true}))}}")]
     return st
 PROBE = """()=>{
@@ -141,6 +145,11 @@ with sync_playwright() as p:
             pg.evaluate("()=>{document.querySelectorAll('button').forEach(b=>{if(/got it/i.test(b.textContent))b.click()});document.querySelectorAll('.nt-ov,.lx-sheet-back').forEach(x=>x.remove())}")
         except Exception as e: errs.append('LOAD ' + str(e)[:200])
         notes.append(f'{tag} first paint+settle {round(time.time() - t0, 1)}s')
+        try:
+            nav = pg.evaluate("()=>{const n=performance.getEntriesByType('navigation')[0];return n?Math.round(n.loadEventEnd||n.domContentLoadedEventEnd):0}")
+            notes.append(f'{tag} load {nav}ms')
+            if nav > 6000: problems.append(f'{tag}: page load {nav}ms (budget 6000ms)')
+        except Exception: pass
         for name, js in steps_for(role):
             try:
                 pg.evaluate("()=>{document.querySelectorAll('button').forEach(b=>{if(/^\\s*got it\\s*$/i.test(b.textContent))b.click()})}"); pg.evaluate(js); pg.wait_for_timeout(3500 if name in ('boutique', 'product') else 1300)
@@ -157,6 +166,18 @@ with sync_playwright() as p:
         for x2 in sorted(set(bad))[:10]: problems.append(f'{tag} local 4xx/5xx: {x2}')
         b.close()
 srv.shutdown()
+# ---------- production in a real browser (login screen, no session) ----------
+try:
+    with sync_playwright() as p:
+        b = p.webkit.launch(); ctx = b.new_context(**p.devices['iPhone 14']); pg = ctx.new_page(); perr = []
+        pg.on('pageerror', lambda e: perr.append(str(e)[:200]))
+        pg.goto(PROD[0], timeout=60000); pg.wait_for_timeout(5000)
+        ok = pg.evaluate("()=>!!document.querySelector('input[type=email],#lg-magic,.tabs')")
+        pg.screenshot(path=os.path.join(OUT, 'prod-login.png'))
+        if not ok: problems.append('PROD: login screen did not render on iPhone WebKit')
+        for e in perr: problems.append(f'PROD JS error: {e}')
+        b.close()
+except Exception as e: problems.append(f'PROD browser check failed: {str(e)[:160]}')
 rep = {'at': time.strftime('%Y-%m-%d %H:%M:%S'), 'problems': problems, 'notes': notes, 'steps': summary}
 json.dump(rep, open(os.path.join(OUT, 'report.json'), 'w'), indent=1)
 print(json.dumps({'problems': problems, 'notes': notes}, indent=1))
