@@ -4315,3 +4315,9 @@ body:has(.ed-sh) .ed-pill{display:none}
 .pop-go{position:relative;overflow:hidden}
 .pop-go::after{content:'';position:absolute;inset:0;background:linear-gradient(110deg,transparent 35%,rgba(255,255,255,.55) 50%,transparent 65%);background-size:250% 100%;background-position:150% 0;animation:pxBtn 3.2s 1s ease-in-out infinite}
 @keyframes pxBtn{40%,100%{background-position:-60% 0}}
+/* Luxella Live button */
+.hv-fab{width:60px!important;height:60px!important;background:conic-gradient(from 200deg,#fff3cf,#e9c98a,#a8792a,#f7e2a6,#fff3cf)!important;box-shadow:0 12px 28px rgba(0,0,0,.55),0 0 0 5px rgba(233,201,138,.16),0 0 26px rgba(233,201,138,.35)!important;animation:hvGlow 3s ease-in-out infinite}
+.hv-fab::after{content:'';position:absolute;inset:-6px;border-radius:50%;border:1px solid rgba(233,201,138,.55);animation:hvRing 2.6s ease-out infinite}
+.hv-live{position:absolute;bottom:-7px;left:50%;transform:translateX(-50%);padding:2px 6px;border-radius:999px;background:#0b0906;border:1px solid rgba(233,201,138,.6);color:#F1D58E;font:700 7px 'Lux Label',sans-serif;letter-spacing:.2em}
+@keyframes hvRing{0%{transform:scale(.9);opacity:.9}100%{transform:scale(1.35);opacity:0}}
+@keyframes hvGlow{50%{box-shadow:0 12px 28px rgba(0,0,0,.55),0 0 0 7px rgba(233,201,138,.22),0 0 34px rgba(233,201,138,.5)}}
