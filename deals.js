@@ -1309,7 +1309,7 @@
  const COLC={q:'',cat:'',brand:'',gender:'',min:0,max:0,sort:'trend',ready:false};let COLF=null,SHOPH=null;
  const colPrice=p=>p==null?null:(!own()&&M.on?quote(p):p);
  const inrS=p=>p!=null?'₹'+Number(p).toLocaleString('en-IN'):'Price on request';
- const cimg=(u,w)=>{u=String(u||'');w=w||800;if(/scene7\.com/.test(u)&&u.indexOf('?')<0)return u+'?wid='+w+'&hei='+w+'&fit=constrain';if(/cdn\.shopify\.com|\/cdn\/shop\//.test(u)&&u.indexOf('?')<0)return u+'?width='+w;return u;};
+ const cimg=(u,w)=>{u=String(u||'');w=Math.min(1400,Math.round((w||800)*1.35));if(/scene7\.com/.test(u)&&u.indexOf('?')<0)return u+'?wid='+w+'&hei='+w+'&fit=constrain';if(/cdn\.shopify\.com|\/cdn\/shop\//.test(u)&&u.indexOf('?')<0)return u+'?width='+w;return u;};
  const colTitle=it=>String(it.title||'').replace(new RegExp('^'+(it.brand||'').replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\s*','i'),'');
  const colClean=s=>String(s||'').split(/\s*[·.]\s*/).filter(x=>x&&!/®|^(coach|kate spade|michael kors|tory burch)$/i.test(x.trim())).join(' · ');
  function colStory(it){if(it.story)return it.story;const cat=String(it.category||'').toLowerCase();const k=/bag/.test(cat)?'a bag made to be carried every day and remembered for years':/shoe|sneaker/.test(cat)?'a pair built for comfort with the polish the house is known for':/watch/.test(cat)?'a watch that wears easily from desk to dinner':/small leather/.test(cat)?'a small leather piece that earns its place in every bag':/cloth|activewear/.test(cat)?'a piece cut for an easy, modern fit':'a signature piece from the house';return colTitle(it)+' from '+(it.brand||'the house')+' — '+k+'. Sourced to order from the official '+(it.brand||'')+' boutique, checked by Luxella and delivered to your door.';}

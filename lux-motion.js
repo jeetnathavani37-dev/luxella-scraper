@@ -20,4 +20,16 @@
  if(RM)return;
  /* gentle press feedback on cards */
  document.addEventListener('pointerdown',function(e){var c=e.target.closest&&e.target.closest('.cl-card,.dl-pc,.shp-c,.lk-c');if(!c)return;c.classList.add('lxm-press');var up=function(){c.classList.remove('lxm-press');removeEventListener('pointerup',up,true);removeEventListener('pointercancel',up,true);};addEventListener('pointerup',up,true);addEventListener('pointercancel',up,true);},{passive:true});
+
+ /* 3D studio: levitate only cards on screen; tilt + glare under the finger */
+ var SETS='.cl-ph,.dl-c .dl-ph,.shp-c,.mc2-tk figure,.sw .dl-pc-ph';
+ if('IntersectionObserver' in window){var vio=new IntersectionObserver(function(es){es.forEach(function(e){e.target.classList.toggle('lxm-vis',e.isIntersecting);});},{rootMargin:'40px'});
+  var scanT=0,scan=function(){scanT=0;var ns=document.querySelectorAll(SETS);for(var i=0;i<ns.length;i++){if(!ns[i].__lv){ns[i].__lv=1;vio.observe(ns[i]);}}};
+  try{new MutationObserver(function(){if(!scanT)scanT=setTimeout(scan,300);}).observe(document.body||document.documentElement,{childList:true,subtree:true});}catch(e){}setTimeout(scan,500);}
+ var tc=null;function tilt(e){var c=e.target.closest&&e.target.closest(SETS);if(!c){if(tc)untilt();return;}if(tc&&tc!==c)untilt();tc=c;var r=c.getBoundingClientRect();var x=(e.clientX-r.left)/r.width,y=(e.clientY-r.top)/r.height;
+  c.classList.add('lxm-tilt');c.style.setProperty('--ry',((x-.5)*14).toFixed(2)+'deg');c.style.setProperty('--rx',((.5-y)*12).toFixed(2)+'deg');c.style.setProperty('--gx',(x*100).toFixed(0)+'%');c.style.setProperty('--gy',(y*100).toFixed(0)+'%');
+  c.style.setProperty('--px',((x-.5)*-8).toFixed(1)+'px');c.style.setProperty('--py',((y-.5)*-6).toFixed(1)+'px');}
+ function untilt(){if(!tc)return;var c=tc;tc=null;c.classList.remove('lxm-tilt');['--rx','--ry','--px','--py','--gx','--gy'].forEach(function(k){c.style.removeProperty(k);});}
+ document.addEventListener('pointermove',tilt,{passive:true});document.addEventListener('pointerdown',tilt,{passive:true});
+ ['pointerup','pointercancel','pointerleave','scroll'].forEach(function(t){document.addEventListener(t,function(){setTimeout(untilt,t==='pointerup'?180:0);},{passive:true,capture:true});});
 })();
