@@ -4327,3 +4327,15 @@ body:has(.ed-sh) .ed-pill{display:none}
 .hv-fab{animation-iteration-count:3!important}.hv-fab::after{animation-iteration-count:4!important}
 .dl-deck-sk{animation-iteration-count:3!important}
 @media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+/* ===== anti-glitch: calm, single-shot motion ===== */
+@keyframes lxFadeOnly{from{opacity:0}to{opacity:1}}
+.sw [id^="pane-"]:not([hidden]){animation:lxFadeOnly .22s ease-out!important}
+.sw [id^="pane-"]:not([hidden])>*{animation:none!important}
+html.lx-ready .sw .hero-top,html.lx-ready .sw .hero-main,html.lx-ready .sw .rule-double,html.lx-ready .sw .sub,html.lx-ready .sw .tabs,html.lx-ready .sw .tiles .card,html.lx-ready .sw .qa,html.lx-ready .sw .notif,html.lx-ready .sw .chatfab{animation:none!important;opacity:1!important;transform:none!important}
+.sw .reveal{animation-duration:.45s!important}
+.sw .tab[aria-selected=true]{animation:none!important}
+.sw .lx-pin{animation:lxFadeOnly .3s ease-out both!important}
+.sw [class*="btn"]::before{animation-iteration-count:2!important}
+body.dl-imm #pane-deals{background-attachment:scroll!important}
+.rv{transition-duration:.45s!important}
+.sw .chip::before,.sw .chip::after,.sw .btn2::before{animation-iteration-count:2!important}
