@@ -31,27 +31,29 @@ function facts(rows: any[], hasPop: Set<string>) {
   return rows.map((r: any) => ({ item: r.item, brand: r.brand || "", order_no: r.order_no || "", stage: STAGES[stage(r) - 1] || r.status || "", eta: r.eta_date || "", eta_passed: !!(r.eta_date && String(r.eta_date).slice(0, 10) < new Date().toISOString().slice(0, 10) && stage(r) < 9), ordered: r.order_date || "", india_tracking: r.local_tracking || "", courier: r.local_courier || "", amount_inr: Number(r.payout || 0), payment: r.payout_status === "Pending" ? "due" : "paid", proof_of_purchase: hasPop.has(pslug(r.item)) }));
 }
 async function aiAnswer(ai: any, first: string, rows: any[], hasPop: Set<string>, q: string, audio: string, mime: string, hist: any[]) {
-  const sys = `You are "Luxella", the warm, polished voice concierge of Luxella (a luxury personal-shopping service that buys from US/UK stores and delivers to India). You are talking to the client ${first}.
-Rules:
-- Answer ONLY from the ORDERS data below. Never invent dates, delivery windows (no "2-4 days"), prices or tracking numbers. If the data has no ETA, say Luxella will share it soon. Today is ${new Date().toISOString().slice(0, 10)}.
-- Reply in the same language style the client used: English → English; Hindi/Hinglish → natural Hinglish written in Roman script (e.g. "Aapka Coach bag Indian warehouse se nikal chuka hai").
-- Speak like a person on a phone call: 1–2 short sentences, no lists, no emojis, no markdown. Say amounts like "14,000 rupees". Shorten long product names (e.g. "Coach Station Tote").
-- If an ETA has passed and it is not delivered, say it is running a little late and Luxella will update them.
-- Prices are all-inclusive (shipping, customs, delivery). Stores confirm within about a week; if a store cancels, Luxella re-sources or refunds in full.
-- If they ask for a proof of purchase / bill / invoice and it exists, set act="proof" and item to the exact order item.
-- If they ask about something outside their orders, payments, delivery or Luxella's service, politely say Luxella will reply on WhatsApp and set act="wa".
-- "item" = the exact order item you talked about (for follow-ups), else "".
-Return JSON: {"heard": "<what the client said, cleaned, in their language>", "reply": "<what you say>", "item": "", "act": ""}
+  const sys = `You are Aanya, the personal concierge at Luxella (a luxury personal-shopping service: Luxella buys from official US/UK stores and delivers to India, all-inclusive). You are on a live voice call with your client ${first}. Sound like a real, warm, sharp human concierge — never robotic, never like a script.
+How you talk:
+- Mirror the client's language: English → polished English; Hindi/Hinglish → natural spoken Hinglish in Roman script ("Ji Himanshu, aapka Coach tote warehouse se nikal chuka hai, bas raste mein hai").
+- Keep it short and conversational: usually one or two sentences, like a phone call. Vary your phrasing; use small natural touches ("Sure", "Ji", "Good news —", "Just checked —"). Use the client's name only now and then.
+- No lists, emojis or markdown. Say money as "14,000 rupees". Shorten product names naturally ("your Coach tote", "the MK wallet set").
+- Be genuinely helpful: answer the exact question, then add one useful detail if it helps (tracking number, that it is paid, that proof of purchase is available). Understand follow-ups ("aur uska?", "and the other one?") from the conversation.
+- Facts come ONLY from ORDERS below. Never invent dates, delivery windows, prices or tracking. No ETA → say you will share it as soon as it is confirmed. ETA passed and not delivered → it is running a little late and you are on it.
+- Service facts you can use: prices are all-inclusive (shipping, customs, delivery); stores confirm within about a week; if a store cancels, Luxella re-sources or refunds in full; the courier may ask for an OTP at delivery.
+- Proof of purchase / bill / invoice requested and available → set act="proof" and item to that exact order item, and say you are opening it.
+- Anything you cannot answer from the data (new purchases, discounts, complaints, changes) → say warmly you will get the team to reply on chat, and set act="wa".
+- Greetings / thanks / small talk → respond naturally and briefly, then offer help.
+Output JSON only: {"heard": "<exactly what the client said, cleaned, Roman script>", "reply": "<what you say out loud>", "item": "<exact order item this is about, or empty>", "items": [<exact item names of every order your reply is about, max 4; for 'where are my orders' the open ones>], "act": "<proof|wa|empty>"}
+Today is ${new Date().toISOString().slice(0, 10)}.
 ORDERS: ${JSON.stringify(facts(rows, hasPop))}`;
   const parts: any[] = [];
-  if (audio) parts.push({ inline_data: { mime_type: (mime || "audio/webm").split(";")[0], data: audio } }, { text: "The client's voice message is attached. Transcribe it (it may be English, Hindi or Hinglish) and answer it." });
+  if (audio) parts.push({ inline_data: { mime_type: (mime || "audio/webm").split(";")[0], data: audio } }, { text: "The client's voice message is attached. First transcribe it accurately (English, Hindi or Hinglish; brand names like Coach, Michael Kors, Tissot, Marc Jacobs are common). Put the transcript in heard (Roman script), then answer it." });
   else parts.push({ text: q });
   const contents = [...(hist || []).slice(-6).map((h: any) => ({ role: h.role === "a" ? "model" : "user", parts: [{ text: String(h.text || "").slice(0, 500) }] })), { role: "user", parts }];
   const ms = [ai.model && /gemini/.test(ai.model) ? ai.model : "gemini-3.5-flash", "gemini-3.1-flash-lite", "gemini-3.5-flash-lite", "gemini-flash-lite-latest"].filter((x, i, a) => a.indexOf(x) === i);
   let err = "";
   for (const m of ms) {
     try {
-      const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${ai.key}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ systemInstruction: { parts: [{ text: sys }] }, contents, generationConfig: { responseMimeType: "application/json", temperature: 0.4, maxOutputTokens: 500, thinkingConfig: { thinkingBudget: 0 } } }), signal: AbortSignal.timeout(12000) });
+      const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${ai.key}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ systemInstruction: { parts: [{ text: sys }] }, contents, generationConfig: { responseMimeType: "application/json", temperature: 0.7, maxOutputTokens: 600, thinkingConfig: { thinkingBudget: 0 } } }), signal: AbortSignal.timeout(12000) });
       const j = await r.json(); const txt = j?.candidates?.[0]?.content?.parts?.map((p: any) => p.text || "").join("") || "";
       if (txt) return JSON.parse(txt.replace(/^```(json)?|```$/g, "").trim());
       err = m + ": " + JSON.stringify(j).slice(0, 200);
@@ -64,7 +66,7 @@ async function tts(ai: any, text: string) {
   let d: any = null, err = "";
   for (const m of [ai.tts || "gemini-3.8-flash-tts", "gemini-3.8-flash-lite-tts", "gemini-3.1-flash-tts-preview"].filter((x, i, a) => a.indexOf(x) === i)) {
     try {
-      const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${ai.key}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ contents: [{ parts: [{ text: "Say this warmly and naturally, like a friendly Indian luxury concierge on a phone call: " + text }] }], generationConfig: { responseModalities: ["AUDIO"], speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: ai.voice || "Kore" } } } } }), signal: AbortSignal.timeout(15000) });
+      const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${ai.key}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ contents: [{ parts: [{ text: text }] }], generationConfig: { responseModalities: ["AUDIO"], speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: ai.voice && ai.voice !== "Kore" ? ai.voice : "Sulafat" } } } } }), signal: AbortSignal.timeout(15000) });
       const j = await r.json(); d = j?.candidates?.[0]?.content?.parts?.find((p: any) => p.inlineData)?.inlineData; if (d) break; err = JSON.stringify(j).slice(0, 200);
     } catch (e) { err = String(e); }
   }
@@ -75,9 +77,9 @@ async function tts(ai: any, text: string) {
 }
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: CORS });
-  const u = new URL(req.url); let t = u.searchParams.get("t") || "", q = u.searchParams.get("q") || "", fmt = u.searchParams.get("fmt") || "", last = u.searchParams.get("last") || ""; let audio = "", mime = "", hist: any[] = [], say = ""; const cap = u.searchParams.get("cap");
-  if (req.method === "POST") { try { const b = await req.json(); t = b.t || t; q = b.q || q; fmt = b.fmt || fmt; last = b.last || last; audio = b.audio || ""; mime = b.mime || ""; hist = Array.isArray(b.hist) ? b.hist : []; say = String(b.say || ""); } catch (_) { /* ignore */ } }
-  let cur = ""; const out = (text: string, url = "", act = "") => fmt === "json" ? new Response(JSON.stringify({ text, url, item: cur, act }), { headers: { ...CORS, "Content-Type": "application/json" } }) : new Response(text, { headers: { ...CORS, "Content-Type": "text/plain; charset=utf-8" } });
+  const u = new URL(req.url); let t = u.searchParams.get("t") || "", q = u.searchParams.get("q") || "", fmt = u.searchParams.get("fmt") || "", last = u.searchParams.get("last") || ""; let audio = "", mime = "", hist: any[] = [], say = "", speak = false; const cap = u.searchParams.get("cap");
+  if (req.method === "POST") { try { const b = await req.json(); t = b.t || t; q = b.q || q; fmt = b.fmt || fmt; last = b.last || last; audio = b.audio || ""; mime = b.mime || ""; hist = Array.isArray(b.hist) ? b.hist : []; say = String(b.say || ""); speak = !!b.speak; } catch (_) { /* ignore */ } }
+  let cur = ""; const out = (text: string, url = "", act = "") => fmt === "json" ? new Response(JSON.stringify({ text, url, item: cur, act, cards: cur ? cardsFor([cur]) : [] }), { headers: { ...CORS, "Content-Type": "application/json" } }) : new Response(text, { headers: { ...CORS, "Content-Type": "text/plain; charset=utf-8" } });
   if (!/^[a-f0-9]{24,64}$/.test(t)) return out("This Luxella voice link is not set up. Open your Luxella page and tap the gold mic to set it up again.");
   const { data: tok } = await db.from("lx_docs").select("client_id").eq("collection", "meta").eq("doc_id", "voice_token").eq("data->>token", t).maybeSingle();
   if (!tok) return out("This Luxella voice link has expired. Open your Luxella page and tap the gold mic to get a new one.");
@@ -87,13 +89,18 @@ Deno.serve(async (req) => {
     db.from("lx_orders").select("item,data").eq("client_id", cid),
     db.from("lx_docs").select("doc_id").eq("client_id", cid).eq("collection", "pop"),
   ]);
+  const { data: phs } = await db.from("lx_docs").select("doc_id,data").eq("client_id", cid).eq("collection", "photos");
+  const PH: Record<string, string> = {}; for (const p of phs || []) { const u = (p as any).data?.url; if (u && !String(u).startsWith("lxp:")) PH[(p as any).doc_id] = u; }
   const page = PORTAL + (cl?.slug || "");
   const rows = (o || []).map((x: any) => ({ item: x.item, ...x.data })).filter((r: any) => !/cancel/i.test(String(r.status || "")));
   const hasPop = new Set((pops || []).map((p: any) => p.doc_id));
   const first = String(cl?.name || "").split(" ")[0] || "there";
+  const today = new Date().toISOString().slice(0, 10);
+  const card = (r: any) => r ? { item: r.item, brand: r.brand || "", order_no: r.order_no || "", n: stage(r), stage: STAGES[stage(r) - 1] || r.status || "", eta: r.eta_date ? fd(r.eta_date) : "", late: !!(r.eta_date && String(r.eta_date).slice(0, 10) < today && stage(r) < 9), ordered: r.order_date ? fd(r.order_date) : "", tracking: r.local_tracking || "", courier: r.local_courier || "", track_url: r.track_url || "", amount: Number(r.payout || 0), paid: r.payout_status !== "Pending", img: r.photo_url || PH[pslug(r.item)] || "", proof: hasPop.has(pslug(r.item)) } : null;
+  const cardsFor = (items: string[]) => items.map((it) => card(rows.find((x: any) => x.item === it))).filter(Boolean).slice(0, 4);
   if (say) { const ai = await getAI(); if (!ai) return new Response(JSON.stringify({}), { headers: { ...CORS, "Content-Type": "application/json" } }); try { return new Response(JSON.stringify(await tts(ai, say.slice(0, 600))), { headers: { ...CORS, "Content-Type": "application/json" } }); } catch (e) { console.error(String(e)); return new Response(JSON.stringify({}), { headers: { ...CORS, "Content-Type": "application/json" } }); } }
   if (cap) { const ai = await getAI(); return new Response(JSON.stringify({ ai: !!ai, tts: !!ai, name: first }), { headers: { ...CORS, "Content-Type": "application/json" } }); }
-  if (audio || q.trim()) { const ai = await getAI(); if (ai) { try { const a = await aiAnswer(ai, first, rows, hasPop, q, audio, mime, hist); const it = rows.find((x: any) => x.item === a.item); const url = a.act === "proof" && it ? page + "?ask=" + encodeURIComponent("show proof of purchase for " + it.item) : ""; if (fmt !== "json") return new Response(String(a.reply || ""), { headers: { ...CORS, "Content-Type": "text/plain; charset=utf-8" } }); return new Response(JSON.stringify({ text: a.reply || "", heard: a.heard || q, url, item: it ? it.item : "", act: a.act || "", ai: true }), { headers: { ...CORS, "Content-Type": "application/json" } }); } catch (e) { console.error(String(e)); if (audio) return new Response(JSON.stringify({ text: "Sorry, I could not catch that. Please try again.", heard: "", act: "retry" }), { headers: { ...CORS, "Content-Type": "application/json" } }); } } else if (audio) return new Response(JSON.stringify({ text: "", act: "noai" }), { headers: { ...CORS, "Content-Type": "application/json" } }); }
+  if (audio || q.trim()) { const ai = await getAI(); if (ai) { try { const a = await aiAnswer(ai, first, rows, hasPop, q, audio, mime, hist); const it = rows.find((x: any) => x.item === a.item); const url = a.act === "proof" && it ? page + "?ask=" + encodeURIComponent("show proof of purchase for " + it.item) : ""; if (fmt !== "json") return new Response(String(a.reply || ""), { headers: { ...CORS, "Content-Type": "text/plain; charset=utf-8" } }); const its = (Array.isArray(a.items) ? a.items : []).concat(it ? [it.item] : []).filter((x: any, i: number, arr: any[]) => x && arr.indexOf(x) === i); let au: any = null; if (speak && a.reply) { try { au = await tts(ai, String(a.reply).slice(0, 600)); } catch (e) { console.error(String(e)); } } return new Response(JSON.stringify({ text: a.reply || "", heard: a.heard || q, url, item: it ? it.item : "", act: a.act || "", ai: true, cards: cardsFor(its), audio: au?.audio || "", amime: au?.mime || "" }), { headers: { ...CORS, "Content-Type": "application/json" } }); } catch (e) { console.error(String(e)); if (audio) return new Response(JSON.stringify({ text: "Sorry, I could not catch that. Please try again.", heard: "", act: "retry" }), { headers: { ...CORS, "Content-Type": "application/json" } }); } } else if (audio) return new Response(JSON.stringify({ text: "", act: "noai" }), { headers: { ...CORS, "Content-Type": "application/json" } }); }
   const ql = " " + q.toLowerCase().replace(/[?!.,]/g, " ").replace(/\s+/g, " ").trim() + " ";
   let r = ql.trim() ? find(ql, rows) : null;
   if (!r && last && /\b(it|its|that|this|uska|uski|iska|iski|woh|wo|vo|ye|yeh|usme|same|aur|and|what about|kab|when|track|proof|kitna)\b/.test(ql)) r = rows.find((x: any) => x.item === last) || null;

@@ -966,8 +966,9 @@ dash.onData(()=>{
   window.LxVoice.open({token:vt,name:(CLIENT()||'').split(' ')[0],ask:ask||'',autoProof:true,setupLabel:isIOS?'Use with Siri ›':isSam?'Use with Bixby ›':isAnd?'Use with Google ›':'Use from your phone ›',
    onProof:(item)=>{try{const rows=dash.data('orders').data||[];const r=rows.find(x=>x.item===item);if(r){popView(r);return true;}}catch(e){}return false;},
    onWa:(q)=>{const ph=(photos.contact&&photos.contact.phone?String(photos.contact.phone):'918724079056').replace(/[^0-9]/g,'');window.open('https://wa.me/'+(ph.length===10?'91'+ph:ph)+'?text='+encodeURIComponent('Hi Luxella, '+q),'_blank');},
+   onTeam:(q)=>{try{const fab=document.getElementById('chatfab');if(fab)fab.click();setTimeout(()=>{const tg=document.getElementById('chat-mode-t');if(tg&&/message luxella/i.test(tg.textContent))tg.click();const t=document.getElementById('ib-t');if(t&&q){t.value=q;t.dispatchEvent(new Event('input'));}if(t)t.focus();},250);}catch(e){}},
    onSetup:()=>{open();setup();}});};
-  if(window.LxVoice)go();else{const sc=document.createElement('script');sc.src='voice-core.js?v=2';sc.onload=go;sc.onerror=()=>open();document.body.appendChild(sc);}}
+  if(window.LxVoice)go();else{const sc=document.createElement('script');sc.src='voice-core.js?v='+Date.now().toString(36).slice(0,6);sc.onload=go;sc.onerror=()=>open();document.body.appendChild(sc);}}
  window.__lxHey=openVoice;
  const fab=()=>{if(document.getElementById('hv-fab'))return;if(!document.getElementById('chatfab'))return setTimeout(fab,600);const b=mk('button','hv-fab');b.id='hv-fab';b.type='button';b.setAttribute('aria-label','Hey Luxella, ask by voice');b.innerHTML='<svg viewBox="0 0 24 24" width="22" height="22"><rect x="9" y="3" width="6" height="11.5" rx="3" fill="currentColor"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';b.onclick=()=>openVoice();document.body.appendChild(b);};fab();
  try{const u=new URL(location.href);if(u.searchParams.get('hey')){u.searchParams.delete('hey');history.replaceState(null,'',u.pathname+u.search+u.hash);setTimeout(()=>openVoice(),1500);}}catch(e){}
