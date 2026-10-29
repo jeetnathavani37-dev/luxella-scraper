@@ -1,0 +1,49 @@
+name: Catalogue sync
+on:
+  schedule:
+    - cron: '53 21 * * *'   # 03:23 IST  official stores (Coach, MK, Sephora, Macy's...)
+    - cron: '43 22 * * *'   # 04:13 IST  GOAT drip + India sneaker prices
+  workflow_dispatch:
+    inputs:
+      job:
+        description: 'which job (outlets | goat | all)'
+        default: 'all'
+concurrency:
+  group: catalog-sync
+  cancel-in-progress: false
+jobs:
+  outlets:
+    if: github.event_name == 'workflow_dispatch' && contains('all outlets', github.event.inputs.job) || github.event.schedule == '53 21 * * *'
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    env:
+      LX_CAT_KEY: ${{ secrets.LX_CAT_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - run: npm i playwright && npx playwright install --with-deps chromium
+      - name: Official stores
+        run: node scripts/outlet_scrape.js
+      - name: More stores (Sephora, Macy's, Strath, Furla)
+        run: node scripts/more_scrape.js sephora,macys,strath,furla
+        continue-on-error: true
+      - name: Market (Ssense, Flannels, Rack, Ted Baker)
+        run: node scripts/market_scrape.js
+        continue-on-error: true
+  goat:
+    if: github.event_name == 'workflow_dispatch' && contains('all goat', github.event.inputs.job) || github.event.schedule == '43 22 * * *'
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    env:
+      LX_CAT_KEY: ${{ secrets.LX_CAT_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - run: npm i playwright && npx playwright install --with-deps chromium
+      - name: GOAT drip
+        run: node scripts/goat_scrape.js
+      - name: India sneaker prices
+        run: python3 scripts/india_sneakers.py cdc,mainstreet,superkicks
+        continue-on-error: true
