@@ -4468,3 +4468,9 @@ html body .qcm#qc-main svg path[fill="none"]{stroke:#E3C565!important}
 html body .qcm#qc-main .qcc svg,html body .qcm#qc-main .qcx svg{color:#E3C565!important}
 html body .qcm#qc-main{transition:transform .55s cubic-bezier(.22,1,.36,1),opacity .4s ease!important}
 body.lxm-down .qcm#qc-main:not(.on){transform:translateY(calc(100% + 40px)) scale(.85)!important;opacity:0!important;pointer-events:none}
+/* design 2026-10-30 (2): left-aligned headings were still under the LIVE button. Stack both
+   quiet buttons on the right edge (contact below, LIVE above), solid enough that text never
+   shows through; LIVE steps aside while the contact menu is open. */
+html body .hv-fab#hv-fab,html body .qcm#qc-main{background:rgba(14,12,9,.95)!important}
+html body .hv-fab#hv-fab{left:auto!important;right:max(16px,env(safe-area-inset-right,0px))!important;bottom:calc(max(16px,env(safe-area-inset-bottom,0px)) + 112px)!important}
+body:has(#qc-main.on) #hv-fab{opacity:0!important;pointer-events:none}
