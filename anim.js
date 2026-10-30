@@ -45,14 +45,17 @@
  /* only one gold button per card / list: demote the rest to noir-gilt */
  const PRIM=['.lx-rcv button','.stbtn.due','.ordbtns>.btn:first-child','.btn.trk-go','.btn.lx-addr-b'];
  function oneGold(){
-  document.querySelectorAll('.lx-demote').forEach(b=>b.classList.remove('lx-demote'));
-  const groups=[...document.querySelectorAll('#tracker .ord,#ordT tbody tr,.drawer,#pane-ov,.lx-await')];
-  const seen=new Set();
-  document.querySelectorAll('#tracker .ord,#ordT tbody tr,.drawer').forEach(g=>{let keep=null;PRIM.some(sel=>{const b=[...g.querySelectorAll(sel)].find(x=>x.offsetParent);if(b){keep=b;return true;}return false;});g.querySelectorAll(PRIM.join(',')).forEach(b=>{if(b!==keep)b.classList.add('lx-demote');seen.add(b);});});
+  if(document.hidden)return;
+  /* work out which buttons should be demoted, then touch only the ones that change
+     (the old remove-all/re-add every 1.2 s restarted sheens and transitions = flicker) */
+  const want=new Set(),seen=new Set();
+  document.querySelectorAll('#tracker .ord,#ordT tbody tr,.drawer').forEach(g=>{let keep=null;PRIM.some(sel=>{const b=[...g.querySelectorAll(sel)].find(x=>x.offsetParent);if(b){keep=b;return true;}return false;});g.querySelectorAll(PRIM.join(',')).forEach(b=>{if(b!==keep)want.add(b);seen.add(b);});});
   /* lists outside cards (payments): first gold only */
   const rest=[...document.querySelectorAll(PRIM.join(','))].filter(b=>!seen.has(b)&&b.offsetParent);
   const byPane={};rest.forEach(b=>{const p=b.closest('[id^="pane-"]')||document.body;(byPane[p.id]=byPane[p.id]||[]).push(b);});
-  Object.values(byPane).forEach(a=>a.slice(1).forEach(b=>b.classList.add('lx-demote')));
+  Object.values(byPane).forEach(a=>a.slice(1).forEach(b=>want.add(b)));
+  document.querySelectorAll('.lx-demote').forEach(b=>{if(!want.has(b))b.classList.remove('lx-demote');});
+  want.forEach(b=>{if(!b.classList.contains('lx-demote'))b.classList.add('lx-demote');});
  }
  setInterval(oneGold,1200);
  setInterval(deco,1500);setTimeout(()=>{moments();deco();},400);
