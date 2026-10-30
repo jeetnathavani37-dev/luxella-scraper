@@ -7,6 +7,10 @@
 - Product photos with coloured/grey backgrounds show a rectangle on the studio panel.
 
 ## Inbox
+- (growth) Track product views + Edit/Boutique opens (e.g. a `views` doc per client/day with cat_id counts via an rpc like lx_visit). Today the funnel stops at "visits", so attention without an enquiry is invisible.
+- (growth) The Edit's 🔎 search ("Coach nolita") returns nothing while the Collection has 5 Nolita 19 pieces. Fall through to Collection results, and log zero-result searches as requests source `search`.
+- (growth) Show request status to the client (Seen / Sourcing / Quoted). All 9 requests since 28 Oct are still `Submitted`. Needs Jeet's flow.
+- (growth) Value anchor on Collection: "India retail ₹X" (coach.in shows Teri ₹39,999 vs our ₹27,900). lx_catalog.mrp is null for Coach. Jeet decides the wording and source.
 - (panel) Trust block on Edit/product: "Authentic · sourced from the brand · invoice in your Document vault" + returns/duties line; Terms tab shows "Terms will be published here." — needs Jeet's real wording/legal entity/GSTIN (5/10 buyers, 2026-10-30).
 - (panel) Contact email is a Gmail address (luxella.in@gmail.com) — a domain email would lift trust (Jeet).
 - (panel) Empty Private Edit state should offer a next step (last drop / Ask for a quote), not only "every evening" (6/10 buyers).
