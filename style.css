@@ -4445,3 +4445,6 @@ body.lxm-down .hv-fab,body.lxm-down #hv-fab{transform:translateY(calc(100% + 40p
 /* no sideways page scroll on phones */
 html,body{overflow-x:clip;max-width:100%}
 .sw #ledger{display:block;max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
+
+/* panel 2026-10-30: Paid tick sat low and touched the word on the Payments table (display:block drops flex gap) */
+.sw .stbtn.paid::before{display:inline-block;margin-right:8px;font-size:12px;line-height:1;letter-spacing:0;vertical-align:.08em}
