@@ -13,3 +13,4 @@
 - 2026-10-30: 12:38 UTC — no new run since #14 (11:15; 12:07 cron skipped again), no portal-code commits since. 1 crash row = breadcrumb; query_logs works again (edge 71×200, 0 errors).
 - 2026-10-30: 14:38 UTC — run #16 (beeb76f, Jeet's curtain removal + asset bump) QA green, 0 problems, prod smoke ok; deploy step still 0s/empty VT (no VERCEL_TOKEN). 0 crash rows 2h, edge 60×fn, 0 5xx/errors. Hourly cron skipped 13:07/14:07 again.
 - 2026-10-30: 18:38 UTC — run #17 (schedule 16:39, b30e1a7) QA green, 0 problems, prod ok; no portal-code commits since #16. 0 crash rows 2h, edge 42×200. Screenshots: GitHub MCP actions_get download_workflow_run_artifact → curl the signed URL works (gh CLI unauth).
+- 2026-10-30: 20:39 UTC — run #18 (push a4c10ab, security pdf.js flag) QA green, 0 problems, prod smoke ok; deploy step 0s (no VERCEL_TOKEN). 0 crash rows 2h, edge 40×200 + 1×403 lx-admin POST 19:55 (≈security agent's unauth probe, expected). Screens unchanged vs #17.
