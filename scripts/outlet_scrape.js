@@ -209,7 +209,7 @@ async function shopify(only) {
     if (only && !only.includes(key)) continue;
     const P = [];
     for (let page = 1; page <= 40; page++) {
-      let j = null; for (let t = 0; t < 2 && !j; t++) { try { const r = await fetch(`${dom}/products.json?limit=250&page=${page}`, { headers: { 'User-Agent': UA, accept: 'application/json' } }); if (r.ok) j = await r.json(); else { console.log(key, 'http', r.status); break; } } catch (e) { await sleep(2000); } }
+      let j = null; for (let t = 0; t < 4 && !j; t++) { try { const r = await fetch(`${dom}/products.json?limit=250&page=${page}`, { headers: { 'User-Agent': UA, accept: 'application/json' } }); if (r.ok) j = await r.json(); else { console.log(key, 'http', r.status, 'try', t); if (r.status !== 429 && r.status < 500) break; await sleep(10000 * (t + 1)); } } catch (e) { await sleep(2000); } }
       if (!j || !Array.isArray(j.products) || !j.products.length) break; P.push(...j.products); if (j.products.length < 250) break; await sleep(700);
     }
     if (!P.length) { console.log('shop', key, 'no products'); res[key] = 0; continue; }
