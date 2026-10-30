@@ -4475,3 +4475,4 @@ body.dl-locked #pane-deals #deals-key,body.dl-locked #pane-deals #deals-margin,b
 .dl-lock p{margin:0 0 8px;max-width:30ch;color:#b9b0a2;font-size:14px;line-height:1.6}
 .dl-lock .btn{text-decoration:none;display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 22px}
 body.dl-locked .dl-imm-h button:not(.dl-imm-bk),body.dl-locked .cl-teaser,body.dl-locked .lx-ovh{display:none!important}
+.pcur,.sc-cur{display:none!important}
