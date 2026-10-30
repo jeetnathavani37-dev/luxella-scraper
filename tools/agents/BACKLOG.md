@@ -8,6 +8,13 @@
 - Product photos with coloured/grey backgrounds show a rectangle on the studio panel.
 
 ## Inbox
+- (panel) Trust block on Edit/product: "Authentic · sourced from the brand · invoice in your Document vault" + returns/duties line; Terms tab shows "Terms will be published here." — needs Jeet's real wording/legal entity/GSTIN (5/10 buyers, 2026-10-30).
+- (panel) Contact email is a Gmail address (luxella.in@gmail.com) — a domain email would lift trust (Jeet).
+- (panel) Empty Private Edit state should offer a next step (last drop / Ask for a quote), not only "every evening" (6/10 buyers).
+- (panel) Prod login shows "ADMIN PANEL" link to clients — hide or make it a faint owner-only route.
+- (panel) Policy search placeholder truncates on iPhone ("Search the policy (paymer") — shorten to "Search the policy".
+- (panel) Tab strip shows half-cut labels at both edges ("W", "ESS", "TE >") — add edge fade so it reads as swipeable.
+- (panel) Gulf/NRI ideas: named advisor card, gift-to-another-address + note, Arabic labels later.
 - (watchdog) CI deploy step should fail, not warn, when VERCEL_TOKEN is missing — otherwise green runs ship nothing.
 - (watchdog) Updates strip "SHOW ALL 1" button label is clipped on iPhone (webkit-client-home.png).
 - (watchdog) QA never reaches the Boutique: no deals fixture → Edit shows empty state, boutique/product/swipe steps no-op (galleryScrolls=None). Needs a committed deals sample in tools/qa/fixtures (Jeet — protected path).
