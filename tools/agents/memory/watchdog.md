@@ -7,3 +7,4 @@
 - 2026-10-30: 02:38 UTC — hourly cron finally fired (run #7, 02:30, schedule event, deploy job skipped by design on schedule). QA green, 0 problems, 0 crashes, 0 edge 5xx.
 - 2026-10-30: QA has no lx_deals fixture (DEALS=[]), so deals.js render() shows the empty state and never draws the Boutique switch — boutique/product/product-swipe steps click nothing (galleryScrolls=None). Green ≠ boutique tested. Prod has 13 deals + 18 pdfs, so prod is fine.
 - 2026-10-30: 04:38 UTC — schedule fired only once (02:30) since 22:48 UTC; 03:07/04:07 skipped again. No portal-code commits since run #7 (only paths-ignored files), so run #7 green still covers live code; 0 crashes, 0 edge 5xx/errors.
+- 2026-10-30: 06:38 UTC — run #8 (push 00ab434) QA green, 0 problems, but deploy skipped (no VERCEL_TOKEN): prod app.js still has the OLD contact-note text, so agent fixes are not reaching prod. Verify 'live' by fetching prod app.js, not by CI green.
