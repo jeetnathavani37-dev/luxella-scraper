@@ -30,6 +30,7 @@
 - (frontend) style.css is 503 KB with 815 !important and selector stacking up to .sw.sw.sw.sw.sw — later blocks override earlier ones (e.g. lxLev bob forced off by a later !important). Needs a consolidation pass, file by file, not one big rewrite.
 - (frontend) Dead CSS loops nothing renders: .cl-spot-st img / .cl-eg2 figure img spotBob, .ft-bag ftBob (style.css ~3220, 3427, 3599) — safe to delete.
 - (frontend) QA "first paint+settle" note includes a fixed 4.5 s wait (tools/qa/check.py:144) — real nav load is ~100–190 ms; propose logging LCP/long-task total instead (Jeet, protected path).
+- (backend) 2026-10-30 20:52 IST: 5xx-retry fix confirmed — sm_ 2484/2527 and vb2_ 1845/1850 fresh after run 41032989924. Still 0 fresh (IP-blocked, needs proxy/local runner — Jeet): ks 2057, mk 1696, fu 1436, vb(val) 1312, co 1338/1488 → ~7.8k of 62.6k live pieces stale.
 
 ## Done
 - (design 2026-10-30) LIVE + contact coins → 46px dark-glass buttons stacked on the right, no glow/ring/pulse, tuck away on scroll-down; left headings clear (1a4687c, 4d952d7; QA run 41037506581 green). Not live until VERCEL_TOKEN is set.
