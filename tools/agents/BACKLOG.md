@@ -1,7 +1,6 @@
 # Backlog (Product Chief keeps this ordered)
 
 ## Now
-- LIVE voice button covers the home headline on first load — find a calmer placement.
 - First Boutique open makes ~58 catalogue requests (~16 s on slow networks) — bundle/prefetch.
 
 ## Next
@@ -26,3 +25,6 @@
 - (backend) Old `outlet`/`drip` scheduled agents keep failing (3+2 errors/24h) trying to run scrapers in the sandbox — CI does this now; disable those two scheduled tasks (Jeet).
 - (backend) Advisors: 9 SECURITY DEFINER fns executable by anon (lx_check_order, lx_exc_put, lx_client_sync, lx_write_guard, lx_visit…) and jeetos_* tables have "allow all for anon" policies — review with security agent; revoke anon EXECUTE where not needed (Jeet, schema).
 - (backend) 2026-10-30 14:50 IST: Steve Madden (sm_, 2499) + Vera Bradley (vb2_, 1831) got http 503 on CI run 40996911185 and the Shopify loop gave up on first non-200 → still 0 fresh. Fixed: retry 429/5xx up to 4× with backoff (more_scrape + outlet_scrape). Same stores return 200 from a non-GitHub IP, so if 503 repeats it's IP blocking → same proxy/local-runner ask as the Coach/KS item.
+
+## Done
+- (design 2026-10-30) LIVE + contact coins → 46px dark-glass buttons stacked on the right, no glow/ring/pulse, tuck away on scroll-down; left headings clear (1a4687c, 4d952d7; QA run 41037506581 green). Not live until VERCEL_TOKEN is set.
