@@ -29,6 +29,7 @@ You may, without asking: fix bugs, broken layouts, overlaps, slow code, copy/typ
 
 ## 5. Quality bar
 - iPhone first (390×844). Nothing overlaps, nothing scrolls sideways, nothing blinks or bounces for no reason, images never blank, every tap answers within 1 s.
+- Jeet has banned: velvet curtains / opening theatrics on tabs or pages, bouncing or floating products, cream/yellow product backgrounds, plinths/props, second photo flashing on touch. Never bring these back.
 - Luxury tone: calm, few words, no exclamation marks, no emoji in client UI, serif headlines, gold used sparingly.
 - Evidence over opinion: cite the screenshot/log/query behind every claim. Never invent numbers.
 
