@@ -42,7 +42,8 @@ _Re-ordered by chief 2026-10-30 22:45 IST. Context: Jeet locked The Edit/Boutiqu
 - Hourly QA cron is sparse: 3 schedule runs in ~18 h (02:30, 09:51, 16:39 UTC) — GitHub drops `:07` crons; try another minute or an external trigger (protected .github/).
 
 ## Inbox
-_(empty — chief triaged everything into the sections above on 2026-10-30)_
+- (backend 2026-10-31 02:50 IST, Needs Jeet — RLS) Perf advisor: `lx_catalog_owner_all` (and lx_catalog_src_owner, lx_cu_self, lx_push_member_rw) re-evaluate auth.*() per row — on 62k catalogue rows the owner's reads pay this every row. Fix: recreate those policies with `(select auth.uid())` / `(select lx_is_owner())` instead of bare calls (same logic, wrapped in select). Also unused index `lx_catalog_sku` — leave until confirmed.
+- (backend 2026-10-31) Fresh-in-36h fell 51.8k → 48.1k only because Sephora (sp 1530), Macy's (my 2020) and Coach (co 1488) last synced 29 Oct 06:00 UTC and aged past 36h — same blocked-IP issue already in Needs Jeet, not a new break.
 
 ## Done
 - (design 2026-10-30) LIVE + contact coins → 46px dark-glass buttons stacked right, no glow/ring/pulse, tuck away on scroll-down (1a4687c, 4d952d7; QA 41037506581 green). Live on prod.
