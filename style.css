@@ -4448,3 +4448,23 @@ html,body{overflow-x:clip;max-width:100%}
 
 /* panel 2026-10-30: Paid tick sat low and touched the word on the Payments table (display:block drops flex gap) */
 .sw .stbtn.paid::before{display:inline-block;margin-right:8px;font-size:12px;line-height:1;letter-spacing:0;vertical-align:.08em}
+/* ===== design 2026-10-30: quiet corner buttons =====
+   The gold LIVE coin (60px, glow + ring) and the gold contact coin (58px) sat on top of
+   section headings on iPhone ("Payments", "Orders"…). Restyle both to match #totop:
+   46px dark glass, hairline gold border, gold marks, no glow/ring/pulse. Both now slip
+   away while scrolling down and return on scroll-up / pause (existing lxm-down signal). */
+html body .hv-fab#hv-fab{width:46px!important;height:46px!important;background:rgba(14,12,9,.82)!important;-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border:1px solid rgba(227,192,106,.5)!important;box-shadow:0 8px 22px rgba(0,0,0,.45)!important;animation:none!important;color:#E3C565}
+html body .hv-fab#hv-fab::after{content:none!important;animation:none!important}
+html body .hv-fab#hv-fab svg{width:25px;height:25px}
+html body .hv-fab#hv-fab svg text{fill:#E3C565}
+html body .hv-fab#hv-fab svg path{stroke:#E3C565}
+html body .hv-fab#hv-fab .hv-live{bottom:-6px;padding:1px 5px;font-size:6.5px;letter-spacing:.22em;background:#0b0906;border-color:rgba(227,192,106,.45);color:#E3C565}
+html body .qcm#qc-main{width:46px!important;height:46px!important;background:rgba(14,12,9,.82)!important;-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border:1px solid rgba(227,192,106,.5)!important;box-shadow:0 8px 22px rgba(0,0,0,.45)!important;color:#E3C565!important}
+html body .qcm#qc-main .qcc{transform:scale(.8);animation:none!important}
+html body .qcm#qc-main.on .qcc{transform:scale(.5)}
+html body .qcm#qc-main svg,html body .qcm#qc-main svg *{color:#E3C565!important}
+html body .qcm#qc-main svg path[fill]:not([fill="none"]){fill:#E3C565!important;stroke:none!important}
+html body .qcm#qc-main svg path[fill="none"]{stroke:#E3C565!important}
+html body .qcm#qc-main .qcc svg,html body .qcm#qc-main .qcx svg{color:#E3C565!important}
+html body .qcm#qc-main{transition:transform .55s cubic-bezier(.22,1,.36,1),opacity .4s ease!important}
+body.lxm-down .qcm#qc-main:not(.on){transform:translateY(calc(100% + 40px)) scale(.85)!important;opacity:0!important;pointer-events:none}
