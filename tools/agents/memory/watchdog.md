@@ -3,3 +3,4 @@
 - 2026-10-29: lx_docs collection='crash' rows can be unfinished-session breadcrumbs (done:false, steps list) with no error text — not a JS crash by themselves.
 - 2026-10-29: edge logs: query_logs source function_edge_logs (response.status_code) + function_logs (level) works for lx-voice/lx-admin health.
 - 2026-10-30: hourly cron (:07) had not fired by 00:38 UTC — newest run still push #6 (22:48 UTC 29 Oct); judge freshness by run time, not just status.
+- 2026-10-30: 01:38 UTC — cron '7 * * * *' still silent (missed 23:07/00:07/01:07; workflow state=active). gh CLI unauthenticated in sandbox — use GitHub MCP actions_list/get_job_logs instead.
