@@ -186,6 +186,8 @@ async function furla(b) {
 (async () => {
   if (!KEY) { console.log('LX_CAT_KEY missing'); process.exit(1); }
   const which = (process.argv[2] || 'shopify,sephora,macys,strath,furla').split(',');
+  // CI (catalog-sync.yml) passes an explicit list without 'shopify', so Karl Paris/DKNY/Steve Madden/Frye/Vince Camuto/Calpak/Stanley/Vera Bradley never refreshed (stale since 28 Oct). Shopify is plain fetch, no browser — always include it on CI unless MORE_SHOPIFY=0.
+  if (process.env.GITHUB_ACTIONS === 'true' && process.env.MORE_SHOPIFY !== '0' && !which.includes('shopify')) which.unshift('shopify');
   const started = new Date().toISOString(); const res = {};
   if (which.includes('shopify')) res.shopify = await shopify(process.env.SHOPS ? process.env.SHOPS.split(',') : null).catch(e => (console.log('shopify fail', e.message), 0));
   const needB = which.some(w => ['sephora', 'macys', 'strath', 'furla'].includes(w));
