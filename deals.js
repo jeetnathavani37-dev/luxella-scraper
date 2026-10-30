@@ -172,7 +172,7 @@
  function loadPdfJs(){return new Promise((res,rej)=>{if(window.pdfjsLib)return res(window.pdfjsLib);const s=el('script');s.src='vendor/pdf.min.js';s.onload=()=>{window.pdfjsLib.GlobalWorkerOptions.workerSrc='vendor/pdf.worker.min.js';res(window.pdfjsLib);};s.onerror=rej;document.head.appendChild(s);});}
  const PDFC={};
  const LXQ=(()=>{let q=Promise.resolve();return f=>(q=q.then(f,f));})();
- async function pdfDoc(url){if(!PDFC[url]){const lib=await loadPdfJs();PDFC[url]=lib.getDocument({url}).promise;}return PDFC[url];}
+ async function pdfDoc(url){if(!PDFC[url]){const lib=await loadPdfJs();PDFC[url]=lib.getDocument({url,isEvalSupported:false}).promise;}return PDFC[url];}
  async function pageImg(doc,n,w){const pg=await doc.getPage(n);const vp0=pg.getViewport({scale:1});const vp=pg.getViewport({scale:w/vp0.width});const c=document.createElement('canvas');c.width=Math.round(vp.width);c.height=Math.round(vp.height);await pg.render({canvasContext:c.getContext('2d'),viewport:vp}).promise;try{pg.cleanup&&pg.cleanup();}catch(e){}return c;}
  function pdfRequest(r,n,kind,canvas){const d=r.data||{};const sh=sheet();sh.box.appendChild(el('div','dl-sh-eb',({price:'Enquire',availability:'Availability check',size:'Size check',buy:'I want this'})[kind]));sh.box.appendChild(el('div','dl-sh-t',(d.title||'Deal sheet')+' · piece '+n));
   if(canvas){const im=el('img','dl-rq-img');im.src=canvas.toDataURL('image/jpeg',.8);sh.box.appendChild(im);}
@@ -785,7 +785,7 @@
  /* share preview: see the PDF cover + caption, then post to channel / broadcast / chat */
  async function sharePreview(blob,fname,caption,target){const sh=sheet();sh.box.classList.add('dl-spv');sh.box.appendChild(el('div','dl-sh-eb','Ready to post'));sh.box.appendChild(el('div','dl-sh-t',fname.replace(/\.pdf$/,'')));
   const card=el('div','dl-spv-c');const cv=el('div','dl-spv-cv');cv.appendChild(el('span','dl-deck-sk'));card.appendChild(cv);const meta=el('div','dl-spv-m');meta.appendChild(el('b',null,'PDF'));meta.appendChild(el('small',null,Math.round(blob.size/1024)+' KB'));card.appendChild(meta);sh.box.appendChild(card);
-  (async()=>{try{await loadPdfJs();const doc=await window.pdfjsLib.getDocument({data:new Uint8Array(await blob.arrayBuffer())}).promise;meta.querySelector('small').textContent=doc.numPages+' pages · '+Math.round(blob.size/1024)+' KB';const c=await pageImg(doc,1,520);cv.textContent='';const im=el('img');im.src=c.toDataURL('image/jpeg',.85);cv.appendChild(im);}catch(e){cv.textContent='PDF';}})();
+  (async()=>{try{await loadPdfJs();const doc=await window.pdfjsLib.getDocument({data:new Uint8Array(await blob.arrayBuffer()),isEvalSupported:false}).promise;meta.querySelector('small').textContent=doc.numPages+' pages · '+Math.round(blob.size/1024)+' KB';const c=await pageImg(doc,1,520);cv.textContent='';const im=el('img');im.src=c.toDataURL('image/jpeg',.85);cv.appendChild(im);}catch(e){cv.textContent='PDF';}})();
   const ta=el('textarea','dl-in dl-ta');ta.rows=7;ta.value=caption;sh.box.appendChild(el('div','dl-stu-l','Caption'));sh.box.appendChild(ta);
   sh.box.appendChild(el('div','dl-stu-l','Post to'));const tg=el('div','dl-dest');sh.box.appendChild(tg);
   const dests=()=>{const L=(ST.dests||[]).slice();if(ST.channel&&!L.some(d=>d.link===ST.channel))L.unshift({name:'My channel',link:ST.channel,type:'channel'});return L;};let sel=0;
