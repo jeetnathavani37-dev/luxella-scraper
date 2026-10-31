@@ -42,11 +42,18 @@ _Re-ordered by chief 2026-10-30 22:45 IST. Context: Jeet locked The Edit/Boutiqu
 - Hourly QA cron is sparse: 3 schedule runs in ~18 h (02:30, 09:51, 16:39 UTC) — GitHub drops `:07` crons; try another minute or an external trigger (protected .github/).
 
 ## Inbox
+- (panel 2026-10-31) Voice sheet "Hey Luxella" still on screen in webkit-client voice-close, chat-open, chat-close and search-type screenshots (run 41155587814) — close button may not close it on iPhone, or QA's close tap misses; frontend to verify.
+- (panel 2026-10-31) iPhone header: "SIGN OUT" wraps onto two lines and the email chip is cut "QA@EXA…" on every tab top (390px) — nowrap + hide email chip on phones. 3 buyers.
+- (panel 2026-10-31) PAID tick on Payments still sits below the word in WebKit (webkit-client-tab-pay-bottom.png) despite 0b34bf3 — try flex/align-items on .stbtn.paid instead of vertical-align.
+- (panel 2026-10-31) "Opening soon" card: add a 2nd action "Ask for a specific piece" → Help › Ask for a quote; quote form "Copy request" → "Send on WhatsApp" (wa.me prefill, client sends it themselves). 4 buyers.
+- (panel 2026-10-31) "Updated on 19th October" on the hero reads stale on 31 Oct — check what date it shows on prod; hide if older than 7 days. 2 buyers.
+- (panel 2026-10-31, idea for Jeet) Private preview of the first Edit drop for top clients before "Opening soon" lifts + "Your advisor: <name>" card (Gulf/collector buyers).
 - (backend 2026-10-31 02:50 IST, Needs Jeet — RLS) Perf advisor: `lx_catalog_owner_all` (and lx_catalog_src_owner, lx_cu_self, lx_push_member_rw) re-evaluate auth.*() per row — on 62k catalogue rows the owner's reads pay this every row. Fix: recreate those policies with `(select auth.uid())` / `(select lx_is_owner())` instead of bare calls (same logic, wrapped in select). Also unused index `lx_catalog_sku` — leave until confirmed.
 - (backend 2026-10-31) Fresh-in-36h fell 51.8k → 48.1k only because Sephora (sp 1530), Macy's (my 2020) and Coach (co 1488) last synced 29 Oct 06:00 UTC and aged past 36h — same blocked-IP issue already in Needs Jeet, not a new break.
 - (backend 2026-10-31 08:55 IST) Farfetch-style partial staleness: fl_ 772 of 3,289 and nr_ 652 of 1,213 live pieces not seen since 28 Oct while the rest of each store syncs fine — likely sold out / delisted at source but still shown as live. Suggest: scraper deactivates a store's rows unseen for 72h *only when that store's run succeeded* (Needs Jeet ok — it hides ~1.4k pieces).
 
 ## Done
+- (panel 2026-10-31) Quote/"Order again" signed with client's own name not "Swayam" (97fcc78); login "Admin panel" link hidden, faint owner route (517e9bb); policy search placeholder (59eb53d). CI 41175935699 green; NOT live (VERCEL_TOKEN).
 - (design 2026-10-30) LIVE + contact coins → 46px dark-glass buttons stacked right, no glow/ring/pulse, tuck away on scroll-down (1a4687c, 4d952d7; QA 41037506581 green). Live on prod.
 - (frontend 2026-10-30) oneGold 1.2 s class churn stopped (diff-only), dead product-levitation observers removed (9b93c28; CI 41046801189 green). Live.
 - (panel 2026-10-30) "1 order" not "1 orders" (459ff74); Paid badge tick aligned (0b34bf3); warmer contact note (00ab434). Live.
