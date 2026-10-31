@@ -15,3 +15,4 @@
 - 2026-10-30: 18:38 UTC — run #17 (schedule 16:39, b30e1a7) QA green, 0 problems, prod ok; no portal-code commits since #16. 0 crash rows 2h, edge 42×200. Screenshots: GitHub MCP actions_get download_workflow_run_artifact → curl the signed URL works (gh CLI unauth).
 - 2026-10-30: 20:39 UTC — run #18 (push a4c10ab, security pdf.js flag) QA green, 0 problems, prod smoke ok; deploy step 0s (no VERCEL_TOKEN). 0 crash rows 2h, edge 40×200 + 1×403 lx-admin POST 19:55 (≈security agent's unauth probe, expected). Screens unchanged vs #17.
 - 2026-10-30: 21:40 UTC — run #19 (schedule 21:26, fa42895) QA green, 0 problems; no portal-code commits since #18. 0 crash rows 2h, edge 21×200 + 42 fn 'log' lines, 0 errors. Artifact via MCP download URL + curl still works.
+- 2026-10-31: 02:38 UTC — run #20 (schedule 01:29, c3cebdb) QA green, 0 problems; no portal-code commits since #18. 0 crash rows 2h, edge 219×fn 0 5xx/errors. Schedule cadence now ~4h (21:26 → 01:29), not hourly.
