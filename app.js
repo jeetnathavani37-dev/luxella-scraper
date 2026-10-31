@@ -925,25 +925,26 @@ dash.onData(()=>{
  function ask(q){q=String(q||'').trim();if(!q)return;close();const go=()=>{if(window.__lxVoiceAsk)window.__lxVoiceAsk(q,true);else setTimeout(go,300);};go();}
  let ov=null,rec=null;
  function close(){if(rec){try{rec.abort();}catch(e){}rec=null;}if(ov){ov.remove();ov=null;}}
+ document.addEventListener('keydown',e=>{if(ov&&e.key==='Escape')close();});
  function listen(st,tx,orb){if(!SR){st.textContent='Type your question below';return;}try{rec=new SR();}catch(e){st.textContent='Type your question below';return;}rec.lang='en-IN';rec.interimResults=true;let fin='';
   rec.onstart=()=>{orb.classList.add('on');st.textContent='Listening… ask anything';};
   rec.onresult=e=>{let t='';for(const x of e.results)t+=x[0].transcript;tx.textContent='“'+t+'”';if(e.results[e.results.length-1].isFinal)fin=t;};
   rec.onerror=e=>{orb.classList.remove('on');st.textContent=e&&e.error==='not-allowed'?'Allow the microphone, then tap the mic':'Tap the mic and try again';};
   rec.onend=()=>{orb.classList.remove('on');rec=null;if(fin.trim())ask(fin);else if(ov&&!/Allow|again/.test(st.textContent))st.textContent='Tap the mic and speak';};
   try{rec.start();}catch(e){}}
- function open(){close();ov=mk('div','hv-ov');const box=mk('div','hv-box');ov.appendChild(box);
-  const x=mk('button','hv-x','×');x.type='button';x.onclick=close;box.appendChild(x);
+ function open(){close();ov=mk('div','hv-ov');ov.setAttribute('role','dialog');ov.setAttribute('aria-modal','true');ov.setAttribute('aria-label','Hey Luxella');const box=mk('div','hv-box');ov.appendChild(box);
+  const x=mk('button','hv-x','×');x.type='button';x.setAttribute('aria-label','Close');x.onclick=close;box.appendChild(x);
   box.appendChild(mk('small','hv-ey','HEY LUXELLA'));
   const orb=mk('button','hv-orb');orb.type='button';orb.setAttribute('aria-label','Speak');orb.innerHTML='<svg viewBox="0 0 24 24" width="34" height="34"><rect x="9" y="3" width="6" height="11.5" rx="3" fill="currentColor"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M8.5 21h7" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>';box.appendChild(orb);
   const st=mk('div','hv-st','Tap the mic and speak');box.appendChild(st);const tx=mk('div','hv-tx');box.appendChild(tx);
-  const f=mk('form','hv-f');const inp=mk('input');inp.placeholder='…or type: where is my Coach bag?';inp.setAttribute('enterkeyhint','send');const sb=mk('button','hv-go','Ask');sb.type='submit';f.appendChild(inp);f.appendChild(sb);f.onsubmit=e=>{e.preventDefault();ask(inp.value);};box.appendChild(f);
+  const f=mk('form','hv-f');const inp=mk('input');inp.placeholder='…or type: where is my Coach bag?';inp.setAttribute('enterkeyhint','send');inp.setAttribute('aria-label','Ask Luxella a question');const sb=mk('button','hv-go','Ask');sb.type='submit';f.appendChild(inp);f.appendChild(sb);f.onsubmit=e=>{e.preventDefault();ask(inp.value);};box.appendChild(f);
   const sg=mk('div','hv-sg');SUG.forEach(s=>{const b=mk('button','hv-c',s);b.type='button';b.onclick=()=>ask(s);sg.appendChild(b);});box.appendChild(sg);
   const su=mk('button','hv-setup',isIOS?'Use with Siri  ›':isSam?'Use with Bixby  ›':isAnd?'Use with Google / home screen  ›':'Use from your phone  ›');su.type='button';su.onclick=setup;box.appendChild(su);
   orb.onclick=()=>{if(rec){try{rec.stop();}catch(e){}return;}listen(st,tx,orb);};
   ov.addEventListener('click',e=>{if(e.target===ov)close();});document.body.appendChild(ov);
   if(SR)listen(st,tx,orb);else{orb.classList.add('off');st.textContent='Type your question below';setTimeout(()=>inp.focus(),200);}}
  const copy=async(t,b)=>{try{await navigator.clipboard.writeText(t);}catch(e){const a=mk('textarea');a.value=t;document.body.appendChild(a);a.select();document.execCommand('copy');a.remove();}const o=b.textContent;b.textContent='Copied ✓';setTimeout(()=>b.textContent=o,1600);};
- function setup(){const box=ov&&ov.querySelector('.hv-box');if(!box)return;box.textContent='';const x=mk('button','hv-x','×');x.type='button';x.onclick=close;box.appendChild(x);
+ function setup(){const box=ov&&ov.querySelector('.hv-box');if(!box)return;box.textContent='';const x=mk('button','hv-x','×');x.type='button';x.setAttribute('aria-label','Close');x.onclick=close;box.appendChild(x);
   const bk=mk('button','hv-bk','‹ Back');bk.type='button';bk.onclick=open;box.appendChild(bk);
   const step=(n,h,el)=>{const s=mk('div','hv-step');s.appendChild(mk('i',null,String(n)));const c=mk('div');c.appendChild(mk('b',null,h));if(el)c.appendChild(el);s.appendChild(c);box.appendChild(s);};
   const cbtn=(lbl,t)=>{const b=mk('button','hv-cp',lbl);b.type='button';b.onclick=()=>copy(t,b);return b;};
