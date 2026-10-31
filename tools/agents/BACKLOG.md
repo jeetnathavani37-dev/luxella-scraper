@@ -42,6 +42,9 @@ _Re-ordered by chief 2026-10-30 22:45 IST. Context: Jeet locked The Edit/Boutiqu
 - Hourly QA cron is sparse: 3 schedule runs in ~18 h (02:30, 09:51, 16:39 UTC) — GitHub drops `:07` crons; try another minute or an external trigger (protected .github/).
 
 ## Inbox
+- (growth 2026-10-31) Price-change notice on open requests: when a piece inside a client's request/look changes price (e.g. Alo Mat Bag ₹16,600→₹23,000 in an open ₹1.12L look), flag it on the owner's request card ("price moved +39% since asked") so Jeet re-quotes before the client sees it.
+- (growth 2026-10-31) Request SLA badge for owner: requests still `Submitted` after 12h turn amber, after 24h red, top of Ops. Today 9/9 unanswered, oldest ~78h.
+- (growth 2026-10-31, repeat) Track product views + Boutique/Edit opens + search terms (lightweight lx_visit-style counter per piece/day) — without it Growth can't rank pieces by attention.
 - (panel 2026-10-31) Voice sheet "Hey Luxella" still on screen in webkit-client voice-close, chat-open, chat-close and search-type screenshots (run 41155587814) — close button may not close it on iPhone, or QA's close tap misses; frontend to verify.
 - (panel 2026-10-31) iPhone header: "SIGN OUT" wraps onto two lines and the email chip is cut "QA@EXA…" on every tab top (390px) — nowrap + hide email chip on phones. 3 buyers.
 - (panel 2026-10-31) PAID tick on Payments still sits below the word in WebKit (webkit-client-tab-pay-bottom.png) despite 0b34bf3 — try flex/align-items on .stbtn.paid instead of vertical-align.
