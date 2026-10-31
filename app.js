@@ -798,7 +798,7 @@ function renderCrazy(o){const bn=document.getElementById('banner'),cd=document.g
  // collection
  const brands=[...new Set(rows.map(r=>r.brand).filter(Boolean))];brands.forEach(bn2=>col.appendChild(brandEl({brand:bn2})));
 }
-document.getElementById('rq-copy').addEventListener('click',()=>{const v=id=>document.getElementById(id).value.trim();const t='Hi Luxella, quote please:\n• Item: '+v('rq-item')+'\n• Size/colour: '+v('rq-size')+'\n• Budget: ₹'+v('rq-budget')+'\n— Swayam';
+document.getElementById('rq-copy').addEventListener('click',()=>{const v=id=>document.getElementById(id).value.trim();const t='Hi Luxella, quote please:\n• Item: '+v('rq-item')+'\n• Size/colour: '+v('rq-size')+'\n• Budget: ₹'+v('rq-budget')+'\n— '+CLIENT();
  const m=document.getElementById('rq-msg');if(!v('rq-item')){m.textContent='Type the item first.';return;}
  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(()=>m.textContent='Copied. Paste it on WhatsApp.',()=>m.textContent='Copy failed, type it on WhatsApp.');else m.textContent='Copy not available here.';});
 function copyBtn(label,text,cls){const b=document.createElement('button');b.type='button';b.className=cls||'btn2';b.textContent=label;b.addEventListener('click',()=>copyText(text(),b));return b;}
@@ -807,7 +807,7 @@ function orderActions(r){const bb=document.createElement('div');bb.className='or
 
  {const cxd=/cancel/i.test(String(r.status||''));if(cxd){const c=document.createElement('span');c.className='chip cx-badge';c.textContent='Cancelled';bb.appendChild(c);}}
  if(st>=8){bb.appendChild(copyBtn('Issue with this order',()=>'Hi Luxella, issue with '+(r.order_no||'')+' '+r.item+': [describe: wrong size / damaged / missing]. Sending photos.','chip'));}
- if(r.status==='Delivered'||st>=9)bb.appendChild(copyBtn('Order again',()=>'Hi Luxella, quote please:\n• Item: '+r.item+' ('+r.brand+')\n• Same as '+(r.order_no||'')+'\n— Swayam','chip'));
+ if(r.status==='Delivered'||st>=9)bb.appendChild(copyBtn('Order again',()=>'Hi Luxella, quote please:\n• Item: '+r.item+' ('+r.brand+')\n• Same as '+(r.order_no||'')+'\n— '+CLIENT(),'chip'));
  try{if(window.__lxOA)window.__lxOA(r,bb);}catch(e){}
  return bb;}
 window.__lxReRender=()=>{try{render();}catch(e){}};
