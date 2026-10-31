@@ -1,26 +1,29 @@
 # Backlog (Product Chief keeps this ordered)
-_Re-ordered by chief 2026-10-30 22:45 IST. Context: Jeet locked The Edit/Boutique for clients ("Opening soon", 341c52a), so client-facing work focuses on Overview/Tracker/Payments/Collection/login until it opens._
+_Re-ordered by chief 2026-10-31 22:45 IST. Context: The Edit/Boutique still locked for clients ("Opening soon"); panel buy 0/10, desire 3.7. 6 fixes from 30–31 Oct are on main but NOT live (prod still ?v=1793365770/1793400000 vs HEAD 1793460000) — VERCEL_TOKEN._
 
 ## Now (max 3)
-1. (frontend) Forever-polling on every page: anim.js deco 1.5s / deck 1.2s / clamp 1s / prep 0.8s, deals.js scan2 1.2s / scan 1.5s — full-document querySelectorAll forever on iPhone. Replace with one shared debounced MutationObserver (or dash.onData hook), pause when document.hidden. One file per commit, QA green each step. — reliability/battery
-2. (panel/frontend) Client login shows an "ADMIN PANEL" link — hide it for clients (owner keeps a faint route). Reads like a template to buyers (panel 2026-10-30, Priya). — trust
-3. (design/frontend) iPhone clipping polish: tab strip edge fade so half-cut labels read as swipeable ("W", "ESS", "TE >"); "SHOW ALL 1" label clipped on Updates strip (webkit-client-home.png); policy search placeholder → "Search the policy". — trust/ease
+1. (frontend) Finish the forever-timer cleanup: ui2.js:12 setInterval(setH,2000) (forced layout every 2 s — ResizeObserver already covers it, drop it); extras.js:465 owner Ops renderOps every 5 s (pause when pane hidden/document.hidden); deals.js:1465/1581 carousels' 5.2–5.6 s timers while off-screen (IntersectionObserver + document.hidden). Reuse window.__lxTick. One file per commit. — reliability/battery
+2. (panel/design) iPhone header + strip clipping: "SIGN OUT" wraps to two lines and email chip cut "QA@EXA…" on every tab (nowrap, hide chip ≤430px; 3 buyers); tab strip edge fade so half-cut labels read swipeable; "SHOW ALL 1" clipped on Updates; PAID tick still low in WebKit (try flex on .stbtn.paid). — trust
+3. (panel/frontend) While The Edit is locked, give clients a next step: "Opening soon" card gets a 2nd action "Ask for a specific piece" → Help › Ask for a quote (4 buyers); hero "Updated on 19th October" hidden when older than 7 days (2 buyers). Copy only, no new flow. — conversion
 
 ## Next
-- (frontend) Owner Edit "Post today's deals" form overflows the card on 390px — Markup/1 USD inputs and checkbox label cut (chromium-owner-boutique.png, run 41040217315).
-- (frontend) Edit 🔎 search ("Coach nolita") returns nothing while the Collection has 5 Nolita 19 pieces → fall through to Collection results. Do before The Edit reopens for clients.
+- (frontend) Edit 🔎 search ("Coach nolita") returns nothing while the Collection has 5 Nolita 19 pieces → fall through to Collection results. Must land before The Edit reopens (himanshu searched it).
 - (watchdog/frontend) If lx_deals is ever empty, deals.js render() returns before drawing the Edit/Boutique switch — keep the switch outside the empty-state early return.
-- (frontend) Empty Private Edit state should offer a next step (last drop / Ask for a quote) — 6/10 buyers. Relevant once The Edit reopens.
-- First Boutique open makes ~58 catalogue requests (~16 s on slow networks) — bundle/prefetch. (Boutique locked for clients now, so moved out of Now.)
+- (frontend) Owner Edit "Post today's deals" form overflows the card on 390px — Markup/1 USD inputs and checkbox label cut (chromium-owner-boutique.png).
+- (frontend) Empty Private Edit state should offer a next step (last drop / Ask for a quote) — relevant once The Edit reopens.
+- (frontend) Quote form "Copy request" is unclear ("copy to where?") → "Send on WhatsApp" with wa.me prefill that the client sends themselves (panel 2026-10-31).
+- First Boutique open makes ~58 catalogue requests (~16 s on slow networks) — bundle/prefetch.
 - Product photos with coloured/grey backgrounds show a rectangle on the studio panel.
-- (frontend) Dead CSS loops nothing renders: .cl-spot-st img / .cl-eg2 figure img spotBob, .ft-bag ftBob (style.css ~3220, 3427, 3599) — safe to delete.
+- (frontend) Dead CSS loops: .cl-spot-st img / .cl-eg2 figure img spotBob, .ft-bag ftBob (style.css ~3220, 3427, 3599) — safe to delete.
 
 ## Later
-- (frontend) style.css 503 KB, 815 !important, selectors up to .sw.sw.sw.sw.sw — consolidation pass, file by file, never one big rewrite. Design's override blocks at file end add to this; next design run should fold them into the base rules.
+- (frontend) style.css 503 KB, 815 !important, 55 infinite keyframe uses, selectors up to .sw.sw.sw.sw.sw — consolidation pass, file by file, never one big rewrite. Design's override blocks at file end should be folded into base rules.
 - (panel) Gulf/NRI ideas: named advisor card, gift-to-another-address + note, Arabic labels later.
 
 ## Needs Jeet (guarded / protected paths)
-- 🔴 VERCEL_TOKEN secret missing — every CI deploy step prints "skipping deploy" and stays green. Prod matches HEAD tonight (file hashes checked 22:45 IST), so a manual deploy happened; future agent fixes won't auto-ship. Add the secret and make the step fail instead of warn (protected .github/).
+- 🔴 (chief 2026-10-31) 9/9 client requests still `Submitted` — himanshu's 4 ~78h old (90 opens/7d, now quiet since 30 Oct 16:47 IST); anshul's look now ₹1,18,800 vs his ₹1,12,400 budget because Alo Mat Bag moved ₹16,600→₹23,000. Opens fell 26→4/day. Reply/re-quote is guarded. Owner-side ideas in Inbox (SLA badge, price-moved flag).
+- 🟠 (chief 2026-10-31) The Edit: 26 of 27 deals sit in draft (7 added today) while clients see "Opening soon" — panel desire 3.7, buy 0/10. Decide: small private drop for top clients (himanshu, anshul, swayam) before full reopen?
+- 🔴 VERCEL_TOKEN secret missing — every CI deploy step prints "skipping deploy" and stays green. 31 Oct 22:45 IST: prod serves ?v=1793365770/1793400000, HEAD is 1793460000 → 6 fixes not live (panel 97fcc78 'Swayam' signature, 517e9bb admin link, 59eb53d; frontend 8b0c370, 8eac41b). Add the secret and make the step fail instead of warn (protected .github/).
 - 🔴 9 client requests since 28 Oct all still `Submitted` (anshul: open ₹1.12L look, one piece went inactive). Replies/status are guarded. Also: show request status to the client (Seen / Sourcing / Quoted) — needs Jeet's flow.
 - Trust block wording: "Authentic · sourced from the brand · invoice in your Document vault" + returns/duties line; Terms tab still says "Terms will be published here."; legal entity + GSTIN in footer; domain email instead of luxella.in@gmail.com (5/10 buyers).
 - Catalogue: ~7.8k of 62.6k live pieces stale — ks 2057, mk 1696, fu 1436, vb(val) 1312, co ~1.4k, plus Sephora/Macy's — GitHub datacenter IPs blocked (403). Needs a residential proxy or a local runner.
@@ -45,22 +48,14 @@ _Re-ordered by chief 2026-10-30 22:45 IST. Context: Jeet locked The Edit/Boutiqu
 - (growth 2026-10-31) Price-change notice on open requests: when a piece inside a client's request/look changes price (e.g. Alo Mat Bag ₹16,600→₹23,000 in an open ₹1.12L look), flag it on the owner's request card ("price moved +39% since asked") so Jeet re-quotes before the client sees it.
 - (growth 2026-10-31) Request SLA badge for owner: requests still `Submitted` after 12h turn amber, after 24h red, top of Ops. Today 9/9 unanswered, oldest ~78h.
 - (growth 2026-10-31, repeat) Track product views + Boutique/Edit opens + search terms (lightweight lx_visit-style counter per piece/day) — without it Growth can't rank pieces by attention.
-- (panel 2026-10-31) Voice sheet "Hey Luxella" still on screen in webkit-client voice-close, chat-open, chat-close and search-type screenshots (run 41155587814) — close button may not close it on iPhone, or QA's close tap misses; frontend to verify.
-- (panel 2026-10-31) iPhone header: "SIGN OUT" wraps onto two lines and the email chip is cut "QA@EXA…" on every tab top (390px) — nowrap + hide email chip on phones. 3 buyers.
-- (panel 2026-10-31) PAID tick on Payments still sits below the word in WebKit (webkit-client-tab-pay-bottom.png) despite 0b34bf3 — try flex/align-items on .stbtn.paid instead of vertical-align.
-- (panel 2026-10-31) "Opening soon" card: add a 2nd action "Ask for a specific piece" → Help › Ask for a quote; quote form "Copy request" → "Send on WhatsApp" (wa.me prefill, client sends it themselves). 4 buyers.
-- (panel 2026-10-31) "Updated on 19th October" on the hero reads stale on 31 Oct — check what date it shows on prod; hide if older than 7 days. 2 buyers.
 - (panel 2026-10-31, idea for Jeet) Private preview of the first Edit drop for top clients before "Opening soon" lifts + "Your advisor: <name>" card (Gulf/collector buyers).
 - (backend 2026-10-31 02:50 IST, Needs Jeet — RLS) Perf advisor: `lx_catalog_owner_all` (and lx_catalog_src_owner, lx_cu_self, lx_push_member_rw) re-evaluate auth.*() per row — on 62k catalogue rows the owner's reads pay this every row. Fix: recreate those policies with `(select auth.uid())` / `(select lx_is_owner())` instead of bare calls (same logic, wrapped in select). Also unused index `lx_catalog_sku` — leave until confirmed.
 - (backend 2026-10-31) Fresh-in-36h fell 51.8k → 48.1k only because Sephora (sp 1530), Macy's (my 2020) and Coach (co 1488) last synced 29 Oct 06:00 UTC and aged past 36h — same blocked-IP issue already in Needs Jeet, not a new break.
 - (backend 2026-10-31 08:55 IST) Farfetch-style partial staleness: fl_ 772 of 3,289 and nr_ 652 of 1,213 live pieces not seen since 28 Oct while the rest of each store syncs fine — likely sold out / delisted at source but still shown as live. Suggest: scraper deactivates a store's rows unseen for 72h *only when that store's run succeeded* (Needs Jeet ok — it hides ~1.4k pieces).
-- (backend 2026-10-31 14:50 IST) Alo Yoga (sh_alo) only 548 of 4,077 live fresh: Shopify loop stopped when a page had <250 items, but Alo returns 240–249 on full pages (hidden items filtered) → CI read 2 of ~19 pages. Fixed in outlet_scrape.js + more_scrape.js (only an empty page ends the loop); sync dispatched. Verified 20:50 IST: sh_alo 4,011/4,165 fresh — done.
-
-- (frontend 2026-10-31) Remaining forever timers after 8b0c370: ui2.js:12 setInterval(setH,2000) (forced layout every 2 s; ResizeObserver already covers it — drop the interval), extras.js:465 owner Ops renderOps every 5 s (pause when pane hidden/document.hidden), deals.js:1465/1581 carousels keep 5.2–5.6 s timers alive while off-screen (gate on IntersectionObserver + document.hidden).
-- (frontend 2026-10-31) QA voice-close selector never matched .hv-x — fixed in app (aria-label=Close + Escape, 8eac41b); voice-close/chat/search screenshots now show the real page (−19 nodes). Panel's "Hey Luxella stays open" item is resolved.
-- (frontend 2026-10-31) style.css still 815 !important / 55 infinite keyframe uses — consolidation pass (Later) unchanged.
 
 ## Done
+- (backend 2026-10-31) Alo Yoga Shopify pager: only an empty page ends the loop (520f26a); sync 41188255065 green → sh_alo 4,011/4,165 fresh.
+- (chief audit 2026-10-31) 8b0c370 + 517e9bb reviewed: compliant (no guarded areas, calm, no banned motion; __lxTick self-mutations throttled ≤1/s via takeRecords).
 - (frontend 2026-10-31) anim.js five forever setInterval scans (≈4.6 full-document scans/s) → one throttled MutationObserver pass, paused when hidden (8b0c370); Hey Luxella sheet: Close aria-label, Escape, dialog role (8eac41b). CI 41195827831 green, screenshots identical; not live (VT empty).
 - (panel 2026-10-31) Quote/"Order again" signed with client's own name not "Swayam" (97fcc78); login "Admin panel" link hidden, faint owner route (517e9bb); policy search placeholder (59eb53d). CI 41175935699 green; NOT live (VERCEL_TOKEN).
 - (design 2026-10-30) LIVE + contact coins → 46px dark-glass buttons stacked right, no glow/ring/pulse, tuck away on scroll-down (1a4687c, 4d952d7; QA 41037506581 green). Live on prod.
