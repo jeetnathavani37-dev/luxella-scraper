@@ -53,7 +53,12 @@ _Re-ordered by chief 2026-10-30 22:45 IST. Context: Jeet locked The Edit/Boutiqu
 - (backend 2026-10-31 08:55 IST) Farfetch-style partial staleness: fl_ 772 of 3,289 and nr_ 652 of 1,213 live pieces not seen since 28 Oct while the rest of each store syncs fine — likely sold out / delisted at source but still shown as live. Suggest: scraper deactivates a store's rows unseen for 72h *only when that store's run succeeded* (Needs Jeet ok — it hides ~1.4k pieces).
 - (backend 2026-10-31 14:50 IST) Alo Yoga (sh_alo) only 548 of 4,077 live fresh: Shopify loop stopped when a page had <250 items, but Alo returns 240–249 on full pages (hidden items filtered) → CI read 2 of ~19 pages. Fixed in outlet_scrape.js + more_scrape.js (only an empty page ends the loop); sync dispatched. Verify sh_alo fresh ≈4k next run; same fix may lift penation/dooney/vb saved counts.
 
+- (frontend 2026-10-31) Remaining forever timers after 8b0c370: ui2.js:12 setInterval(setH,2000) (forced layout every 2 s; ResizeObserver already covers it — drop the interval), extras.js:465 owner Ops renderOps every 5 s (pause when pane hidden/document.hidden), deals.js:1465/1581 carousels keep 5.2–5.6 s timers alive while off-screen (gate on IntersectionObserver + document.hidden).
+- (frontend 2026-10-31) QA voice-close selector never matched .hv-x — fixed in app (aria-label=Close + Escape, 8eac41b); voice-close/chat/search screenshots now show the real page (−19 nodes). Panel's "Hey Luxella stays open" item is resolved.
+- (frontend 2026-10-31) style.css still 815 !important / 55 infinite keyframe uses — consolidation pass (Later) unchanged.
+
 ## Done
+- (frontend 2026-10-31) anim.js five forever setInterval scans (≈4.6 full-document scans/s) → one throttled MutationObserver pass, paused when hidden (8b0c370); Hey Luxella sheet: Close aria-label, Escape, dialog role (8eac41b). CI 41195827831 green, screenshots identical; not live (VT empty).
 - (panel 2026-10-31) Quote/"Order again" signed with client's own name not "Swayam" (97fcc78); login "Admin panel" link hidden, faint owner route (517e9bb); policy search placeholder (59eb53d). CI 41175935699 green; NOT live (VERCEL_TOKEN).
 - (design 2026-10-30) LIVE + contact coins → 46px dark-glass buttons stacked right, no glow/ring/pulse, tuck away on scroll-down (1a4687c, 4d952d7; QA 41037506581 green). Live on prod.
 - (frontend 2026-10-30) oneGold 1.2 s class churn stopped (diff-only), dead product-levitation observers removed (9b93c28; CI 41046801189 green). Live.
