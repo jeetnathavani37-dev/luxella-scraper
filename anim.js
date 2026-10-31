@@ -1,4 +1,15 @@
 /* Luxella motion layer: shimmer, stagger, count-up, stage moments, ripple, tab transitions, payment success */
+/* one shared, throttled DOM-decoration pass instead of five forever setIntervals (0.8–1.5 s full-document scans).
+   Runs ~250 ms after the DOM changes (max once a second), a slow 5 s safety beat, never while the tab is hidden. */
+(function(){
+ const fns=[];let q=0,last=0,mo=null;
+ const run=()=>{q=0;if(document.hidden)return;last=Date.now();fns.forEach(f=>{try{f();}catch(e){}});if(mo)mo.takeRecords();};
+ const kick=()=>{if(q)return;q=setTimeout(run,Math.max(250,last+1000-Date.now()));};
+ try{mo=new MutationObserver(kick);mo.observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['hidden','open']});}catch(e){mo=null;}
+ document.addEventListener('visibilitychange',()=>{if(!document.hidden)kick();});
+ setInterval(kick,mo?5000:1200);
+ window.__lxTick=f=>{fns.push(f);kick();};
+})();
 (function(){
  const RM=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;if(RM)return;
  const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
@@ -57,8 +68,8 @@
   document.querySelectorAll('.lx-demote').forEach(b=>{if(!want.has(b))b.classList.remove('lx-demote');});
   want.forEach(b=>{if(!b.classList.contains('lx-demote'))b.classList.add('lx-demote');});
  }
- setInterval(oneGold,1200);
- setInterval(deco,1500);setTimeout(()=>{moments();deco();},400);
+ window.__lxTick(oneGold);
+ window.__lxTick(deco);setTimeout(()=>{moments();deco();},400);
 })();
 /* top Back bar on every sheet/drawer (close × can sit under the status bar) */
 (function(){
@@ -84,17 +95,17 @@
   if(!box.dataset.l){box.dataset.l='1';box.addEventListener('scroll',()=>requestAnimationFrame(mark),{passive:true});}
   mark();
  }
- setInterval(deck,1200);setTimeout(deck,600);
+ window.__lxTick(deck);setTimeout(deck,600);
 })();
 
 /* long step descriptions: two lines + "More" */
 (function(){
  function clamp(){document.querySelectorAll('.st .sdesc p:not([data-cl])').forEach(p=>{if(!p.offsetParent)return;p.dataset.cl='1';p.classList.add('lx-cl');requestAnimationFrame(()=>{if(p.scrollHeight<=p.clientHeight+2){p.classList.remove('lx-cl');return;}const b=document.createElement('button');b.type='button';b.className='lx-more';b.textContent='More';b.addEventListener('click',e=>{e.stopPropagation();const o=p.classList.toggle('lx-cl');b.textContent=o?'More':'Less';b.classList.toggle('open',!o);});p.after(b);});});}
- setInterval(clamp,1000);
+ window.__lxTick(clamp);
 })();
 
 /* Orders: compact cards that expand on demand */
 (function(){
  function prep(){document.querySelectorAll('#ordT tbody tr.oc2:not(.lxc)').forEach(tr=>{tr.classList.add('lxc');const td=document.createElement('td');td.className='lxc-t';const b=document.createElement('button');b.type='button';b.className='lxc-b';b.innerHTML='<span>Details</span><i></i>';b.addEventListener('click',e=>{e.stopPropagation();const o=tr.classList.toggle('open');b.firstChild.textContent=o?'Less':'Details';if(o){tr.classList.add('lxc-anim');setTimeout(()=>tr.classList.remove('lxc-anim'),500);}});td.appendChild(b);tr.appendChild(td);});}
- setInterval(prep,800);setTimeout(prep,300);
+ window.__lxTick(prep);setTimeout(prep,300);
 })();
