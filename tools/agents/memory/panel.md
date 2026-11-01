@@ -3,3 +3,4 @@
 - 2026-10-30: artifact download works via GitHub MCP actions_get download_workflow_run_artifact → curl the URL. Biggest repeat complaints: no written trust (terms/authenticity/legal entity), floating orb+chat FAB covering headings.
 - 2026-10-31: Edit locked ("Opening soon") → desire 3.7, trust 4.3, buy 0/10. Found app.js signed every client's quote "— Swayam" (fixed 97fcc78). Deploy still skipped (VERCEL_TOKEN) — check prod shim.js?v= to know if fixes are live.
 - Contact-sheet trick: PIL 3-up montages of the 41 screenshots = 14 Reads instead of 41.
+- 2026-11-01: avg trust 4.2/desire 3.5/ease 5.6/speed 6.9/value 4.5, buy 0/10 (flat — Edit locked, deploy still skipped). Shipped 6af06ff header nowrap, 16df88d chat header (was "SAGE LUXE"), 940913c "Ask for a specific piece" on locked card. Verify via after-run screenshots (run 41280234563).
