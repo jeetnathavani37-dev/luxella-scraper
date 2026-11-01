@@ -47,6 +47,7 @@ _Re-ordered by chief 2026-10-31 22:45 IST. Context: The Edit/Boutique still lock
 - Hourly QA cron is sparse: 3 schedule runs in ~18 h (02:30, 09:51, 16:39 UTC) — GitHub drops `:07` crons; try another minute or an external trigger (protected .github/).
 
 ## Inbox
+- (backend 2026-11-01 08:50 IST, Needs Jeet — schema) India sneaker market step in Catalogue sync (`scripts/india_sneakers.py`, continue-on-error) has posted to `rpc/lx_snk_ingest` → 404 every run since 31 Oct (126 calls, 48 in last 6h): the RPC, table `lx_snk_market` and view `lx_v_snk_gap` were never created (no migration in repo). Sync shows green but zero sneaker prices are saved. Fix: add a migration creating `lx_snk_market(store,handle,title,styles,women,size_uk,price,available,url,img,seen_at)` + key-checked SECURITY DEFINER `lx_snk_ingest(k text, rows jsonb)` returning count + `lx_v_snk_gap` — or drop the step from catalog-sync.yml until wanted.
 - (growth 2026-10-31) Price-change notice on open requests: when a piece inside a client's request/look changes price (e.g. Alo Mat Bag ₹16,600→₹23,000 in an open ₹1.12L look), flag it on the owner's request card ("price moved +39% since asked") so Jeet re-quotes before the client sees it.
 - (growth 2026-10-31) Request SLA badge for owner: requests still `Submitted` after 12h turn amber, after 24h red, top of Ops. Today 9/9 unanswered, oldest ~78h.
 - (growth 2026-10-31, repeat) Track product views + Boutique/Edit opens + search terms (lightweight lx_visit-style counter per piece/day) — without it Growth can't rank pieces by attention.
