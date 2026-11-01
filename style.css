@@ -4486,3 +4486,5 @@ html body #chat.chat .ch .eyebrow{white-space:nowrap;flex:0 0 auto}
 html body #chat.chat .ch #chat-mode{flex:1 1 40%;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 html body #chat.chat .ch .chip{flex:0 0 auto;white-space:nowrap;max-width:none;overflow:visible}
 }
+/* panel 2026-11-01: second, quieter action on the locked Edit card */
+.dl-lock .dl-ask2{min-height:44px;padding:0 22px;margin-top:-2px}
