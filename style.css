@@ -4476,3 +4476,6 @@ body.dl-locked #pane-deals #deals-key,body.dl-locked #pane-deals #deals-margin,b
 .dl-lock .btn{text-decoration:none;display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 22px}
 body.dl-locked .dl-imm-h button:not(.dl-imm-bk),body.dl-locked .cl-teaser,body.dl-locked .lx-ovh{display:none!important}
 .pcur,.sc-cur{display:none!important}
+/* panel 2026-11-01: iPhone header — Sign out stays on one line, email chip hidden on phones */
+html body #top.lx-top button{white-space:nowrap;flex:0 0 auto}
+@media (max-width:430px){html body #top.lx-top .who{display:none!important}}
