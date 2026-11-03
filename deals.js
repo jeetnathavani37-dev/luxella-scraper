@@ -7,6 +7,7 @@
  const WA='918724079056';
  const today=()=>new Date(Date.now()+5.5*3600e3).toISOString().slice(0,10);
  const addD=(d,k)=>new Date(Date.parse(d+'T00:00:00Z')+k*864e5).toISOString().slice(0,10);
+ const LOCKED=true; /* The Edit stays closed to clients until it is ready: they see lockedView, no intro */
  const own=()=>{try{return !!(window.lx&&window.lx.isOwner&&window.lx.isOwner());}catch(e){return false;}};
  const cli=()=>{try{return (window.lx&&window.lx.client&&window.lx.client())||{};}catch(e){return {};}};
  const logo=b=>{try{return staticLogo(b);}catch(e){return '';}};
@@ -1051,7 +1052,7 @@
   const s=el('div','dl-sum');const it=(v,k)=>{const x=el('div');x.appendChild(el('b',null,String(v)));x.appendChild(el('small',null,k));s.appendChild(x);};it(td.length,'Today');if(!own())it(nw,'New for you');it(brands,'Houses today');it(end,'Ending today');return s;}
  function stickTop(){try{let b=0;const ih=document.body.classList.contains('dl-imm')&&document.querySelector('.dl-imm-h');if(ih){b=ih.getBoundingClientRect().bottom;const pn=$('pane-deals');ih.classList.toggle('sc',pn&&pn.scrollTop>60);const vs=document.querySelector('.sw .dl-vs');if(vs)vs.classList.toggle('stuck',vs.getBoundingClientRect().top<=b+9);document.documentElement.style.setProperty('--vsTop',Math.round(b-(pn?pn.getBoundingClientRect().top:0))+6+'px');return;}document.querySelectorAll('.sw .tabs,.sw .mini,body>header,.sw>header').forEach(e=>{const cs=getComputedStyle(e);if(cs.display==='none'||(cs.position!=='sticky'&&cs.position!=='fixed'))return;const r=e.getBoundingClientRect();if(!r.height)return;const t=parseFloat(cs.top)||0;if((cs.position==='fixed'&&r.top<120)||Math.abs(r.top-t)<=2){if(r.bottom>b)b=r.bottom;}});const vs=document.querySelector('.sw .dl-vs');if(vs){const ab=vs.getBoundingClientRect();vs.classList.toggle('stuck',ab.top<=Math.round(b)+9);}document.documentElement.style.setProperty('--vsTop',Math.round(b)+8+'px');}catch(e){}}
  function lockedView(l){document.body.classList.add('dl-locked');l.textContent='';const w=el('section','dl-lock');w.appendChild(el('small',null,'The Private Edit'));w.appendChild(el('h3',null,'Opening soon'));w.appendChild(el('p',null,'We are preparing a private selection for you. Your concierge will let you know the moment it opens.'));const b=el('a','btn dl-ask','Message your concierge');b.href='https://wa.me/'+WA+'?text='+encodeURIComponent('Hi Luxella, please let me know when The Private Edit opens.');b.target='_blank';b.rel='noopener';w.appendChild(b);const q=el('button','btn2 dl-ask2','Ask for a specific piece');q.type='button';q.onclick=()=>{leaveEdit(false);const t=document.getElementById('tab-help');if(t)t.click();setTimeout(()=>{const i=document.getElementById('rq-item');if(i){i.scrollIntoView({block:'center',behavior:'smooth'});try{i.focus({preventScroll:true});}catch(e){}}},350);};w.appendChild(q);l.appendChild(w);}
- function render(){const l=$('deals-list');if(!l)return;if(!own()){lockedView(l);return;}document.body.classList.remove('dl-locked');const keepScroll=document.activeElement&&document.activeElement.closest&&document.activeElement.closest('.dl-search');l.textContent='';
+ function render(){const l=$('deals-list');if(!l)return;if(LOCKED&&!own()){lockedView(l);return;}document.body.classList.remove('dl-locked');const keepScroll=document.activeElement&&document.activeElement.closest&&document.activeElement.closest('.dl-search');l.textContent='';
   const all=rows.filter(r=>r.kind==='deal'),pdfs=rows.filter(r=>r.kind==='pdf'||r.kind==='post');
   if(!all.length&&!pdfs.length){const e=el('div','dl-empty');e.appendChild(el('b',null,'New arrivals are presented here every evening.'));e.appendChild(el('span',null,'Check back this evening, or message Luxella for a specific piece.'));l.appendChild(e);return;}
   stickTop();if(!window.__stk){window.__stk=1;let q=0;const f=()=>{if(q)return;q=requestAnimationFrame(()=>{q=0;stickTop();});};document.addEventListener('scroll',f,{passive:true,capture:true});addEventListener('resize',f);}
@@ -1164,8 +1165,10 @@
   const place=()=>{const W=innerWidth,H=innerHeight,IW=1080,IH=1456;const sc=Math.max(W/IW,H/IH);const ox=(W-IW*sc)*.3,oy=(H-IH*sc)*.5;const x0=ox+176*sc,y0=oy+181*sc,w=(563-176)*sc,h=(663-181)*sc;ov.style.setProperty('--tx',x0+'px');ov.style.setProperty('--ty',y0+'px');ov.style.setProperty('--tw',w+'px');ov.style.setProperty('--th',h+'px');ov.style.setProperty('--cx',(x0+w/2)+'px');ov.style.setProperty('--cy',(y0+h/2)+'px');};
   const start=()=>{place();requestAnimationFrame(()=>requestAnimationFrame(()=>ov.classList.add('go')));setTimeout(()=>ov.classList.add('land'),850);setTimeout(()=>ov.classList.add('held'),1550);setTimeout(()=>ov.classList.add('zoom'),1800);setTimeout(()=>{next();done=true;},1900);setTimeout(()=>{ov.classList.add('out');setTimeout(()=>ov.remove(),600);},2250);};
   if(img.complete)start();else{img.onload=start;img.onerror=()=>fin(false);setTimeout(()=>{if(!ov.classList.contains('go'))start();},1500);}}
- function intro(force){if(own()&&!force)return;try{if(!force&&sessionStorage.getItem('lxdi'))return;sessionStorage.setItem('lxdi','1');}catch(e){}if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)return;
-  cardScene(()=>{
+ function intro(force){if(!force&&(LOCKED||own()))return;if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  const latest=rows.filter(r=>!(r.data||{}).draft).reduce((m,r)=>r.created_at>m?r.created_at:m,'');let seen='';try{seen=localStorage.getItem('lxdi_seen')||'';}catch(e){}
+  if(!force&&(!latest||seen>=latest))return;try{localStorage.setItem('lxdi_seen',latest);}catch(e){}
+  const vault=()=>{
   const td=today();const rec=[...rows].filter(r=>!(r.data||{}).draft).sort((a,b)=>a.created_at<b.created_at?1:-1);const day0=(rec.find(r=>r.day===td)||rec[0]||{}).day;const pool=rec.filter(r=>r.day===day0);
   const lists=pool.map(r=>{const d=r.data||{};const caps=d.caps||{};const out=[];
    if(r.kind==='deal'){if(d.img)out.push({u:d.img,b:d.brand||'',k:'Offer'});}
@@ -1188,7 +1191,8 @@
   document.body.appendChild(ov);requestAnimationFrame(()=>requestAnimationFrame(()=>ov.classList.add('in')));const SP=1.8;const fast=()=>{try{ov.getAnimations({subtree:true}).forEach(a=>{if(a.playbackRate!==SP)a.playbackRate=SP;});}catch(e){}};const fq=setInterval(fast,60);setTimeout(()=>clearInterval(fq),4200);
   setTimeout(()=>{try{navigator.vibrate&&navigator.vibrate(12);}catch(e){}},1000);
   let done=false;const end=()=>{if(done)return;done=true;ov.classList.add('out');setTimeout(()=>ov.remove(),900);};
-  setTimeout(end,src.length?3600:2600);skip.addEventListener('click',e=>{e.stopPropagation();end();});ov.addEventListener('click',()=>{if(ov.classList.contains('opened'))end();});setTimeout(()=>ov.classList.add('opened'),1700);});}
+  setTimeout(end,src.length?3600:2600);skip.addEventListener('click',e=>{e.stopPropagation();end();});ov.addEventListener('click',()=>{if(ov.classList.contains('opened'))end();});setTimeout(()=>ov.classList.add('opened'),1700);};
+  if(seen)vault();else cardScene(vault);}
  /* ---------- copy all ---------- */
  function copyAll(btn){const list=visibleDeals();if(!list.length)return;const res=!own()&&M.on;const k=dealKey();
   const lines=[(res?((cli().biz||cli().name||'')+' · '):'Luxella · ')+"Today's deals",''];
