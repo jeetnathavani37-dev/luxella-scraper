@@ -7,6 +7,7 @@
  const WA='918724079056';
  const today=()=>new Date(Date.now()+5.5*3600e3).toISOString().slice(0,10);
  const addD=(d,k)=>new Date(Date.parse(d+'T00:00:00Z')+k*864e5).toISOString().slice(0,10);
+ const LOCKED=true; /* The Edit stays closed to clients until it is ready: they see lockedView, no intro */
  const own=()=>{try{return !!(window.lx&&window.lx.isOwner&&window.lx.isOwner());}catch(e){return false;}};
  const cli=()=>{try{return (window.lx&&window.lx.client&&window.lx.client())||{};}catch(e){return {};}};
  const logo=b=>{try{return staticLogo(b);}catch(e){return '';}};
@@ -56,6 +57,14 @@
    try{await photos.db.doc('requests/'+id).set({brand:d.brand||'',product:d.title||'',spec,qty:1,budget:num(d.price)||0,needBy:'',link:d.link||'',photo:d.img||'',note:nt.value.trim(),urgent:false,status:'Submitted',at:new Date().toISOString(),source:'deal',deal_id:r.id,ask:kind});
     markReq(r.id,kind);sh.close();{const b0=d.brand;say(isHigh(b0)?'Sent. '+b0+' confirms through its boutique — Luxella replies within 24 hours.':'Your enquiry is with Luxella. We will reply here and on WhatsApp.');}render();}
    catch(e){const m='Hi Luxella, '+ASK[kind].toLowerCase()+' for '+[d.brand,d.title].filter(Boolean).join(' ')+(sz.value?' · size '+sz.value:'')+'.';window.open('https://wa.me/'+WA+'?text='+encodeURIComponent(m),'_blank','noopener');sh.close();}});}
+ const keepRaw=(inp,old)=>inp.value===''&&old!=null&&old!==''&&num(old)==null?old:num(inp.value);
+ function priceSheet(r){const d=r.data||{};const sh=sheet();sh.box.appendChild(el('div','dl-sh-eb','Edit price'));sh.box.appendChild(el('div','dl-sh-t',[d.brand,d.title].filter(Boolean).join(' · ')));
+  const pr=el('input','dl-in');pr.type='number';pr.inputMode='numeric';pr.placeholder='Deal price ₹ (empty = price on request)';pr.value=num(d.price)??'';const mr=el('input','dl-in');mr.type='number';mr.inputMode='numeric';mr.placeholder='Usual price ₹ (optional)';mr.value=num(d.mrp)??'';
+  const lb=(t,i)=>{const l=el('label','dl-l');l.style.marginTop='10px';l.appendChild(el('span',null,t));l.appendChild(i);return l;};const er=el('p','dl-n');const go=el('button','btn dl-ask','Save price');go.type='button';[lb('Deal price ₹',pr),lb('Usual price ₹',mr),go,er].forEach(x=>sh.box.appendChild(x));setTimeout(()=>pr.focus(),320);
+  go.addEventListener('click',async()=>{go.disabled=true;er.textContent='';try{await window.lx.deals.update(r.id,Object.assign({},d,{price:keepRaw(pr,d.price),mrp:keepRaw(mr,d.mrp)}));sh.close();say('Price saved.');load();}catch(e){go.disabled=false;er.textContent='Could not save. Check the connection and try again.';}});}
+ function removeSheet(r){const d=r.data||{};const sh=sheet();sh.box.appendChild(el('div','dl-sh-eb','Remove deal'));sh.box.appendChild(el('div','dl-sh-t',[d.brand,d.title].filter(Boolean).join(' · ')));sh.box.appendChild(el('p','dl-n','Clients will no longer see this piece. This cannot be undone.'));
+  const er=el('p','dl-n');const go=el('button','btn dl-ask','Remove');go.type='button';const no=el('button','btn2','Keep it');no.type='button';no.addEventListener('click',sh.close);[go,no,er].forEach(x=>sh.box.appendChild(x));
+  go.addEventListener('click',async()=>{go.disabled=true;er.textContent='';try{await window.lx.deals.remove(r.id);sh.close();say('Deal removed.');load();}catch(e){go.disabled=false;er.textContent='Could not remove. Try again.';}});}
  function sheet(){const ov=el('div','dl-sh');const box=el('div','dl-sh-b');const x=el('button','x','×');x.type='button';x.setAttribute('aria-label','Close');box.appendChild(x);ov.appendChild(box);const close=()=>{ov.classList.remove('in');setTimeout(()=>ov.remove(),300);};x.addEventListener('click',close);ov.addEventListener('click',e=>{if(e.target===ov)close();});(document.querySelector('.sw')||document.body).appendChild(ov);requestAnimationFrame(()=>ov.classList.add('in'));return {box,close};}
 
  /* ---------- quote card (client's own style) ---------- */
@@ -139,10 +148,10 @@
   bd.appendChild(actions(r,true));c.appendChild(bd);return c;}
  function actions(r,compact){const d=r.data||{};const ac=el('div','dl-ac');
   if(own()){
-   const ep=el('button','btn2','Edit price');ep.type='button';ep.addEventListener('click',async()=>{const v=prompt('Deal price ₹ (leave empty for "price on request")',d.price??'');if(v===null)return;const m=prompt('Usual price ₹ (optional)',d.mrp??'');const nd=Object.assign({},d,{price:num(v),mrp:m===null?d.mrp:num(m)});try{await window.lx.deals.update(r.id,nd);load();}catch(e){alert('Could not save.');}});ac.appendChild(ep);
+   const ep=el('button','btn2','Edit price');ep.type='button';ep.addEventListener('click',()=>priceSheet(r));ac.appendChild(ep);
    const so=el('button','btn2',d.sold?'Mark available':'Mark sold out');so.type='button';so.addEventListener('click',async()=>{try{await window.lx.deals.update(r.id,Object.assign({},d,{sold:!d.sold}));load();}catch(e){alert('Could not save.');}});ac.appendChild(so);
    const nb=el('button','btn2','Notify');nb.type='button';nb.addEventListener('click',()=>notifySheet(r));ac.appendChild(nb);
-   const x=el('button','btn2 dl-del','Remove');x.type='button';x.addEventListener('click',async()=>{if(!confirm('Remove this deal?'))return;try{await window.lx.deals.remove(r.id);load();}catch(e){alert('Could not remove.');}});ac.appendChild(x);return ac;}
+   const x=el('button','btn2 dl-del','Remove');x.type='button';x.addEventListener('click',()=>removeSheet(r));ac.appendChild(x);return ac;}
   if(d.sold){const s=el('button','btn2','Ask for something similar');s.type='button';s.addEventListener('click',()=>request(r,'similar'));ac.appendChild(s);return ac;}
   const main=el('button','btn dl-ask',num(d.price)==null?'Enquire':'I want this');main.type='button';main.addEventListener('click',()=>request(r,num(d.price)==null?'price':'buy'));ac.appendChild(main);
   const av=el('button','btn2','Availability');av.type='button';av.addEventListener('click',()=>request(r,'availability'));ac.appendChild(av);
@@ -1051,7 +1060,7 @@
   const s=el('div','dl-sum');const it=(v,k)=>{const x=el('div');x.appendChild(el('b',null,String(v)));x.appendChild(el('small',null,k));s.appendChild(x);};it(td.length,'Today');if(!own())it(nw,'New for you');it(brands,'Houses today');it(end,'Ending today');return s;}
  function stickTop(){try{let b=0;const ih=document.body.classList.contains('dl-imm')&&document.querySelector('.dl-imm-h');if(ih){b=ih.getBoundingClientRect().bottom;const pn=$('pane-deals');ih.classList.toggle('sc',pn&&pn.scrollTop>60);const vs=document.querySelector('.sw .dl-vs');if(vs)vs.classList.toggle('stuck',vs.getBoundingClientRect().top<=b+9);document.documentElement.style.setProperty('--vsTop',Math.round(b-(pn?pn.getBoundingClientRect().top:0))+6+'px');return;}document.querySelectorAll('.sw .tabs,.sw .mini,body>header,.sw>header').forEach(e=>{const cs=getComputedStyle(e);if(cs.display==='none'||(cs.position!=='sticky'&&cs.position!=='fixed'))return;const r=e.getBoundingClientRect();if(!r.height)return;const t=parseFloat(cs.top)||0;if((cs.position==='fixed'&&r.top<120)||Math.abs(r.top-t)<=2){if(r.bottom>b)b=r.bottom;}});const vs=document.querySelector('.sw .dl-vs');if(vs){const ab=vs.getBoundingClientRect();vs.classList.toggle('stuck',ab.top<=Math.round(b)+9);}document.documentElement.style.setProperty('--vsTop',Math.round(b)+8+'px');}catch(e){}}
  function lockedView(l){document.body.classList.add('dl-locked');l.textContent='';const w=el('section','dl-lock');w.appendChild(el('small',null,'The Private Edit'));w.appendChild(el('h3',null,'Opening soon'));w.appendChild(el('p',null,'We are preparing a private selection for you. Your concierge will let you know the moment it opens.'));const b=el('a','btn dl-ask','Message your concierge');b.href='https://wa.me/'+WA+'?text='+encodeURIComponent('Hi Luxella, please let me know when The Private Edit opens.');b.target='_blank';b.rel='noopener';w.appendChild(b);const q=el('button','btn2 dl-ask2','Ask for a specific piece');q.type='button';q.onclick=()=>{leaveEdit(false);const t=document.getElementById('tab-help');if(t)t.click();setTimeout(()=>{const i=document.getElementById('rq-item');if(i){i.scrollIntoView({block:'center',behavior:'smooth'});try{i.focus({preventScroll:true});}catch(e){}}},350);};w.appendChild(q);l.appendChild(w);}
- function render(){const l=$('deals-list');if(!l)return;if(!own()){lockedView(l);return;}document.body.classList.remove('dl-locked');const keepScroll=document.activeElement&&document.activeElement.closest&&document.activeElement.closest('.dl-search');l.textContent='';
+ function render(){const l=$('deals-list');if(!l)return;if(LOCKED&&!own()){lockedView(l);return;}document.body.classList.remove('dl-locked');const keepScroll=document.activeElement&&document.activeElement.closest&&document.activeElement.closest('.dl-search');l.textContent='';
   const all=rows.filter(r=>r.kind==='deal'),pdfs=rows.filter(r=>r.kind==='pdf'||r.kind==='post');
   if(!all.length&&!pdfs.length){const e=el('div','dl-empty');e.appendChild(el('b',null,'New arrivals are presented here every evening.'));e.appendChild(el('span',null,'Check back this evening, or message Luxella for a specific piece.'));l.appendChild(e);return;}
   stickTop();if(!window.__stk){window.__stk=1;let q=0;const f=()=>{if(q)return;q=requestAnimationFrame(()=>{q=0;stickTop();});};document.addEventListener('scroll',f,{passive:true,capture:true});addEventListener('resize',f);}
@@ -1164,8 +1173,11 @@
   const place=()=>{const W=innerWidth,H=innerHeight,IW=1080,IH=1456;const sc=Math.max(W/IW,H/IH);const ox=(W-IW*sc)*.3,oy=(H-IH*sc)*.5;const x0=ox+176*sc,y0=oy+181*sc,w=(563-176)*sc,h=(663-181)*sc;ov.style.setProperty('--tx',x0+'px');ov.style.setProperty('--ty',y0+'px');ov.style.setProperty('--tw',w+'px');ov.style.setProperty('--th',h+'px');ov.style.setProperty('--cx',(x0+w/2)+'px');ov.style.setProperty('--cy',(y0+h/2)+'px');};
   const start=()=>{place();requestAnimationFrame(()=>requestAnimationFrame(()=>ov.classList.add('go')));setTimeout(()=>ov.classList.add('land'),850);setTimeout(()=>ov.classList.add('held'),1550);setTimeout(()=>ov.classList.add('zoom'),1800);setTimeout(()=>{next();done=true;},1900);setTimeout(()=>{ov.classList.add('out');setTimeout(()=>ov.remove(),600);},2250);};
   if(img.complete)start();else{img.onload=start;img.onerror=()=>fin(false);setTimeout(()=>{if(!ov.classList.contains('go'))start();},1500);}}
- function intro(force){if(own()&&!force)return;try{if(!force&&sessionStorage.getItem('lxdi'))return;sessionStorage.setItem('lxdi','1');}catch(e){}if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)return;
-  cardScene(()=>{
+ function intro(force){if(!force&&(LOCKED||own()))return;if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  if(!rows.length&&!force){const n=(intro.n||0)+1;intro.n=n;if(n<20)setTimeout(()=>{const t=$('tab-deals');if(t&&t.getAttribute('aria-selected')==='true')intro();},300);return;}
+  const latest=rows.filter(r=>!(r.data||{}).draft).reduce((m,r)=>r.created_at>m?r.created_at:m,'');let seen='';try{seen=localStorage.getItem('lxdi_seen')||'';}catch(e){}
+  if(!force&&(!latest||seen>=latest))return;try{localStorage.setItem('lxdi_seen',latest);}catch(e){}
+  const vault=()=>{
   const td=today();const rec=[...rows].filter(r=>!(r.data||{}).draft).sort((a,b)=>a.created_at<b.created_at?1:-1);const day0=(rec.find(r=>r.day===td)||rec[0]||{}).day;const pool=rec.filter(r=>r.day===day0);
   const lists=pool.map(r=>{const d=r.data||{};const caps=d.caps||{};const out=[];
    if(r.kind==='deal'){if(d.img)out.push({u:d.img,b:d.brand||'',k:'Offer'});}
@@ -1188,7 +1200,8 @@
   document.body.appendChild(ov);requestAnimationFrame(()=>requestAnimationFrame(()=>ov.classList.add('in')));const SP=1.8;const fast=()=>{try{ov.getAnimations({subtree:true}).forEach(a=>{if(a.playbackRate!==SP)a.playbackRate=SP;});}catch(e){}};const fq=setInterval(fast,60);setTimeout(()=>clearInterval(fq),4200);
   setTimeout(()=>{try{navigator.vibrate&&navigator.vibrate(12);}catch(e){}},1000);
   let done=false;const end=()=>{if(done)return;done=true;ov.classList.add('out');setTimeout(()=>ov.remove(),900);};
-  setTimeout(end,src.length?3600:2600);skip.addEventListener('click',e=>{e.stopPropagation();end();});ov.addEventListener('click',()=>{if(ov.classList.contains('opened'))end();});setTimeout(()=>ov.classList.add('opened'),1700);});}
+  setTimeout(end,src.length?3600:2600);skip.addEventListener('click',e=>{e.stopPropagation();end();});ov.addEventListener('click',()=>{if(ov.classList.contains('opened'))end();});setTimeout(()=>ov.classList.add('opened'),1700);};
+  if(seen)vault();else cardScene(vault);}
  /* ---------- copy all ---------- */
  function copyAll(btn){const list=visibleDeals();if(!list.length)return;const res=!own()&&M.on;const k=dealKey();
   const lines=[(res?((cli().biz||cli().name||'')+' · '):'Luxella · ')+"Today's deals",''];
