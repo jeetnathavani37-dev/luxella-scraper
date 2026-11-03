@@ -47,7 +47,6 @@ _Re-ordered by chief 2026-10-31 22:45 IST. Context: The Edit/Boutique still lock
 - Hourly QA cron is sparse: 3 schedule runs in ~18 h (02:30, 09:51, 16:39 UTC) — GitHub drops `:07` crons; try another minute or an external trigger (protected .github/).
 
 ## Inbox
-- (panel 2026-11-03, design) Floating coins cover content on iPhone: contact coin sits on Help "OPEN GUIDE" button (webkit-client-tab-help.png) and on Stats LIFETIME SPEND "₹45,00…" (webkit-client-tab-st.png); home welcome sheet (Track your parcel / View order / Got it) covers half the first screen (webkit-client-home.png). 3 buyers. Idea: 72px right safe-area on cards/buttons ≤430px, or coins hide until scroll stops; welcome as a one-line strip.
 - (panel 2026-11-03, Needs Jeet — promise) Gift/overseas line asked by 4 buyers (UK→Rajkot gift, South Africa, Indonesia gift box, Sydney gift card): "Gifts to another address with a note · overseas on request". Also 2 days running: Thai/Mexican/Turkish buyers expect 0% instalments.
 - (panel 2026-11-03) Senior buyers can't read the faint spaced capitals (PRIVATE CLIENT, footer L U X E L L A …, labels ~9px letter-spacing .3em). Design: min 11px + contrast ≥4.5 for helper caps.
 - (backend 2026-11-03 08:50 IST, 🔴 heartbeat) Whole agent fleet was silent ~42h: lx_agent_runs has ZERO rows from any agent between 01 Nov 08:11 UTC and 03 Nov 02:38 UTC (watchdog, chief, panel, security, growth, frontend, backend and the ops agents all missed; last repo commit was watchdog 01 Nov). Resumed today (watchdog 02:38, brain/ops 03:11 UTC). Cause is outside the repo (scheduled tasks paused / account) — Jeet: check the scheduled tasks list; Chief missed 2 days in a row.
@@ -67,6 +66,7 @@ _Re-ordered by chief 2026-10-31 22:45 IST. Context: The Edit/Boutique still lock
 - (backend 2026-10-31 08:55 IST) Farfetch-style partial staleness: fl_ 772 of 3,289 and nr_ 652 of 1,213 live pieces not seen since 28 Oct while the rest of each store syncs fine — likely sold out / delisted at source but still shown as live. Suggest: scraper deactivates a store's rows unseen for 72h *only when that store's run succeeded* (Needs Jeet ok — it hides ~1.4k pieces).
 
 ## Done
+- (design 2026-11-03) LIVE + contact buttons: right-edge stack (52–158px up) → one 46px row on the bottom line (contact in corner, LIVE left; step left when back-to-top shows). Help 'Open guide' + Stats '₹45,000' now clear (0bcc354; QA 41614238912 green, deploy skipped — VERCEL_TOKEN). Trade-off: in the 664px CI view the row now sits on Payments 'Total' at the screen bottom until you scroll. Still open from that panel note: home welcome sheet covers half the first screen.
 - (panel 2026-11-03) Hero "Updated on …" hidden when >7 days/missing (d65894c); Paid tick CSS-centred (59b6cab); quote form "Send on WhatsApp" prefilled (7d654aa). On main; prod still old until VERCEL_TOKEN.
 - (backend 2026-10-31) Alo Yoga Shopify pager: only an empty page ends the loop (520f26a); sync 41188255065 green → sh_alo 4,011/4,165 fresh.
 - (chief audit 2026-10-31) 8b0c370 + 517e9bb reviewed: compliant (no guarded areas, calm, no banned motion; __lxTick self-mutations throttled ≤1/s via takeRecords).
