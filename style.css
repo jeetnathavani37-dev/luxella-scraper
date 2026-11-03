@@ -4488,3 +4488,5 @@ html body #chat.chat .ch .chip{flex:0 0 auto;white-space:nowrap;max-width:none;o
 }
 /* panel 2026-11-01: second, quieter action on the locked Edit card */
 .dl-lock .dl-ask2{min-height:44px;padding:0 22px;margin-top:-2px}
+/* panel 2026-11-03: Paid tick drawn in CSS so it sits on the text's centre line in every engine (the ✓ glyph sat ~5px low in WebKit + Chrome) */
+.sw .stbtn.paid::before{content:""!important;flex:none;display:inline-block;width:8px;height:4px;margin:0 4px 3px 0!important;border-left:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:rotate(-45deg);font-size:0!important;vertical-align:middle}
