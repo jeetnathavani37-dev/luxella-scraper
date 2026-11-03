@@ -2,7 +2,7 @@
 
 | Role | Schedule (IST) | Owns |
 |---|---|---|
-| 🩺 Portal Watchdog (SRE) | every hour at :37 | CI QA results, prod uptime, crashes, JS errors, edge-function errors → fix fast |
+| 🩺 Portal Watchdog (SRE) | every 3 h at :37 (00:37, 03:37 … 21:37) | CI QA results, prod uptime, crashes, JS errors, edge-function errors → fix fast |
 | 💎 Global Buyer Panel (UX research) | daily 11:43 | 10 NEW buyers every day (4 India, 2 NRI, 4 international — see PERSONAS.md) judge the site vs their own luxury stores → ≤3 polish fixes |
 | 🎨 Design Director | Tue & Fri 15:17 | one meaningful design upgrade from the backlog, before/after screenshots |
 | 🖥️ Frontend & Motion Engineer | daily 16:37 | speed (load, long tasks, memory, image weight), animation quality (60 fps, no jank/bounce), accessibility, front-end code health → ≤2 fixes |

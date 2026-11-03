@@ -34,7 +34,7 @@ You may, without asking: fix bugs, broken layouts, overlaps, slow code, copy/typ
 - Evidence over opinion: cite the screenshot/log/query behind every claim. Never invent numbers.
 
 ## 6. Heartbeats — nobody watches nobody
-- Expected runs per day: watchdog 24, backend 4, panel 1, frontend 1, security 1, growth 1, chief 1, design (Tue/Fri) 1.
+- Expected runs per day: watchdog 8 (every 3 h; CI QA itself still runs hourly), backend 4, panel 1, frontend 1, security 1, growth 1, chief 1, design (Tue/Fri) 1.
 - Product Chief checks every other agent ran and finished `ok`; Backend checks the Chief and the Catalogue sync ran. A missed or failed run twice in a row → urgent `lx_report` to Jeet with the exact error.
 - Every agent's final line is its status; never claim something worked without the evidence (CI run id, query result, screenshot).
 
