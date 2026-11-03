@@ -51,6 +51,7 @@ async function capture(b, url, re, waitMs) {
   }
   const list = [...all.values()].sort((a, c) => c.trend - a.trend).slice(0, LIMIT); const batch = []; let saved = 0, done = 0, blocked = 0;
   for (const it of list) {
+    if (!/^https?:\/\//.test(String(it.img || ''))) { done++; continue; } // no photo → never list a blank tile
     const res = await capture(b, 'https://www.goat.com/' + (it.sneaker ? 'sneakers' : 'apparel') + '/' + it.slug, /buy_bar_data/, 12000);
     done++; const V = Array.isArray(res.out[0]) ? res.out[0] : [];
     if (res.st === 403) { blocked++; await sleep(15000); }
