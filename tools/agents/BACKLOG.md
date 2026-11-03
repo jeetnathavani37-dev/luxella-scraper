@@ -49,6 +49,7 @@ _Re-ordered by chief 2026-11-03 22:45 IST. Context: VERCEL_TOKEN now set — dep
 - Hourly QA cron is sparse: 3 schedule runs in ~18 h (02:30, 09:51, 16:39 UTC) — GitHub drops `:07` crons; try another minute or an external trigger (protected .github/).
 
 ## Inbox
+- (backend 2026-11-04) Frontend agent has no ledger row since 31 Oct 11:09 UTC (3 days) while chief/security/growth recovered on 03 Nov — Jeet: check the frontend scheduled task is enabled.
 _(empty — chief 2026-11-03 merged all items into Now/Next/Needs Jeet)_
 
 ## Done
