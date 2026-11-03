@@ -4490,3 +4490,16 @@ html body #chat.chat .ch .chip{flex:0 0 auto;white-space:nowrap;max-width:none;o
 .dl-lock .dl-ask2{min-height:44px;padding:0 22px;margin-top:-2px}
 /* panel 2026-11-03: Paid tick drawn in CSS so it sits on the text's centre line in every engine (the ✓ glyph sat ~5px low in WebKit + Chrome) */
 .sw .stbtn.paid::before{content:""!important;flex:none;display:inline-block;width:8px;height:4px;margin:0 4px 3px 0!important;border-left:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:rotate(-45deg);font-size:0!important;vertical-align:middle}
+/* ===== design 2026-11-03: corner buttons become one low row =====
+   The LIVE and contact buttons were stacked up the right edge (52–158px from the bottom) and sat
+   on cards mid-screen on iPhone: Help "Open guide", Stats "₹45,000" (panel 2026-11-03, 3 buyers).
+   Now they rest side by side on the bottom line, like a dock: contact in the corner, LIVE to its
+   left. When back-to-top appears (after 600px) it takes the corner and the pair steps one place
+   left. Footprint drops from ~160px tall to one 46px row. No new animation — position only. */
+html body .qcm#qc-main{bottom:max(16px,env(safe-area-inset-bottom,0px))!important;right:calc(max(16px,env(safe-area-inset-right,0px)) + 56px)!important}
+html body .hv-fab#hv-fab{bottom:max(16px,env(safe-area-inset-bottom,0px))!important;right:calc(max(16px,env(safe-area-inset-right,0px)) + 112px)!important}
+html body #qc-menu.qcmenu{bottom:calc(max(16px,env(safe-area-inset-bottom,0px)) + 64px)!important}
+html body:has(#totop[hidden]) .qcm#qc-main{right:max(16px,env(safe-area-inset-right,0px))!important}
+html body:has(#totop[hidden]) .hv-fab#hv-fab{right:calc(max(16px,env(safe-area-inset-right,0px)) + 56px)!important}
+html body #qc-menu.qcmenu{right:calc(max(16px,env(safe-area-inset-right,0px)) + 56px)!important}
+html body:has(#totop[hidden]) #qc-menu.qcmenu{right:max(16px,env(safe-area-inset-right,0px))!important}
