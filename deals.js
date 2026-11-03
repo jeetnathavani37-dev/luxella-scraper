@@ -57,6 +57,13 @@
    try{await photos.db.doc('requests/'+id).set({brand:d.brand||'',product:d.title||'',spec,qty:1,budget:num(d.price)||0,needBy:'',link:d.link||'',photo:d.img||'',note:nt.value.trim(),urgent:false,status:'Submitted',at:new Date().toISOString(),source:'deal',deal_id:r.id,ask:kind});
     markReq(r.id,kind);sh.close();{const b0=d.brand;say(isHigh(b0)?'Sent. '+b0+' confirms through its boutique — Luxella replies within 24 hours.':'Your enquiry is with Luxella. We will reply here and on WhatsApp.');}render();}
    catch(e){const m='Hi Luxella, '+ASK[kind].toLowerCase()+' for '+[d.brand,d.title].filter(Boolean).join(' ')+(sz.value?' · size '+sz.value:'')+'.';window.open('https://wa.me/'+WA+'?text='+encodeURIComponent(m),'_blank','noopener');sh.close();}});}
+ function priceSheet(r){const d=r.data||{};const sh=sheet();sh.box.appendChild(el('div','dl-sh-eb','Edit price'));sh.box.appendChild(el('div','dl-sh-t',[d.brand,d.title].filter(Boolean).join(' · ')));
+  const pr=el('input','dl-in');pr.type='number';pr.inputMode='numeric';pr.placeholder='Deal price ₹ (empty = price on request)';pr.value=d.price??'';const mr=el('input','dl-in');mr.type='number';mr.inputMode='numeric';mr.placeholder='Usual price ₹ (optional)';mr.value=d.mrp??'';
+  const lb=(t,i)=>{const l=el('label','dl-l');l.style.marginTop='10px';l.appendChild(el('span',null,t));l.appendChild(i);return l;};const er=el('p','dl-n');const go=el('button','btn dl-ask','Save price');go.type='button';[lb('Deal price ₹',pr),lb('Usual price ₹',mr),go,er].forEach(x=>sh.box.appendChild(x));setTimeout(()=>pr.focus(),320);
+  go.addEventListener('click',async()=>{go.disabled=true;er.textContent='';try{await window.lx.deals.update(r.id,Object.assign({},d,{price:num(pr.value),mrp:num(mr.value)}));sh.close();say('Price saved.');load();}catch(e){go.disabled=false;er.textContent='Could not save. Check the connection and try again.';}});}
+ function removeSheet(r){const d=r.data||{};const sh=sheet();sh.box.appendChild(el('div','dl-sh-eb','Remove deal'));sh.box.appendChild(el('div','dl-sh-t',[d.brand,d.title].filter(Boolean).join(' · ')));sh.box.appendChild(el('p','dl-n','Clients will no longer see this piece. This cannot be undone.'));
+  const er=el('p','dl-n');const go=el('button','btn dl-ask','Remove');go.type='button';const no=el('button','btn2','Keep it');no.type='button';no.addEventListener('click',sh.close);[go,no,er].forEach(x=>sh.box.appendChild(x));
+  go.addEventListener('click',async()=>{go.disabled=true;er.textContent='';try{await window.lx.deals.remove(r.id);sh.close();say('Deal removed.');load();}catch(e){go.disabled=false;er.textContent='Could not remove. Try again.';}});}
  function sheet(){const ov=el('div','dl-sh');const box=el('div','dl-sh-b');const x=el('button','x','×');x.type='button';x.setAttribute('aria-label','Close');box.appendChild(x);ov.appendChild(box);const close=()=>{ov.classList.remove('in');setTimeout(()=>ov.remove(),300);};x.addEventListener('click',close);ov.addEventListener('click',e=>{if(e.target===ov)close();});(document.querySelector('.sw')||document.body).appendChild(ov);requestAnimationFrame(()=>ov.classList.add('in'));return {box,close};}
 
  /* ---------- quote card (client's own style) ---------- */
@@ -140,10 +147,10 @@
   bd.appendChild(actions(r,true));c.appendChild(bd);return c;}
  function actions(r,compact){const d=r.data||{};const ac=el('div','dl-ac');
   if(own()){
-   const ep=el('button','btn2','Edit price');ep.type='button';ep.addEventListener('click',async()=>{const v=prompt('Deal price ₹ (leave empty for "price on request")',d.price??'');if(v===null)return;const m=prompt('Usual price ₹ (optional)',d.mrp??'');const nd=Object.assign({},d,{price:num(v),mrp:m===null?d.mrp:num(m)});try{await window.lx.deals.update(r.id,nd);load();}catch(e){alert('Could not save.');}});ac.appendChild(ep);
+   const ep=el('button','btn2','Edit price');ep.type='button';ep.addEventListener('click',()=>priceSheet(r));ac.appendChild(ep);
    const so=el('button','btn2',d.sold?'Mark available':'Mark sold out');so.type='button';so.addEventListener('click',async()=>{try{await window.lx.deals.update(r.id,Object.assign({},d,{sold:!d.sold}));load();}catch(e){alert('Could not save.');}});ac.appendChild(so);
    const nb=el('button','btn2','Notify');nb.type='button';nb.addEventListener('click',()=>notifySheet(r));ac.appendChild(nb);
-   const x=el('button','btn2 dl-del','Remove');x.type='button';x.addEventListener('click',async()=>{if(!confirm('Remove this deal?'))return;try{await window.lx.deals.remove(r.id);load();}catch(e){alert('Could not remove.');}});ac.appendChild(x);return ac;}
+   const x=el('button','btn2 dl-del','Remove');x.type='button';x.addEventListener('click',()=>removeSheet(r));ac.appendChild(x);return ac;}
   if(d.sold){const s=el('button','btn2','Ask for something similar');s.type='button';s.addEventListener('click',()=>request(r,'similar'));ac.appendChild(s);return ac;}
   const main=el('button','btn dl-ask',num(d.price)==null?'Enquire':'I want this');main.type='button';main.addEventListener('click',()=>request(r,num(d.price)==null?'price':'buy'));ac.appendChild(main);
   const av=el('button','btn2','Availability');av.type='button';av.addEventListener('click',()=>request(r,'availability'));ac.appendChild(av);
