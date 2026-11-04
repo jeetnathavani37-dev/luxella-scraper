@@ -43,3 +43,9 @@ You may, without asking: fix bugs, broken layouts, overlaps, slow code, copy/typ
 - Shared backlog: `tools/agents/BACKLOG.md` — the Product Chief owns order; anyone may add items under "Inbox".
 - Ledger: first SQL `select lx_agent_start('<role>');`, last `select lx_agent_done('<role>','<one line>','<ok|error>');` (ignore if they error).
 - Report: `select lx_report('<role>','<Hinglish text>','[]'::jsonb,<urgent bool>,false,'group');` — only when there is something worth Jeet's attention, except the scheduled daily briefs.
+
+## 8. Fleet rules (Jeet, 2026-11-05) — every run
+1. **Retry once:** if a step fails (SQL error, timeout, fetch/API error, flaky CI poll), retry it once. If it fails again, finish the rest of the run and report that step as failed.
+2. **Stuck → Fixer, not Jeet:** a technical problem you cannot solve yourself (error, permission refusal, function/cron down, missing tool) goes to the 🔧 Fixer as one ticket: `select lx_ticket_open('<role>','fixer',null,'<what broke + exact error>',2);`. Don't open a second one if an open fixer ticket from you with the same error exists.
+3. **Always close the ledger:** your LAST statement is always `lx_agent_done('<role>','<one line>','ok'|'error')`, also when the run failed — status `error` honestly.
+- Never ask Jeet something the data already answers (check the order/doc first).
