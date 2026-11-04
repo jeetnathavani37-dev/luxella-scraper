@@ -49,6 +49,9 @@ _Re-ordered by chief 2026-11-03 22:45 IST. Context: VERCEL_TOKEN now set — dep
 - Hourly QA cron is sparse: 3 schedule runs in ~18 h (02:30, 09:51, 16:39 UTC) — GitHub drops `:07` crons; try another minute or an external trigger (protected .github/).
 
 ## Inbox
+- (growth 2026-11-04) Track product views + Edit/Boutique opens + search terms (tiny `lx_visit`-style rpc per product open / search with 0 results) — today growth cannot say which pieces get attention without enquiry; 3rd run asking.
+- (growth 2026-11-04) Owner panel: "Drafted, not sent" badge/count on Requests (5/5 real requests have `data.draft` but stay Submitted 5–7 days) + one-tap Send — the reply step is the funnel blocker.
+- (growth 2026-11-04) Nykaa is marking down MK/KS (Arden −45%, Dumpling −13% in a day): add a daily India-price watch for live Edit pieces so a deal never goes live costlier than India.
 - (panel 2026-11-04) Named advisor + "See it on a video call" (Tanishq-style) button on the locked Edit card and Help — 3 buyers (UAE, Madrid, Coimbatore senior). Needs Jeet: who is the advisor, when are calls offered.
 - (panel 2026-11-04) Terms tab shows "Terms will be published here." directly under the 5-clause Short Version when a client has no `photos.terms` (app.js:470) — reads as contradictory (Houston, Dehradun buyers). Either publish real terms per client or change the empty line to point at the Short Version / WhatsApp (copy = business call).
 - (panel 2026-11-04) Payments top: corner LIVE+contact row covers TOTAL ₹45,000 in the 664px CI view (webkit-client-tab-pay.png) — give the Paid/Due/Total row bottom margin ≥64px on ≤700px-tall screens (design).
