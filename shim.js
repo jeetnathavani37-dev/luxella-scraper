@@ -29,7 +29,7 @@ window.d3={max:(a,f)=>a.length?Math.max(...a.map(f)):undefined,
 /* ---- state ---- */
 const S={session:null,email:'',owner:false,client:null,orders:[],docs:{},listeners:{coll:{},doc:{}},onData:[],calcs:{},channel:null,ready:false};
 const g=id=>document.getElementById(id);
-const esc=s=>String(s==null?'':s);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
 /* ---- auth gate ---- */
 function gate(html){const w=g('gate');w.hidden=false;w.innerHTML='<div class="box">'+html+'</div>';g('dash-root').hidden=true;g('top').hidden=true;}

@@ -28,7 +28,7 @@ function line(r: any) {
 
 async function getAI() { const { data } = await db.from("lx_km_vault").select("data").eq("id", "ai").maybeSingle(); const a = data?.data || null; return a && a.key ? a : (Deno.env.get("GEMINI_API_KEY") ? { provider: "gemini", key: Deno.env.get("GEMINI_API_KEY") } : null); }
 function facts(rows: any[], hasPop: Set<string>) {
-  return rows.map((r: any) => ({ item: r.item, brand: r.brand || "", order_no: r.order_no || "", stage: STAGES[stage(r) - 1] || r.status || "", eta: r.eta_date || "", eta_passed: !!(r.eta_date && String(r.eta_date).slice(0, 10) < new Date().toISOString().slice(0, 10) && stage(r) < 9), ordered: r.order_date || "", india_tracking: r.local_tracking || "", courier: r.local_courier || "", amount_inr: Number(r.payout || 0), payment: r.payout_status === "Pending" ? "due" : "paid", paid_so_far_inr: (globalThis as any).__PAID?.[pslug(r.item)] || 0, proof_of_purchase: hasPop.has(pslug(r.item)), luxella_updates: (globalThis as any).__NOTES?.[pslug(r.item)] || [] }));
+  return rows.map((r: any) => ({ item: r.item, brand: r.brand || "", order_no: r.order_no || "", stage: STAGES[stage(r) - 1] || r.status || "", eta: r.eta_date || "", eta_passed: !!(r.eta_date && String(r.eta_date).slice(0, 10) < new Date().toISOString().slice(0, 10) && stage(r) < 9), ordered: r.order_date || "", india_tracking: r.local_tracking || "", courier: r.local_courier || "", amount_inr: Number(r.payout || 0), payment: r.payout_status === "Pending" ? "due" : "paid", paid_so_far_inr: r.__paid || 0, proof_of_purchase: hasPop.has(pslug(r.item)), luxella_updates: r.__notes || [] }));
 }
 async function aiAnswer(ai: any, first: string, rows: any[], hasPop: Set<string>, q: string, audio: string, mime: string, hist: any[], hint = "") {
   const sys = `You are Aanya, the personal concierge at Luxella (a luxury personal-shopping service: Luxella buys from official US/UK stores and delivers to India, all-inclusive). You are on a live voice call with your client ${first}. Sound like a real, warm, sharp human concierge — never robotic, never like a script.
@@ -102,7 +102,7 @@ Deno.serve(async (req) => {
   const page = PORTAL + (cl?.slug || "");
   const rows = (o || []).map((x: any) => ({ item: x.item, ...x.data })).filter((r: any) => !/cancel/i.test(String(r.status || "")));
   const hasPop = new Set((pops || []).map((p: any) => p.doc_id));
-  (globalThis as any).__NOTES = NOTES; (globalThis as any).__PAID = PAID;
+  for (const r of rows) { r.__notes = NOTES[pslug(r.item)]; r.__paid = PAID[pslug(r.item)]; }
   const first = String(cl?.name || "").split(" ")[0] || "there";
   const today = new Date().toISOString().slice(0, 10);
   const card = (r: any) => r ? { item: r.item, brand: r.brand || "", order_no: r.order_no || "", n: stage(r), stage: STAGES[stage(r) - 1] || r.status || "", eta: r.eta_date ? fd(r.eta_date) : "", late: !!(r.eta_date && String(r.eta_date).slice(0, 10) < today && stage(r) < 9), ordered: r.order_date ? fd(r.order_date) : "", tracking: r.local_tracking || "", courier: r.local_courier || "", track_url: r.track_url || "", amount: Number(r.payout || 0), paid: r.payout_status !== "Pending", img: r.photo_url || PH[pslug(r.item)] || "", proof: hasPop.has(pslug(r.item)) } : null;
