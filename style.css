@@ -4505,3 +4505,10 @@ html body:has(#totop[hidden]) .hv-fab#hv-fab{right:calc(max(16px,env(safe-area-i
 html body #qc-menu.qcmenu{right:calc(max(16px,env(safe-area-inset-right,0px)) + 56px)!important}
 html body:has(#totop[hidden]) #qc-menu.qcmenu{right:max(16px,env(safe-area-inset-right,0px))!important}
 @media (prefers-reduced-motion:reduce){#pane-deals *,#pane-deals *::before,#pane-deals *::after,.dl-sh,.dl-sh *,.dl-sh *::before,.dl-sh *::after,.dl-vault *,.dl-vault *::before,.dl-vault *::after,.dl-intro *,.dl-intro *::before,.dl-intro *::after,.cl-page *,.cl-page *::before,.cl-page *::after{animation-duration:.01ms!important;animation-delay:0s!important;animation-iteration-count:1!important;transition-duration:.01ms!important;transition-delay:0s!important;scroll-behavior:auto!important}}
+/* panel 2026-11-04: LIVE button alone in mid-air. Inside The Edit / Boutique / product overlay and
+   with the chat open, the contact button is covered, so LIVE floated by itself ~70% across the
+   bottom (webkit-client-edit/boutique/product.png) and sat on the "How does ordering work?" chip
+   (webkit-client-chat-open.png). In the overlay LIVE takes the corner; with the chat open it steps
+   away (the chat is already the assistant). Position/opacity only, no new motion. */
+html body.dl-imm:has(#hv-fab) .hv-fab#hv-fab{right:max(16px,env(safe-area-inset-right,0px))!important}
+html body:has(#chat:not([hidden])) .hv-fab#hv-fab{opacity:0!important;pointer-events:none!important}
