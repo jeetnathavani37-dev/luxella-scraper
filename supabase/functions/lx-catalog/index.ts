@@ -42,14 +42,23 @@ function mapProduct(p: any, disc: number, seg = "luxury", vend = "", on = true, 
   const images = (p.images || []).slice(0, 6).map((i: any) => String(i.src || "").split("?")[0]).filter(Boolean);
   if (!images.length) return null;
   const por = POR.has(brand);
-  return { row: { id: "c" + p.id, brand, title, category: CAT(String(p.product_type || ""), tags, title), gender, price: por ? null : price, mrp: null && mrp, sizes: por ? sizes.map((x: any) => ({ s: x.s, p: null })) : sizes, images, ship, segment: seg, active: on && !OUTLET_BRANDS.has(brand) && price <= maxP, trend: Math.round(70 * Math.exp(-pos / 1500) * 10) / 10 + (hash(String(p.id)) % 100) / 1000, seen_at: new Date().toISOString() }, src: { id: "c" + p.id, src_handle: String(p.handle || ""), src_prices: av.map((v: any) => [v.title, Number(v.price)]), updated_at: new Date().toISOString() } };
+  return { row: { id: "c" + p.id, brand, title, category: CAT(String(p.product_type || ""), tags, title), gender, price: por ? null : price, mrp: null && mrp, sizes: por ? sizes.map((x: any) => ({ s: x.s, p: null })) : sizes, images, ship, segment: seg, active: on && !HIDE.has(brand) && price <= maxP, trend: Math.round(70 * Math.exp(-pos / 1500) * 10) / 10 + (hash(String(p.id)) % 100) / 1000, seen_at: new Date().toISOString() }, src: { id: "c" + p.id, src_handle: String(p.handle || ""), src_prices: av.map((v: any) => [v.title, Number(v.price)]), updated_at: new Date().toISOString() } };
 }
 const BR = ["Hermès","Louis Vuitton","Chanel","Dior","Gucci","Prada","Miu Miu","Bottega Veneta","Saint Laurent","Celine","Fendi","Loewe","Balenciaga","Valentino Garavani","Valentino","Givenchy","Versace","Burberry","Ferragamo","Tod's","Loro Piana","Brunello Cucinelli","Zegna","Moncler","Alexander McQueen","Alexander Wang","Balmain","Lanvin","Chloé","Jacquemus","Jil Sander","Maison Margiela","Marni","Off-White","Amiri","Rick Owens","Golden Goose","Christian Louboutin","Jimmy Choo","Goyard","MCM","Mulberry","Longchamp","Tory Burch","Coach","Michael Kors","Kate Spade","Karl Lagerfeld","Marc Jacobs","Polo Ralph Lauren","Ralph Lauren","Ted Baker","Emporio Armani","Giorgio Armani","Armani Exchange","EA7","Armani","Kenzo","Ami Paris","Alaïa","Dolce & Gabbana","Philipp Plein","Tom Ford","Rimowa","Montblanc","Bvlgari","Cartier","Rolex","Omega","Tag Heuer","Rado","Hamilton","Citizen","Tissot","Longines","Swatch","Gentle Monster","Ganni","RM Williams","Maison Mihara Yasuhiro","Denim Tears","Sp5der","KAWS","Hellstar","Supreme","Rhude","A.P.C.","Mastermind","Godspeed","On","Lululemon","UGG","Dr. Martens","JW Pei","Converse","Salomon","Autry","Sprayground","New Era","Matin Kim","Diesel","Hugo Boss","Calvin Klein","Tommy Hilfiger","Jordan","Nike","Adidas","Yeezy","New Balance","Asics","Essentials","Fear of God","Stüssy","A Bathing Ape","Palm Angels","Corteiz","Represent","Gallery Dept.","Chrome Hearts","Aimé Leon Dore","Onitsuka Tiger","Vans","Puma"];
 const fold = (x: string) => x.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9&]+/g, " ").trim();
 const BRF = BR.map((b) => [fold(b), b] as [string, string]).sort((a, b) => b[0].length - a[0].length);
 const FIX: Record<string, string> = { "hermes": "Hermès", "louisvuitton": "Louis Vuitton", "blalenciaga": "Balenciaga", "chloe": "Chloé", "off white": "Off-White", "offwhite": "Off-White", "dr martens": "Dr. Martens", "maison mihara yasuhio": "Maison Mihara Yasuhiro", "alaia": "Alaïa", "bulgari": "Bvlgari" };
 const hash = (x: string) => { let h = 0; for (let i = 0; i < x.length; i++) h = (h * 31 + x.charCodeAt(i)) | 0; return Math.abs(h); };
-const OUTLET_BRANDS = new Set(["Michael Kors", "Coach", "Kate Spade"]);
+// Partner copies of these brands stay hidden while the brand's own outlet scrape is fresh (seen in 48 h).
+// When the outlet scrape is down (403 on GitHub IPs), the partner copies go live instead. Errors keep them hidden.
+const OUTLET_BRANDS: Record<string, string> = { "Michael Kors": "mk_", "Coach": "co_", "Kate Spade": "ks_" };
+let HIDE = new Set(Object.keys(OUTLET_BRANDS)); let hideAt = 0;
+async function refreshHide() {
+  if (Date.now() - hideAt < 36e5) return;
+  const cut = new Date(Date.now() - 2 * 864e5).toISOString(); const next = new Set<string>();
+  for (const [b, pre] of Object.entries(OUTLET_BRANDS)) { const { count, error } = await db.from("lx_catalog").select("id", { count: "exact", head: true }).like("id", pre + "%").gt("seen_at", cut); if (error || (count || 0) > 0) next.add(b); }
+  HIDE = next; hideAt = Date.now();
+}
 const POR = new Set(["Hermès","Louis Vuitton","Chanel","Dior","Gucci","Prada","Miu Miu","Bottega Veneta","Saint Laurent","Celine","Fendi","Loewe","Balenciaga","Valentino","Valentino Garavani","Givenchy","Versace","Burberry","Ferragamo","Loro Piana","Brunello Cucinelli","Moncler","Alexander McQueen","Christian Louboutin","Goyard","Cartier","Rolex","Omega","Bvlgari","Tom Ford","Dolce & Gabbana","Zegna","Tod's"]);
 function canonBrand(vendor: string, title: string) {
   for (const s of [vendor, title]) { const f = fold(s); if (FIX[f]) return FIX[f]; for (const [k, v] of BRF) if (f === k || f.startsWith(k + " ")) return v; for (const [k, v] of Object.entries(FIX)) if (f.startsWith(k + " ")) return v; }
@@ -68,6 +77,7 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: CORS });
   try {
     const c: any = await cfg(); if (!(await allowed(req, c))) return J({ ok: false, error: "not allowed" }, 403);
+    await refreshHide();
     const body: any = await req.json().catch(() => ({}));
     const disc = Number(body.discount ?? c.discount ?? 15);
     if (body.action === "sync") {
