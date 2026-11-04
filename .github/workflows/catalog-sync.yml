@@ -6,7 +6,9 @@ on:
   workflow_dispatch:
     inputs:
       job:
-        description: 'which job (outlets | goat | all | blocked)'
+        description: 'which job'
+        type: choice
+        options: [all, outlets, goat, blocked]
         default: 'all'
 concurrency:
   group: catalog-sync
@@ -38,7 +40,7 @@ jobs:
         continue-on-error: true
       - name: Summary (warns on every store that saved 0)
         if: always()
-        run: node scripts/sync_summary.js sync.log
+        run: node scripts/sync_summary.js sync.log --expect=shopify,tb,strath,ssense,flannels,rack,tedbaker
   blocked:
     # Manual retry for stores that block GitHub IPs. No proxies or bot-check workarounds.
     if: github.event_name == 'workflow_dispatch' && github.event.inputs.job == 'blocked'
@@ -63,7 +65,7 @@ jobs:
         continue-on-error: true
       - name: Summary
         if: always()
-        run: node scripts/sync_summary.js sync.log
+        run: node scripts/sync_summary.js sync.log --expect=coach,ks,mk,sephora,macys,furla
   goat:
     if: github.event_name == 'workflow_dispatch' && contains('all goat', github.event.inputs.job) || github.event.schedule == '43 22 * * *'
     runs-on: ubuntu-latest

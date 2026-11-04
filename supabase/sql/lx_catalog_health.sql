@@ -1,10 +1,23 @@
 -- lx_catalog_health: daily catalogue hygiene (cron 01:00 UTC = 06:30 IST, after the night sync).
 -- 1. Hides live pieces not seen for 7 days (price/stock too old to sell). Ingest sets active=true again when a piece is seen.
+--    Every hidden id is logged in lx_catalog_hide_log (undo: update lx_catalog set active=true where id in (select id from
+--    lx_catalog_hide_log where hidden_at::date = '<day>')).
 --    Safety lock: if more than 25% of live pieces would go at once, nothing is hidden and a critical exception is raised.
--- 2. Raises `catalog_store_stale` per store (id prefix) that scraped 100+ pieces in 30 days but 0 in the last 48 h.
---    It auto-resolves when the store is fresh again.
+-- 2. Raises `catalog_store_stale` per store that scraped 100+ pieces in 30 days but 0 in the last 48 h.
+--    Store = id prefix (sh_<shop> for Shopify brands, else text before the first "_", partner rows = "c").
+--    It resolves only when the store has a fresh row again (a store dead for 30+ days stays open until Jeet closes it).
 -- select lx_catalog_health();       -- dry run: counts only, writes nothing
 -- select lx_catalog_health(false);  -- real run (what cron does)
+create table if not exists public.lx_catalog_hide_log (id text not null, hidden_at timestamptz not null default now());
+create index if not exists lx_catalog_hide_log_at on public.lx_catalog_hide_log (hidden_at);
+alter table public.lx_catalog_hide_log enable row level security;  -- no policies: service role / postgres only
+revoke all on public.lx_catalog_hide_log from anon, authenticated;
+
+create or replace function public.lx_catalog_store(p_id text) returns text
+language sql immutable set search_path = public as $$
+  select coalesce(substring(p_id from '^(sh_[a-z0-9]+|[a-z0-9]+)_'), left(p_id, 1))
+$$;
+
 create or replace function public.lx_catalog_health(p_dry boolean default true) returns jsonb
 language plpgsql security definer set search_path = public as $$
 declare v_active int; v_old int; v_hidden int := 0; v_blocked boolean; r record; v_stale text[] := '{}';
@@ -18,14 +31,15 @@ begin
         format('Auto-hide skipped: %s of %s live pieces are older than 7 days (over 25%%)', v_old, v_active),
         'Check Catalogue sync, then hide by hand if right');
     else
-      update lx_catalog set active = false where active and seen_at < now() - interval '7 days';
+      with h as (update lx_catalog set active = false where active and seen_at < now() - interval '7 days' returning id)
+      insert into lx_catalog_hide_log (id) select id from h;
       get diagnostics v_hidden = row_count;
       update lx_exceptions set status = 'resolved', resolved_at = now(), resolved_by = 'auto'
         where status = 'open' and rule = 'catalog_hide_blocked';
     end if;
   end if;
   for r in
-    select substring(id from '^[a-z]{1,6}') store, count(*) n30, max(seen_at) last_seen
+    select lx_catalog_store(id) store, count(*) n30, max(seen_at) last_seen
     from lx_catalog where seen_at > now() - interval '30 days'
     group by 1 having count(*) >= 100 and max(seen_at) < now() - interval '48 hours'
   loop
@@ -39,7 +53,8 @@ begin
   end loop;
   if not p_dry then
     update lx_exceptions set status = 'resolved', resolved_at = now(), resolved_by = 'auto'
-      where status = 'open' and rule = 'catalog_store_stale' and not (ref = any (select 'store:' || s from unnest(v_stale) s));
+      where status = 'open' and rule = 'catalog_store_stale'
+        and substr(ref, 7) in (select lx_catalog_store(id) from lx_catalog where seen_at > now() - interval '48 hours');
   end if;
   return jsonb_build_object('dry', p_dry, 'active', v_active, 'older_7d', v_old, 'blocked', v_blocked, 'hidden', v_hidden, 'stale_stores', to_jsonb(v_stale));
 end $$;
