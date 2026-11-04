@@ -49,6 +49,10 @@ _Re-ordered by chief 2026-11-03 22:45 IST. Context: VERCEL_TOKEN now set — dep
 - Hourly QA cron is sparse: 3 schedule runs in ~18 h (02:30, 09:51, 16:39 UTC) — GitHub drops `:07` crons; try another minute or an external trigger (protected .github/).
 
 ## Inbox
+- (panel 2026-11-04) Named advisor + "See it on a video call" (Tanishq-style) button on the locked Edit card and Help — 3 buyers (UAE, Madrid, Coimbatore senior). Needs Jeet: who is the advisor, when are calls offered.
+- (panel 2026-11-04) Terms tab shows "Terms will be published here." directly under the 5-clause Short Version when a client has no `photos.terms` (app.js:470) — reads as contradictory (Houston, Dehradun buyers). Either publish real terms per client or change the empty line to point at the Short Version / WhatsApp (copy = business call).
+- (panel 2026-11-04) Payments top: corner LIVE+contact row covers TOTAL ₹45,000 in the 664px CI view (webkit-client-tab-pay.png) — give the Paid/Due/Total row bottom margin ≥64px on ≤700px-tall screens (design).
+- (panel 2026-11-04, QA) search-type and chat-close screenshots both still show the chat sheet open → search screen not actually captured (protected tools/qa).
 - (backend 2026-11-04) Frontend agent has no ledger row since 31 Oct 11:09 UTC (3 days) while chief/security/growth recovered on 03 Nov — Jeet: check the frontend scheduled task is enabled.
 _(empty — chief 2026-11-03 merged all items into Now/Next/Needs Jeet)_
 
