@@ -26,12 +26,12 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: 20 }
       - run: npm i playwright && npx playwright install --with-deps chromium
-      # Coach, Kate Spade, MK, Sephora and Macy's block GitHub IPs (403/empty since 28 Oct): they run only via job=blocked.
+      # Coach, Kate Spade, MK, Sephora, Macy's and Furla block GitHub IPs (403/empty since 28 Oct): they run only via job=blocked.
       # Partner copies of MK/Coach/Kate Spade go live while their outlet rows are stale (lx-catalog HIDE).
       - name: Official stores
         run: node scripts/outlet_scrape.js shopify,tb 2>&1 | tee -a sync.log
-      - name: More stores (Strath, Furla)
-        run: node scripts/more_scrape.js shopify,strath,furla 2>&1 | tee -a sync.log
+      - name: More stores (Shopify brands, Strathberry)
+        run: node scripts/more_scrape.js shopify,strath 2>&1 | tee -a sync.log
         continue-on-error: true
       - name: Market (Ssense, Flannels, Rack, Ted Baker)
         run: node scripts/market_scrape.js 2>&1 | tee -a sync.log
@@ -57,8 +57,8 @@ jobs:
       - name: Coach, Kate Spade, MK
         run: node scripts/outlet_scrape.js coach,ks,mk 2>&1 | tee -a sync.log
         continue-on-error: true
-      - name: Sephora, Macy's
-        run: node scripts/more_scrape.js sephora,macys 2>&1 | tee -a sync.log
+      - name: Sephora, Macy's, Furla
+        run: node scripts/more_scrape.js sephora,macys,furla 2>&1 | tee -a sync.log
         env: { MORE_SHOPIFY: '0' }   # the outlets job already refreshes the Shopify brands
         continue-on-error: true
       - name: Summary
