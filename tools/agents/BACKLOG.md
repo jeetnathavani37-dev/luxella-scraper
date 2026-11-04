@@ -53,6 +53,9 @@ _Re-ordered by chief 2026-11-03 22:45 IST. Context: VERCEL_TOKEN now set — dep
 - (panel 2026-11-04) Terms tab shows "Terms will be published here." directly under the 5-clause Short Version when a client has no `photos.terms` (app.js:470) — reads as contradictory (Houston, Dehradun buyers). Either publish real terms per client or change the empty line to point at the Short Version / WhatsApp (copy = business call).
 - (panel 2026-11-04) Payments top: corner LIVE+contact row covers TOTAL ₹45,000 in the 664px CI view (webkit-client-tab-pay.png) — give the Paid/Due/Total row bottom margin ≥64px on ≤700px-tall screens (design).
 - (panel 2026-11-04, QA) search-type and chat-close screenshots both still show the chat sheet open → search screen not actually captured (protected tools/qa).
+- (frontend 2026-11-04) Scroll reveal breaks the motion standard: style.css:1269-1271 animates `filter: blur(6px)` + `clip-path` for 1–1.1 s (h2 line 1.4 s) on every card → drop blur/clip-path, opacity+transform only, 500–600 ms ease-out. Paint cost on iPhone + slow-feeling tabs.
+- (frontend 2026-11-04) Remaining forever timers on client pages: neworder.js:236 payments tick 2 s (JSON.stringify of all orders) and :249 address fill 2.5 s — both already have dash.onData → drop the intervals; app.js:590 ETA pills 30 s fine. extras.js renderOps / deals.js:1594 carousel still per backlog Now #3.
+- (frontend 2026-11-04) app.js:1 chat mic button uses emoji 🎙 as its label (app.js:317) — §5 no emoji in client UI; swap for the SVG mic used by hv-fab.
 - (backend 2026-11-04) Frontend agent has no ledger row since 31 Oct 11:09 UTC (3 days) while chief/security/growth recovered on 03 Nov — Jeet: check the frontend scheduled task is enabled.
 _(empty — chief 2026-11-03 merged all items into Now/Next/Needs Jeet)_
 
