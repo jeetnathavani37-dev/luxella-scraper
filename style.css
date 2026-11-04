@@ -4516,3 +4516,7 @@ html body:has(#chat:not([hidden])) .hv-fab#hv-fab{opacity:0!important;pointer-ev
    was 8.5px, .4em tracking, #5A554C on #0B0B0C = 2.7:1 — unreadable for older clients (Backlog Now #2).
    Now 11px, .24em, #8C857A = 5.4:1. Same quiet tone, just legible. */
 html body .sw .colophon{font-size:11px;letter-spacing:.24em;color:#8C857A}
+/* panel 2026-11-04: Address tab — the sticky Submit/Save bar faded in over 30% of its height, so the
+   intro note showed through beside "Submit address for this order" ("…d tap", webkit-client-tab-ad.png).
+   Fade over the first 14px only, so the buttons always sit on solid black. */
+html body .ad-sticky{background:linear-gradient(180deg,rgba(11,11,12,0),#0B0B0C 14px)!important}
