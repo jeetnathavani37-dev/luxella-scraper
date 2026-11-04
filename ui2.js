@@ -9,7 +9,7 @@ const fdate=s=>{if(!s)return '';const d=new Date(String(s).slice(0,10)+'T00:00:0
 /* 1 · sticky tabs: no gap between top bar, tabs and the mini strip */
 const setH=()=>{const t=$('.sw .tabs');if(t)document.documentElement.style.setProperty('--tabsH',Math.round(t.getBoundingClientRect().height)+'px');};
 setH();window.addEventListener('resize',setH);try{const ro=new ResizeObserver(setH);const t=$('.sw .tabs');if(t)ro.observe(t);}catch(e){}
-setInterval(setH,2000);
+{let k=0;const hk=()=>{if(window.__lxTick)return window.__lxTick(setH);if(++k<60)setTimeout(hk,250);};hk();} /* was a forever 2 s interval; ResizeObserver + shared tick cover it */
 const glue=()=>{const t=$('.sw .tabs'),m=$('.sw .mini');if(!t||!m)return;const r=t.getBoundingClientRect();const tt=parseFloat(getComputedStyle(t).top)||0;if(r.top<=tt+80){m.style.setProperty('top',Math.round(r.bottom-1)+'px','important');}};
 window.addEventListener('scroll',glue,{passive:true});window.addEventListener('resize',glue);setTimeout(glue,500);
 
