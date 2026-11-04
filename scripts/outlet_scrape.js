@@ -185,7 +185,7 @@ const SHOPS = [
   ['demellier', 'DeMellier', 'https://www.demellierlondon.com', 'USD', 'luxury', '2–3 weeks'],
   ['cultgaia', 'Cult Gaia', 'https://cultgaia.com', 'USD', 'luxury', '2–3 weeks'],
   ['wandler', 'Wandler', 'https://www.wandler.com', 'USD', 'luxury', '2–3 weeks'],
-  ['telfar', 'Telfar', 'https://telfar.net', 'USD', 'lifestyle', '2–3 weeks'],
+  ['telfar', 'Telfar', 'https://shop.telfar.net', 'USD', 'lifestyle', '2–3 weeks'],
   ['songmont', 'Songmont', 'https://songmontofficial.com', 'USD', 'lifestyle', '2–3 weeks'],
   ['cambridge', 'Cambridge Satchel', 'https://us.cambridgesatchel.com', 'USD', 'lifestyle', '2–3 weeks'],
   ['simonmiller', 'Simon Miller', 'https://www.simonmillerusa.com', 'USD', 'luxury', '2–3 weeks'],

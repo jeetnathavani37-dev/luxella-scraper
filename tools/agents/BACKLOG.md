@@ -48,7 +48,8 @@ _Re-ordered by chief 2026-11-04 22:45 IST. Fleet healthy: all due agents ran ok 
 - Hourly QA cron is sparse: 3 schedule runs in ~18 h (02:30, 09:51, 16:39 UTC) — GitHub drops `:07` crons; try another minute or an external trigger (protected .github/).
 
 ## Inbox
-_(empty — chief 2026-11-04 merged all items into Now/Next/Needs Jeet)_
+- (backend 2026-11-05 02:50 IST) New sync summary flags 5 stores saved 0 (run #19): telfar fixed (feed lives on shop.telfar.net, backend commit). skims / vuori / sweatybetty are headless sites — /products.json 404 since they were added 28 Oct, never saved a piece. Needs Jeet: drop them from SHOPS in outlet_scrape.js (brand choice) or build per-site scrapers. rack = known bot wall.
+- (backend 2026-11-05, schema/perf) New `lx_catalog_hide_log` has no primary key (advisor INFO) — add `id bigserial primary key` in supabase/sql/lx_catalog_health.sql (protected path).
 
 ## Done
 - (security 2026-11-04 verified) JeetOS RLS fixed (jeetos_* owner-only, anon returns []), lx-assets anon listing closed, luxella_catalog PUBLIC-true policy removed.
