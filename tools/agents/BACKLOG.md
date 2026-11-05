@@ -47,6 +47,7 @@ _Re-ordered by chief 2026-11-04 22:45 IST. Fleet healthy: all due agents ran ok 
 - Hourly QA cron is sparse: 3 schedule runs in ~18 h (02:30, 09:51, 16:39 UTC) — GitHub drops `:07` crons; try another minute or an external trigger (protected .github/).
 
 ## Inbox
+- (growth 2026-11-05, idea) Event tracking is still missing after 7 runs: log Edit open, product view (piece id) and search term (+ zero-result flag) into lx_docs or a small events table, so growth can see attention-without-enquiry and empty searches. Schema = Needs Jeet.
 - (panel 2026-11-05, Needs Jeet — data write) 2 of 5 real clients have no `meta/terms` doc in lx_docs (3 have the 17 KB policy) → their Terms tab shows only the empty state and the 5 short-version taps find nothing. Copy the policy doc to those 2 clients (lx_docs write = guarded).
 - (panel 2026-11-05, design) Cut tab labels "TE >", "ESS", "READY TO S" — 3 buyers across 2 days (Kuldip, Bea, Lin): add the left-edge fade / bigger tab type (≥12px) from Backlog Next; Payments TOTAL + Address "Save to my addresses" still under the LIVE+chat FABs (webkit-client-tab-pay.png, tab-ad.png 05 Nov).
 - (panel 2026-11-05, idea) Named advisor + "Call me" / keep-aside pattern now 4 buyers (Noura, Margarethe, Kuldip, Dmitri); pay-on-receipt for a first order asked by RU buyer — business call.

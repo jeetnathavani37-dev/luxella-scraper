@@ -9,3 +9,4 @@
 - 2026-11-03: Nykaa listing URLs (luxe MK c/13515, TB c/56822, KS c/7825) fetch fine once surfaced by WebSearch allowed_domains=nykaafashion.com; Myntra listing pages return no products; coach.in product pages are flaky (City Tote failed, Teri ₹41,999 ok).
 - 2026-11-04: All 5 real requests now carry data.draft (not just 2) — still 0 sent. himanshu returned once 3 Nov 22:20 IST after 6 days. 2 himanshu MK orders marked Delivered 4 Nov = follow-up moment.
 - 2026-11-04: coach.in fully client_error today; Nykaa Coach list c/9527 works (City Medium Tote ₹43,990). Nykaa marked down MK/KS overnight (Arden now ₹14,990–19,990 → Luxella Arden only 'similar'). lx_deals.data.mrp now populated.
+- 2026-11-05: 0 opens for 2nd day (last himanshu 3 Nov 22:20 IST); 5/5 drafts still unsent. Nykaa MK/KS/Coach prices flat vs 4 Nov (no new markdown). Edit 43 deals (42 draft). coach.in now PROVENANCE_REQUIRED via WebFetch — skip it. Catalog Coach Teri ₹27,900→28,500; City Tote ₹25,100.
