@@ -1729,12 +1729,12 @@
   // 2 formats
   w.appendChild(el('div','dl-stu-l','2 · Format'));const g=el('div','dl-ig-grid');const r=IGSEL;
   const T=(ic,t,d2,fn,hot)=>{const b=el('button','dl-ig-t'+(hot?' hot':''));b.type='button';b.appendChild(el('span','dl-ig-ic',ic));b.appendChild(el('b',null,t));b.appendChild(el('small',null,d2));b.addEventListener('click',fn);g.appendChild(b);};
-  T('◫','Stories','Themes × occasions · New drop, PDF, Diwali, Sale',()=>storyMaker(r),1);
-  T('▶','Reel','Templates + voice-over + music',()=>reelMaker(r),1);
-  T('🎥','AI video','Unboxing, hands, model — you choose',()=>pickPiece(r,'AI video',it=>aiVideoSheet(it.img,{brand:it.brand,title:it.title},null)));
-  T('✨','AI model photo','Your piece on a model of your choice',()=>pickPiece(r,'AI model photo',it=>modelShotSheet(it)));
-  T('▤','PDF catalogue','For WhatsApp channel & groups',()=>studio(r));
-  T('✎','Caption','WhatsApp-ready, bold & italic',async(ev)=>{const btn=ev.currentTarget.querySelector('b');const its=r?await dropItems(r):shopItems();const mine={name:own()?'Luxella':(ST.name||cli().biz||cli().name||''),wa:own()?'8724079056':(ST.wa||'')};copyTxt(captionFor('editorial',its,mine,r),btn);say('Caption copied — paste it in Instagram or WhatsApp.');});
+  T('◫\uFE0E','Stories','Themes × occasions · New drop, PDF, Diwali, Sale',()=>storyMaker(r),1);
+  T('▶\uFE0E','Reel','Templates + voice-over + music',()=>reelMaker(r),1);
+  T('◉\uFE0E','AI video','Unboxing, hands, model — you choose',()=>pickPiece(r,'AI video',it=>aiVideoSheet(it.img,{brand:it.brand,title:it.title},null)));
+  T('✧\uFE0E','AI model photo','Your piece on a model of your choice',()=>pickPiece(r,'AI model photo',it=>modelShotSheet(it)));
+  T('▤\uFE0E','PDF catalogue','For WhatsApp channel & groups',()=>studio(r));
+  T('✎\uFE0E','Caption','WhatsApp-ready, bold & italic',async(ev)=>{const btn=ev.currentTarget.querySelector('b');const its=r?await dropItems(r):shopItems();const mine={name:own()?'Luxella':(ST.name||cli().biz||cli().name||''),wa:own()?'8724079056':(ST.wa||'')};copyTxt(captionFor('editorial',its,mine,r),btn);say('Caption copied — paste it in Instagram or WhatsApp.');});
   w.appendChild(g);
   const how=el('details','dl-ig-how');how.appendChild(el('summary',null,'How to post · Instagram & WhatsApp'));const ol=el('ol');['Instagram story: tap “Post to Instagram” → Instagram → Story. Add the Link sticker and paste (the link is already copied).','Reel: Share reel → Instagram → Reels. The caption is copied — paste it.','WhatsApp status: share the story images → WhatsApp → My status.','WhatsApp channel or group: make the PDF → Share to my channel (your saved links open in one tap).'].forEach(t=>ol.appendChild(el('li',null,t)));how.appendChild(ol);w.appendChild(how);}
  document.addEventListener('click',e=>{if(e.target&&e.target.closest&&e.target.closest('#tab-ig'))setTimeout(async()=>{igStudio();if(!rows.length){await load();igStudio();}},30);});
