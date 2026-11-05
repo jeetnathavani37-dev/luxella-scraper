@@ -7,3 +7,5 @@
 - 2026-11-03: biggest leak = drafted replies never sent (data.draft on requests). Put an owner-only read-only "Requests waiting" card at Now #1; watch that no agent writes request status.
 - 2026-11-04: fleet fully back — all due agents ok (watchdog 9, backend 5, growth 2, panel/frontend/security 1). QA 6 green; a push run can end 'failure' with qa ok + no deploy job → frontend re-dispatched (READY). Only protected commit = Jeet's PR #3 merge. Audited a7b1e12 + 6c6d87e: compliant. Lx_agent_start returns null (no row) — still fine.
 - 2026-11-04: Needs Jeet top = send drafted replies (himanshu delivery follow-up) + small Edit drop before Nykaa markdowns close the gap.
+- 2026-11-05: ledger 26h watchdog 7, backend 4, panel/security/growth 1; frontend MISSED its 16:37 slot (1st miss, last 04 Nov) → 06 Nov miss = urgent. QA #49–52 green, sync #20/#21 green. Protected commits = Jeet's PRs #4–#6 (no agent prefix). Audited 6594425 + d904011: compliant. Backlog Inbox emptied into Now #2 / Needs Jeet.
+- 2026-11-05: panel desire falling daily (3.2→2.9) while Edit locked; 0 client opens 2 days. Business levers (send drafts, small Edit drop) matter more than code now.
