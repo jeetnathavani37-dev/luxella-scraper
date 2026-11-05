@@ -7,7 +7,6 @@ _Re-ordered by chief 2026-11-04 22:45 IST. Fleet healthy: all due agents ran ok 
 3. (frontend) Motion standard + Edit readiness, one file per commit: (a) scroll reveal style.css:1269-1271 animates blur(6px)+clip-path 1–1.4 s on every card → opacity+transform only, 500–600 ms ease-out; (b) Edit 🔎 search ("Coach nolita") falls through to Collection results — must land before The Edit reopens; (c) remaining forever timers: neworder.js:236/249 intervals (dash.onData covers them), extras.js renderOps pause when hidden, deals.js:1594 carousel off-screen (reuse __lxTick). — reliability/calm
 
 ## Next
-- (frontend) Chat mic uses emoji 🎙 as label (app.js:317) — §5 no emoji in client UI; reuse hv-fab SVG mic.
 - (design) Owner home topbar 'QC' avatar clipped at left edge (watchdog 11-04, chromium-owner-home.png).
 - (watchdog/frontend) If lx_deals is ever empty, deals.js render() returns before drawing the Edit/Boutique switch — keep the switch outside the empty-state early return (re-check after Jeet's PR #1 "single LOCKED switch").
 - (design) Tab strip edge fade so half-cut labels read swipeable; "SHOW ALL 1" clipped on Updates; email chip hidden ≤430px.
@@ -48,10 +47,14 @@ _Re-ordered by chief 2026-11-04 22:45 IST. Fleet healthy: all due agents ran ok 
 - Hourly QA cron is sparse: 3 schedule runs in ~18 h (02:30, 09:51, 16:39 UTC) — GitHub drops `:07` crons; try another minute or an external trigger (protected .github/).
 
 ## Inbox
+- (panel 2026-11-05, Needs Jeet — data write) 2 of 5 real clients have no `meta/terms` doc in lx_docs (3 have the 17 KB policy) → their Terms tab shows only the empty state and the 5 short-version taps find nothing. Copy the policy doc to those 2 clients (lx_docs write = guarded).
+- (panel 2026-11-05, design) Cut tab labels "TE >", "ESS", "READY TO S" — 3 buyers across 2 days (Kuldip, Bea, Lin): add the left-edge fade / bigger tab type (≥12px) from Backlog Next; Payments TOTAL + Address "Save to my addresses" still under the LIVE+chat FABs (webkit-client-tab-pay.png, tab-ad.png 05 Nov).
+- (panel 2026-11-05, idea) Named advisor + "Call me" / keep-aside pattern now 4 buyers (Noura, Margarethe, Kuldip, Dmitri); pay-on-receipt for a first order asked by RU buyer — business call.
 - (backend 2026-11-05 02:50 IST) New sync summary flags 5 stores saved 0 (run #19): telfar fixed (feed lives on shop.telfar.net, backend commit). skims / vuori / sweatybetty are headless sites — /products.json 404 since they were added 28 Oct, never saved a piece. Needs Jeet: drop them from SHOPS in outlet_scrape.js (brand choice) or build per-site scrapers. rack = known bot wall.
 - (backend 2026-11-05, schema/perf) New `lx_catalog_hide_log` has no primary key (advisor INFO) — add `id bigserial primary key` in supabase/sql/lx_catalog_health.sql (protected path).
 
 ## Done
+- (panel 2026-11-05) IG studio tile emoji → glyphs (d904011), chat mic SVG (6594425), Terms empty-state copy (ebfc02d). QA 41979501077 green, READY. Live.
 - (security 2026-11-04 verified) JeetOS RLS fixed (jeetos_* owner-only, anon returns []), lx-assets anon listing closed, luxella_catalog PUBLIC-true policy removed.
 - (frontend 2026-11-04) Ask Luxella chat: Escape, labelled Close, dialog role, focus return (a7b1e12); scroll-reveal + tabs-height forever intervals → __lxTick (de094a9). Push run deploy never started → dispatch 41820776935 green + READY. Live. Chief audit: compliant.
 - (panel 2026-11-04) LIVE corner inside Edit overlay + hidden with chat open (6c6d87e); footer colophon 11px 5.4:1 (779db00); Address sticky bar solid (cd87ce6). QA 41784639687 green, READY. Live. Chief audit 6c6d87e: compliant (position/opacity only).
