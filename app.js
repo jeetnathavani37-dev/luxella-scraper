@@ -467,7 +467,7 @@ function renderTerms(){const w=document.getElementById('terms');w.textContent=''
   const by=el('div','lbl','Luxella · '+(t.title||'Terms')+(t.edition?' · '+t.edition:'')+' · Last revised '+fd(t.at));by.style.marginTop='14px';w.appendChild(by);
   return;}
  if(t&&t.text){w.textContent=t.text;const by=el('div','lbl','Last revised '+fd(t.at));by.style.marginTop='10px';w.appendChild(by);}
- else w.appendChild(el('span','lbl','Terms will be published here.'));}
+ else w.appendChild(el('span','lbl','The full policy is being added to your page. Until then, your concierge will send any clause on WhatsApp.'));}
 function renderPayInfo(){const w=document.getElementById('payinfo');w.textContent='';const p=photos.payinfo;
  if(p&&(p.upi||p.bank)){if(p.upi){const k=document.createElement('span');k.className='k';k.textContent='UPI';const v=document.createElement('div');v.className='v';v.textContent=p.upi;copyable(v,p.upi,'UPI ID copied');w.appendChild(k);w.appendChild(v);const b=document.createElement('p');b.style.margin='6px 0 0';b.appendChild(copyBtn('Copy UPI ID',()=>p.upi,'btn2'));w.appendChild(b);}
   if(p.bank){const k=document.createElement('span');k.className='k';k.textContent='Bank transfer';w.appendChild(k);String(p.bank).split('\n').forEach(line=>{const v=document.createElement('div');v.textContent=line;const m=/(\d{9,18}|[A-Z]{4}0[A-Z0-9]{6})/.exec(line);copyable(v,m?m[1]:line,(m?m[1]:'Line')+' copied');w.appendChild(v);});const all=document.createElement('p');all.style.margin='8px 0 0';all.appendChild(copyBtn('Copy all bank details',()=>p.bank,'btn2'));w.appendChild(all);}
