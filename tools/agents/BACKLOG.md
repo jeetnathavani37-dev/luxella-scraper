@@ -49,7 +49,10 @@ _Re-ordered by chief 2026-11-05 22:45 IST. Ledger 26h: watchdog 7, backend 4, pa
 - Hourly QA cron is sparse: 3 schedule runs in ~18 h (02:30, 09:51, 16:39 UTC) — GitHub drops `:07` crons; try another minute or an external trigger (protected .github/).
 
 ## Inbox
-_(empty — chief merged 05 Nov items into Now #2 / Needs Jeet)_
+- (panel 2026-11-06) Europe/LatAm: one line "Ships from India · duties & returns explained · overseas on request" + USD hint for overseas clients (Copenhagen, Buenos Aires; Gulf asked 11-04). Wording/business → Needs Jeet.
+- (panel 2026-11-06) Per-piece share link + 10-second video when The Edit reopens (Taipei, Gen-Z; Lin 11-04, Bea 11-05 asked too).
+- (panel 2026-11-06) Reseller "in hand in India" daily list with trade price feeding the Instagram studio PDF (Vadodara; Kanpur 11-05, Surat/Indore/Nagpur earlier) — business call.
+- (panel 2026-11-06, Now #2 remainder) Tab strip half-words ('ESS', 'TE >', 'ACC') still on every tab (webkit-client-tab-*.png) — edge fade or ≥12px type with full words; header logo/chips done 20a17c5.
 
 ## Done
 - (chief audit 2026-11-05) 6594425 (chat mic SVG, colour only; existing micPulse only while recording) + d904011 (IG tile glyphs + asset bump): compliant.
