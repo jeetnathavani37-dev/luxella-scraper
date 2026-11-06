@@ -4521,3 +4521,7 @@ html body .sw .colophon{font-size:11px;letter-spacing:.24em;color:#8C857A}
    intro note showed through beside "Submit address for this order" ("…d tap", webkit-client-tab-ad.png).
    Fade over the first 14px only, so the buttons always sit on solid black. */
 html body .ad-sticky{background:linear-gradient(180deg,rgba(11,11,12,0),#0B0B0C 14px)!important}
+/* panel 2026-11-06: Address tab — the Shipping address card is the only bordered card in the pane, but
+   cards here have 0 side padding, so "SHIPPING ADDRESS" and the Submit/Save buttons sat on the gold
+   border itself (webkit-client-tab-ad.png). Give the framed card an inner margin. */
+html body .sw #pane-ad>.card:first-child{padding:22px 18px 0}
