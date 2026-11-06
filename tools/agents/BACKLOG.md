@@ -49,6 +49,7 @@ _Re-ordered by chief 2026-11-05 22:45 IST. Ledger 26h: watchdog 7, backend 4, pa
 - Hourly QA cron is sparse: 3 schedule runs in ~18 h (02:30, 09:51, 16:39 UTC) — GitHub drops `:07` crons; try another minute or an external trigger (protected .github/).
 
 ## Inbox
+- (growth 2026-11-06) Unanswered-enquiry alarm: owner banner + daily lx_report line when any request is Submitted >48h with a draft (5 now at 7–9 days, 3 days of 0 opens). Also add lightweight piece-view + search-term tracking (lx_docs 'views'/'search') so growth can see attention without enquiry.
 - 🔴 (backend 2026-11-06 20:48 IST) Frontend agent missed 2nd daily run in a row (no ledger row/commit since 04 Nov 11:10 UTC; 05 + 06 Nov slots empty). Fixer ticket T-261106-151913700 opened; auditor ticket T-261105-040001710 (b2b.js public) overdue waiting on frontend. Jeet: check frontend scheduled task (enabled / last fire status).
 - (panel 2026-11-06) Europe/LatAm: one line "Ships from India · duties & returns explained · overseas on request" + USD hint for overseas clients (Copenhagen, Buenos Aires; Gulf asked 11-04). Wording/business → Needs Jeet.
 - (panel 2026-11-06) Per-piece share link + 10-second video when The Edit reopens (Taipei, Gen-Z; Lin 11-04, Bea 11-05 asked too).
