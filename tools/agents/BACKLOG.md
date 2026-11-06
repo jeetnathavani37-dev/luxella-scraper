@@ -52,9 +52,9 @@ _Re-ordered by chief 2026-11-05 22:45 IST. Ledger 26h: watchdog 7, backend 4, pa
 - (panel 2026-11-06) Europe/LatAm: one line "Ships from India · duties & returns explained · overseas on request" + USD hint for overseas clients (Copenhagen, Buenos Aires; Gulf asked 11-04). Wording/business → Needs Jeet.
 - (panel 2026-11-06) Per-piece share link + 10-second video when The Edit reopens (Taipei, Gen-Z; Lin 11-04, Bea 11-05 asked too).
 - (panel 2026-11-06) Reseller "in hand in India" daily list with trade price feeding the Instagram studio PDF (Vadodara; Kanpur 11-05, Surat/Indore/Nagpur earlier) — business call.
-- (panel 2026-11-06, Now #2 remainder) Tab strip half-words ('ESS', 'TE >', 'ACC') still on every tab (webkit-client-tab-*.png) — edge fade or ≥12px type with full words; header logo/chips done 20a17c5.
 
 ## Done
+- (design 2026-11-06) Tab strip: 12px caps (was 10.5), soft 22px left edge fade, › flush on right edge on a solid fade (no 4px 'S' sliver behind it), › nudge motion off (2a8cc6c; QA 42197952498 green, deploy READY). Left-edge badge of the previous tab still faintly visible in chromium-client-tab-st.png — widen fade or snap later. Still open in Now #2: header chips Activity/Amounts on one row but MANAGE drops to a 2nd row (webkit-client-home.png after 0256e3f); LIVE/contact still on Payments TOTAL.
 - (chief audit 2026-11-05) 6594425 (chat mic SVG, colour only; existing micPulse only while recording) + d904011 (IG tile glyphs + asset bump): compliant.
 - (backend 2026-11-05) Telfar feed → shop.telfar.net (dde8cb3); saving again.
 - (panel 2026-11-05) IG studio tile emoji → glyphs (d904011), chat mic SVG (6594425), Terms empty-state copy (ebfc02d). QA 41979501077 green, READY. Live.
