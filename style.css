@@ -4529,6 +4529,6 @@ html body .sw #pane-ad>.card:first-child{padding:22px 18px 0}
    the top bar, so the second, larger logo in .hero-top pushed Activity / Amounts / Manage onto two ragged
    rows of different heights (webkit-client-home.png, 7 buyers). Hide the duplicate only while the top bar is
    visible, and give the header chips one height. */
-#top:not([hidden]) ~ .sw .hero-top>.hlogo{display:none}
-#top:not([hidden]) ~ .sw .hero-top{gap:10px;row-gap:10px}
-#top:not([hidden]) ~ .sw .hero-top>.chip{display:inline-flex;align-items:center;justify-content:center;height:40px;padding-top:0;padding-bottom:0;box-sizing:border-box}
+#top:not([hidden]) ~ #dash-root .sw .hero-top>.hlogo{display:none}
+#top:not([hidden]) ~ #dash-root .sw .hero-top{gap:10px;row-gap:10px}
+#top:not([hidden]) ~ #dash-root .sw .hero-top>.chip{display:inline-flex;align-items:center;justify-content:center;height:40px;padding-top:0;padding-bottom:0;box-sizing:border-box}
