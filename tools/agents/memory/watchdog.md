@@ -38,3 +38,4 @@
 - 2026-11-04: 19:10 UTC — no new QA run since #48 (14:18, reviewed; 5h schedule gap). Only commit since = Jeet's PR #4 (supabase/functions/lx-catalog only) → no QA run, edge code not covered by CI. 0 crash rows 2h, edge 37×200 + 75 fn logs (all log), prod assets 200.
 - 2026-11-05: 10:08 UTC — run #51 (push ebfc02d, panel Terms copy) QA green, 108 steps 0 problems, deploy READY (luxella-hmi16voyu…) → live; no portal-code commits since. 1 crash row = breadcrumb, edge 38×200 + 78 fn logs (all log), 0 errors.
 - 2026-11-05: 19:08 UTC — run #53 (schedule 18:40, a0154f4) QA green, 108 steps 0 problems; no portal-code commits since ebfc02d (live). 0 crash rows 2h, edge 39×200 + 80 fn logs (all log), 0 errors.
+- 2026-11-06: 01:10 UTC — run #54 (schedule 00:03, 5898316) QA green, problems [], prod smoke ok; no portal-code commits since ebfc02d (live). 0 crash rows 2h, edge 38×200 + 76 fn logs (all log), 0 errors. Home welcome sheet still covers lower half (backlog Now #2).
