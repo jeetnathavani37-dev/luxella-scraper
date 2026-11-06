@@ -4532,3 +4532,13 @@ html body .sw #pane-ad>.card:first-child{padding:22px 18px 0}
 #top:not([hidden]) ~ #dash-root .sw .hero-top>.hlogo{display:none}
 #top:not([hidden]) ~ #dash-root .sw .hero-top{gap:10px;row-gap:10px}
 #top:not([hidden]) ~ #dash-root .sw .hero-top>.chip{display:inline-flex;align-items:center;justify-content:center;height:40px;padding-top:0;padding-bottom:0;box-sizing:border-box}
+
+/* ── design 2026-11-06 · Tab strip: full words, calm edges ─────────────────
+   Before (webkit-client-tab-pay.png, run 42179188646): 10.5px caps, a 4px sliver
+   of the next tab ('S') peeking past the sticky › arrow (it stuck inside the
+   strip's 4px padding), a half-cut badge at the left edge, › nudging 3×.
+   After: 12px caps, left edge fades softly into the bar, › sits flush on the
+   right edge on a solid fade so nothing shows behind it, no nudge motion. */
+html body .sw .tabs .tab{font-size:12px!important;letter-spacing:.18em!important}
+html body .sw .tabs::before{content:'';position:sticky;left:-4px;flex:0 0 22px;margin-right:-22px;align-self:stretch;z-index:2;pointer-events:none;background:linear-gradient(90deg,#0d0b09 15%,rgba(13,11,9,0))}
+html body .sw .tabs .tabs-next{right:-4px;margin-right:-4px;z-index:3;min-width:56px;padding:0 14px 0 26px;font-size:20px;color:#E9D3A0;background:linear-gradient(90deg,rgba(13,11,9,0),#0d0b09 42%)!important;animation:none!important;transform:none!important}
