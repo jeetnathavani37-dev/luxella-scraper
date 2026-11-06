@@ -4525,3 +4525,10 @@ html body .ad-sticky{background:linear-gradient(180deg,rgba(11,11,12,0),#0B0B0C 
    cards here have 0 side padding, so "SHIPPING ADDRESS" and the Submit/Save buttons sat on the gold
    border itself (webkit-client-tab-ad.png). Give the framed card an inner margin. */
 html body .sw #pane-ad>.card:first-child{padding:22px 18px 0}
+/* panel 2026-11-06: one logo at the top (Backlog Now #2). Signed-in pages already show the Luxella logo in
+   the top bar, so the second, larger logo in .hero-top pushed Activity / Amounts / Manage onto two ragged
+   rows of different heights (webkit-client-home.png, 7 buyers). Hide the duplicate only while the top bar is
+   visible, and give the header chips one height. */
+#top:not([hidden]) ~ .sw .hero-top>.hlogo{display:none}
+#top:not([hidden]) ~ .sw .hero-top{gap:10px;row-gap:10px}
+#top:not([hidden]) ~ .sw .hero-top>.chip{display:inline-flex;align-items:center;justify-content:center;height:40px;padding-top:0;padding-bottom:0;box-sizing:border-box}
