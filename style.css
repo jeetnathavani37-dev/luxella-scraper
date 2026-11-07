@@ -4552,3 +4552,14 @@ html body .sw .tabs .tabs-next{right:-4px;margin-right:-4px;z-index:3;min-width:
 #top:not([hidden]) ~ #dash-root .sw .hero-top>.hdrbtns:empty{display:none}
 #top:not([hidden]) ~ #dash-root .sw .hero-top:has(>.hdrbtns:empty)>.chip{flex:1 1 0;min-width:0;padding-left:6px!important;padding-right:6px!important;letter-spacing:.12em!important}
 }
+
+/* panel 2026-11-07 — chat header + Terms short version.
+   webkit-client-chat-open.png: Message Luxella / New / Close split over two rows, Close alone → one row.
+   webkit-client-tab-pol-bottom.png: #terms-quick lines are <button>s, which don't inherit the page font,
+   so "All-inclusive price…" rendered in the system fallback → use the page sans. */
+@media (max-width:520px){
+html body #chat.chat .ch #chat-mode{flex:1 1 calc(100% - 150px)}
+html body #chat.chat .ch .chip{margin-left:0;padding-left:12px!important;padding-right:12px!important;letter-spacing:.14em}
+html body #chat.chat .ch #chat-mode-t{margin-left:auto}
+}
+#terms-quick .tqp{font-family:var(--font-anthropic-sans,'Manrope',-apple-system,sans-serif)}
