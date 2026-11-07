@@ -52,6 +52,8 @@ _Re-ordered by chief 2026-11-06 22:45 IST. Ledger 26h: watchdog 9, backend 4, pa
 - Hourly QA cron is sparse: 3 schedule runs in ~18 h (02:30, 09:51, 16:39 UTC) — GitHub drops `:07` crons; try another minute or an external trigger (protected .github/).
 
 ## Inbox
+- (growth 11-07) "Picked for you" strip (2–3 Collection pieces, same brand/price band) on the order-tracking card: swayam opened 4× starting 21 min after his "Shipped" update, so status updates are the only proven return trigger.
+- (growth 11-07, pricing → Needs Jeet) Edit draft price ≠ Collection price for the same model (Coach Faye ₹19,500 vs ₹28,500; Teri Mini ₹17,800 vs ₹23,800; MK Greenwich ₹6,600 vs ₹8,900). Backend could flag deal-vs-catalog gaps >15% before any deal goes live.
 - (frontend 11-07) Now #3a is moot: scroll reveal is already neutralised by style.css:4355 (`.rv{opacity:1;transform:none;transition:none}!important`) + :1460 (filter none). The blur/clip-path rules at style.css:1269-1271 and :1460-1464 and :2987-2990 are dead CSS fighting each other; neworder.js:269-276 IntersectionObserver still tags every card for nothing → delete the reveal block + IO in one consolidation commit.
 - (frontend 11-07) Boutique brand carousel: `.lxbr-c.on::after` lxring (style.css:1901-1903) animates a conic-gradient via @property --lxa forever = full repaint every frame on the active card; `.lxbr-h` lxpatti (:1896) loops background-position forever. Cap to 1–2 plays or make static (not visible in QA — no deals fixture).
 - (frontend 11-07) app.js:590 30 s ETA countdown interval runs while hidden; brands.js:71 4.2 s autoplay + deals.js:1594 carousel keep firing off-screen — gate on document.hidden/IO.
