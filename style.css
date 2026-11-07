@@ -4542,3 +4542,13 @@ html body .sw #pane-ad>.card:first-child{padding:22px 18px 0}
 html body .sw .tabs .tab{font-size:12px!important;letter-spacing:.18em!important}
 html body .sw .tabs::before{content:'';position:sticky;left:-4px;flex:0 0 22px;margin-right:-22px;align-self:stretch;z-index:2;pointer-events:none;background:linear-gradient(90deg,#0d0b09 15%,rgba(13,11,9,0))}
 html body .sw .tabs .tabs-next{right:-4px;margin-right:-4px;z-index:3;min-width:56px;padding:0 14px 0 26px;font-size:20px;color:#E9D3A0;background:linear-gradient(90deg,rgba(13,11,9,0),#0d0b09 42%)!important;animation:none!important;transform:none!important}
+
+/* panel 2026-11-07 — header chips one row on iPhone.
+   webkit-client-home.png (run 42320690209) still showed Activity + Amounts on row 1 and Manage alone on
+   row 2: the empty #hdrbtns span still took a 10px gap and the three chips' padding overflowed 358px.
+   Client view only (hdrbtns empty): hide the empty span, three equal chips share one row. */
+@media (max-width:520px){
+#top:not([hidden]) ~ #dash-root .sw .hero-top:has(>.hdrbtns:empty){flex-wrap:nowrap;gap:8px}
+#top:not([hidden]) ~ #dash-root .sw .hero-top>.hdrbtns:empty{display:none}
+#top:not([hidden]) ~ #dash-root .sw .hero-top:has(>.hdrbtns:empty)>.chip{flex:1 1 0;min-width:0;padding-left:6px!important;padding-right:6px!important;letter-spacing:.12em!important}
+}
