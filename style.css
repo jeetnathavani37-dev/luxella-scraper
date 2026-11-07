@@ -1731,7 +1731,7 @@ html.lx-ro #tb-switch,html.lx-ro #tb-out,html.lx-ro #top .who{display:none!impor
 .sw{--lux-gbtn:linear-gradient(135deg,#F7E7B4 0%,#E8C774 38%,#C99A45 72%,#E3C06A 100%)}
 .sw .btn,.sw .btn2,.sw a.chip.wal,.sw .chip:not(.tog):not(.cx-badge):not(.eta-tag):not(.rts-c):not(.pc2-c),.sw .stbtn.due,.sw .lx-askc,.sw .ab-b,.sw .lx-rcv button,.sw .ub-go{position:relative;overflow:hidden;background:var(--lux-gbtn)!important;background-size:160% 160%!important;border:1px solid #F4E1A0!important;color:#16120a!important;font-weight:600!important;box-shadow:0 2px 14px rgba(227,192,106,.22),inset 0 1px 0 rgba(255,255,255,.45)!important;text-shadow:0 1px 0 rgba(255,255,255,.25);transition:background-position .5s,box-shadow .3s,transform .15s!important}
 .sw .btn::before,.sw .btn2::before,.sw a.chip.wal::before,.sw .chip:not(.tog):not(.cx-badge):not(.eta-tag):not(.rts-c):not(.pc2-c)::before,.sw .stbtn.due::before,.sw .ab-b::before,.sw .lx-rcv button::before{content:'';position:absolute;top:0;bottom:0;left:-60%;width:40%;background:linear-gradient(100deg,rgba(255,255,255,0),rgba(255,255,255,.55),rgba(255,255,255,0));transform:skewX(-20deg);pointer-events:none;animation:lxbtnsheen 4.5s ease-in-out infinite}
-@keyframes lxbtnsheen{0%,62%{left:-60%}100%{left:140%}}
+@keyframes lxbtnsheen{0%,62%{transform:translateX(0) skewX(-20deg)}100%{transform:translateX(500%) skewX(-20deg)}}
 .sw .btn:hover,.sw .btn2:hover,.sw a.chip.wal:hover,.sw .chip:not(.tog):not(.cx-badge):not(.eta-tag):not(.rts-c):not(.pc2-c):hover,.sw .stbtn.due:hover,.sw .ab-b:hover,.sw .lx-rcv button:hover{background:var(--lux-gbtn)!important;background-size:160% 160%!important;background-position:100% 100%!important;color:#16120a!important;box-shadow:0 4px 22px rgba(227,192,106,.4),inset 0 1px 0 rgba(255,255,255,.55)!important}
 @media (prefers-reduced-motion:reduce){.sw .btn::before,.sw .btn2::before,.sw a.chip.wal::before,.sw .chip::before,.sw .stbtn.due::before,.sw .ab-b::before,.sw .lx-rcv button::before{animation:none;display:none}}
 .sw .ab-h+.ab-r .ab-b,.sw #pane-ov .btn:first-child{background:var(--lux-gbtn)!important;background-size:160% 160%!important;color:#16120a!important}
@@ -4341,6 +4341,8 @@ html.lx-ready .sw .hero-top,html.lx-ready .sw .hero-main,html.lx-ready .sw .rule
 body.dl-imm #pane-deals{background-attachment:scroll!important}
 .rv{transition-duration:.45s!important}
 .sw .chip::before,.sw .chip::after,.sw .btn2::before{animation-iteration-count:2!important}
+/* frontend: action-bar + 'reached you?' sheen played forever (left = layout every frame) — now transform-only, twice like every other button */
+.sw .ab-b::before,.sw .lx-rcv button::before{animation-iteration-count:2!important}
 /* ===== Luxe motion layer (maison feel, compositor-only) ===== */
 .lxm-bar{position:fixed;left:0;right:0;top:0;height:2px;z-index:2147482000;pointer-events:none;opacity:0;transition:opacity .4s ease}
 .lxm-bar.on{opacity:1}
