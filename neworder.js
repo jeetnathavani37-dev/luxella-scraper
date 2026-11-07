@@ -199,6 +199,8 @@ let n=0;const t=setInterval(()=>{n++;let ok=false;try{ok=typeof dash!=='undefine
 const $=id=>document.getElementById(id);
 const el=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e;};
 const inr=v=>'₹'+Number(v||0).toLocaleString('en-IN');
+/* frontend: forever 2–2.5 s polls → shared __lxTick (runs after DOM changes, ≤1/s, 5 s beat, paused when hidden); fallback interval also skips hidden tabs */
+const lxEvery=(f,ms)=>{let hk=0;const hook=()=>{if(window.__lxTick){window.__lxTick(f);return;}if(++hk<60)return setTimeout(hook,250);setInterval(()=>{if(!document.hidden)f();},ms);};hook();};
 const wait=(cond,cb,max)=>{let n=0;const t=setInterval(()=>{n++;let ok=false;try{ok=cond();}catch(e){}if(ok){clearInterval(t);cb();}else if(n>(max||200))clearInterval(t);},150);};
 const toastM=t=>{try{if(window.alertMsg)window.alertMsg(t);}catch(e){}};
 
@@ -233,7 +235,7 @@ wait(()=>$('pane-pay')&&typeof dash!=='undefined'&&typeof photos!=='undefined',(
   if(!p.upi&&!p.bank)body.appendChild(el('span','lbl','Payment details will appear here once published.'));
   dt.appendChild(body);sec.appendChild(dt);
   const sub=el('button','btn2','Already paid? Submit payment');sub.type='button';sub.style.marginTop='12px';sub.addEventListener('click',()=>{const s=$('paysub');if(s)s.scrollIntoView({behavior:'smooth',block:'start'});});sec.appendChild(sub);};
- let lk='';const tick=()=>{const o=dash.data('orders');const k=JSON.stringify(photos.payinfo||{})+'|'+(o.status==='ok'?o.data.map(r=>r.item+r.payout+paidOf(r)).join(','):o.status);if(k!==lk){lk=k;render();}};tick();try{dash.onData(tick);}catch(e){}setInterval(tick,2000);
+ let lk='';const tick=()=>{const o=dash.data('orders');const k=JSON.stringify(photos.payinfo||{})+'|'+(o.status==='ok'?o.data.map(r=>r.item+r.payout+paidOf(r)).join(','):o.status);if(k!==lk){lk=k;render();}};tick();try{dash.onData(tick);}catch(e){}lxEvery(tick,2000);
 });
 
 /* ---- Address: add new / use saved, sticky save ---- */
@@ -246,7 +248,7 @@ wait(()=>$('pane-ad')&&$('a-save')&&typeof photos!=='undefined',()=>{
  sel.addEventListener('change',()=>{const book=Object.values(photos.book||{});const b=book[Number(sel.value)];if(!b)return;$('a-addr').value=b.address||'';if(b.phone)$('a-phone').value=b.phone;});
  add.addEventListener('click',()=>{$('a-addr').value='';$('a-phone').value='';$('a-pref').value='';sel.value='';$('a-addr').focus();form.scrollIntoView({behavior:'smooth',block:'center'});});
  bar.appendChild(add);bar.appendChild(sel);form.parentNode.insertBefore(bar,form);fill();
- try{dash.onData(fill);}catch(e){}setInterval(fill,2500);
+ try{dash.onData(fill);}catch(e){}lxEvery(fill,2500);
  const sv=$('a-save').parentNode;sv.classList.add('ad-sticky');
 });
 
