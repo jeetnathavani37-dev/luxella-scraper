@@ -149,8 +149,23 @@ async reqImage(blob){const path=(S.owner?'deals':'client-uploads/'+(S.client&&S.
 
 /* ---- boot ---- */
 function topbar(){const t=g('top');t.hidden=false;const cl=(S.docs&&S.docs.meta&&S.docs.meta.client_logo)||null;t.innerHTML='<img class="tlogo'+(cl&&cl.url?' hasc':'')+'" src="assets/luxella_logo.png" alt="Luxella">'+(cl&&cl.url?'<img class="tclogo" src="'+esc(cl.url)+'" alt="" onerror="this.remove()">':'')+'<span class="who">'+esc(S.email)+'</span>'+(S.owner?'<button id="tb-switch">← Admin</button>':'')+'<button id="tb-out">Sign out</button>';if(S.owner)g('tb-switch').onclick=()=>{location.href=new URL('admin',document.baseURI).href;};g('tb-out').onclick=()=>sb.auth.signOut().then(()=>{location.href=new URL('./',document.baseURI).href;});}
+
+/* ---- Face ID / Touch ID device lock (WebAuthn platform authenticator; gate on top of the kept session) ---- */
+const FID_KEY='lx_faceid';
+const fidGet=()=>{try{return JSON.parse(localStorage.getItem(FID_KEY)||'null');}catch(e){return null;}};
+const b64u=(buf)=>btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+const unb64u=(t)=>Uint8Array.from(atob(t.replace(/-/g,'+').replace(/_/g,'/')+'==='.slice((t.length+3)%4)),c=>c.charCodeAt(0));
+async function fidSupported(){try{return !!(window.PublicKeyCredential&&PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable&&await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable());}catch(e){return false;}}
+async function fidEnable(email){const cred=await navigator.credentials.create({publicKey:{challenge:crypto.getRandomValues(new Uint8Array(32)),rp:{name:'Luxella'},user:{id:crypto.getRandomValues(new Uint8Array(16)),name:email,displayName:email},pubKeyCredParams:[{type:'public-key',alg:-7},{type:'public-key',alg:-257}],authenticatorSelection:{authenticatorAttachment:'platform',userVerification:'required',residentKey:'discouraged'},timeout:60000,attestation:'none'}});localStorage.setItem(FID_KEY,JSON.stringify({email,id:b64u(cred.rawId)}));}
+async function fidVerify(rec){await navigator.credentials.get({publicKey:{challenge:crypto.getRandomValues(new Uint8Array(32)),allowCredentials:[{type:'public-key',id:unb64u(rec.id),transports:['internal']}],userVerification:'required',timeout:60000}});return true;}
+function gateFace(rec){gate('<img class="logo" src="assets/luxella_logo.png" alt="Luxella"><p>Unlock with Face ID to open your client page.</p><button id="fid-go">Unlock with Face ID</button><button class="out" id="fid-pw" type="button">Use password instead</button><p id="fid-m" style="font-size:13px;opacity:.8"></p>');
+ const go=async()=>{try{await fidVerify(rec);window.__lxUnlocked=1;start();}catch(e){g('fid-m').textContent='Face ID did not unlock. Try again or use your password.';}};
+ g('fid-go').onclick=go;g('fid-pw').onclick=()=>{try{localStorage.removeItem(FID_KEY);}catch(e){}sb.auth.signOut().then(()=>location.reload());};}
+async function faceBtn(){const t=g('top');if(!t||!(await fidSupported()))return;const old=g('tb-face');if(old)old.remove();const rec=fidGet();const on=!!(rec&&rec.email===S.email);const b=document.createElement('button');b.id='tb-face';b.type='button';b.textContent=on?'Face ID on ✓':'Enable Face ID';b.onclick=async()=>{try{if(on){localStorage.removeItem(FID_KEY);}else{await fidEnable(S.email);window.__lxUnlocked=1;}}catch(e){alert('Could not set up Face ID on this device.');}faceBtn();};const out=g('tb-out');if(out)t.insertBefore(b,out);else t.appendChild(b);}
+const _topbar=topbar;topbar=function(){_topbar();faceBtn();};
 window.__lxAdmin={sb,S,esc,adminCall:(b)=>adminCall(b)};
 async function start(){const {data:{session}}=await sb.auth.getSession();S.session=session;if(!session){gateLogin();return;}S.email=(session.user.email||'').toLowerCase();S.owner=['jeetnathavani37@gmail.com','jeetnatb@gmail.com'].includes(S.email);
+ {const fr=fidGet();if(fr&&fr.email===S.email&&!window.__lxUnlocked&&await fidSupported()){gateFace(fr);return;}}
  const basePath=new URL(document.baseURI).pathname;const rel=location.pathname.startsWith(basePath)?location.pathname.slice(basePath.length):'';const seg=rel.split('/').filter(Boolean)[0]||'';const slug=new URLSearchParams(location.search).get('c')||(seg==='index.html'?'':seg);
  if(slug==='b2b'){location.replace('/');return;}
  if(slug==='admin'){if(!S.owner){gateNoAccess();return;}g('gate').hidden=true;g('top').hidden=true;g('dash-root').hidden=true;g('admin-root').hidden=false;if(window.__adminLoaded)return;window.__adminLoaded=1;const a=document.createElement('script');a.src='admin.js?v=1793610000';document.body.appendChild(a);return;}
