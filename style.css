@@ -4565,3 +4565,49 @@ html body #chat.chat .ch .chip{margin-left:0;padding-left:12px!important;padding
 html body #chat.chat .ch #chat-mode-t{margin-left:auto}
 }
 #terms-quick .tqp{font-family:var(--font-anthropic-sans,'Manrope',-apple-system,sans-serif)}
+
+/* ===== Luxella sign-in — premium pass (2026-11-07) ===== */
+.lx-gate{min-height:100vh;min-height:100dvh;position:relative;overflow:hidden;
+ background:radial-gradient(120% 70% at 50% -8%,rgba(201,162,39,.16),rgba(201,162,39,0) 55%),radial-gradient(90% 60% at 50% 115%,rgba(140,110,22,.14),rgba(0,0,0,0) 60%),#070707}
+.lx-gate::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.5;mix-blend-mode:overlay;
+ background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .07 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")}
+.lx-gate .box{position:relative;width:min(430px,100%);padding:46px 34px 34px;border:1px solid transparent;border-radius:2px;
+ background:linear-gradient(180deg,#0e0e0f,#0a0a0b) padding-box,linear-gradient(165deg,rgba(227,197,101,.7),rgba(201,162,39,.10) 38%,rgba(201,162,39,.06) 62%,rgba(227,197,101,.45)) border-box;
+ box-shadow:0 30px 80px -30px rgba(0,0,0,.9),0 0 90px -40px rgba(201,162,39,.35);animation:lxIn .9s cubic-bezier(.2,.7,.1,1) both}
+.lx-gate .box::before,.lx-gate .box::after{content:"";position:absolute;width:18px;height:18px;border:1px solid #C9A227;opacity:.8;pointer-events:none}
+.lx-gate .box::before{top:9px;left:9px;border-right:0;border-bottom:0}
+.lx-gate .box::after{bottom:9px;right:9px;border-left:0;border-top:0}
+.lx-gate .logo{width:176px;margin:0 auto 14px;filter:drop-shadow(0 0 22px rgba(201,162,39,.28));animation:lxGlow 5s ease-in-out infinite}
+.lx-gate .eyebrow{font:500 9.5px 'Jost',sans-serif;letter-spacing:.42em;text-transform:uppercase;color:#C9A227;margin:26px 0 12px}
+.lx-gate p{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:400;font-size:19px;line-height:1.4;color:#CFC7B8;margin:0 0 20px}
+.lx-gate .eyebrow+p{font-size:20px;margin-bottom:30px;position:relative;padding-bottom:26px}
+.lx-gate .eyebrow+p::after{content:"";position:absolute;left:50%;bottom:0;width:120px;height:9px;transform:translateX(-50%);
+ background:linear-gradient(90deg,transparent,#C9A227 35%,transparent) center/100% 1px no-repeat}
+.lx-gate .eyebrow+p::before{content:"";position:absolute;left:50%;bottom:-1px;width:7px;height:7px;margin-left:-3.5px;background:#C9A227;transform:rotate(45deg) scale(.7);z-index:1;box-shadow:0 0 0 4px #0b0b0c}
+.lx-gate input:not([type=checkbox]){background:rgba(255,255,255,.025);border:1px solid #2A2724;border-radius:2px;padding:16px 18px;margin-bottom:12px;font:300 15px 'Jost',sans-serif;letter-spacing:.04em;color:#F3EEE6;transition:border-color .25s,box-shadow .25s,background .25s;-webkit-appearance:none}
+.lx-gate input::placeholder{font:400 10.5px 'Jost',sans-serif;letter-spacing:.3em;text-transform:uppercase;color:#6F695E}
+.lx-gate input:not([type=checkbox]):focus{border-color:#C9A227;background:rgba(201,162,39,.05);box-shadow:0 0 0 3px rgba(201,162,39,.10),0 8px 24px -12px rgba(201,162,39,.4)}
+.lx-gate .keep{margin:6px 0 22px;gap:11px;font:300 11px 'Jost',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#8F887B}
+.lx-gate .keep input{-webkit-appearance:none;appearance:none;width:17px;height:17px;border:1px solid #5b4a16;border-radius:2px;background:transparent;display:grid;place-content:center;padding:0;margin:0;flex:none;transition:all .2s}
+.lx-gate .keep input::after{content:"";width:9px;height:5px;border-left:1.5px solid #0A0A0A;border-bottom:1.5px solid #0A0A0A;transform:rotate(-45deg) scale(0);margin-top:-2px;transition:transform .15s}
+.lx-gate .keep input:checked{background:linear-gradient(135deg,#E3C565,#C9A227);border-color:#E3C565}
+.lx-gate .keep input:checked::after{transform:rotate(-45deg) scale(1)}
+.lx-gate button{position:relative;overflow:hidden;border-radius:2px;padding:17px 14px;font:600 10.5px 'Jost',sans-serif;letter-spacing:.38em;transition:transform .15s,box-shadow .25s,border-color .25s,color .25s}
+.lx-gate #lg-go,.lx-gate #fid-go{background:linear-gradient(135deg,#8C6E16 0%,#E3C565 38%,#C9A227 62%,#8C6E16 100%);background-size:220% 100%;background-position:0 0;border:0;color:#0A0A0A;box-shadow:0 14px 34px -14px rgba(201,162,39,.65),inset 0 1px 0 rgba(255,255,255,.35);transition:background-position .6s,transform .15s,box-shadow .25s}
+.lx-gate #lg-go:hover,.lx-gate #fid-go:hover{background-position:100% 0;box-shadow:0 18px 40px -14px rgba(227,197,101,.75),inset 0 1px 0 rgba(255,255,255,.4)}
+.lx-gate button:active{transform:scale(.985)}
+.lx-gate #lg-magic{background:transparent!important;color:#E3C565!important;border:1px solid rgba(201,162,39,.45)!important;margin-top:12px!important;font-weight:500}
+.lx-gate #lg-magic:hover{border-color:#E3C565!important;background:rgba(201,162,39,.07)!important}
+.lx-gate .m{font:400 12px 'Jost',sans-serif;letter-spacing:.06em;color:#C98A7F;margin-top:16px;min-height:16px}
+.lx-gate .out{margin-top:20px;font:500 9.5px 'Jost',sans-serif;letter-spacing:.32em;color:#7d776b;background:none!important;border:0!important;box-shadow:none!important;padding:8px}
+.lx-gate .out:hover{color:#E3C565}
+.lx-gate .lx-foot{margin-top:26px;font:400 9px 'Jost',sans-serif;letter-spacing:.4em;text-transform:uppercase;color:#4d483f}
+/* Face ID unlock */
+.lx-gate .fid-ring{width:92px;height:92px;margin:2px auto 22px;border-radius:50%;display:grid;place-items:center;border:1px solid rgba(201,162,39,.5);background:radial-gradient(circle,rgba(201,162,39,.14),rgba(201,162,39,0) 70%);position:relative;animation:lxPulse 2.8s ease-out infinite}
+.lx-gate .fid-ring svg{width:46px;height:46px;stroke:#E3C565;fill:none;stroke-width:1.3;stroke-linecap:round;stroke-linejoin:round}
+.lx-gate .fid-hi{font:500 13px 'Jost',sans-serif;letter-spacing:.3em;text-transform:uppercase;color:#F3EEE6;margin:0 0 8px}
+@keyframes lxIn{from{opacity:0;transform:translateY(16px) scale(.985)}to{opacity:1;transform:none}}
+@keyframes lxGlow{0%,100%{filter:drop-shadow(0 0 16px rgba(201,162,39,.18))}50%{filter:drop-shadow(0 0 30px rgba(227,197,101,.42))}}
+@keyframes lxPulse{0%{box-shadow:0 0 0 0 rgba(201,162,39,.32)}70%,100%{box-shadow:0 0 0 22px rgba(201,162,39,0)}}
+@media (prefers-reduced-motion:reduce){.lx-gate .box,.lx-gate .logo,.lx-gate .fid-ring{animation:none}}
+@media (max-width:380px){.lx-gate .box{padding:40px 22px 28px}.lx-gate p{font-size:18px}}
