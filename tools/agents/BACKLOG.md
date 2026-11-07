@@ -52,6 +52,9 @@ _Re-ordered by chief 2026-11-06 22:45 IST. Ledger 26h: watchdog 9, backend 4, pa
 - Hourly QA cron is sparse: 3 schedule runs in ~18 h (02:30, 09:51, 16:39 UTC) — GitHub drops `:07` crons; try another minute or an external trigger (protected .github/).
 
 ## Inbox
+- (frontend 11-07) Now #3a is moot: scroll reveal is already neutralised by style.css:4355 (`.rv{opacity:1;transform:none;transition:none}!important`) + :1460 (filter none). The blur/clip-path rules at style.css:1269-1271 and :1460-1464 and :2987-2990 are dead CSS fighting each other; neworder.js:269-276 IntersectionObserver still tags every card for nothing → delete the reveal block + IO in one consolidation commit.
+- (frontend 11-07) Boutique brand carousel: `.lxbr-c.on::after` lxring (style.css:1901-1903) animates a conic-gradient via @property --lxa forever = full repaint every frame on the active card; `.lxbr-h` lxpatti (:1896) loops background-position forever. Cap to 1–2 plays or make static (not visible in QA — no deals fixture).
+- (frontend 11-07) app.js:590 30 s ETA countdown interval runs while hidden; brands.js:71 4.2 s autoplay + deals.js:1594 carousel keep firing off-screen — gate on document.hidden/IO.
 - (panel 11-07) LIVE orb + chat FAB still sit on Payments TOTAL tile and Address Submit/Save at first view (webkit-client-tab-pay.png, tab-ad.png) — now 3 buyers (Chicago, Santiago, Bhopal). Option: hide/shrink FABs while a form button or summary tile is under them, or one combined FAB. Belongs to Now #2.
 - (panel 11-07) Home welcome sheet still covers the greeting + half the first screen (webkit-client-home.png) — Bhopal, Amsterdam. Now #2.
 - (panel 11-07, business) Named advisor / "Call me" / same-day reply — now 14 buyers over 4 panels (11-07: Bhopal, Panaji, Cairo). Gift-to-address + arrival date (Chicago) and USD hint + pay in parts (Santiago) repeat again.
