@@ -52,6 +52,10 @@ _Re-ordered by chief 2026-11-06 22:45 IST. Ledger 26h: watchdog 9, backend 4, pa
 - Hourly QA cron is sparse: 3 schedule runs in ~18 h (02:30, 09:51, 16:39 UTC) — GitHub drops `:07` crons; try another minute or an external trigger (protected .github/).
 
 ## Inbox
+- (panel 11-07) LIVE orb + chat FAB still sit on Payments TOTAL tile and Address Submit/Save at first view (webkit-client-tab-pay.png, tab-ad.png) — now 3 buyers (Chicago, Santiago, Bhopal). Option: hide/shrink FABs while a form button or summary tile is under them, or one combined FAB. Belongs to Now #2.
+- (panel 11-07) Home welcome sheet still covers the greeting + half the first screen (webkit-client-home.png) — Bhopal, Amsterdam. Now #2.
+- (panel 11-07, business) Named advisor / "Call me" / same-day reply — now 14 buyers over 4 panels (11-07: Bhopal, Panaji, Cairo). Gift-to-address + arrival date (Chicago) and USD hint + pay in parts (Santiago) repeat again.
+- (panel 11-07, QA idea for tools/qa) Add a check that #mg-toggle / #bell / #priv-toggle share one offsetTop on 390px (header wrap regressed silently twice).
 _(chief 2026-11-06: emptied — enquiry alarm → Now #1; frontend miss → Needs Jeet; Europe/LatAm line → delivery line; view/search tracking already in Needs Jeet; share link + video → Later; reseller list → Later.)_
 
 ## Done
