@@ -14,3 +14,6 @@
 - 2026-11-07: avg trust 3.7/desire 2.6/ease 5.4/speed 7.1/value 3.9, buy 0/10 (maybe 3); Edit locked day 10. Shipped 3bb577a header chips one row (:has(>.hdrbtns:empty), empty span took a gap), 094e988 chat header one row + #terms-quick .tqp buttons didn't inherit page font. Verify on next webkit-client-home / chat-open / tab-pol-bottom.
 - Used 11-07: Bhopal/Rajkot/Thiruvananthapuram/Panaji, Chicago/Melbourne, Amsterdam/Ho Chi Minh City/Cairo/Santiago. Isolated test trick: copy style.css to /tmp/t + minimal markup (no scripts) in chromium works for layout checks.
 - 2026-11-07: push run 42346301858 green + READY; all 3 fixes visible in after-screens.
+- 2026-11-08: avg trust 3.6/desire 2.5/ease 5.5/speed 7.1/value 3.8, buy 0/10 (maybe 3); Edit locked day 11. Shipped 90d5c43 (rv-line strike-through on .acc Overview cards + chat .ib-q blank icons: chip padding 0 18px!important L1660 beats them) and b5c34d9 ("no need to call" copy). CDP CSS.getMatchedStylesForNode in isolated chromium finds the winning rule fast.
+- Used 11-08: Varanasi/Nashik/Shillong/Mangaluru, Durban/Seattle, Osaka/Stockholm/Casablanca/Bogotá. QA now runs every ~4h (schedule), webkit shots are 390×664 @3x; chromium-client-search-type shows Overview mid-page.
+- 2026-11-08: push run 42454272363 green + READY; all 3 fixes visible in after-screens.

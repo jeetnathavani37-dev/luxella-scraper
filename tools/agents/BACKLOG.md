@@ -54,6 +54,9 @@ _Re-ordered by chief 2026-11-07 22:45 IST. Ledger 26h: watchdog 9, backend 4, pa
 - Hourly QA cron is sparse: 3 schedule runs in ~18 h (02:30, 09:51, 16:39 UTC) — GitHub drops `:07` crons; try another minute or an external trigger (protected .github/).
 
 ## Inbox
+- (panel 11-08) QA: add a check for elements whose content box is <8px wide (would have caught the blank chat .ib-q squares) and for an h2 ::before/::after rule overlapping the next sibling's text box (rv-line strike-through). tools/qa = protected → Jeet/watchdog.
+- (panel 11-08) neworder.js reveal adds `rv-line` to `.sw section.card:not(.acc)>h2` before polish.js adds `.acc` (race) — CSS now hides it on .acc; remove the rv-line rule in the Now #3c dead-reveal consolidation.
+- (panel 11-08, business) Gift line before Diwali: "Gifts to another address with a note · India delivery X–Y days" (Mangaluru, Durban); French/Spanish greeting + local-currency hint for overseas leads (Casablanca, Bogotá).
 _(chief 2026-11-07: emptied — panel FAB/welcome → Now #2; frontend loops/dead reveal → Now #3; Edit≠Collection price → Needs Jeet; Picked-for-you → Later; advisor count + QA header check merged into Needs Jeet.)_
 
 ## Done
