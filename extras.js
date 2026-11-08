@@ -484,7 +484,7 @@ function buildOps(n){
  n=n||0;const pane=$('pane-mg');if(!pane){if(n<60)setTimeout(()=>buildOps(n+1),250);return;}if($('ops'))return;
  const sec=el('section','card mgc');sec.id='ops';sec.appendChild(el('h2',null,'Operations'));sec.appendChild(el('p','note','Only you see the Admin tab. Costs are stored separately from anything clients can read.'));
  const b=el('div');b.id='ops-body';sec.appendChild(b);pane.insertBefore(sec,pane.firstChild);
- const load=async()=>{try{opsState.costs=await window.lx.costsList();opsState.client=opsState.costs['__client__']||{};delete opsState.costs['__client__'];}catch(e){}renderOps();};load();setInterval(()=>{if(!document.querySelector('#ops-body details[open]'))renderOps();},5000);opsState.reload=load;
+ const load=async()=>{try{opsState.costs=await window.lx.costsList();opsState.client=opsState.costs['__client__']||{};delete opsState.costs['__client__'];}catch(e){}renderOps();};load();setInterval(()=>{if(document.hidden||!sec.isConnected||!sec.getClientRects().length)return;const ob=$('ops-body');if(document.querySelector('#ops-body details[open]')||(ob&&ob.contains(document.activeElement)))return;renderOps();},5000);opsState.reload=load;
 }
 const _drawer=window.__lxDrawer;
 window.__lxDrawer=function(r,pan){
