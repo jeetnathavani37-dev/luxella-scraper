@@ -416,6 +416,7 @@ function renderOps(){
  const tiles=el('div','xo-tiles');
  [['Sales (agreed)',inr(sales),'Order value, not cash'],['Cash received',inr(cash),'Verified payments'],['Outstanding',inr(Math.max(0,sales-cash)),'Sales minus cash'],['Realized profit',inr(realized),'Delivered, costs final'],['Pending profit (est.)',inr(est),estN+' order'+(estN===1?'':'s')+(noCost?' · '+noCost+' without cost':'')]].forEach(a=>{const d=el('div','xo-tile');d.appendChild(el('div','lbl',a[0]));d.appendChild(el('b',null,a[1]));d.appendChild(el('small',null,a[2]));tiles.appendChild(d);});
  body.appendChild(tiles);
+ renderWaiting(body);
  const qi=queueItems();body.appendChild(el('h3',null,'Action queue'+(qi.length?' ('+qi.length+')':'')));
  if(!qi.length)body.appendChild(el('p','note','Nothing needs action right now.'));
  qi.slice(0,25).forEach(i=>{const b=el('button','xo-q');b.type='button';b.appendChild(el('span','xchip',i.k));b.appendChild(el('span',null,i.t));b.addEventListener('click',i.go);body.appendChild(b);});
@@ -424,6 +425,27 @@ function renderOps(){
  rows.slice().sort((a,b)=>String(b.order_date||'')<String(a.order_date||'')?-1:1).forEach(r=>{const p=profitOf(r);if(!p)return;any=true;const row=el('button','xo-prow');row.type='button';row.appendChild(el('span',null,(r.order_no||'')+' '+r.item));row.appendChild(el('span',null,inr(p.rev)+' − '+inr(p.cost)));const pf=el('b',null,inr(p.profit)+' · '+p.margin.toFixed(0)+'%');pf.style.color=p.profit<0?'var(--wine)':'inherit';row.appendChild(pf);row.appendChild(el('em',null,p.final?'Final':'Estimated'));row.addEventListener('click',()=>openOrder(r.item));tb.appendChild(row);});
  body.appendChild(any?tb:el('p','note','Open an order and add its costs to see profit here.'));
  renderBulk(body,rows);renderCrm(body);renderAudit(body);
+}
+// Owner-only, read-only: client requests still 'Submitted', oldest first, with age + unsent draft. Never writes status, never sends.
+function renderWaiting(body){
+ const now=Date.now(),hrs=x=>{const t=Date.parse(x.at||'');return isFinite(t)?(now-t)/36e5:0;};
+ const list=Object.entries(rqState.items).map(([id,v])=>Object.assign({id},v)).filter(x=>x.status==='Submitted').sort((a,b)=>hrs(b)-hrs(a));
+ if(!list.length)return;
+ const dtext=x=>{const d=x.draft;return d&&typeof d==='object'?String(d.text||''):typeof d==='string'?d:'';};
+ const drafted=list.filter(x=>dtext(x)).length;
+ const w=el('div','xo-wait');w.id='ops-wait';
+ w.appendChild(el('h3',null,'Requests waiting ('+list.length+')'+(drafted?' · '+drafted+' drafted, not sent':'')));
+ const old=list.filter(x=>hrs(x)>48&&dtext(x)).length;
+ if(old)w.appendChild(el('p','xo-alarm',old+' request'+(old===1?' has':'s have')+' waited over 48 hours with a reply drafted but not sent.'));
+ const age=h=>h<1?'<1h':h<48?Math.floor(h)+'h':Math.floor(h/24)+'d';
+ list.slice(0,12).forEach(x=>{const h=hrs(x),t=dtext(x);const d=el('details','xo-wq');const s=el('summary');
+  s.appendChild(el('span','xchip xo-age'+(h>24?' red':h>12?' amb':''),age(h)));s.appendChild(el('span','xo-wt',(x.brand?x.brand+' ':'')+(x.product||'Request')));
+  if(t)s.appendChild(el('span','xchip xo-dr','Drafted, not sent'));d.appendChild(s);
+  const b=el('div','xo-wb');if(x.note)b.appendChild(el('p','note',String(x.note).slice(0,300)));
+  if(t){b.appendChild(el('p','xo-dt',t));const a=el('a','btn2','Open WhatsApp');a.href='https://wa.me/?text='+encodeURIComponent(t);a.target='_blank';a.rel='noopener';b.appendChild(a);}
+  else b.appendChild(el('p','note','No reply drafted yet.'));
+  d.appendChild(b);w.appendChild(d);});
+ body.appendChild(w);
 }
 const openIn={};
 function fold(body,id,title,fn){const d=el('details','xo-fold');d.id=id;if(openIn[id])d.open=true;d.addEventListener('toggle',()=>{openIn[id]=d.open;});d.appendChild(el('summary',null,title));const w=el('div');d.appendChild(w);fn(w);body.appendChild(d);return d;}
