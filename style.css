@@ -4611,3 +4611,9 @@ html body #chat.chat .ch #chat-mode-t{margin-left:auto}
 @keyframes lxPulse{0%{box-shadow:0 0 0 0 rgba(201,162,39,.32)}70%,100%{box-shadow:0 0 0 22px rgba(201,162,39,0)}}
 @media (prefers-reduced-motion:reduce){.lx-gate .box,.lx-gate .logo,.lx-gate .fid-ring{animation:none}}
 @media (max-width:380px){.lx-gate .box{padding:40px 22px 28px}.lx-gate p{font-size:18px}}
+
+/* panel 2026-11-08: Overview dropdown cards (Next delivery / Your to-dos) — the scroll-reveal gold rule (h2.rv-line:before, bottom:0) can land on a heading before polish.js turns the card into .acc; on .acc the h2 has margin 0 and the note sits 8px up, so the line ran through "Closest open order" like a strike-through. The chevron is the .acc marker; no rule needed. */
+.sw section.card.acc>h2.rv-line:before{display:none!important}
+/* panel 2026-11-08: chat photo / voice-note buttons (.ib-q, 40px) lost to the generic chip padding 0 18px!important (style.css:1660) → 4px content box, 2px icons = two blank squares next to Send. */
+.sw.sw.sw .chat .ci .ib-q.ib-q{padding:0!important;gap:0!important}
+.sw .chat .ci .ib-q svg{flex:none;width:18px;height:18px}
