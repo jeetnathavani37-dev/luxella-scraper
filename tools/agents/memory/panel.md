@@ -17,3 +17,6 @@
 - 2026-11-08: avg trust 3.6/desire 2.5/ease 5.5/speed 7.1/value 3.8, buy 0/10 (maybe 3); Edit locked day 11. Shipped 90d5c43 (rv-line strike-through on .acc Overview cards + chat .ib-q blank icons: chip padding 0 18px!important L1660 beats them) and b5c34d9 ("no need to call" copy). CDP CSS.getMatchedStylesForNode in isolated chromium finds the winning rule fast.
 - Used 11-08: Varanasi/Nashik/Shillong/Mangaluru, Durban/Seattle, Osaka/Stockholm/Casablanca/Bogotá. QA now runs every ~4h (schedule), webkit shots are 390×664 @3x; chromium-client-search-type shows Overview mid-page.
 - 2026-11-08: push run 42454272363 green + READY; all 3 fixes visible in after-screens.
+- 2026-11-09: avg trust 3.4/desire 2.4/ease 5.3/speed 7.0/value 3.5, buy 0/10 (maybe 3); Edit locked day 12. Shipped 39dc32f (mini bar Next ETA → etaOf + past = "Any day"), a01d37d (ovHero "Opening soon" when LOCKED), 635b892 (chat voice-note waveform icon; 2 identical mics). Bump 1794090000.
+- Used 11-09: Madurai/Siliguri/Chh. Sambhajinagar/Udaipur, Edison NJ/Dar es Salaam, Monaco/Busan/Accra/Lisbon. Mini bar used raw eta_date while cards use etaOf(order_date+1 month) — check other ETA spots for the same split.
+- 2026-11-09: push run 42572581120 green + READY; all 3 fixes visible in after-screens.
