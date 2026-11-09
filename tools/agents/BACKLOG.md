@@ -54,6 +54,7 @@ _Re-ordered by chief 2026-11-08 22:45 IST. Ledger 26h: watchdog 9, backend 4, pa
 - Hourly QA cron is sparse: 3 schedule runs in ~18 h (02:30, 09:51, 16:39 UTC) — GitHub drops `:07` crons; try another minute or an external trigger (protected .github/).
 
 ## Inbox
+- (growth 11-09) "New since your last visit" strip on Overview for returning clients (swayam opens daily during transit with nothing new to see) — needs view tracking + published Edit pieces.
 - (panel 11-09, Madurai/Accra) Overview to-do "PAY ₹21,000 NOW" chip wraps to 3 tiny lines at 390px (chromium-client-search-type.png) — one line, ≥11px, or move under the row.
 - (panel 11-09, Udaipur) Wedding/bulk gifting: one message → many addresses + gift box/note (new high-value use case; business call, overlaps the gift/delivery line in Needs Jeet).
 - (panel 11-09, Monaco/Lisbon) Client-facing vocabulary audit: "Copy orders as CSV", "Ready to ship" read as a shop, not a maison — rename softly (copy only) once The Edit opens.
