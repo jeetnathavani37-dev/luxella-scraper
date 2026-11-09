@@ -1743,7 +1743,7 @@
   const n=rows.filter(r=>r.day===today()&&!(r.data||{}).draft).length;const first=String((window.LX_CLIENT&&window.LX_CLIENT.name)||'').split(' ')[0];
   const tx=el('div','pe-tx');tx.appendChild(el('em','pe-dear','Dear '+(first||'client')+','));const t=el('h3','pe-t');t.appendChild(el('small',null,'The Luxella'));t.appendChild(el('span',null,'Private Edit'));tx.appendChild(t);
   const ru=el('div','pe-rule');ru.appendChild(el('i'));ru.appendChild(el('b',null,'✦'));ru.appendChild(el('i'));tx.appendChild(ru);
-  tx.appendChild(el('p','pe-s',n?(n+' new '+(n>1?'pieces':'piece')+', chosen for you tonight.'):'New pieces are presented every evening.'));tx.appendChild(el('span','pe-d',longDate()));h.appendChild(tx);
+  tx.appendChild(el('p','pe-s',LOCKED&&!own()?'Opening soon. Your concierge will tell you first.':n?(n+' new '+(n>1?'pieces':'piece')+', chosen for you tonight.'):'New pieces are presented every evening.'));tx.appendChild(el('span','pe-d',longDate()));h.appendChild(tx);
   const env=el('div','pe-strip');const cards=env;h.appendChild(env);
   const cta=el('button','pe-cta','Open your edit');cta.type='button';h.appendChild(cta);
   const go=()=>{if(h.classList.contains('open'))return;h.classList.add('open');setTimeout(()=>{const tb=$('tab-deals');if(tb)tb.click();setTimeout(()=>h.classList.remove('open'),800);},900);};h.addEventListener('click',go);
