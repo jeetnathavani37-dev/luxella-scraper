@@ -57,6 +57,8 @@ _Re-ordered by chief 2026-11-09 22:45 IST. Ledger 26h: watchdog 7, backend 4, pa
 - Hourly QA cron is sparse (chief 11-09: last run #78 07:51 UTC, none for 9 h+ by 17:15 UTC): 3 schedule runs in ~18 h (02:30, 09:51, 16:39 UTC) — GitHub drops `:07` crons; try another minute or an external trigger (protected .github/).
 
 ## Inbox
+- (frontend 11-10) deals.js:1408 colSpot (Collection spotlight) auto-cycles product photos every 1.6 s forever while on screen — reads as 'second photo flashing' (Jeet ban §5); suggest manual swipe only or one slow pass. Plus .cl-spot-st img spotBob infinite (style.css:3222) — design call, not shipped.
+- (frontend 11-10) Now #2(b) left: app.js:590 30 s ETA setInterval (not paused when hidden), deals.js:1594 carousel already skips off-screen but not document.hidden. Low impact.
 _(chief 2026-11-09: emptied — PAY-NOW chip → Now #1d; 'new since last visit' + vocabulary audit → Later; wedding/bulk gifting → Needs Jeet delivery/gift line.)_
 - (panel 11-10) Now #1(d) PAY-NOW chip DONE by panel 28a653b (one line, .act .it>.btn2 flex:none nowrap) — design can skip it; FAB coins (Now #1b) re-flagged by Jamshedpur (tab-help 'Open a case'), Sharjah (tab-ad 'Copy instead'), Almaty (tab-pay/st/rts last line).
 - (panel 11-10) Other ETA spots still print raw past `eta_date`: drawer/timeline + to-dos 'Overdue ETA' (app.js:451) and extras.js:398 'Overdue' — client-facing 'Overdue' should read 'Any day now' like the Tracker now does (6f4d8fe). Frontend, low risk.
@@ -64,6 +66,7 @@ _(chief 2026-11-09: emptied — PAY-NOW chip → Now #1d; 'new since last visit'
 - (panel 11-10, gifting — 3 buyers Sharjah/Athens/Jamshedpur) Gift option on enquiry: 'gift to another address · your note · price never shown' — business promise first (Needs Jeet gift line), then a tick box on Ask for a quote.
 
 ## Done
+- (frontend 2026-11-10) Now #2(b) mostly done: Overview 'Explore your houses' shimmer/ring, journey dot pulse, countdown hand → finite plays (577842e); brand carousel auto-advance skips when hidden/off-tab/off-screen (b9b123a). QA #85 42805518957 green, deploy READY; endless anims 90→0 summed over 108 steps (home/ov/tr 3→0), 0 problems, nodes unchanged.
 - 2026-11-10 design: quiet bottom fade under LIVE/contact/top coins on iPhone (≤900px), coins fully opaque — b6567ef, QA #84 green, deploy READY (before/after webkit-client-tab-help, chromium-client-tab-pay).
 - (chief audit 2026-11-09) 39dc32f (mini bar Next ETA via etaOf, past → 'Any day') + a01d37d (Overview Edit card 'Opening soon' while LOCKED, client only): compliant — copy/logic only, no guarded areas, no motion, no price change.
 - (panel 2026-11-09) Sticky bar ETA matches Next delivery card (39dc32f); Overview Edit card no longer promises 'every evening' while locked (a01d37d); chat voice-note waveform icon, no more 2 identical mics (635b892). QA 42572581120 green, READY.
