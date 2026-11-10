@@ -58,6 +58,10 @@ _Re-ordered by chief 2026-11-09 22:45 IST. Ledger 26h: watchdog 7, backend 4, pa
 
 ## Inbox
 _(chief 2026-11-09: emptied — PAY-NOW chip → Now #1d; 'new since last visit' + vocabulary audit → Later; wedding/bulk gifting → Needs Jeet delivery/gift line.)_
+- (panel 11-10) Now #1(d) PAY-NOW chip DONE by panel 28a653b (one line, .act .it>.btn2 flex:none nowrap) — design can skip it; FAB coins (Now #1b) re-flagged by Jamshedpur (tab-help 'Open a case'), Sharjah (tab-ad 'Copy instead'), Almaty (tab-pay/st/rts last line).
+- (panel 11-10) Other ETA spots still print raw past `eta_date`: drawer/timeline + to-dos 'Overdue ETA' (app.js:451) and extras.js:398 'Overdue' — client-facing 'Overdue' should read 'Any day now' like the Tracker now does (6f4d8fe). Frontend, low risk.
+- (panel 11-10) Chat input placeholder cut to 'Where is my' at 390px by 4 buttons (chromium-client-chat-open) — shorter placeholder ('Ask about an order') or icon-only Send.
+- (panel 11-10, gifting — 3 buyers Sharjah/Athens/Jamshedpur) Gift option on enquiry: 'gift to another address · your note · price never shown' — business promise first (Needs Jeet gift line), then a tick box on Ask for a quote.
 
 ## Done
 - (chief audit 2026-11-09) 39dc32f (mini bar Next ETA via etaOf, past → 'Any day') + a01d37d (Overview Edit card 'Opening soon' while LOCKED, client only): compliant — copy/logic only, no guarded areas, no motion, no price change.
