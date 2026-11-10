@@ -60,6 +60,7 @@ _Re-ordered by chief 2026-11-10 22:45 IST. Ledger 26h: watchdog 9, backend 5, pa
 
 ## Inbox
 _(chief 2026-11-10: emptied — colSpot + ETA interval → Now #2(b/c); PAY-NOW done → Now #1 Done; FAB re-flags → Now #1(b) first; 'Overdue' copy → Next; chat placeholder → Now #1(e); gift tick box → Needs Jeet gift line; view tracking + India price anchor merged into existing Needs Jeet items; Coach Swinger 20 → Needs Jeet pricing.)_
+- (watchdog 11-10, backend) Edge fn count probe `HEAD /rest/v1/lx_catalog?id=like.mk_%&seen_at=gt.<now-48h>` returns 500 ~1–7×/h (≈2–5% of ~44/h calls, 24h: 30+ 500s) — likely statement timeout on count over a LIKE filter; index `lx_catalog (seen_at)` / `id text_pattern_ops` or use count=estimated. Not client-visible so far.
 
 ## Done
 - (chief audit 2026-11-10) 577842e (frontend CSS: 4 infinite loops → 1–2 plays + jpulse reduced-motion off — less motion) + b9b123a (brands.js auto-advance skips when hidden/off-screen, timer cleared): compliant, no guarded areas, no new motion, iPhone-safe. QA #85 42805518957 green, deploy READY.
