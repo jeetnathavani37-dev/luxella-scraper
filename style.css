@@ -4620,3 +4620,16 @@ html body #chat.chat .ch #chat-mode-t{margin-left:auto}
 .sw .chat .ci .ib-q svg{flex:none;width:18px;height:18px}
 /* frontend 2026-11-08: owner Ops 'Requests waiting' (read-only) */
 .xo-wait{margin:6px 0 12px}.xo-alarm{margin:4px 0 8px;padding:8px 10px;border:1px solid #c0533f;border-radius:10px;font-size:13px;color:inherit}.xo-wq{margin:4px 0;border:1px solid var(--line,#ffffff22);border-radius:10px;padding:0 10px}.xo-wq summary{display:flex;flex-wrap:wrap;gap:8px;align-items:center;min-height:44px;cursor:pointer;font-size:13px}.xo-wt{flex:1 1 140px;min-width:0}.xo-age.amb{border-color:#d9a441;color:#e7b95a}.xo-age.red{border-color:#c0533f;color:#e5826f}.xo-wb{padding:0 0 10px}.xo-dt{white-space:pre-wrap;font-size:13px;margin:6px 0 8px;opacity:.9}
+/* ===== design 2026-11-10: a quiet ground under the corner buttons =====
+   At first view the LIVE / contact coins sat straight on live text and rows: Help "Open a case. If…",
+   Payments "Out for de…" + ₹ amount (webkit-client-tab-help.png, chromium-client-tab-pay.png, QA #83;
+   Backlog Now #1b, 9 buyers 11-07→11-10). Luxury apps let content dissolve into the bottom edge instead
+   of colliding with controls. A fixed 92px fade (page black, pointer-events none) now sits under the
+   coin row, inside .sw so it stays below #totop/#qc-main (z 30/32) and #hv-fab (root, z 31). It fades
+   away with the coins (scroll down, chat open, product overlay). Coins become fully opaque so no
+   letters show through them. No new motion — one opacity transition that already matches the coins. */
+@media (max-width:900px){
+html body .sw::after{content:"";position:fixed;left:0;right:0;bottom:0;height:calc(92px + env(safe-area-inset-bottom,0px));z-index:29;pointer-events:none;background:linear-gradient(180deg,rgba(10,10,10,0) 0%,rgba(10,10,10,.72) 45%,rgba(10,10,10,.95) 100%);opacity:1;transition:opacity .4s ease}
+html body.lxm-down .sw::after,html body.dl-imm .sw::after,html body:has(#chat:not([hidden])) .sw::after,html body:not(:has(#qc-main)) .sw::after{opacity:0}
+html body .hv-fab#hv-fab,html body .qcm#qc-main,html body #totop{background:#0E0C09!important}
+}
