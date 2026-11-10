@@ -793,7 +793,7 @@ function renderCrazy(o){const bn=document.getElementById('banner'),cd=document.g
   cd.appendChild(svg);cd.appendChild(side);
   const start=nxt.order_date?new Date(nxt.order_date).getTime():Date.now()-18*864e5,end=new Date(nxt.eta_date+'T23:59:59').getTime();
   const tick=()=>{const ms2=end-Date.now();const frac=Math.max(0,Math.min(1,(Date.now()-start)/(end-start)));arc.setAttribute('stroke-dashoffset',C*(1-frac));
-   if(ms2<=0){big.textContent='ETA passed';num.textContent='—';u.textContent='OVERDUE';return;}const d=Math.floor(ms2/864e5),hh=Math.floor(ms2%864e5/36e5),mm=Math.floor(ms2%36e5/6e4),ss=Math.floor(ms2%6e4/1e3);num.textContent=d;big.textContent=String(hh).padStart(2,'0')+':'+String(mm).padStart(2,'0')+':'+String(ss).padStart(2,'0');};tick();cdTimer=setInterval(tick,1000);}
+   if(ms2<=0){const s8=Number(nxt.stage)===8;big.textContent=s8?'Arriving today':'Any day now';num.textContent='—';u.textContent=s8?'TODAY':'ARRIVING';sm.textContent=(nxt.order_no?'Ref. '+nxt.order_no+' · ':'')+nxt.item;return;}const d=Math.floor(ms2/864e5),hh=Math.floor(ms2%864e5/36e5),mm=Math.floor(ms2%36e5/6e4),ss=Math.floor(ms2%6e4/1e3);num.textContent=d;big.textContent=String(hh).padStart(2,'0')+':'+String(mm).padStart(2,'0')+':'+String(ss).padStart(2,'0');};tick();cdTimer=setInterval(tick,1000);}
  else{const s2=document.createElement('span');s2.className='lbl';s2.textContent='No ETA to count down to right now.';cd.appendChild(s2);}
  // collection
  const brands=[...new Set(rows.map(r=>r.brand).filter(Boolean))];brands.forEach(bn2=>col.appendChild(brandEl({brand:bn2})));
@@ -838,7 +838,7 @@ function renderHome(o){renderCal(o);renderCrazy(o);renderExtras(o);const nx=docu
  const open=o.data.filter(r=>r.status!=='Delivered'&&Number(r.stage||1)<9);
  const cand=open.slice().sort((a,b)=>{const sa=Number(a.stage||1),sb2=Number(b.stage||1);if(sb2!==sa)return sb2-sa;return String(a.eta_date||'9')<String(b.eta_date||'9')?-1:1;})[0];
  if(cand){nx.appendChild(photoEl(cand,true));const t=document.createElement('div');const b=document.createElement('div');b.className='big';b.textContent=(cand.order_no?cand.order_no+' ':'')+cand.item;
-  const s=document.createElement('div');s.className='lbl';const ce=etaOf(cand);const dd=ce?Math.ceil((new Date(ce)-Date.now())/864e5):null;s.textContent=stName(cand,cand.stage)+(ce?' · ETA '+fd(ce)+(dd>0?' · in '+dd+' days':(dd!==null?' · any day now':'')):'')+(Number(cand.stage)===8?' · arriving today':'');t.appendChild(b);t.appendChild(s);nx.appendChild(t);}
+  const s=document.createElement('div');s.className='lbl';const ce=etaOf(cand);const dd=ce?Math.ceil((new Date(ce)-Date.now())/864e5):null;s.textContent=stName(cand,cand.stage)+(Number(cand.stage)===8?' · arriving today':(ce?(dd>0?' · ETA '+fd(ce)+' · in '+dd+' days':' · any day now'):''));t.appendChild(b);t.appendChild(s);nx.appendChild(t);}
  else{const s=document.createElement('span');s.className='lbl';s.textContent='Nothing on the way right now.';nx.appendChild(s);}
  const c={placed:0,transit:0,done:0};o.data.forEach(r=>{const st=Number(r.stage||1);if(st>=9||r.status==='Delivered')c.done++;else if(st<=2)c.placed++;else c.transit++;});
  [['Placed',c.placed],['On the way',c.transit],['Delivered',c.done]].forEach(([l,v])=>{const d=document.createElement('div');const b=document.createElement('b');b.textContent=v;d.appendChild(b);d.appendChild(document.createTextNode(l));sb.appendChild(d);});
