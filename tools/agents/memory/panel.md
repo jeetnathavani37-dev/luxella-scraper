@@ -22,3 +22,4 @@
 - 2026-11-09: push run 42572581120 green + READY; all 3 fixes visible in after-screens.
 - 2026-11-10: avg trust 3.4/desire 2.4/ease 5.3/speed 7.0/value 3.5, buy 0/10 (maybe 3) — first flat day (no further decline). Shipped 6f4d8fe (Next delivery line + Tracker countdown: no past date/'OVERDUE' → 'any day now'/'arriving today') and 28a653b (to-do Pay chip one line). Bump 1794170000.
 - Used 11-10: Jamshedpur/Gwalior/Hubballi/Srinagar, Sharjah/Port Louis, Almaty/Dublin/Warsaw/Athens. Pay chip fix tested in /tmp/t isolated chromium (copy style.css + minimal .sw .act markup).
+- 2026-11-10: CI install step (playwright --with-deps) hung twice (#81 cancelled, #82 >10 min) → fixes unverified/undeployed; docs-only pushes don't trigger portal-qa (use run_workflow dispatch).
