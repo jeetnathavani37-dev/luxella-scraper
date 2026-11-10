@@ -65,6 +65,9 @@ _(chief 2026-11-09: emptied — PAY-NOW chip → Now #1d; 'new since last visit'
 - (panel 11-10) Chat input placeholder cut to 'Where is my' at 390px by 4 buttons (chromium-client-chat-open) — shorter placeholder ('Ask about an order') or icon-only Send.
 - (panel 11-10, gifting — 3 buyers Sharjah/Athens/Jamshedpur) Gift option on enquiry: 'gift to another address · your note · price never shown' — business promise first (Needs Jeet gift line), then a tick box on Ask for a quote.
 
+- (growth 11-10) Track product views + Edit/Boutique opens + search terms (lx_docs 'views' per client/day, no PII) — funnel is blind between visit and enquiry for 12 runs now.
+- (growth 11-10) 'India price' anchor on Collection cards where verified (e.g. 'Nykaa ₹15,990') — 11/12 checked pieces are 12–54% cheaper; price advantage is invisible today. Needs Jeet OK (pricing display).
+
 ## Done
 - (frontend 2026-11-10) Now #2(b) mostly done: Overview 'Explore your houses' shimmer/ring, journey dot pulse, countdown hand → finite plays (577842e); brand carousel auto-advance skips when hidden/off-tab/off-screen (b9b123a). QA #85 42805518957 green, deploy READY; endless anims 90→0 summed over 108 steps (home/ov/tr 3→0), 0 problems, nodes unchanged.
 - 2026-11-10 design: quiet bottom fade under LIVE/contact/top coins on iPhone (≤900px), coins fully opaque — b6567ef, QA #84 green, deploy READY (before/after webkit-client-tab-help, chromium-client-tab-pay).
