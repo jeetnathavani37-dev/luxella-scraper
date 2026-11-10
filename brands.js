@@ -40,7 +40,7 @@
   const map=new Map();rows.forEach(r=>{const b=String(r.brand).trim();const k=b.toLowerCase();if(!map.has(k))map.set(k,{b,rows:[]});map.get(k).rows.push(r);});
   const groups=[...map.values()].map(g=>{g.rows.sort((a,b)=>String(b.order_date||'')<String(a.order_date||'')?-1:1);g.hero=g.rows.find(r=>pu(r))||g.rows[0];g.open=g.rows.filter(r=>Number(r.stage||1)<9&&r.status!=='Delivered').length;return g;}).sort((a,b)=>b.rows.length-a.rows.length||(String(b.rows[0].order_date)>String(a.rows[0].order_date)?1:-1));
   let w=$('lxbrands');
-  if(groups.length<1){if(w)w.remove();return;}
+  if(groups.length<1){clearInterval(timer);timer=null;if(w)w.remove();return;}
   const key=groups.map(g=>g.b+g.rows.length+g.open+pu(g.hero)).join('|');if(w&&key===lastKey)return;lastKey=key;
   if(!w){w=document.createElement('section');w.id='lxbrands';w.className='lxbr';}{const no=$('neworder');if(no&&no.parentNode){if(no.nextSibling!==w)no.after(w);}else if(!w.parentNode)pane.appendChild(w);}
   w.textContent='';
@@ -68,12 +68,13 @@
    const mark=()=>{const i=cur();[...dots.children].forEach((d,j)=>d.classList.toggle('on',i===j));cards.forEach((c,j)=>c.classList.toggle('on',i===j));};
    const go=i=>{const c=cards[(i+cards.length)%cards.length];track.scrollTo({left:c.offsetLeft-(track.clientWidth-c.offsetWidth)/2,behavior:RM?'auto':'smooth'});};
    const stop=()=>{clearInterval(timer);timer=null;pl.classList.remove('on');};
-   const start=()=>{if(RM)return;stop();timer=setInterval(()=>go(cur()+1),4200);pl.classList.add('on');};
+   /* frontend 11-10: skip the auto-advance while the page is hidden, the Overview pane is not shown or the carousel is off-screen (each step re-scrolled + re-classed the track → wasted decoration passes) */const idle=()=>{if(document.hidden||!track.isConnected||!track.offsetParent)return true;const bx=track.getBoundingClientRect();return bx.bottom<0||bx.top>(window.innerHeight||0);};
+   const start=()=>{if(RM)return;stop();timer=setInterval(()=>{if(!idle())go(cur()+1);},4200);pl.classList.add('on');};
    pl.addEventListener('click',()=>timer?stop():start());
    track.addEventListener('scroll',()=>requestAnimationFrame(mark),{passive:true});
    track.addEventListener('pointerdown',stop,{passive:true});
    setTimeout(()=>{mark();start();},300);
-  }else{track.firstChild&&track.firstChild.classList.add('on');}
+  }else{clearInterval(timer);timer=null;track.firstChild&&track.firstChild.classList.add('on');}
  }
  try{render();dash.onData(render);}catch(e){}
 })();
