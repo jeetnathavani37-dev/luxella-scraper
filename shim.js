@@ -166,6 +166,11 @@ const _topbar=topbar;topbar=function(){_topbar();faceBtn();};
 window.__lxAdmin={sb,S,esc,adminCall:(b)=>adminCall(b)};
 async function start(){const {data:{session}}=await sb.auth.getSession();S.session=session;if(!session){gateLogin();return;}S.email=(session.user.email||'').toLowerCase();S.owner=['jeetnathavani37@gmail.com','jeetnatb@gmail.com'].includes(S.email);
  {const fr=fidGet();if(fr&&fr.email===S.email&&!window.__lxUnlocked&&await fidSupported()){gateFace(fr);return;}}
+ // ?money=1 — owner opens the Money app from here: get a single-use pass and hand over (no password, no mail)
+ if(S.owner&&new URLSearchParams(location.search).has('money')&&!window.__moneyGo){window.__moneyGo=true;
+  try{const r=await fetch(SUPABASE_URL+'/functions/v1/money-pass',{method:'POST',headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':'Bearer '+session.access_token},body:'{}'});const j=await r.json().catch(()=>({}));
+   if(r.ok&&j.pass){location.replace('https://money-app-olmp.vercel.app/#lxpass='+encodeURIComponent(j.pass));return;}}catch(_){}
+  history.replaceState(null,'',location.pathname);}
  const basePath=new URL(document.baseURI).pathname;const rel=location.pathname.startsWith(basePath)?location.pathname.slice(basePath.length):'';const seg=rel.split('/').filter(Boolean)[0]||'';const slug=new URLSearchParams(location.search).get('c')||(seg==='index.html'?'':seg);
  if(slug==='b2b'){location.replace('/');return;}
  if(slug==='admin'){if(!S.owner){gateNoAccess();return;}g('gate').hidden=true;g('top').hidden=true;g('dash-root').hidden=true;g('admin-root').hidden=false;if(window.__adminLoaded)return;window.__adminLoaded=1;const a=document.createElement('script');a.src='admin.js?v=1793610000';document.body.appendChild(a);return;}
