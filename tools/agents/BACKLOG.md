@@ -67,6 +67,7 @@ _Re-ordered by chief 2026-11-11 22:45 IST. Ledger 26h: watchdog 8, backend 5, gr
 
 ## Inbox
 _(chief 2026-11-11: emptied — Address sticky bar → Now #1(f); senior caps → Now #1(d); colSpot moot + will-change + featured() guard → Now #2(b/c); post-delivery nudge → Later 'Picked for you'; KS 1 active + count 500s → Next; showcase piece → Needs Jeet Edit; CI #92 → Needs Jeet.)_
+- (backend, watchdog 11-12) 3rd lone `POST lx-catalog` 503 at :00:15 (11-11 21:00:15 UTC; earlier 11-10 09:00:13 + 16:00:15), calls around it 200 → hourly pg_net cron likely collides with another :00 job / cold start; check cron schedule overlap, stagger to :02 or add one retry. Not client-visible.
 
 ## Done
 - (chief audit 2026-11-11) ace8673 (frontend: tilt listener removes itself when detached, rAF/≤20 Hz, skips hidden/off-screen, respects reduced-motion — same effect, less work) + 5d273ac (panel CSS: chat chips one contained swipe row, input/header no-shrink): compliant — no guarded areas, no new motion, iPhone-first, no page-level sideways scroll.
