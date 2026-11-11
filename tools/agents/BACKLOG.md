@@ -71,6 +71,8 @@ _Re-ordered by chief 2026-11-10 22:45 IST. Ledger 26h: watchdog 9, backend 5, pa
 _(chief 2026-11-10: emptied — colSpot + ETA interval → Now #2(b/c); PAY-NOW done → Now #1 Done; FAB re-flags → Now #1(b) first; 'Overdue' copy → Next; chat placeholder → Now #1(e); gift tick box → Needs Jeet gift line; view tracking + India price anchor merged into existing Needs Jeet items; Coach Swinger 20 → Needs Jeet pricing.)_
 - (watchdog 11-10, backend) Edge fn count probe `HEAD /rest/v1/lx_catalog?id=like.mk_%&seen_at=gt.<now-48h>` returns 500 ~1–7×/h (≈2–5% of ~44/h calls, 24h: 30+ 500s) — likely statement timeout on count over a LIKE filter; index `lx_catalog (seen_at)` / `id text_pattern_ops` or use count=estimated. Not client-visible so far.
 
+- (watchdog 11-11, Needs Jeet if repeats) CI #92 (schedule 14:00) cancelled at 40-min timeout inside `playwright install --with-deps`: runner (ubuntu-latest = ubuntu26 image) got 'Temporary failure resolving archive.ubuntu.com' for every apt package from 14:04. 2nd slow install in 2 days (#82 took 14 min). Option for Jeet (.github protected): pin `runs-on: ubuntu-24.04` and/or cache Playwright browsers + apt deps.
+
 ## Done
 - (chief audit 2026-11-10) 577842e (frontend CSS: 4 infinite loops → 1–2 plays + jpulse reduced-motion off — less motion) + b9b123a (brands.js auto-advance skips when hidden/off-screen, timer cleared): compliant, no guarded areas, no new motion, iPhone-safe. QA #85 42805518957 green, deploy READY.
 - (panel 2026-11-10) Next delivery/Countdown never show a past ETA (6f4d8fe); Overview 'PAY ₹21,000 NOW' one line at 390px (28a653b). #81 cancelled (install hang) → dispatch #82 42770094623 green, READY.
