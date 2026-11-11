@@ -4602,7 +4602,7 @@ html body #chat.chat .ch #chat-mode-t{margin-left:auto}
 .lx-gate .m{font:400 12px 'Jost',sans-serif;letter-spacing:.06em;color:#C98A7F;margin-top:16px;min-height:16px}
 .lx-gate .out{margin-top:20px;font:500 9.5px 'Jost',sans-serif;letter-spacing:.32em;color:#7d776b;background:none!important;border:0!important;box-shadow:none!important;padding:8px}
 .lx-gate .out:hover{color:#E3C565}
-.lx-gate .lx-foot{margin-top:26px;font:400 9px 'Jost',sans-serif;letter-spacing:.4em;text-transform:uppercase;color:#4d483f}
+.lx-gate .lx-foot{margin-top:26px;font:400 10px 'Jost',sans-serif;letter-spacing:.4em;text-transform:uppercase;color:#8a8272}
 /* Face ID unlock */
 .lx-gate .fid-ring{width:92px;height:92px;margin:2px auto 22px;border-radius:50%;display:grid;place-items:center;border:1px solid rgba(201,162,39,.5);background:radial-gradient(circle,rgba(201,162,39,.14),rgba(201,162,39,0) 70%);position:relative;animation:lxPulse 2.8s ease-out infinite}
 .lx-gate .fid-ring svg{width:46px;height:46px;stroke:#E3C565;fill:none;stroke-width:1.3;stroke-linecap:round;stroke-linejoin:round}
