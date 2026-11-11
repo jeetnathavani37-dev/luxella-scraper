@@ -37,6 +37,12 @@ async function boot(){const {data}=await sb.auth.getSession();const s=data&&data
  if(!s){$('gate').hidden=false;$('admin-root').hidden=true;return;}
  const email=String(s.user.email||'').toLowerCase();
  if(!OWNERS.includes(email)){await sb.auth.signOut();$('gate').hidden=false;$('m').textContent='Ye page sirf owner ke liye hai.';return;}
+ // ?money=1 — the owner asked to open the Money app from here: get a single-use pass and hand over
+ if(new URLSearchParams(location.search).has('money')&&!window.__moneyGo){window.__moneyGo=true;$('gate').hidden=false;$('admin-root').hidden=true;$('m').textContent='Money app khul raha hai…';
+  try{const r=await fetch('https://qzripzgbstvxkfobzhyv.supabase.co/functions/v1/money-pass',{method:'POST',headers:{'Content-Type':'application/json','apikey':'sb_publishable_-EA-q_dacUuWovbrCW5XVw_pPZ2vK_O','Authorization':'Bearer '+s.access_token},body:'{}'});const j=await r.json().catch(()=>({}));
+   if(r.ok&&j.pass){location.replace('https://money-app-olmp.vercel.app/#lxpass='+encodeURIComponent(j.pass));return;}
+   $('m').textContent='Money app ka pass nahi bana ('+(j.error||r.status)+'). Page refresh karke dobara try karo.';}catch(_){$('m').textContent='Network error — dobara try karo.';}
+  return;}
  if(started)return;started=true;$('gate').hidden=true;$('admin-root').hidden=false;
  window.__lxAdmin={sb,S:{email,owner:true}};const a=document.createElement('script');a.src='b2b.js?v='+(window.__V||Date.now());a.onload=()=>window.lxB2BApp&&window.lxB2BApp();document.body.appendChild(a);}
 $('go').onclick=async()=>{const e=$('em').value.trim().toLowerCase(),p=$('pw').value;if(!e||!p){$('m').textContent='Enter email and password.';return;}$('m').textContent='Signing in…';const {error}=await sb.auth.signInWithPassword({email:e,password:p});if(error){$('m').textContent='Galat email ya password.';return;}boot();};
