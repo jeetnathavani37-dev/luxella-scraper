@@ -60,6 +60,9 @@ _Re-ordered by chief 2026-11-10 22:45 IST. Ledger 26h: watchdog 9, backend 5, pa
 - Hourly QA cron is sparse (chief 11-09: last run #78 07:51 UTC, none for 9 h+ by 17:15 UTC): 3 schedule runs in ~18 h (02:30, 09:51, 16:39 UTC) — GitHub drops `:07` crons; try another minute or an external trigger (protected .github/).
 
 ## Inbox
+- (frontend 11-11) Now #2(b) is moot: colSpot (deals.js:1406) is defined but never called, and spotBob is already forced off by style.css:4442 (`animation:none!important`); .ft-bag/ftBob (style.css:3601-3602, 3628, 3635, 3787) has no JS user — all dead, fold into the #2(c) dead-CSS/JS delete commit. No live photo auto-cycle remains.
+- (frontend 11-11) style.css:817 `.sw img.ph,.sw #clogo img{will-change:transform}` promotes every order photo to its own GPU layer permanently (iPhone memory) — drop will-change (polish.js gyro now only writes ≤20 Hz to rendered nodes).
+- (frontend 11-11) deals.js:1594 featured() 5.6 s auto-scroll: hidden pane gives rect 0×0 which passes the off-screen check → scrollTo on a hidden track; add `!r.height||document.hidden` to the guard.
 - (panel 11-11) Address tab: the 3-button sticky bar (Submit / Save to my addresses / Copy instead) sits directly under the 'Shipping address' heading at first view and hides the note + form (webkit-client-tab-ad, Berlin buyer); 'Copy instead' renders at ~20% opacity — looks disabled. Make the bar appear only after the form scrolls into view, or give the heading ≥16px gap.
 - (panel 11-11) Seniors (Agra) still can't read 9–10px gold caps ('RECEIVED —', 'OPEN 2 · DUE · NEXT ETA' strip) — helper caps ≥11px across tabs (extends Now #1 helper caps).
 - (panel 11-11, Needs Jeet merge) Day 14 locked: 7/10 buyers' first reason for no-buy is 'nothing on the shelf'; Brussels collector: 'an empty window for two weeks is not mysterious, it is closed' → even one non-sale showcase piece with provenance on the Boutique doors.
