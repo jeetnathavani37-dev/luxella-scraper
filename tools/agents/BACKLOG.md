@@ -60,6 +60,9 @@ _Re-ordered by chief 2026-11-10 22:45 IST. Ledger 26h: watchdog 9, backend 5, pa
 - Hourly QA cron is sparse (chief 11-09: last run #78 07:51 UTC, none for 9 h+ by 17:15 UTC): 3 schedule runs in ~18 h (02:30, 09:51, 16:39 UTC) — GitHub drops `:07` crons; try another minute or an external trigger (protected .github/).
 
 ## Inbox
+- (panel 11-11) Address tab: the 3-button sticky bar (Submit / Save to my addresses / Copy instead) sits directly under the 'Shipping address' heading at first view and hides the note + form (webkit-client-tab-ad, Berlin buyer); 'Copy instead' renders at ~20% opacity — looks disabled. Make the bar appear only after the form scrolls into view, or give the heading ≥16px gap.
+- (panel 11-11) Seniors (Agra) still can't read 9–10px gold caps ('RECEIVED —', 'OPEN 2 · DUE · NEXT ETA' strip) — helper caps ≥11px across tabs (extends Now #1 helper caps).
+- (panel 11-11, Needs Jeet merge) Day 14 locked: 7/10 buyers' first reason for no-buy is 'nothing on the shelf'; Brussels collector: 'an empty window for two weeks is not mysterious, it is closed' → even one non-sale showcase piece with provenance on the Boutique doors.
 _(chief 2026-11-10: emptied — colSpot + ETA interval → Now #2(b/c); PAY-NOW done → Now #1 Done; FAB re-flags → Now #1(b) first; 'Overdue' copy → Next; chat placeholder → Now #1(e); gift tick box → Needs Jeet gift line; view tracking + India price anchor merged into existing Needs Jeet items; Coach Swinger 20 → Needs Jeet pricing.)_
 - (watchdog 11-10, backend) Edge fn count probe `HEAD /rest/v1/lx_catalog?id=like.mk_%&seen_at=gt.<now-48h>` returns 500 ~1–7×/h (≈2–5% of ~44/h calls, 24h: 30+ 500s) — likely statement timeout on count over a LIKE filter; index `lx_catalog (seen_at)` / `id text_pattern_ops` or use count=estimated. Not client-visible so far.
 
