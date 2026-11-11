@@ -4633,3 +4633,9 @@ html body .sw::after{content:"";position:fixed;left:0;right:0;bottom:0;height:ca
 html body.lxm-down .sw::after,html body.dl-imm .sw::after,html body:has(#chat:not([hidden])) .sw::after,html body:not(:has(#qc-main)) .sw::after{opacity:0}
 html body .hv-fab#hv-fab,html body .qcm#qc-main,html body #totop{background:#0E0C09!important}
 }
+/* panel 2026-11-11: chat input stayed below the panel on short iPhone viewports (webkit-client-chat-open: 5 wrapped chips pushed #chat-form out) — suggestions become one swipeable row, header + input never shrink */
+.sw .chat .ch,.sw .chat .ci{flex-shrink:0}
+.sw .chat .cm{min-height:96px}
+.sw .chat .cs{flex-wrap:nowrap;flex-shrink:0;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.sw .chat .cs::-webkit-scrollbar{display:none}
+.sw .chat .cs .chip{flex:0 0 auto;white-space:nowrap}
