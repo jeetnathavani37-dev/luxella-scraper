@@ -71,7 +71,8 @@ function welcome(rows){if(sheetShown||owner||!rows.length)return;sheetShown=true
 /* ---------- device tilt (3D parallax on phones) ---------- */
 function gyro(){if(RMQ||!('DeviceOrientationEvent' in window))return;let armed=false;const arm=()=>{if(armed)return;armed=true;const go=()=>addEventListener('deviceorientation',onTilt,{passive:true});if(typeof DeviceOrientationEvent.requestPermission==='function'){DeviceOrientationEvent.requestPermission().then(s=>{if(s==='granted')go();}).catch(()=>{});}else go();};
  addEventListener('touchstart',arm,{once:true,passive:true});
- let raf=null,g=0,b=0;function onTilt(e){g=e.gamma||0;b=e.beta||0;if(raf)return;raf=requestAnimationFrame(()=>{raf=null;const rx=Math.max(-6,Math.min(6,(b-45)/8)),ry=Math.max(-6,Math.min(6,g/8));sw.querySelectorAll('img.ph,.hlogo,.brandlogo,#clogo img').forEach(n=>{n.style.transform='perspective(700px) rotateX('+(-rx)+'deg) rotateY('+ry+'deg)';});});}}
+ /* ≤20 Hz, skip when hidden or the tilt barely moved, re-query targets every 2 s (not every frame), write only to rendered nodes */
+ let raf=null,g=0,b=0,last=0,lrx=99,lry=99,nodes=null,nAt=0;function onTilt(e){g=e.gamma||0;b=e.beta||0;if(raf||document.hidden||Date.now()-last<50)return;raf=requestAnimationFrame(()=>{raf=null;last=Date.now();const rx=+Math.max(-6,Math.min(6,(b-45)/8)).toFixed(1),ry=+Math.max(-6,Math.min(6,g/8)).toFixed(1);if(Math.abs(rx-lrx)<.3&&Math.abs(ry-lry)<.3)return;lrx=rx;lry=ry;if(!nodes||last-nAt>2000){nodes=sw.querySelectorAll('img.ph,.hlogo,.brandlogo,#clogo img');nAt=last;}const tf='perspective(700px) rotateX('+(-rx)+'deg) rotateY('+ry+'deg)';const vis=[];nodes.forEach(n=>{if(n.isConnected&&n.getClientRects().length)vis.push(n);});vis.forEach(n=>{n.style.transform=tf;});});}}
 
 /* ---------- press feedback + one-time wordmark shimmer ---------- */
 function shimmer(){const l=sw.querySelector('.hlogo');if(!l||RMQ)return;l.classList.add('shine');setTimeout(()=>l.classList.remove('shine'),2600);}
