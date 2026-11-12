@@ -72,6 +72,8 @@ _(chief 2026-11-11: emptied — Address sticky bar → Now #1(f); senior caps �
 - (panel 11-12, Atlanta/Lima/Vijayawada) One pay link (card/UPI) with automatic receipt instead of "send the screenshot on WhatsApp" (webkit-client-tab-pay-bottom); EMI / pay-in-2 line. Payments = guarded → Needs Jeet.
 - (panel 11-12) Address sticky bar: corner fade now off on Address (08525d8); still open — bar sits right under 'Shipping address' at first view (Now #1f rest).
 - (frontend 11-12) deals.js:1448 'looking for …' word rotator: 1.8 s forever, forces layout (offsetWidth) each tick even when the pane is hidden/off-screen, no reduced-motion check → skip when document.hidden/!rect.height/off-screen (same pattern as 92f6acd). Also deals.js:1478 5.2 s carousel only checks `vis` — confirm it pauses on hidden tab.
+- (growth 11-12) "Address needed" prompt: when an order is at stage *Address requested* and the client has no saved address, open the portal straight onto a calm Address card (Overview top) + to-do line — swayam's 2 orders waiting 23 h, 0 opens, 0 address writes. Client UI only; the WhatsApp nudge stays with Jeet.
+- (growth 11-12) "New houses" line on Overview: Loewe (28) + Bottega Veneta (22) arrived 12 Nov, +700 pieces in 48 h — returning clients only see tracking. Read-only UI; pairs with 'Picked for you'.
 
 ## Done
 - (frontend 2026-11-12) Now #2(b) done: Les Pièces auto-scroll skips hidden pane/tab + ETA 30 s countdown skips hidden tab (92f6acd); permanent will-change:transform off order photos (8b83f8e). QA #97 43206968151 green, deploy READY; metrics 0 diffs (inf 0, nodes same), screenshots unchanged apart from live clock/countdown.
