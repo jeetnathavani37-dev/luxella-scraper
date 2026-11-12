@@ -25,3 +25,6 @@
 - 2026-11-10: CI install step (playwright --with-deps) hung twice (#81 cancelled, #82 >10 min) → fixes unverified/undeployed; docs-only pushes don't trigger portal-qa (use run_workflow dispatch).
 - 2026-11-11: avg trust 3.3/desire 2.3/ease 5.2/speed 7.0/value 3.4, buy 0/10 (maybe 3); Edit locked day 14. Found real bug: webkit 390×664 chat input+Send fell below the 70vh panel (5 wrapped chips) → 5d273ac chips one swipe row; 57cce19 placeholder 'Ask here'; 7bac656 login foot 5.2:1. Run 42972032149 green + READY, all 3 visible.
 - Used 11-11: Agra/Ranchi/Moradabad/Gurugram, Birmingham/Kampala, Al Khobar/Berlin/Chengdu/Brussels. Isolated test /tmp/t/chat.html + fix.css @import with bbox print works for flex-overflow bugs.
+- 2026-11-12: avg trust 3.1/desire 2.3/ease 5.4/speed 7.1/value 3.3, buy 0/10 (maybe 3); Edit locked day 15. Shipped 55f3f58 (voice + IG link placeholders cut → shorter, ?v 1794350000) and 08525d8 (corner fade .sw::after z29 dimmed Address 'Copy instead' → off when #tab-ad[aria-selected=true]).
+- Used 11-12: Prayagraj/Vijayawada/Kolhapur/Jabalpur, Atlanta/Suva (Fiji), Ras Al Khaimah/Oslo/Lima/Prague. Tabs mark active via aria-selected — body:has(#tab-X[aria-selected="true"]) scopes CSS per tab.
+- 2026-11-12: push run 43167113000 green + deploy ok; both fixes visible in after-screens.
