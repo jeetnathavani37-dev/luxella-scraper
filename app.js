@@ -587,7 +587,7 @@ function statusMsg(r){const st=Number(r.stage||1);const line=stName(r,st)||r.sta
 const fd=s=>s?d3.utcFormat('%-d %b')(new Date(s)):'—';
 
 function lxCdTick(ep){const c=ep.querySelector('.cd');if(!c)return;const end=new Date(ep.dataset.eta+'T18:00:00+05:30').getTime();let ms=end-Date.now();const today=new Date().toISOString().slice(0,10);if(ep.dataset.eta===today){c.textContent='Arriving today';c.classList.add('now');return;}if(ms<=0){c.textContent='Any day now';return;}const d=Math.floor(ms/864e5);ms-=d*864e5;const h=Math.floor(ms/36e5);ms-=h*36e5;const m=Math.floor(ms/6e4);c.textContent='Arriving in '+(d?d+'d ':'')+h+'h '+String(m).padStart(2,'0')+'m';}
-setInterval(()=>{document.querySelectorAll('.dpill.eta[data-eta]').forEach(lxCdTick);},30000);
+setInterval(()=>{if(document.hidden)return;document.querySelectorAll('.dpill.eta[data-eta]').forEach(lxCdTick);},30000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)document.querySelectorAll('.dpill.eta[data-eta]').forEach(lxCdTick);});
 function journeyEl(r,st){const loc=isLocalO(r);const N=loc?[[20,'Store'],[170,'Luxella'],[320,'You']]:[[20,'US store'],[100,'Reshipper'],[170,'In flight'],[240,'India hub'],[320,'You']];
  const P=loc?{1:20,2:20,3:170,7:170,8:250,9:320}:{1:20,2:20,3:60,4:100,5:170,6:240,7:240,8:282,9:320};const x=P[st]!=null?P[st]:20;
  const ns='http://www.w3.org/2000/svg';const w=document.createElement('div');w.className='journey';const s=document.createElementNS(ns,'svg');s.setAttribute('viewBox','0 0 340 64');s.setAttribute('preserveAspectRatio','xMidYMid meet');
