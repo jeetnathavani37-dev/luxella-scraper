@@ -937,7 +937,7 @@ dash.onData(()=>{
   box.appendChild(mk('small','hv-ey','HEY LUXELLA'));
   const orb=mk('button','hv-orb');orb.type='button';orb.setAttribute('aria-label','Speak');orb.innerHTML='<svg viewBox="0 0 24 24" width="34" height="34"><rect x="9" y="3" width="6" height="11.5" rx="3" fill="currentColor"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M8.5 21h7" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>';box.appendChild(orb);
   const st=mk('div','hv-st','Tap the mic and speak');box.appendChild(st);const tx=mk('div','hv-tx');box.appendChild(tx);
-  const f=mk('form','hv-f');const inp=mk('input');inp.placeholder='…or type: where is my Coach bag?';inp.setAttribute('enterkeyhint','send');inp.setAttribute('aria-label','Ask Luxella a question');const sb=mk('button','hv-go','Ask');sb.type='submit';f.appendChild(inp);f.appendChild(sb);f.onsubmit=e=>{e.preventDefault();ask(inp.value);};box.appendChild(f);
+  const f=mk('form','hv-f');const inp=mk('input');inp.placeholder='…or type your question';inp.setAttribute('enterkeyhint','send');inp.setAttribute('aria-label','Ask Luxella a question');const sb=mk('button','hv-go','Ask');sb.type='submit';f.appendChild(inp);f.appendChild(sb);f.onsubmit=e=>{e.preventDefault();ask(inp.value);};box.appendChild(f);
   const sg=mk('div','hv-sg');SUG.forEach(s=>{const b=mk('button','hv-c',s);b.type='button';b.onclick=()=>ask(s);sg.appendChild(b);});box.appendChild(sg);
   const su=mk('button','hv-setup',isIOS?'Use with Siri  ›':isSam?'Use with Bixby  ›':isAnd?'Use with Google / home screen  ›':'Use from your phone  ›');su.type='button';su.onclick=setup;box.appendChild(su);
   orb.onclick=()=>{if(rec){try{rec.stop();}catch(e){}return;}listen(st,tx,orb);};
