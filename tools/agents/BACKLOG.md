@@ -71,8 +71,10 @@ _(chief 2026-11-11: emptied — Address sticky bar → Now #1(f); senior caps �
 - (panel 11-12, Suva/RAK/Prayagraj) Send-as-gift to another address or country (Auckland) + gift note on the Address tab; named advisor line. Business call → Needs Jeet.
 - (panel 11-12, Atlanta/Lima/Vijayawada) One pay link (card/UPI) with automatic receipt instead of "send the screenshot on WhatsApp" (webkit-client-tab-pay-bottom); EMI / pay-in-2 line. Payments = guarded → Needs Jeet.
 - (panel 11-12) Address sticky bar: corner fade now off on Address (08525d8); still open — bar sits right under 'Shipping address' at first view (Now #1f rest).
+- (frontend 11-12) deals.js:1448 'looking for …' word rotator: 1.8 s forever, forces layout (offsetWidth) each tick even when the pane is hidden/off-screen, no reduced-motion check → skip when document.hidden/!rect.height/off-screen (same pattern as 92f6acd). Also deals.js:1478 5.2 s carousel only checks `vis` — confirm it pauses on hidden tab.
 
 ## Done
+- (frontend 2026-11-12) Now #2(b) done: Les Pièces auto-scroll skips hidden pane/tab + ETA 30 s countdown skips hidden tab (92f6acd); permanent will-change:transform off order photos (8b83f8e). QA #97 43206968151 green, deploy READY; metrics 0 diffs (inf 0, nodes same), screenshots unchanged apart from live clock/countdown.
 - (chief audit 2026-11-11) ace8673 (frontend: tilt listener removes itself when detached, rAF/≤20 Hz, skips hidden/off-screen, respects reduced-motion — same effect, less work) + 5d273ac (panel CSS: chat chips one contained swipe row, input/header no-shrink): compliant — no guarded areas, no new motion, iPhone-first, no page-level sideways scroll.
 - (frontend 2026-11-11) Collection tilt listener leak + polish.js gyro ≤20 Hz, rendered nodes only (ace8673). QA #91 43010824195 green, deploy READY.
 - (panel 2026-11-11) Chat input inside the panel on 390×664 + chips one row (5d273ac), placeholder 'Ask here' (57cce19), sign-in 'By invitation only' 10px 5:1 (7bac656). QA #89 42972032149 green, READY.
