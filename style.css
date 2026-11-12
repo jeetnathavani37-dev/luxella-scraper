@@ -814,7 +814,7 @@ img{max-width:100%}
  .hero-top .hlogo{transition:transform .5s cubic-bezier(.2,.8,.2,1);transform-style:preserve-3d}
  .hero-top .hlogo:hover{transform:perspective(600px) rotateY(14deg) rotateX(4deg)}
  .hero-top .hlogo.shine{-webkit-mask-image:linear-gradient(110deg,#000 40%,rgba(0,0,0,.35) 50%,#000 60%);mask-image:linear-gradient(110deg,#000 40%,rgba(0,0,0,.35) 50%,#000 60%);-webkit-mask-size:300% 100%;mask-size:300% 100%;animation:lxshine 2.4s ease-in-out 1}
- .sw img.ph,.sw #clogo img{transition:transform .25s ease;will-change:transform}
+ .sw img.ph,.sw #clogo img{transition:transform .25s ease}
 }
 @keyframes lxshine{from{-webkit-mask-position:120% 0;mask-position:120% 0}to{-webkit-mask-position:-120% 0;mask-position:-120% 0}}
 
