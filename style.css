@@ -4639,3 +4639,12 @@ html body .hv-fab#hv-fab,html body .qcm#qc-main,html body #totop{background:#0E0
 .sw .chat .cs{flex-wrap:nowrap;flex-shrink:0;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:none;-webkit-overflow-scrolling:touch}
 .sw .chat .cs::-webkit-scrollbar{display:none}
 .sw .chat .cs .chip{flex:0 0 auto;white-space:nowrap}
+
+/* ===== panel 2026-11-12: Address form buttons never sit under the corner fade =====
+   The fixed bottom fade (.sw::after, z 29, design 11-10) lies over the sticky Address bar, so its
+   third button "Copy instead" read as ~20% opacity / disabled at first view (webkit-client-tab-ad,
+   chromium-client-tab-ad, chromium-owner-tab-ad, QA #94; Backlog Now #1f). The bar already has its
+   own solid ground, so on the Address tab the fade steps aside. */
+@media (max-width:900px){
+html body:has(#tab-ad[aria-selected="true"]) .sw::after{opacity:0}
+}
