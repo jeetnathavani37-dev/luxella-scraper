@@ -4656,3 +4656,19 @@ html body:has(#tab-ad[aria-selected="true"]) .sw::after{opacity:0}
 .sw .mini{font-size:11px!important;letter-spacing:.12em!important;gap:14px!important;color:#A39C90!important}
 .sw .mini b{font-size:11px!important}
 .sw #payT td:nth-child(5):before{font-size:11px;letter-spacing:.12em;color:#9A9184}
+
+/* === design 2026-11-13: top bar fits 390px for owner + client ===
+   Owner bar (logo, QC, search, ALERTS BLOCKED, ← ADMIN, SIGN OUT) was ~85px wider
+   than the iPhone (justify-content:flex-end → LUXELLA logo off-screen, QC chip cut at
+   x=0; chromium-owner-home / -tab-ad, QA #99/#101). Client bar overflowed ~7px.
+   ≤430px: tighter gap + tracking; owner preview hides the client monogram (hero already
+   names the client). Isolated chromium 390px: owner logo 16px from edge, 17px slack;
+   client 16px, monogram kept. */
+@media (max-width:430px){
+ html body #top.lx-top{gap:10px;letter-spacing:.2em;padding-left:16px;padding-right:16px}
+ html body #top.lx-top .mono{margin-right:0}
+ html body #top.lx-top .bellb{padding:4px 8px;letter-spacing:.16em}
+ html body #top.lx-top:has(#tb-switch){letter-spacing:.16em}
+ html body #top.lx-top:has(#tb-switch) .mono{display:none}
+ html body #top.lx-top:has(#tb-switch) .bellb{letter-spacing:.12em}
+}
