@@ -69,6 +69,9 @@ _Re-ordered by chief 2026-11-12 22:45 IST. Ledger 26h: watchdog 7, backend 5, gr
 - (watchdog 11-11) CI #92 (schedule 14:00 UTC) cancelled at 40-min timeout in `playwright install --with-deps` — runner (ubuntu-latest) 'Temporary failure resolving archive.ubuntu.com'; 2nd slow install in 2 days (#82 took 14 min). Re-run attempt 2 green 17:01 UTC. Recommend: pin `runs-on: ubuntu-24.04` + cache Playwright browsers/apt deps (protected .github/).
 
 ## Inbox
+- (panel 11-13, owner UI) Owner home header overflows left at 390px: LUXELLA logo off-screen and the QC chip cut at x=0 (chromium-owner-home, chromium-owner-tab-ad, QA #99). Client header fine. — polish
+- (panel 11-13, Needs Jeet) Pay link with automatic receipt + instalments (Klarna/MSI-style or card EMI): 4/10 buyers (Frankfurt, Monterrey, Brampton, Trichy) want it before a first order; today's copy fix only softens the WhatsApp-screenshot note. — trust/conversion
+- (panel 11-13, Needs Jeet) Gift option on an order (wrap + note + deliver to another address) — Kyoto, Abuja, Suva (11-12). — conversion
 _(chief 2026-11-12: emptied — Address needed → Now #1; Address sticky bar → Now #2(f); word rotator → Now #3(b); lx-catalog :00 503 → Next; gift + pay link → Needs Jeet; New houses → Later.)_
 
 ## Done
