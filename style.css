@@ -4648,3 +4648,11 @@ html body .hv-fab#hv-fab,html body .qcm#qc-main,html body #totop{background:#0E0
 @media (max-width:900px){
 html body:has(#tab-ad[aria-selected="true"]) .sw::after{opacity:0}
 }
+
+/* panel 2026-11-13 — helper caps readable for seniors (Backlog Now #2d): the sticky
+   'OPEN · DUE · NEXT ETA' bar and the 'RECEIVED' label on payment cards were 9–9.5px,
+   #6F685E ≈3.5:1 (webkit-client-tab-*-bottom, -tab-pay-bottom, QA #99). Now 11px, ≥6:1;
+   isolated chromium: bar stays one row at 390px even with ₹1,21,000. */
+.sw .mini{font-size:11px!important;letter-spacing:.12em!important;gap:14px!important;color:#A39C90!important}
+.sw .mini b{font-size:11px!important}
+.sw #payT td:nth-child(5):before{font-size:11px;letter-spacing:.12em;color:#9A9184}
