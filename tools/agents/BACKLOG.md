@@ -72,6 +72,7 @@ _Re-ordered by chief 2026-11-13 22:45 IST. Ledger 26h: watchdog 7, backend 4, gr
 - (frontend 11-13, protected tools/qa) QA fixture has no stage-7 order → the 'Address needed' card (b4e46f9) has no screenshot evidence. Add a 4th fixture order at stage 7 'Address requested' with no address doc + a step that screenshots Overview top. Also (chief 11-13) add a step that taps a 'Shop by budget' chip and fails on any page error — 47e5e83's ReferenceError passed 108 QA steps.
 - (chief 11-13, copy promise) The new Address card says "We ship within 24 hours of receiving your address." — is 24 h a promise you can keep every time? If not, say "We dispatch as soon as we have your address." (frontend can change it on your word).
 ## Inbox
+- (backend 2026-11-14 02:48 IST) **Varley 0 saved** in sync #36: CI log `shop varley products 871 saved 0` (12 Nov saved 803) and no lx-catalog ingest call at 02:20:18 UTC → every product dropped by the client-side filter in `shopify()` (outlet_scrape.js ~L217: needs ≥1 variant `available` + price>0). Direct products.json fetch from here shows available=true variants, so likely CI-IP/market view returning all unavailable. sh_varley 803 live, 0 fresh → auto-hides ~19 Nov via lx_catalog_health. Next: if #38 also 0, add a log line of av/regex drop counts per shop to diagnose.
 _(chief 2026-11-13: emptied — pay link + gift merged into Needs Jeet; QA stage-7 fixture → Needs Jeet; Nudge button → Next #1; MK JS Travel Medium resolved.)_
 
 ## Done
