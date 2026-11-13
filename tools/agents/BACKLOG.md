@@ -11,7 +11,6 @@ _Re-ordered by chief 2026-11-12 22:45 IST. Ledger 26h: watchdog 7, backend 5, gr
 - (backend, watchdog 11-10→11-12) Lone `POST lx-catalog` 503 at :00:12–:00:15 (4 hits: 11-10 09:00, 16:00, 11-11 21:00, 11-12 02:00 UTC), neighbours 200 → hourly pg_net cron collides with another :00 job / cold start; check cron overlap, stagger to :02 or one retry. Not client-visible.
 - (backend, watchdog 11-10) Edge fn count probe `HEAD /rest/v1/lx_catalog?id=like.mk_%&seen_at=gt.…` 500s ~2–5% — likely statement timeout; propose index `lx_catalog (seen_at)` / `id text_pattern_ops` or count=estimated (schema → Needs Jeet SQL). Not client-visible.
 - (frontend, panel 11-10) Client-facing 'Overdue' still printed from raw past `eta_date`: drawer/timeline + to-dos 'Overdue ETA' (app.js:451) and extras.js:398 → 'Any day now' like Tracker (6f4d8fe). Low risk copy/logic.
-- (design) Owner home topbar 'QC' avatar clipped at left edge (watchdog 11-04, chromium-owner-home.png).
 - (watchdog/frontend) If lx_deals is ever empty, deals.js render() returns before drawing the Edit/Boutique switch — keep the switch outside the empty-state early return (re-check after Jeet's PR #1 "single LOCKED switch").
 - (design) "SHOW ALL 1" clipped on Updates; email chip hidden ≤430px (tab fade moved into Now #2).
 - (frontend) Empty Private Edit state should offer a next step (last drop / Ask for a quote) — relevant once The Edit reopens.
@@ -69,12 +68,12 @@ _Re-ordered by chief 2026-11-12 22:45 IST. Ledger 26h: watchdog 7, backend 5, gr
 - (watchdog 11-11) CI #92 (schedule 14:00 UTC) cancelled at 40-min timeout in `playwright install --with-deps` — runner (ubuntu-latest) 'Temporary failure resolving archive.ubuntu.com'; 2nd slow install in 2 days (#82 took 14 min). Re-run attempt 2 green 17:01 UTC. Recommend: pin `runs-on: ubuntu-24.04` + cache Playwright browsers/apt deps (protected .github/).
 
 ## Inbox
-- (panel 11-13, owner UI) Owner home header overflows left at 390px: LUXELLA logo off-screen and the QC chip cut at x=0 (chromium-owner-home, chromium-owner-tab-ad, QA #99). Client header fine. — polish
 - (panel 11-13, Needs Jeet) Pay link with automatic receipt + instalments (Klarna/MSI-style or card EMI): 4/10 buyers (Frankfurt, Monterrey, Brampton, Trichy) want it before a first order; today's copy fix only softens the WhatsApp-screenshot note. — trust/conversion
 - (panel 11-13, Needs Jeet) Gift option on an order (wrap + note + deliver to another address) — Kyoto, Abuja, Suva (11-12). — conversion
 _(chief 2026-11-12: emptied — Address needed → Now #1; Address sticky bar → Now #2(f); word rotator → Now #3(b); lx-catalog :00 503 → Next; gift + pay link → Needs Jeet; New houses → Later.)_
 
 ## Done
+- 2026-11-13 design: top bar fits 390px — owner LUXELLA logo + QC no longer cut at left (≤430px: gap 10, tracking .16–.2em, owner preview hides client monogram); client bar's 7px overflow gone too. ebd7050, QA #102 43404582719 green, deploy READY (before/after chromium-owner-home, -tab-ad, webkit-client-home). Closes Inbox 11-13 + Next 'QC avatar clipped'.
 - (chief audit 2026-11-12) 92f6acd (frontend: featured() auto-scroll + 30 s ETA tick skip hidden tab/0×0 pane, refresh on return — less work, same look) + 08525d8 (panel CSS: `.sw::after` fade opacity 0 only while #tab-ad selected, ≤900px): compliant — no guarded areas, no new motion, iPhone-first, no sideways scroll.
 - (security 2026-11-12) money-pass review (Jeet's 88c8bdf): server-side auth OK (bad token 401, owner list); CORS gap for duckdns → Needs Jeet khata item.
 - (panel 2026-11-12) Voice + Instagram link placeholders whole at 390px (55f3f58); Address 'Copy instead' readable — corner fade off on Address (08525d8). QA #95 43167113000 green, READY.
