@@ -652,6 +652,18 @@ function shareStage(r,k){const m=waStageMsg(r,k);const ad=addrFor(r);const ph=(a
 
 const addrFor=r=>addrDocs.list.find(d=>d.id===slug(r.item)||d.order===r.item||(r.order_no&&String(d.order||'').indexOf(r.order_no)>=0));
 function goAddr(r){const d=document.querySelector('.sw .drawer');if(d)d.remove();const tab=document.getElementById('tab-ad');if(tab)tab.click();fillOrders();const s=document.getElementById('a-order');if(s&&[...s.options].some(o=>o.value===r.item))s.value=r.item;setTimeout(()=>{const ta=document.getElementById('a-addr');if(ta){ta.focus();ta.scrollIntoView({behavior:'smooth',block:'center'});ta.classList.add('lx-glow');setTimeout(()=>ta.classList.remove('lx-glow'),2200);}},250);}
+/* Overview: one calm card while an order waits at 'Address requested' and no address is on file (read-only; the save stays the Address form) */
+function addrNeed(o){try{const pane=document.getElementById('pane-ov');if(!pane)return;let c=document.getElementById('ov-addr');
+ o=o||dash.data('orders');const known=addrDocs.loaded||(addrState.ready&&!addrState.db);
+ const need=(known&&o&&o.status==='ok')?o.data.filter(r=>Number(r.stage)===7&&r.status!=='Delivered'&&!addrFor(r)):[];
+ if(!need.length){if(c)c.hidden=true;return;}
+ if(!c){c=document.createElement('div');c.id='ov-addr';c.className='banner';c.setAttribute('role','region');c.setAttribute('aria-label','Delivery address needed');c.style.cssText='flex-wrap:wrap;gap:14px';pane.insertBefore(c,pane.firstChild);}
+ c.hidden=false;c.textContent='';const tx=document.createElement('div');tx.style.cssText='flex:1 1 220px;min-width:0';
+ const t=document.createElement('p');t.className='big';const l=document.createElement('span');l.className='lab';l.style.fontSize='11px';l.textContent='Delivery address';t.appendChild(l);
+ const names=need.map(r=>r.item);t.appendChild(document.createTextNode('Where should we deliver your '+(names.length>2?names.length+' pieces':names.join(' and '))+'?'));
+ const s=document.createElement('p');s.className='lbl';s.style.margin='0';s.textContent='Ready to dispatch. We ship within 24 hours of receiving your address.';tx.appendChild(t);tx.appendChild(s);
+ const b=document.createElement('button');b.type='button';b.className='btn';b.style.cssText='flex:0 0 auto;min-height:44px';b.textContent='Add delivery address';b.addEventListener('click',()=>goAddr(need[0]));
+ c.appendChild(tx);c.appendChild(b);}catch(e){}}
 function lxModal(title,body,cta){const old=document.querySelector('.lx-modal');if(old)old.remove();const ov=document.createElement('div');ov.className='lx-modal';ov.addEventListener('click',e=>{if(e.target===ov)ov.remove();});const bx=document.createElement('div');bx.className='lx-modal-bx';const ic=document.createElement('div');ic.className='lx-modal-ic';ic.textContent='✓';const h=document.createElement('h3');h.textContent=title;const pp=document.createElement('p');pp.textContent=body;const row=document.createElement('div');row.className='lxrow';const b=document.createElement('button');b.className='btn';b.type='button';b.textContent=cta||'Got it';b.addEventListener('click',()=>ov.remove());row.appendChild(b);if(cta){const g=document.createElement('button');g.className='btn2';g.type='button';g.textContent='Got it';g.addEventListener('click',()=>ov.remove());row.appendChild(g);}bx.append(ic,h,pp,row);ov.appendChild(bx);document.body.appendChild(ov);setTimeout(()=>b.focus(),50);return ov;}
 
 function openOrders(){const o=dash.data('orders');if(o.status!=='ok')return [];return o.data.filter(r=>r.status!=='Delivered'&&Number(r.stage||1)<9&&String(r.order_type).indexOf('Local')<0);}
@@ -779,6 +791,7 @@ function renderCrazy(o){const bn=document.getElementById('banner'),cd=document.g
  const today=new Date().toISOString().slice(0,10);const arriving=rows.find(r=>Number(r.stage)===8);const justDel=rows.filter(r=>r.status==='Delivered'&&r.order_date&&(Date.now()-new Date(r.order_date))<7*864e5);
  if(arriving){bn.hidden=false;const t=document.getElementById('bn-t');t.textContent='';const l=document.createElement('span');l.className='lab';l.textContent='Arriving today';t.appendChild(l);t.appendChild(document.createTextNode(arriving.item));document.getElementById('bn-s').textContent='Out for delivery. Keep your phone within reach.';}
  else if(justDel.length){bn.hidden=false;const t=document.getElementById('bn-t');t.textContent='';const l=document.createElement('span');l.className='lab';l.textContent='Delivered this week';t.appendChild(l);t.appendChild(document.createTextNode(justDel.map(r=>r.item).join(', ')));document.getElementById('bn-s').textContent='Enjoy! Tell Luxella how it fits.';}
+ addrNeed(o);
  // countdown
  const nxt=rows.filter(r=>r.eta_date&&r.status!=='Delivered'&&Number(r.stage||1)<9).sort((a,b)=>a.eta_date<b.eta_date?-1:1)[0];
  if(cdTimer){clearInterval(cdTimer);cdTimer=null;}
@@ -850,16 +863,16 @@ const addrState={db:null,ready:false};
 const slug=s=>String(s).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,60);
 const amsg=t=>{document.getElementById('a-msg').textContent=t;};
 const addrText=()=>{const v=id=>document.getElementById(id).value.trim();return {order:v('a-order'),phone:v('a-phone'),address:v('a-addr'),pref:v('a-pref')};};
-function renderAddrList(docs){const w=document.getElementById('a-list');w.textContent='';addrDocs.list=docs;try{const o=dash.data('orders');if(o&&o.status==='ok')renderBoard(o);}catch(e){}
+function renderAddrList(docs){const w=document.getElementById('a-list');w.textContent='';addrDocs.list=docs;addrDocs.loaded=true;try{addrNeed();}catch(e){}try{const o=dash.data('orders');if(o&&o.status==='ok')renderBoard(o);}catch(e){}
  const openSet=new Set(openOrders().map(r=>r.item));docs=docs.filter(d=>openSet.has(d.order));
  if(!docs.length){const s=document.createElement('span');s.className='lbl';s.textContent='Nothing saved for your open orders. Delivered orders are cleared automatically.';w.appendChild(s);return;}
  docs.forEach(d=>{const it=document.createElement('div');it.className='it';const dot=document.createElement('span');dot.className='dot';dot.style.color='var(--color-ok)';
   const t=document.createElement('span');t.textContent=d.order||d.id;const sm=document.createElement('small');sm.textContent=(d.address||'')+(d.phone?' · '+d.phone:'')+(d.pref?' · '+d.pref:'')+(d.savedAt?' · saved '+fd(d.savedAt):'');t.appendChild(sm);
   it.appendChild(dot);it.appendChild(t);w.appendChild(it);});}
 (async()=>{try{const db=window.claude&&window.claude.use?await window.claude.use('db'):null;addrState.db=db;addrState.ready=true;
- if(!db){amsg('Saving is off in this view. Use Copy instead and send it on WhatsApp.');return;}
+ if(!db){addrNeed();amsg('Saving is off in this view. Use Copy instead and send it on WhatsApp.');return;}
  db.collection('addresses').onSnapshot(s=>{renderAddrList(s.docs.filter(x=>x.exists).map(x=>Object.assign({id:x.id},x.data())));},e=>{amsg('Could not load saved addresses.');});
-}catch(e){addrState.ready=true;amsg('Saving is off in this view. Use Copy instead.');}})();
+}catch(e){addrState.ready=true;try{addrNeed();}catch(_){}amsg('Saving is off in this view. Use Copy instead.');}})();
 document.getElementById('a-save').addEventListener('click',async()=>{const a=addrText();const btn=document.getElementById('a-save');
  if(!a.order||!a.address){amsg('Pick the order and paste the address first.');return;}
  if(!/\b\d{6}\b/.test(a.address)){amsg('Add a 6-digit pincode to the address.');return;}
