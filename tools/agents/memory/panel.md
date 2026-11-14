@@ -30,3 +30,6 @@
 - 2026-11-12: push run 43167113000 green + deploy ok; both fixes visible in after-screens.
 - 2026-11-13: avg trust 2.9/desire 2.2/ease 5.4/speed 7.4/value 3.2, buy 0/10 (maybe 2); Edit locked day 16. Shipped e9ded87 (.mini bar + #payT Received label 11px ≥6:1, Backlog Now #2d) and 836def0 (pay-note copy). Bump 1794560000. Run #100 43377570202 green + READY, both visible. "RECEIVED —" lives in style.css:1313 ::before content, not JS.
 - Used 11-13: Kota/Tiruchirappalli/Meerut/Shimla, Brampton/Frankfurt, Geneva/Abuja/Monterrey/Kyoto. Owner home header overflows left (logo off-screen) — in Inbox.
+- 2026-11-14: avg trust 3.0/desire 2.3/ease 5.6/speed 7.7/value 3.3, buy 0/10 (maybe 3) — first rise (+0.1–0.3) after 15 days; Edit locked day 17. Shipped 194ae86 (to-do ₹ en-IN grouping app.js:8, Stats 'Orders paid' when 0 pay records, #payT received 'Confirmed by Luxella'/'Not yet' + no stray dash). ?v 1794740000.
+- Used 11-14: Bareilly/Tirupati/Bikaner/Puducherry, Los Angeles/Glasgow, Lusail/Lyon/Shenzhen/Miami. Owner home header now fits (ebd7050). Look for money strings built with '₹'+raw value (no fmt) — app.js dash.calc runs before fmt is defined, use toLocaleString('en-IN') inline.
+
