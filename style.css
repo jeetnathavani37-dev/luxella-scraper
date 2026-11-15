@@ -4684,3 +4684,13 @@ html body .sw.sw div.ph.none.mono{border:1px solid rgba(201,169,106,.22)!importa
 html body .sw #pane-ad .ad-sticky{gap:8px!important;padding-top:10px!important}
 html body .sw #pane-ad .ad-sticky>#a-save{flex:1 1 100%}
 html body .sw #pane-ad .ad-sticky>#a-book,html body .sw #pane-ad .ad-sticky>#a-copy{flex:1 1 0;min-width:0;padding-left:8px!important;padding-right:8px!important;white-space:nowrap;letter-spacing:.16em!important}
+
+/* watchdog 2026-11-15: Address tab — the corner dock (LIVE + contact, back-to-top) sat on top of the new
+   2-row sticky bar and covered 'Copy address' (webkit/chromium-client-tab-ad.png, QA #115 after 137be25).
+   On the Address tab the dock rests just above the bar (~110px) instead of on the bottom line. Position only. */
+@media (max-width:900px){
+html body:has(#tab-ad[aria-selected="true"]) .qcm#qc-main,
+html body:has(#tab-ad[aria-selected="true"]) .hv-fab#hv-fab,
+html body:has(#tab-ad[aria-selected="true"]) .sw .totop{bottom:calc(max(16px,env(safe-area-inset-bottom,0px)) + 112px)!important}
+html body:has(#tab-ad[aria-selected="true"]) #qc-menu.qcmenu{bottom:calc(max(16px,env(safe-area-inset-bottom,0px)) + 176px)!important}
+}
