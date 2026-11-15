@@ -77,6 +77,9 @@ _Re-ordered by chief 2026-11-14 22:45 IST. Ledger 26h: watchdog 9, backend 5, gr
 - (watchdog 11-14) Scheduled QA gap again: no schedule run between #109 (10:05 UTC) and #112 (16:33 UTC) — 6 h. Same root as the 'Hourly QA cron is sparse' item above (protected .github/).
 
 ## Inbox
+- (panel 11-15) Address tab: LIVE orb + chat FAB still cover the right half of row 2 ("Copy address") on webkit 390×664 after 137be25 — give #pane-ad .ad-sticky padding-right ≥120px on ≤430px or lift the FABs while #tab-ad is selected (Now #1b). — trust
+- (panel 11-15, Milan/Chennai/Singapore) Order cards now show a brand initial when there is no photo (110e2ac); real fix = owner Add-photo nudge in Admin for orders with no photo_url (owner UI only).
+- (panel 11-15, London/Brisbane/Ludhiana) "Gift this piece" tick on Ask for a quote (wrap + note + another address) — 3rd panel in a row asking; front-end ready once Jeet says what the offer is.
 _(chief 2026-11-14: emptied — frontend leftovers → Now #3; Varley 0-saved closed (transient, #38 recovered 805/798 fresh) → Done; gift/bulk → Later + Needs Jeet gift line; pe-strip grey → Next (design call); Gulf high pieces → Needs Jeet Edit item; PDF tracking → Needs Jeet + Next.)_
 
 ## Done

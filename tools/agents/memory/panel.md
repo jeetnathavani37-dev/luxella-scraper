@@ -32,4 +32,5 @@
 - Used 11-13: Kota/Tiruchirappalli/Meerut/Shimla, Brampton/Frankfurt, Geneva/Abuja/Monterrey/Kyoto. Owner home header overflows left (logo off-screen) — in Inbox.
 - 2026-11-14: avg trust 3.0/desire 2.3/ease 5.6/speed 7.7/value 3.3, buy 0/10 (maybe 3) — first rise (+0.1–0.3) after 15 days; Edit locked day 17. Shipped 194ae86 (to-do ₹ en-IN grouping app.js:8, Stats 'Orders paid' when 0 pay records, #payT received 'Confirmed by Luxella'/'Not yet' + no stray dash). ?v 1794740000.
 - Used 11-14: Bareilly/Tirupati/Bikaner/Puducherry, Los Angeles/Glasgow, Lusail/Lyon/Shenzhen/Miami. Owner home header now fits (ebd7050). Look for money strings built with '₹'+raw value (no fmt) — app.js dash.calc runs before fmt is defined, use toLocaleString('en-IN') inline.
-
+- 2026-11-15: avg trust 3.0/desire 2.3/ease 5.6/speed 7.7/value 3.3, buy 0/10 (maybe 3) — flat; Edit locked day 18. Shipped 110e2ac (phMono brand initial instead of 'NO PHOTO'), 0630c14 ('Alerts blocked'→'Alerts off'), 137be25 (Address bar 3→2 rows, 'Save address'/'Copy address'). Run #115 43684828616 green + READY, all visible.
+- Used 11-15: Ludhiana/Surat/Chennai/Pune, London/Dallas, São Paulo/Milan/Singapore/Brisbane. Buttons in .sw have !important padding 18px — overrides need !important too (check computed style in isolated chromium).
