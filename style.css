@@ -4677,3 +4677,10 @@ html body:has(#tab-ad[aria-selected="true"]) .sw::after{opacity:0}
    Address order card). 4 buyers read it as unfinished. Now the brand initial in Lux Display italic on the same
    dark radial as the Edit placeholders (.dl-ph.none) — calm, no cream, no prop. */
 html body .sw.sw div.ph.none.mono{border:1px solid rgba(201,169,106,.22)!important;border-style:solid!important;background:radial-gradient(circle at 50% 40%,#2a2318,#0d0b08)!important;font:italic 400 24px/1 'Lux Display',Didot,serif!important;letter-spacing:0!important;text-transform:none!important;color:rgba(227,192,106,.6)!important}
+
+/* panel 2026-11-15: Address tab — the sticky Submit / Save / Copy bar stacked 3 rows (~164px) and on iPhone
+   sat right under 'Shipping address' at first view, covering the note and the order card (webkit-client-tab-ad,
+   chromium-client-tab-ad; Backlog Now #1f). Submit stays full width; Save address + Copy address share row 2 (~108px). */
+html body .sw #pane-ad .ad-sticky{gap:8px!important;padding-top:10px!important}
+html body .sw #pane-ad .ad-sticky>#a-save{flex:1 1 100%}
+html body .sw #pane-ad .ad-sticky>#a-book,html body .sw #pane-ad .ad-sticky>#a-copy{flex:1 1 0;min-width:0;padding-left:8px!important;padding-right:8px!important;white-space:nowrap;letter-spacing:.16em!important}

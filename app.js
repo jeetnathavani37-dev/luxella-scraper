@@ -872,14 +872,14 @@ function renderAddrList(docs){const w=document.getElementById('a-list');w.textCo
   const t=document.createElement('span');t.textContent=d.order||d.id;const sm=document.createElement('small');sm.textContent=(d.address||'')+(d.phone?' · '+d.phone:'')+(d.pref?' · '+d.pref:'')+(d.savedAt?' · saved '+fd(d.savedAt):'');t.appendChild(sm);
   it.appendChild(dot);it.appendChild(t);w.appendChild(it);});}
 (async()=>{try{const db=window.claude&&window.claude.use?await window.claude.use('db'):null;addrState.db=db;addrState.ready=true;
- if(!db){addrNeed();amsg('Saving is off in this view. Use Copy instead and send it on WhatsApp.');return;}
+ if(!db){addrNeed();amsg('Saving is off in this view. Use Copy address and send it on WhatsApp.');return;}
  db.collection('addresses').onSnapshot(s=>{renderAddrList(s.docs.filter(x=>x.exists).map(x=>Object.assign({id:x.id},x.data())));},e=>{amsg('Could not load saved addresses.');});
-}catch(e){addrState.ready=true;try{addrNeed();}catch(_){}amsg('Saving is off in this view. Use Copy instead.');}})();
+}catch(e){addrState.ready=true;try{addrNeed();}catch(_){}amsg('Saving is off in this view. Use Copy address.');}})();
 document.getElementById('a-save').addEventListener('click',async()=>{const a=addrText();const btn=document.getElementById('a-save');
  if(!a.order||!a.address){amsg('Pick the order and paste the address first.');return;}
  if(!/\b\d{6}\b/.test(a.address)){amsg('Add a 6-digit pincode to the address.');return;}
  if(a.phone&&!/^(\+91[\s-]?)?[6-9]\d{9}$/.test(a.phone.replace(/\s/g,''))){amsg('Phone should be a 10-digit Indian mobile, with or without +91.');return;}
- if(!addrState.db){amsg('Saving is off in this view. Tap Copy instead and send it on WhatsApp.');return;}
+ if(!addrState.db){amsg('Saving is off in this view. Tap Copy address and send it on WhatsApp.');return;}
  btn.disabled=true;amsg('Saving…');
  try{await addrState.db.doc('addresses/'+slug(a.order)).set({order:a.order,address:a.address,phone:a.phone,pref:a.pref,savedAt:new Date().toISOString().slice(0,10)});amsg('Saved. Luxella can see it now.');lxModal('Address received!','Thank you — your order ships within 24 hours. You will get the tracking number right here on your page.','View order').querySelector('.btn').addEventListener('click',()=>{const t=document.getElementById('tab-tr');if(t)t.click();});try{dash.refresh&&dash.refresh();}catch(e){}}
  catch(e){amsg(e&&e.code==='invalid_argument'?'You can view but not save here. Tap Copy and send it on WhatsApp.':'Could not save. Tap Copy and send it on WhatsApp.');}
