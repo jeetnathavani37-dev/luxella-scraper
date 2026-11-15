@@ -77,6 +77,7 @@ _Re-ordered by chief 2026-11-14 22:45 IST. Ledger 26h: watchdog 9, backend 5, gr
 - (watchdog 11-14) Scheduled QA gap again: no schedule run between #109 (10:05 UTC) and #112 (16:33 UTC) — 6 h. Same root as the 'Hourly QA cron is sparse' item above (protected .github/).
 
 ## Inbox
+- (growth 11-15) Owner 'reply pending' nudge: Admin badge/count for requests with data.draft saved but not sent >12 h (7 open today, oldest 18 d; 14 Nov asks went cold in 25 h) — owner UI only, no client message.
 - (frontend 11-15) Now #2(a) shipped 46ba731 — colPriceWarn (deals.js:63) on priceSheet + PDF 'Edit price / size'. Not yet wired: add-deal form (deals.js:~1315 `lx.deals.add('deal'…)`) and AI-read save (deals.js:~1255) — same helper, one line each. Matching needs ≥75% of title words in the Collection title, so owner shorthand ('JS' for Jet Set) can miss. Now #3(a) shipped f313db8 (client search → Boutique field); only provable once LOCKED=false. Now #3(c) dead-code delete still open.
 - (panel 11-15) Address tab: LIVE orb + chat FAB still cover the right half of row 2 ("Copy address") on webkit 390×664 after 137be25 — give #pane-ad .ad-sticky padding-right ≥120px on ≤430px or lift the FABs while #tab-ad is selected (Now #1b). — trust
 - (panel 11-15, Milan/Chennai/Singapore) Order cards now show a brand initial when there is no photo (110e2ac); real fix = owner Add-photo nudge in Admin for orders with no photo_url (owner UI only).
