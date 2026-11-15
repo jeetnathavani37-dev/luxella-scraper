@@ -4672,3 +4672,8 @@ html body:has(#tab-ad[aria-selected="true"]) .sw::after{opacity:0}
  html body #top.lx-top:has(#tb-switch) .mono{display:none}
  html body #top.lx-top:has(#tb-switch) .bellb{letter-spacing:.12em}
 }
+
+/* panel 2026-11-15: order cards without a photo showed 'NO PHOTO' in a dashed box (Next delivery, All orders,
+   Address order card). 4 buyers read it as unfinished. Now the brand initial in Lux Display italic on the same
+   dark radial as the Edit placeholders (.dl-ph.none) — calm, no cream, no prop. */
+html body .sw.sw div.ph.none.mono{border:1px solid rgba(201,169,106,.22)!important;border-style:solid!important;background:radial-gradient(circle at 50% 40%,#2a2318,#0d0b08)!important;font:italic 400 24px/1 'Lux Display',Didot,serif!important;letter-spacing:0!important;text-transform:none!important;color:rgba(227,192,106,.6)!important}

@@ -568,10 +568,12 @@ function alertMsg(t){let b=document.getElementById('ph-msg');if(!b){b=document.c
 function addPhotoBtn(r){const b=document.createElement('button');b.type='button';b.className='addph';b.textContent=photoUrl(r)?'Change photo':'Add photo';
  b.addEventListener('click',()=>{photos.pending=r;document.getElementById('ph-file').click();});return b;}
 function photoEl(r,big){const u=photoUrl(r);if(u){r=Object.assign({},r,{photo_url:u});const im=document.createElement('img');im.className='ph'+(big?' big':'');im.alt=r.item;im.loading='lazy';im.src=r.photo_url;
-  im.addEventListener('error',()=>{const d=document.createElement('div');d.className='ph none';d.textContent='—';im.replaceWith(d);});
+  im.addEventListener('error',()=>{im.replaceWith(phMono(r));});
   if(big)im.addEventListener('click',()=>{const lb=document.createElement('div');lb.className='lightbox';const z=document.createElement('img');z.src=r.photo_url;z.alt=r.item;lb.appendChild(z);lb.addEventListener('click',()=>lb.remove());document.querySelector('.sw').appendChild(lb);});
   return im;}
- const d=document.createElement('div');d.className='ph none';d.textContent='No photo';return d;}
+ return phMono(r);}
+/* panel 2026-11-15: no photo yet → the piece's initial in quiet gold italic, not the words 'No photo' in a dashed box (chromium-client-search-type / tab-al / tab-ad). */
+function phMono(r){const d=document.createElement('div');d.className='ph none mono';const m=String((r&&(r.brand||r.item))||'').match(/[A-Za-z]/);d.textContent=m?m[0].toUpperCase():'L';d.setAttribute('role','img');d.setAttribute('aria-label','Photo coming soon');return d;}
 const trackUrl=(no,slug)=>no?('https://track.aftership.com/'+(slug?encodeURIComponent(slug)+'/':'')+encodeURIComponent(no)):'';
 function trackLink(no,courier,slug){const a=document.createElement('a');a.className='trk';a.href=trackUrl(no,slug);a.target='_blank';a.rel='noopener';a.textContent=(courier?courier+' ':'')+no;return a;}
 const days=s=>{if(!s)return null;return Math.round((Date.now()-new Date(s).getTime())/864e5);};
