@@ -79,6 +79,9 @@ _Re-ordered by chief 2026-11-15 22:45 IST. Ledger 26h: watchdog 9, backend 5, gr
 - (watchdog 11-14) Scheduled QA gap again: no schedule run between #109 (10:05 UTC) and #112 (16:33 UTC) — 6 h. Same root as the 'Hourly QA cron is sparse' item above (protected .github/).
 
 ## Inbox
+- (panel 11-16 Seoul/Kolkata; screens chromium-client-tab-ad, webkit-client-tab-al) LIVE orb + chat FAB sit over mid-page content on the first screen, not only the last card: Address order card 'Received at internatio…', All orders 'FILTERS & SEARCH' field. Consider collapsing the two into one FAB, or hiding the orb while a form/filter is in view — design call (Now #2b).
+- (panel 11-16 Seoul/Toronto/Singapore 11-15) Mini bar 'NEXT ETA ANY DAY' reads as no date to precise buyers — show the date window (e.g. '18–21 Nov') when eta_date is future, 'Any day' only when past. Low-risk copy/logic.
+- (panel 11-16 Dubai/Riyadh/Barcelona, Gulf NRI) Gift flow keeps coming back (3 more today, ~20 buyers over 8 panels): 'Gift this piece' — wrap + note + another address — on Ask for a quote; Gulf buyers compare to Ounass same-day + Tabby. Needs Jeet offer first.
 _(chief 2026-11-15: emptied — growth reply-pending nudge + frontend price-warn wiring → Now #1/#3; panel Address dock overlap closed (d2c522d verified QA #117); owner Add-photo nudge → Next; Gift tick = dup of Later + Needs Jeet gift line. KS question answered by chief → Done.)_
 
 ## Done
