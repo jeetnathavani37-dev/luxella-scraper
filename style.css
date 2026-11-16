@@ -4694,3 +4694,6 @@ html body:has(#tab-ad[aria-selected="true"]) .hv-fab#hv-fab,
 html body:has(#tab-ad[aria-selected="true"]) .sw .totop{bottom:calc(max(16px,env(safe-area-inset-bottom,0px)) + 112px)!important}
 html body:has(#tab-ad[aria-selected="true"]) #qc-menu.qcmenu{bottom:calc(max(16px,env(safe-area-inset-bottom,0px)) + 176px)!important}
 }
+
+/* panel 2026-11-16: Payments card rows with no photo show the brand initial (same as phMono) instead of a dash */
+html body .sw.sw .pc2-ph.mono{box-sizing:border-box;border:1px solid rgba(201,169,106,.22);border-radius:4px;background:radial-gradient(circle at 50% 40%,#2a2318,#0d0b08);font:italic 400 22px/1 'Lux Display',Didot,serif;letter-spacing:0;text-transform:none;color:rgba(227,192,106,.6)}

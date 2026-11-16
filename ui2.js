@@ -27,9 +27,9 @@ function payCards(){const pane=$('#pane-pay');if(!pane)return;let w=$('#pc2');if
  const bar=el('div','pc2-bar');const fi=el('i');fi.style.width=(tot?Math.round(pd/tot*100):0)+'%';bar.appendChild(fi);w.appendChild(bar);
  const ch=el('div','pc2-ch');[['all','All'],['due','Due'],['paid','Paid']].forEach(([k,t])=>{const n=rows.filter(r=>k==='all'||(k==='due'?paid(r)<Number(r.payout||0):paid(r)>=Number(r.payout||0)&&Number(r.payout||0)>0)).length;const b=el('button','pc2-c'+(PF===k?' on':''),t+' · '+n);b.type='button';b.onclick=()=>{PF=k;payCards();};ch.appendChild(b);});w.appendChild(ch);
  const list=rows.filter(r=>PF==='all'||(PF==='due'?paid(r)<Number(r.payout||0):paid(r)>=Number(r.payout||0)&&Number(r.payout||0)>0)).sort((a,b)=>{const da=paid(a)<Number(a.payout||0)?0:1,db=paid(b)<Number(b.payout||0)?0:1;return da-db||String(b.order_date||'').localeCompare(String(a.order_date||''));});
- const g=el('div','pc2-g');if(!list.length)g.appendChild(el('p','note','Kuch nahi.'));
+ const g=el('div','pc2-g');if(!list.length)g.appendChild(el('p','note','No payments here.'));
  list.forEach(r=>{const amt=Number(r.payout||0),p=paid(r);const st=amt&&p>=amt?'paid':p>0?'part':'due';const c=el('button','pc2-i '+st);c.type='button';
-  const ph=el('div','pc2-ph');const u=pic(r);if(u){const im=el('img');im.src=u;im.alt='';im.loading='lazy';ph.appendChild(im);}else ph.textContent='—';c.appendChild(ph);
+  const ph=el('div','pc2-ph');const mono=()=>{ph.textContent=(String(r.brand||r.item||'').match(/[A-Za-z]/)||['L'])[0].toUpperCase();ph.classList.add('mono');ph.setAttribute('role','img');ph.setAttribute('aria-label','Photo coming soon');};const u=pic(r);if(u){const im=el('img');im.src=u;im.alt='';im.loading='lazy';im.onerror=()=>{im.remove();mono();};ph.appendChild(im);}else mono();c.appendChild(ph);
   const mid=el('div','pc2-m');mid.appendChild(el('b',null,r.item||'Order'));mid.appendChild(el('small',null,[r.order_no,fdate(r.order_date),r.status].filter(Boolean).join(' · ')));
   const tg=el('span','pc2-t '+st,st==='paid'?'✓ Paid'+(r.payment_date?' · '+fdate(r.payment_date):''):st==='part'?'Part paid · '+money(p):'Due');mid.appendChild(tg);c.appendChild(mid);
   const rt=el('div','pc2-a');rt.appendChild(el('b',null,money(amt)));if(st!=='paid'&&amt)rt.appendChild(el('small',null,money(amt-p)+' due'));c.appendChild(rt);
