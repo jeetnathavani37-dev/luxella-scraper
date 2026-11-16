@@ -83,6 +83,7 @@ _Re-ordered by chief 2026-11-15 22:45 IST. Ledger 26h: watchdog 9, backend 5, gr
 - (panel 11-16 Seoul/Kolkata; screens chromium-client-tab-ad, webkit-client-tab-al) LIVE orb + chat FAB sit over mid-page content on the first screen, not only the last card: Address order card 'Received at internatio…', All orders 'FILTERS & SEARCH' field. Consider collapsing the two into one FAB, or hiding the orb while a form/filter is in view — design call (Now #2b).
 - (panel 11-16 Seoul/Toronto/Singapore 11-15) Mini bar 'NEXT ETA ANY DAY' reads as no date to precise buyers — show the date window (e.g. '18–21 Nov') when eta_date is future, 'Any day' only when past. Low-risk copy/logic.
 - (panel 11-16 Dubai/Riyadh/Barcelona, Gulf NRI) Gift flow keeps coming back (3 more today, ~20 buyers over 8 panels): 'Gift this piece' — wrap + note + another address — on Ask for a quote; Gulf buyers compare to Ounass same-day + Tabby. Needs Jeet offer first.
+- (growth 11-16) 0 visits/24h when there's no drop and no order update — two triggers explain every return so far. Owner Admin 'Quiet day' line: 'No live drop in Nh · N drafts ready · N asks waiting' on the dashboard so Jeet sees the cause at a glance (read-only, no auto-publish/send, §4). Pairs with Now #1. — conversion
 _(chief 2026-11-15: emptied — growth reply-pending nudge + frontend price-warn wiring → Now #1/#3; panel Address dock overlap closed (d2c522d verified QA #117); owner Add-photo nudge → Next; Gift tick = dup of Later + Needs Jeet gift line. KS question answered by chief → Done.)_
 
 ## Done
