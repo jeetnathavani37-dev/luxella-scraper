@@ -4681,3 +4681,8 @@ html body .sw [id^="pane-"]:not([hidden]){padding-bottom:max(72px,env(safe-area-
 html body.lx-fld .hv-fab#hv-fab,html body.lx-fld .qcm#qc-main:not(.on){opacity:0!important;pointer-events:none!important}
 html body.lx-fld .sw::after{opacity:0}
 }
+/* frontend 2026-11-17: owner pulse line under the Arrivals/Boutique/Enquiries switch (deals.js ownerPulse) */
+.dl-pulse{display:flex;align-items:baseline;gap:10px;width:100%;min-height:44px;margin:8px 0 12px;padding:10px 14px;background:transparent;border:1px solid rgba(201,162,74,.28);color:inherit;font:inherit;font-size:13px;line-height:1.45;text-align:left;cursor:pointer}
+.dl-pulse small{flex:none;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:#c9a24a}
+.dl-pulse.warn{border-color:rgba(178,74,74,.55)}
+.dl-pulse.warn small{color:#d98b8b}

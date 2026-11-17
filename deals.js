@@ -950,7 +950,7 @@
   if(own()){const f=el('div','dl-rqc-f');const pr=el('input','dl-in');pr.type='number';pr.placeholder='Price ₹';pr.value=c.price??'';const av=el('select','dl-in');['','In stock','Limited availability','Only on order','Sold out'].forEach(o=>{const op=el('option',null,o||'Availability');op.value=o;av.appendChild(op);});av.value=c.avail||'';
    const ta=el('input','dl-in');ta.placeholder='Your answer…';ta.value=c.reply||(c.draft&&c.draft.text)||'';if(!c.reply&&c.draft){if(c.draft.price!=null)pr.value=c.draft.price;if(c.draft.avail)av.value=c.draft.avail;w.insertBefore(el('div','dl-cbadge','🛎️ Concierge drafted this · check & send'),w.children[1]||null);}const sb=el('button','btn dl-ask',c.reply?'Update answer':'Send answer');sb.type='button';
    sb.addEventListener('click',async()=>{const t=ta.value.trim()||[pr.value?'Price '+inr(pr.value):'',av.value].filter(Boolean).join(' · ');if(!t){ta.focus();return;}sb.disabled=true;
-    try{await window.lx.deals.reply(x.client_id,x.doc_id,t,{price:num(pr.value),avail:av.value});try{await window.lx.deals.popup([x.client_id],{title:'Luxella answered · '+String(c.product||'').slice(0,50),body:[pr.value?inr(pr.value):'',av.value,t].filter(Boolean).join(' · ').slice(0,300),img:c.photo||''});}catch(e){}say('Answer sent.');render();}catch(e){sb.disabled=false;alert('Could not send.');}});
+    try{await window.lx.deals.reply(x.client_id,x.doc_id,t,{price:num(pr.value),avail:av.value});try{await window.lx.deals.popup([x.client_id],{title:'Luxella answered · '+String(c.product||'').slice(0,50),body:[pr.value?inr(pr.value):'',av.value,t].filter(Boolean).join(' · ').slice(0,300),img:c.photo||''});}catch(e){}say('Answer sent.');PULSE=null;window.__pulse=0;render();}catch(e){sb.disabled=false;alert('Could not send.');}});
    const r1=el('div','dl-rqc-r');r1.appendChild(pr);r1.appendChild(av);f.appendChild(r1);f.appendChild(ta);f.appendChild(sb);w.appendChild(f);}
   return w;}
  /* ---------- Shop pieces from drops (every PDF page / photo becomes a product card) ---------- */
@@ -975,6 +975,24 @@
   else{const e=el('button','btn2','Open & edit');e.type='button';e.addEventListener('click',()=>viewer(r,p.i));ac.appendChild(e);}
   b.appendChild(ac);if(REQ[r.id+':'+(p.i+1)])b.appendChild(el('small','dl-pc-q','✓ You asked about this'));{const hb=holdBadge(r.id+':'+(p.i+1));if(hb)b.appendChild(hb);}c.appendChild(b);return c;}
  /* ---------- Shop: brand storefronts + comments ---------- */
+ /* owner-only, read-only (Backlog Now #1): one line — hours since the last live drop, drafts ready, asks waiting, replies drafted but unsent >12 h. Never sends, never publishes (§4). */
+ let PULSE=null;
+ function ownerPulse(){if(!own()||!window.lx||!window.lx.deals)return null;
+  if(PULSE==null&&!window.__pulse&&window.lx.deals.pendingReqs){window.__pulse=1;window.lx.deals.pendingReqs().then(L=>{PULSE=L||[];render();}).catch(()=>{});}
+  const now=Date.now(),T=v=>{const t=Date.parse(v||'');return isFinite(t)?t:NaN;},age=ms=>ms<864e5?Math.max(1,Math.floor(ms/36e5))+'h':Math.floor(ms/864e5)+'d';
+  const live=rows.filter(r=>!(r.data||{}).draft).reduce((m,r)=>r.created_at>m?r.created_at:m,'');const lt=T(live);
+  const drafts=rows.filter(r=>(r.data||{}).draft).length;
+  const P=PULSE||[],dtx=d=>d&&typeof d==='object'?String(d.text||''):typeof d==='string'?d:'';
+  const stale=P.filter(x=>{const d=x.data||{};if(!dtx(d.draft))return false;const t=T((d.draft&&d.draft.at)||d.at);return isFinite(t)&&now-t>12*36e5;});
+  const oldest=stale.reduce((m,x)=>{const t=T((x.data||{}).at);return isFinite(t)&&t<m?t:m;},now);
+  const parts=[];const quiet=isFinite(lt)&&now-lt>=864e5;
+  parts.push(!isFinite(lt)?'No live drop yet':quiet?'No live drop in '+age(now-lt):'Last drop '+age(now-lt)+' ago');
+  if(drafts)parts.push(drafts+' draft'+(drafts===1?'':'s')+' ready');
+  if(PULSE!=null&&P.length)parts.push(P.length+' ask'+(P.length===1?'':'s')+' waiting');
+  if(stale.length)parts.push(stale.length+' repl'+(stale.length===1?'y':'ies')+' drafted, not sent'+(oldest<now?' · oldest '+age(now-oldest):''));
+  const b=el('button','dl-pulse'+(stale.length||quiet?' warn':''));b.type='button';b.setAttribute('aria-label','Owner pulse: '+parts.join(', ')+'. Open enquiries');
+  b.appendChild(el('small',null,'Today'));b.appendChild(el('span',null,parts.join(' · ')));
+  b.addEventListener('click',()=>{if(VIEW==='reqs')return;VIEW='reqs';LS.set('view','reqs');PAGE=24;render();});return b;}
  function viewSwitch(nD,nS){const w=el('div','dl-vs');const mk=(k,t,n)=>{const b=el('button','dl-vs-b'+(VIEW===k?' on':''));b.type='button';b.setAttribute('aria-pressed',VIEW===k);b.appendChild(el('span',null,t));b.appendChild(el('small',null,String(n)));b.addEventListener('click',()=>{if(VIEW===k)return;VIEW=k;LS.set('view',k);PAGE=24;render();try{$('deals').scrollIntoView({behavior:'smooth',block:'start'});}catch(e){}});w.appendChild(b);};mk('deals','Arrivals',nD);mk('shop','Boutique',nS);mk('reqs',own()?'Enquiries':'My enquiries',RQN==null?'·':RQN);if(RQN==null&&!window.__rqn){window.__rqn=1;window.lx.deals.myReqs().then(L=>{RQN=L.filter(x=>!(x.data||{}).reply).length;render();}).catch(()=>{});}return w;}
  function fromPrice(L){const p=L.map(r=>r.r?num(r.cp.price):num((r.data||{}).price)).filter(x=>x!=null);return p.length?Math.min(...p):null;}
  function shelf(b,L){const sec=el('section','dl-shelf');const h=el('button','dl-shelf-h');h.type='button';const lg=logo(b);const mk=el('span','dl-shelf-m');if(lg){const im=el('img');im.src=lg;im.alt=b;mk.appendChild(im);}else mk.textContent=b.charAt(0);h.appendChild(mk);const tt=el('span','dl-shelf-t');tt.appendChild(el('b',null,b));const fp=fromPrice(L);const cn=colCount(b);const tot=L.length+cn;tt.appendChild(el('small',null,tot.toLocaleString('en-IN')+(tot>1?' pieces':' piece')+(fp!=null&&!cn?' · from '+inr(fp):'')));h.appendChild(tt);const fb=followBtn(b);if(fb)h.appendChild(fb);h.appendChild(el('span','dl-shelf-go','View all ›'));h.addEventListener('click',()=>{if(cn){collectionPage({brand:b,cat:'',q:''});return;}F.brand=b;PAGE=24;saveF();render();try{$('deals').scrollIntoView({behavior:'smooth',block:'start'});}catch(e){}});sec.appendChild(h);
@@ -1079,6 +1097,7 @@
   {const sp=el('button','dl-srch-pill');sp.type='button';sp.appendChild(el('span','dl-srch-ic','⌕'));sp.appendChild(el('span',null,'Search brands, pieces, budget, size…'));sp.addEventListener('click',()=>searchSheet());l.appendChild(sp);}
   if(!COLF&&!window.__colf){window.__colf=1;window.lx.deals.catalogFacets().then(f=>{COLF=f;render();}).catch(()=>{});}
   {const nS=all.length+dropPieces().length+((COLF&&COLF.total)||0);l.appendChild(viewSwitch(pdfs.length,nS>=10000?(Math.floor(nS/100)/10)+'k':nS));}
+  {const pu=ownerPulse();if(pu)l.appendChild(pu);}
   if(!own())autoReady(l);
   if(VIEW==='shop'){shopView(l,all);return;}
   if(VIEW==='reqs'){requestsView(l);return;}
