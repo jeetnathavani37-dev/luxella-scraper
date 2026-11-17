@@ -4667,3 +4667,17 @@ html body:has(#tab-ad[aria-selected="true"]) #qc-menu.qcmenu{bottom:calc(max(16p
 
 /* panel 2026-11-16: Payments card rows with no photo show the brand initial (same as phMono) instead of a dash */
 html body .sw.sw .pc2-ph.mono{box-sizing:border-box;border:1px solid rgba(201,169,106,.22);border-radius:4px;background:radial-gradient(circle at 50% 40%,#2a2318,#0d0b08);font:italic 400 22px/1 'Lux Display',Didot,serif;letter-spacing:0;text-transform:none;color:rgba(227,192,106,.6)}
+
+/* ===== design 2026-11-17: calm corners — coins never sit on a field =====
+   The LIVE orb + contact coin covered 'Filters & search' on All orders and the 'Shipping address'
+   heading on Address (webkit-client-tab-al.png, webkit-client-tab-ad.png, QA #128; panel 11-16;
+   Backlog Now #2b). polish.js sets body.lx-fld while a visible field/filter/sticky form bar is in the
+   bottom 150px; the two coins then fade with their existing .4s opacity (no new motion). Back-to-top
+   stays. Each open pane also ends with 72px of air so its last card clears the coin row, and focused
+   fields scroll to sit above it. */
+@media (max-width:900px){
+html{scroll-padding-bottom:96px}
+html body .sw [id^="pane-"]:not([hidden]){padding-bottom:max(72px,env(safe-area-inset-bottom,0px))}
+html body.lx-fld .hv-fab#hv-fab,html body.lx-fld .qcm#qc-main:not(.on){opacity:0!important;pointer-events:none!important}
+html body.lx-fld .sw::after{opacity:0}
+}

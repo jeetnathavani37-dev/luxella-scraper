@@ -209,3 +209,22 @@ new MutationObserver(()=>scheduleLinkify()).observe(document.getElementById('pan
  let busy=false;const fix=()=>{if(busy)return;busy=true;const v=t.textContent.replace(/[^0-9]/g,'');if(t.textContent.trim()!=='—'&&Number(v||'1')===0&&!/None/.test(t.textContent)){t.textContent='None';t.title='No outstanding balance';t.classList.remove('bad');t.classList.add('ok');}busy=false;};
  new MutationObserver(fix).observe(t,{childList:true,characterData:true,subtree:true});fix();
 })();
+
+/* design 2026-11-17: corner coins step aside while a form or filter field sits under them.
+   LIVE orb + contact coin covered 'Filters & search' (All orders) and the Address heading/bar
+   (webkit-client-tab-al.png, -tab-ad.png, QA #128; Backlog Now #2b). When any visible field in the
+   open pane reaches the bottom 150px of the screen, body gets .lx-fld and the two coins fade out
+   (same .4s opacity they already use; no new motion). Back-to-top stays. Read-only, no writes. */
+(function(){
+ const SEL='.sw [id^="pane-"]:not([hidden]) :is(input:not([type=hidden]),textarea,select,details.flt>summary,.ad-sticky)';
+ let q=false;
+ const run=()=>{q=false;const h=window.innerHeight||0,band=h-150;let on=false;
+  if(window.innerWidth<=900){const els=document.querySelectorAll(SEL);
+   for(let i=0;i<els.length&&!on;i++){const r=els[i].getBoundingClientRect();if(r.height>0&&r.bottom>band&&r.top<h)on=true;}}
+  document.body.classList.toggle('lx-fld',on);};
+ const tick=()=>{if(!q){q=true;requestAnimationFrame(run);}};
+ addEventListener('scroll',tick,{passive:true});addEventListener('resize',tick,{passive:true});
+ document.addEventListener('click',()=>setTimeout(tick,120),true);
+ document.addEventListener('toggle',tick,true);
+ setInterval(tick,1500);tick();
+})();
