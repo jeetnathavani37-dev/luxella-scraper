@@ -37,3 +37,6 @@
 - 2026-11-16: avg trust 2.8/desire 2.2/ease 5.6/speed 7.7/value 3.2, buy 0/10 (maybe 2); Edit locked day 19. Shipped a182d73 (Payments pc2 cards '—' photo box → brand initial .pc2-ph.mono, 'Kuch nahi.'→'No payments here.' in ui2.js) + d140ab5 (Terms 'being added' copy, Stats 'Houses ordered' when top brand =1). ui2.js is versioned inside shim.js (ui2.js?v=…), not index.html.
 - Used 11-16: Kolkata/Indore/Kochi/Belagavi, Riyadh/Toronto, Dubai/Paris/Seoul/Barcelona. Grep client-visible strings for Hinglish ('Kuch', 'nahi') — owner templates are fine, client UI is not.
 - 2026-11-16: push run #123 43815665877 green + deploy ok; both fixes visible in after-screens.
+- 2026-11-17: avg trust 2.8/desire 2.2/ease 5.7/speed 7.8/value 3.2, buy 0/10 (maybe 2) — flat; Edit locked day 20; prod still 13 Nov build (?v 1794590322). Shipped 2ce4717 (mini Next ETA 'Today' if any open stage 8; RTS empty → 'Ask for a specific piece' btn; voice no-SR placeholder 'Your question'). Mistake: 3 ideas in 1 commit — split next time.
+- Used 11-17: Lucknow/Guwahati/Hyderabad/Ujjain, Nairobi/New York, Istanbul/Hong Kong/Rome/Mexico City. No WebFetch tool in this env — WebSearch result titles only.
+- 2026-11-17: push run #128 44029965121 green + deploy ok; all 3 visible in after-screens; prod still ?v 1794590322 after deploy.

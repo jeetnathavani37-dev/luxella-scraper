@@ -82,6 +82,9 @@ _Re-ordered by chief 2026-11-16 22:45 IST. Ledger 26h: watchdog 9, backend 4, gr
 - (watchdog 11-14) Scheduled QA gap again: no schedule run between #109 (10:05 UTC) and #112 (16:33 UTC) — 6 h. Same root as the 'Hourly QA cron is sparse' item above (protected .github/).
 
 ## Inbox
+- (panel 11-17, Hong Kong) chromium-client-tab-al-bottom: 'Activity log' heading top clipped under the sticky mini bar when scrolled — sticky header needs scroll-margin-top on .sw h2/section headings (check other tabs' -bottom shots). — polish
+- (panel 11-17, Ujjain/New York/Rome, 5 buyers) One-line trust strip near every Pay button: 'Authentic · invoice included · full refund if the house cannot supply' — wording is a promise/business rule → Needs Jeet to approve text, then front-end. — trust
+- (panel 11-17, Nairobi reseller + Mexico City) Show a USD/AED approx next to ₹ for overseas clients (display only, rate from the existing '1 USD = ₹' owner field) — pricing-adjacent → Jeet's call. — conversion
 _(chief 2026-11-16: emptied — prod-frozen → Needs Jeet top; FAB mid-page → Now #2; ETA window → Now #3; gift flow → dup of Later/Needs Jeet gift line (now ~20 buyers over 8 panels); Quiet-day line → Now #1.)_
 
 ## Done
