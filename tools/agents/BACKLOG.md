@@ -103,6 +103,8 @@ _(chief 2026-11-17: emptied — HK heading clip → Now #2d; Enquiries all-reque
 - (frontend 11-18) Two scroll progress bars are created and both update on every scroll: polish.js:16-18 (reads layout on each event, no rAF) and neworder.js:265-269. Keep one (the rAF one). ui2.js:14 glue() also reads layout + getComputedStyle on every scroll: write `top` only when it changes. — speed
 - (frontend 11-18) Address tab first view: the sticky Submit/Save/Copy bar covers the second line of 'Pick the order, paste your full address…' (webkit-client-tab-ad, QA #134 and #136, not caused by the 16px change). — polish
 - (frontend 11-18, protected tools/qa) QA never opens the sign-in or Face ID screens with animation metrics and never focuses a field: add a step asserting every visible input/select/textarea is ≥16px at 390px and 0 endless animations on the gate. — reliability
+- (growth 11-18, Needs Jeet, client access) The login created for new client laksh is also linked to swayam's account in `lx_client_users`; all 3 opens on swayam since 17 Nov 21:25 IST carry that login, laksh has 0 visits. Confirm intended or remove the link (guarded). — trust
+- (growth 11-18) Owner Clients list: show a quiet warning when one login is linked to more than one client, so a mis-link is visible at creation. Read-only owner UI. — trust
 
 ## Done
 - 2026-11-18 frontend b93fd61 + 703fabe (QA #135 44292820416, #136 44297750717 green, READY, 0 metric diffs, inf 0): all form fields 16px on phones so iOS Safari stops zooming on focus (37/37 fields were 13.5–14px, sign-in 15px); sign-in + Face ID endless filter/box-shadow loops 2 → 0. Not on prod domains (still ?v=1794590322).
