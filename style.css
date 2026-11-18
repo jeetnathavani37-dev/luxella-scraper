@@ -4548,7 +4548,7 @@ html body #chat.chat .ch #chat-mode-t{margin-left:auto}
 .lx-gate .box::before,.lx-gate .box::after{content:"";position:absolute;width:18px;height:18px;border:1px solid #C9A227;opacity:.8;pointer-events:none}
 .lx-gate .box::before{top:9px;left:9px;border-right:0;border-bottom:0}
 .lx-gate .box::after{bottom:9px;right:9px;border-left:0;border-top:0}
-.lx-gate .logo{width:176px;margin:0 auto 14px;filter:drop-shadow(0 0 22px rgba(201,162,39,.28));animation:lxGlow 5s ease-in-out infinite}
+.lx-gate .logo{width:176px;margin:0 auto 14px;filter:drop-shadow(0 0 22px rgba(201,162,39,.28))}
 .lx-gate .eyebrow{font:500 9.5px 'Jost',sans-serif;letter-spacing:.42em;text-transform:uppercase;color:#C9A227;margin:26px 0 12px}
 .lx-gate p{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:400;font-size:19px;line-height:1.4;color:#CFC7B8;margin:0 0 20px}
 .lx-gate .eyebrow+p{font-size:20px;margin-bottom:30px;position:relative;padding-bottom:26px}
@@ -4574,13 +4574,14 @@ html body #chat.chat .ch #chat-mode-t{margin-left:auto}
 .lx-gate .out:hover{color:#E3C565}
 .lx-gate .lx-foot{margin-top:26px;font:400 10px 'Jost',sans-serif;letter-spacing:.4em;text-transform:uppercase;color:#8a8272}
 /* Face ID unlock */
-.lx-gate .fid-ring{width:92px;height:92px;margin:2px auto 22px;border-radius:50%;display:grid;place-items:center;border:1px solid rgba(201,162,39,.5);background:radial-gradient(circle,rgba(201,162,39,.14),rgba(201,162,39,0) 70%);position:relative;animation:lxPulse 2.8s ease-out infinite}
+.lx-gate .fid-ring{width:92px;height:92px;margin:2px auto 22px;border-radius:50%;display:grid;place-items:center;border:1px solid rgba(201,162,39,.5);background:radial-gradient(circle,rgba(201,162,39,.14),rgba(201,162,39,0) 70%);position:relative}
+/* frontend 2026-11-18: sign-in and Face ID screens looped filter and box-shadow forever (repaint every frame). The logo keeps its still glow; the ring breathes three times on transform/opacity, then rests. */
+.lx-gate .fid-ring::after{content:"";position:absolute;inset:-1px;border-radius:50%;border:1px solid rgba(201,162,39,.45);opacity:0;pointer-events:none;animation:lxFidRing 2.8s ease-out 3}
 .lx-gate .fid-ring svg{width:46px;height:46px;stroke:#E3C565;fill:none;stroke-width:1.3;stroke-linecap:round;stroke-linejoin:round}
 .lx-gate .fid-hi{font:500 13px 'Jost',sans-serif;letter-spacing:.3em;text-transform:uppercase;color:#F3EEE6;margin:0 0 8px}
 @keyframes lxIn{from{opacity:0;transform:translateY(16px) scale(.985)}to{opacity:1;transform:none}}
-@keyframes lxGlow{0%,100%{filter:drop-shadow(0 0 16px rgba(201,162,39,.18))}50%{filter:drop-shadow(0 0 30px rgba(227,197,101,.42))}}
-@keyframes lxPulse{0%{box-shadow:0 0 0 0 rgba(201,162,39,.32)}70%,100%{box-shadow:0 0 0 22px rgba(201,162,39,0)}}
-@media (prefers-reduced-motion:reduce){.lx-gate .box,.lx-gate .logo,.lx-gate .fid-ring{animation:none}}
+@keyframes lxFidRing{0%{opacity:.7;transform:scale(1)}70%,100%{opacity:0;transform:scale(1.48)}}
+@media (prefers-reduced-motion:reduce){.lx-gate .box,.lx-gate .fid-ring::after{animation:none}}
 @media (max-width:380px){.lx-gate .box{padding:40px 22px 28px}.lx-gate p{font-size:18px}}
 
 /* panel 2026-11-08: Overview dropdown cards (Next delivery / Your to-dos) — the scroll-reveal gold rule (h2.rv-line:before, bottom:0) can land on a heading before polish.js turns the card into .acc; on .acc the h2 has margin 0 and the note sits 8px up, so the line ran through "Closest open order" like a strike-through. The chevron is the .acc marker; no rule needed. */
