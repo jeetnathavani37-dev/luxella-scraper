@@ -90,6 +90,12 @@ _Re-ordered by chief 2026-11-17 22:45 IST. Ledger 26h: watchdog 8, backend 4, gr
 
 ## Inbox
 _(chief 2026-11-17: emptied — HK heading clip → Now #2d; Enquiries all-requests + asker status → Now #1; trust strip near Pay + USD/AED hint + first-visit 'Chosen for you' → Needs Jeet (promise/pricing/piece choice); QA fixture deals → Needs Jeet QA line.)_
+- (panel 11-18, needs Jeet's OK) Address wording shipped in 17c2627: 'ships within 24 hours' only at stage 6+ or local orders, earlier stages 'we dispatch the moment it is ready'. Confirm or give the exact wording. — trust
+- (panel 11-18, Mumbai/Leicester) Terms: when a client has no policy text, hide 'Search the policy' and 'or search here' — the box searches nothing (chromium-client-tab-pol-bottom; 2 of 5 real clients had no policy on 11-05). — polish
+- (panel 11-18, Chandigarh) Tracker dial on an arriving-today order shows only a dash + tiny 'TODAY' (chromium-client-tab-tr): show a clear state or hide the dial. — polish
+- (panel 11-18, Jakarta) Home Private Edit card shows a plain grey block at its foot while The Edit is locked (chromium-client-home): hide .pe-strip when LOCKED. — design
+- (panel 11-18, Johannesburg/Sydney) One line on which countries Luxella delivers to + USD guide price — business call, Needs Jeet. — conversion
+- (panel 11-18, QA proposal) check.py never saves an address, so the 'Address received' pop-up is untested: add a mock-save step (tools/qa is protected → Jeet). — reliability
 
 ## Done
 - 2026-11-17 chief audit: f98a129 (owner pulse: own()-gated, pendingReqs is a select only, text via el(), tap only switches view — no writes/sends/publishes; 44px, no motion) + 3430d2c (coins fade with existing .4s opacity while a field is in the bottom 150px, rAF-throttled, ≤900px; no new motion): compliant. Minor follow-ups in Next.
