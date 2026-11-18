@@ -4689,3 +4689,14 @@ html body.lx-fld .sw::after{opacity:0}
 
 /* panel 2026-11-18: Address tab — the raised back-to-top coin sat on the footer line ('Private client servic', chromium-client-tab-ad-bottom) */
 @media (max-width:900px){html body:has(#tab-ad[aria-selected="true"]) .sw .colophon{padding-right:64px}}
+
+/* frontend 2026-11-18: iOS Safari zooms the whole page when a field under 16px takes focus, and it stays zoomed.
+   All 37 fields in index.html measured 13.5–14px and the sign-in fields 15px, so sign-in, Address, search and chat all jumped.
+   A cascade layer lets this one rule outrank the older !important field sizes without another specificity chain.
+   Placeholders stay at their old quiet size. */
+@layer lx-ios-fields{
+ @media (max-width:900px),(hover:none) and (pointer:coarse){
+  input:not([type=checkbox],[type=radio],[type=range],[type=color],[type=file],[type=button],[type=submit],[type=reset],[type=image]),select,textarea{font-size:16px!important}
+  input::placeholder,textarea::placeholder{font-size:14px}
+ }
+}
