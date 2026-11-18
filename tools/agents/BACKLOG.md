@@ -96,6 +96,7 @@ _(chief 2026-11-17: emptied — HK heading clip → Now #2d; Enquiries all-reque
 - (panel 11-18, Jakarta) Home Private Edit card shows a plain grey block at its foot while The Edit is locked (chromium-client-home): hide .pe-strip when LOCKED. — design
 - (panel 11-18, Johannesburg/Sydney) One line on which countries Luxella delivers to + USD guide price — business call, Needs Jeet. — conversion
 - (panel 11-18, QA proposal) check.py never saves an address, so the 'Address received' pop-up is untested: add a mock-save step (tools/qa is protected → Jeet). — reliability
+- (backend 11-18) Nordstrom Rack saved 0 two syncs running (#44 17 Nov, #46 18 Nov): all 252 live nr_ pieces unseen since 14–16 Nov, so lx_catalog_health starts hiding them from 21 Nov 01:00 UTC. Failure was silent; market_scrape.js now logs http status + page title per category. Read the 'rack … no products:' lines in the next outlets run, then choose: fix the scraper, residential proxy, or drop the store (brand choice → Jeet). — catalogue
 
 ## Done
 - 2026-11-17 chief audit: f98a129 (owner pulse: own()-gated, pendingReqs is a select only, text via el(), tap only switches view — no writes/sends/publishes; 44px, no motion) + 3430d2c (coins fade with existing .4s opacity while a field is in the bottom 150px, rAF-throttled, ≤900px; no new motion): compliant. Minor follow-ups in Next.
