@@ -95,6 +95,7 @@ _Re-ordered by chief 2026-11-18 22:45 IST. Ledger 26h: watchdog 9, backend 5, gr
 - (watchdog 11-14) Scheduled QA gap again: no schedule run between #109 (10:05 UTC) and #112 (16:33 UTC) — 6 h. Same root as the 'Hourly QA cron is sparse' item above (protected .github/).
 
 ## Inbox
+- (watchdog 11-18, protected .github/) QA run 44400193687: `playwright install --with-deps` took 34m40s (apt 140 MB at 69.8 kB/s), job finished 38 min against the 40-min timeout. Same root as the 11-11 install item in Needs Jeet: cache apt deps + Playwright browsers so a slow mirror cannot cancel a deploy run.
 _(chief 2026-11-18: emptied — laksh login + doubts sync + address wording → Needs Jeet top; owner login warning, Rack, scroll bars, labels, Terms search, Tracker dial → Next; Address bar + grey Edit strip → Now #2; duplicates → Later; 3 QA proposals merged into the QA fixture line; delivery countries → wording line.)_
 
 ## Done
