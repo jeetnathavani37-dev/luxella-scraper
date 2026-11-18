@@ -143,16 +143,16 @@ async function rack(b) {
   const items = []; const seen = new Set(); let gpos = 0;
   for (const [c, g, cat] of cats) {
     for (let page = 1; page <= 30 && items.length < CAP; page++) {
-      let P = null;
+      let P = null; let why = '';
       for (let a = 0; a < 2 && !P; a++) {
-        const ctx = await newCtx(b); const p = await ctx.newPage();
-        try { await p.goto(`https://www.nordstromrack.com/shop/${c}?top=200&page=${page}`, { timeout: 90000, waitUntil: 'domcontentloaded' });
+        const ctx = await newCtx(b); const p = await ctx.newPage(); let st = 0;
+        try { const r = await p.goto(`https://www.nordstromrack.com/shop/${c}?top=200&page=${page}`, { timeout: 90000, waitUntil: 'domcontentloaded' }); st = r ? r.status() : 0;
           await p.waitForFunction(() => window.__INITIAL_CONFIG__ && window.__INITIAL_CONFIG__.productResults, null, { timeout: 30000 });
           P = await p.evaluate(() => { const o = window.__INITIAL_CONFIG__.productResults; const order = Object.values(o.productUi && o.productUi.byId || {}).filter(u => u.source === 'organic').sort((a, b) => a.sourceIndex - b.sourceIndex).map(u => u.productId); const by = o.productsById; const ids = order.length ? order : Object.keys(by); return ids.map(id => by[id]).filter(Boolean); });
-        } catch (e) { P = null; }
+        } catch (e) { P = null; why = `http ${st} title "${clean(await p.title().catch(() => '')).slice(0, 60)}" ${String(e.message).split('\n')[0].slice(0, 80)}`; }
         await ctx.close().catch(() => {}); if (!P) await sleep(10000);
       }
-      if (!P || !P.length) break; let kept = 0;
+      if (!P || !P.length) { log('rack', c, 'page', page, 'no products:', why || 'empty list'); break; } let kept = 0;
       for (const x of P) {
         gpos++; const br = keepBrand(x.labelDisplayName); const pr = (x.propositions || [])[0] || {}; const price = Number(pr.sellingRetailPriceRange && pr.sellingRetailPriceRange.min);
         if (!br || !price || seen.has(x.id) || (pr.salability && pr.salability.status !== 'SELLABLE')) continue;
