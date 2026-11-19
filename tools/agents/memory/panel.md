@@ -44,3 +44,4 @@
 - Used 11-18: Chandigarh/Ahmedabad/Mumbai/Salem, Sydney/Leicester, Zürich/Jakarta/Bangkok/Johannesburg. Look for static copy that contradicts per-order data (index.html notes vs app.js stage logic).
 - 2026-11-19: avg trust 2.7/desire 2.3/ease 5.6/speed 8.0/value 3.2, buy 0/10 (maybe 2) — flat; Edit locked day 22. Shipped fe7cb99 (Terms search box + 'or search here' hidden when no policy, ids #pol-qw/#pol-qn) and 5e4aab8 (Tracker dial 'Today'/'Soon'+ARRIVING, ?v app/shim 1795700100). Push run #140 44471000341 sat in playwright install >8 min.
 - Used 11-19: Jalandhar/Bengaluru/New Delhi/Kozhikode, Doha/Manchester, Munich/Kuwait City/Tokyo/Rio de Janeiro. app.js version lives in shim.js:185, shim version in index.html:303 — bump both.
+- 2026-11-19: run #140 green + READY, both fixes visible in after-screens; prod still ?v 1794590322 (day 6).
