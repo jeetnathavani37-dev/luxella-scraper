@@ -12,10 +12,7 @@ const STAGES=['Order placed','Order confirmed','Shipped by retailer/outlet','Rec
 const inr=v=>'₹'+new Intl.NumberFormat('en-IN').format(Math.round(Number(v)||0));
 const slugKey=()=>'lx_seen_'+((window.lx&&window.lx.client()&&window.lx.client().slug)||'x');
 
-/* ---------- scroll progress hairline ---------- */
-const prog=el('div','lx-prog');document.body.appendChild(prog);
-const onScroll=()=>{const h=document.documentElement;const max=h.scrollHeight-h.clientHeight;prog.style.transform='scaleX('+(max>0?h.scrollTop/max:0)+')';};
-addEventListener('scroll',onScroll,{passive:true});onScroll();
+/* scroll progress hairline: drawn once by neworder.js (rAF-throttled); the duplicate bar here was removed */
 
 /* ---------- monogram in top bar ---------- */
 function monogram(){const top=document.getElementById('top');if(!top||top.querySelector('.mono'))return;const n=client();if(!n)return;const m=el('span','mono',n.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase());m.title=n;const who=top.querySelector('.who');if(who)top.insertBefore(m,who);else top.appendChild(m);}
