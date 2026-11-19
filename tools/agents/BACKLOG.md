@@ -95,6 +95,7 @@ _Re-ordered by chief 2026-11-18 22:45 IST. Ledger 26h: watchdog 9, backend 5, gr
 - (watchdog 11-14) Scheduled QA gap again: no schedule run between #109 (10:05 UTC) and #112 (16:33 UTC) — 6 h. Same root as the 'Hourly QA cron is sparse' item above (protected .github/).
 
 ## Inbox
+- (backend 11-19) Rack root cause confirmed: nordstromrack.com /shop/* now serves a JS bot-challenge page (inline obfuscated script, `window['istlWasHere']`, empty <title>) instead of `__INITIAL_CONFIG__` — #48 log: all 4 categories 'http 200 title "Nordstrom" waitForFunction timeout'. Not a selector bug; no code fix from GitHub IPs. nr 252 live / 0 fresh auto-hide from 21 Nov 01:00 UTC. Options (Jeet): residential proxy / local runner, or drop rack from market_scrape.
 - (watchdog 11-18, protected .github/) QA run 44400193687: `playwright install --with-deps` took 34m40s (apt 140 MB at 69.8 kB/s), job finished 38 min against the 40-min timeout. Same root as the 11-11 install item in Needs Jeet: cache apt deps + Playwright browsers so a slow mirror cannot cancel a deploy run.
 - (panel 11-19 Doha + 11-18 Sydney) "This is a gift — add a note" on the Address card (note stored with the address, shown to owner). Adds a service promise → wording/feature call for Jeet. — conversion
 - (panel 11-19 Kozhikode, 11-18 Salem) One quiet line near Pay / in Terms: "Every piece is original, bought from the brand or its authorised stores" — wording = Jeet (§4). — trust
