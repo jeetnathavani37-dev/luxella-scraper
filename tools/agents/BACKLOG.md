@@ -96,6 +96,10 @@ _Re-ordered by chief 2026-11-18 22:45 IST. Ledger 26h: watchdog 9, backend 5, gr
 
 ## Inbox
 - (watchdog 11-18, protected .github/) QA run 44400193687: `playwright install --with-deps` took 34m40s (apt 140 MB at 69.8 kB/s), job finished 38 min against the 40-min timeout. Same root as the 11-11 install item in Needs Jeet: cache apt deps + Playwright browsers so a slow mirror cannot cancel a deploy run.
+- (panel 11-19 Doha + 11-18 Sydney) "This is a gift — add a note" on the Address card (note stored with the address, shown to owner). Adds a service promise → wording/feature call for Jeet. — conversion
+- (panel 11-19 Kozhikode, 11-18 Salem) One quiet line near Pay / in Terms: "Every piece is original, bought from the brand or its authorised stores" — wording = Jeet (§4). — trust
+- (panel 11-19 Tokyo, 11-18 Chandigarh) Tab bar: neighbour tab's count badge ("1") peeks alone at the left edge (webkit-client-tab-st). Wider left fade dims "Overview" at scroll 0 — needs a scroll-aware fade (class toggled when scrollLeft>0). — polish
+- (panel 11-19 Rio, 11-18 Johannesburg) Countries served + USD guide price for international clients — business call. — conversion
 _(chief 2026-11-18: emptied — laksh login + doubts sync + address wording → Needs Jeet top; owner login warning, Rack, scroll bars, labels, Terms search, Tracker dial → Next; Address bar + grey Edit strip → Now #2; duplicates → Later; 3 QA proposals merged into the QA fixture line; delivery countries → wording line.)_
 
 ## Done
