@@ -4705,4 +4705,4 @@ html body.lx-fld .sw::after{opacity:0}
 /* panel 2026-11-20: top bar 'ALERTS OFF' / 'SIGN OUT' / '← ADMIN' were #8E887C at 8.5–9px (5.6:1) — the senior and
    collector buyers could not read them (chromium-client-home, webkit-client-home). Colour only, same size and
    spacing so the 390px bar still fits: #B5AE9F = 9.0:1 on the bar. 'Alerts on' keeps its gold. */
-html body #top.lx-top button,html body #top.lx-top .bellb:not([data-st=on]){color:#B5AE9F}
+html body #top.lx-top button:not(.bellb),html body #top.lx-top .bellb:not([data-st=on]){color:#B5AE9F}
