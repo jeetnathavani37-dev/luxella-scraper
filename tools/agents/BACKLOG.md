@@ -93,6 +93,9 @@ _Re-ordered by chief 2026-11-19 22:45 IST. Ledger 26h: watchdog 9, backend 5, gr
 - (watchdog 11-14) Scheduled QA gap again: no schedule run between #109 (10:05 UTC) and #112 (16:33 UTC) — 6 h. Same root as the 'Hourly QA cron is sparse' item above (protected .github/).
 
 ## Inbox
+- (panel 11-20 Jaipur/Bhavnagar) **Two Luxella numbers on one card:** Overview contact shows 'WhatsApp: +91 87240 79056' (fallback contact) but the CALL button is hard-coded `tel:+917896697800` (app.js:57). A senior buyer asked which one is Luxella. Jeet: is the call number intentional? If one number → CALL uses the same `c.phone` as WhatsApp (frontend, 1 line).
+- (panel 11-20 Vienna) Reply promise mismatch: Overview note 'We reply within 24 hours' (index.html contact note) vs Terms 'Confirmation in 24–48 hours'. Pick one wording (service promise → Jeet).
+- (panel 11-20 Vienna/Bhavnagar/Muscat) Legal imprint under the colophon — company name, city, business email (5/10 buyers: gmail + no firm). Needs Jeet wording; merges with the 'authentic · invoice' trust line.
 _(chief 2026-11-19: emptied — frontend Now #1 → Done; Rack → Needs Jeet decision; QA install → merged into the 11-11 install item; gift note, authenticity line, countries/USD → Needs Jeet wording lines; view tracking + vs-India line → merged; tab badge → Now #1(c).)_
 
 ## Done
