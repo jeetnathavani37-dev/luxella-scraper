@@ -252,10 +252,23 @@ wait(()=>$('pane-ad')&&$('a-save')&&typeof photos!=='undefined',()=>{
  const sv=$('a-save').parentNode;sv.classList.add('ad-sticky');
 });
 
-/* ---- Tabs: stable horizontal scroll, centre active tab ---- */
+/* ---- Tabs: stable horizontal scroll, centre active tab ----
+   design 2026-11-20: the centred scroll left half a neighbour (or only its
+   count badge, e.g. a lone '1') at the left edge. Now the scroll lands on a
+   tab boundary: the cut neighbour is either fully hidden or fully shown, and
+   the left fade (body .tabs.lx-tl) appears only while a label is really cut. */
 wait(()=>document.querySelector('.sw .tabs')&&$('tab-ov'),()=>{
  const tabs=document.querySelector('.sw .tabs');
- tabs.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{try{const l=t.offsetLeft-(tabs.clientWidth-t.offsetWidth)/2;tabs.scrollTo({left:Math.max(0,l),behavior:'smooth'});}catch(e){}setTimeout(()=>{try{const pn=$(t.id.replace('tab-','pane-'));if(!pn)return;const y=pn.getBoundingClientRect().top+window.scrollY-tabs.offsetHeight-12;if(window.scrollY>y+4)window.scrollTo({top:Math.max(0,y),behavior:'smooth'});}catch(e){}},40);}));
+ const geo=()=>{const b=tabs.getBoundingClientRect().left-tabs.scrollLeft;return [...tabs.querySelectorAll('.tab')].map(u=>{const r=u.getBoundingClientRect();return {u,x:r.left-b,w:r.width};}).filter(g=>g.w>0);};
+ const cutAt=(G,l)=>G.find(g=>g.x<l-1&&g.x+g.w>l+1);
+ const place=t=>{const G=geo(),a=G.find(g=>g.u===t);if(!a)return 0;const W=tabs.clientWidth,max=Math.max(0,tabs.scrollWidth-W),arrow=56,clamp=v=>Math.max(0,Math.min(max,v));
+  let l=clamp(a.x-(W-a.w)/2);const c=cutAt(G,l);
+  if(c&&c.u!==t){const hide=clamp(c.x+c.w),show=clamp(c.x),fits=v=>a.x>=v&&a.x+a.w<=v+W-(v>=max-1?0:arrow);
+   if(fits(show))l=show;else if(hide===c.x+c.w&&fits(hide))l=hide;}
+  return l;};
+ let tq=0;const tl=()=>{tq=0;tabs.classList.toggle('lx-tl',tabs.scrollLeft>2&&!!cutAt(geo(),tabs.scrollLeft));};
+ tabs.addEventListener('scroll',()=>{if(!tq)tq=requestAnimationFrame(tl);},{passive:true});setTimeout(tl,400);
+ tabs.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{try{tabs.scrollTo({left:place(t),behavior:'smooth'});}catch(e){}setTimeout(()=>{try{const pn=$(t.id.replace('tab-','pane-'));if(!pn)return;const y=pn.getBoundingClientRect().top+window.scrollY-tabs.offsetHeight-12;if(window.scrollY>y+4)window.scrollTo({top:Math.max(0,y),behavior:'smooth'});}catch(e){}},40);}));
 });
 
 /* ---- Luxurious scroll reveal ---- */

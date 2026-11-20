@@ -4706,3 +4706,12 @@ html body.lx-fld .sw::after{opacity:0}
    collector buyers could not read them (chromium-client-home, webkit-client-home). Colour only, same size and
    spacing so the 390px bar still fits: #B5AE9F = 9.0:1 on the bar. 'Alerts on' keeps its gold. */
 html body #top.lx-top button:not(.bellb),html body #top.lx-top .bellb:not([data-st=on]){color:#B5AE9F}
+
+/* ── design 2026-11-20 · Tab strip: no half-cut neighbour at the left edge ──
+   Before (webkit-client-tab-st / -tab-tr, QA #147): the centred scroll left a
+   lone count badge '1' or 'ADY TO SHIP' peeking under a 22px fade.
+   neworder.js now lands the scroll on a tab boundary; the fade shows only
+   while a label is truly cut (.lx-tl, set on scroll), so 'Overview' at
+   scroll 0 and boundary-aligned states are never dimmed. */
+html body .sw .tabs::before{flex-basis:30px;margin-right:-30px;background:linear-gradient(90deg,#0d0b09 40%,rgba(13,11,9,0));opacity:0;transition:opacity .2s ease}
+html body .sw .tabs.lx-tl::before{opacity:1}
