@@ -98,6 +98,7 @@ _Re-ordered by chief 2026-11-19 22:45 IST. Ledger 26h: watchdog 9, backend 5, gr
 - (panel 11-20 Jaipur/Bhavnagar) **Two Luxella numbers on one card:** Overview contact shows 'WhatsApp: +91 87240 79056' (fallback contact) but the CALL button is hard-coded `tel:+917896697800` (app.js:57). A senior buyer asked which one is Luxella. Jeet: is the call number intentional? If one number → CALL uses the same `c.phone` as WhatsApp (frontend, 1 line).
 - (panel 11-20 Vienna) Reply promise mismatch: Overview note 'We reply within 24 hours' (index.html contact note) vs Terms 'Confirmation in 24–48 hours'. Pick one wording (service promise → Jeet).
 - (panel 11-20 Vienna/Bhavnagar/Muscat) Legal imprint under the colophon — company name, city, business email (5/10 buyers: gmail + no firm). Needs Jeet wording; merges with the 'authentic · invoice' trust line.
+- (growth 11-20, owner UI only) Owner Collection 'Waiting to go live' strip: '24 priced drafts · oldest 6 d · last live drop 14 Nov' + tick-to-select + one 'Publish selected' button that **Jeet** taps (no auto-publish, §4). Drafts pile up 3–5/day while 0 drops; opens only come after drops/status updates.
 _(chief 2026-11-19: emptied — frontend Now #1 → Done; Rack → Needs Jeet decision; QA install → merged into the 11-11 install item; gift note, authenticity line, countries/USD → Needs Jeet wording lines; view tracking + vs-India line → merged; tab badge → Now #1(c).)_
 
 ## Done
