@@ -4715,3 +4715,5 @@ html body #top.lx-top button:not(.bellb),html body #top.lx-top .bellb:not([data-
    scroll 0 and boundary-aligned states are never dimmed. */
 html body .sw .tabs::before{flex-basis:30px;margin-right:-30px;background:linear-gradient(90deg,#0d0b09 40%,rgba(13,11,9,0));opacity:0;transition:opacity .2s ease}
 html body .sw .tabs.lx-tl::before{opacity:1}
+/* panel 2026-11-21: chat 'Ask here' text sat on the left edge of its gold focus frame (webkit/chromium-client-chat-open; computed padding-left 0 from .sw input{padding:10px 0}) — give the field its own inner space */
+html body .sw .chat .ci #chat-in{padding:10px 12px}
