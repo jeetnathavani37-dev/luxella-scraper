@@ -870,7 +870,7 @@ const amsg=t=>{document.getElementById('a-msg').textContent=t;};
 const addrText=()=>{const v=id=>document.getElementById(id).value.trim();return {order:v('a-order'),phone:v('a-phone'),address:v('a-addr'),pref:v('a-pref')};};
 function renderAddrList(docs){const w=document.getElementById('a-list');w.textContent='';addrDocs.list=docs;addrDocs.loaded=true;try{addrNeed();}catch(e){}try{const o=dash.data('orders');if(o&&o.status==='ok')renderBoard(o);}catch(e){}
  const openSet=new Set(openOrders().map(r=>r.item));docs=docs.filter(d=>openSet.has(d.order));
- if(!docs.length){const s=document.createElement('span');s.className='lbl';s.textContent='Nothing saved for your open orders. Delivered orders are cleared automatically.';w.appendChild(s);return;}
+ if(!docs.length){const s=document.createElement('span');s.className='lbl';s.textContent='Nothing saved yet.';w.appendChild(s);return;}
  docs.forEach(d=>{const it=document.createElement('div');it.className='it';const dot=document.createElement('span');dot.className='dot';dot.style.color='var(--color-ok)';
   const t=document.createElement('span');t.textContent=d.order||d.id;const sm=document.createElement('small');sm.textContent=(d.address||'')+(d.phone?' · '+d.phone:'')+(d.pref?' · '+d.pref:'')+(d.savedAt?' · saved '+fd(d.savedAt):'');t.appendChild(sm);
   it.appendChild(dot);it.appendChild(t);w.appendChild(it);});}
