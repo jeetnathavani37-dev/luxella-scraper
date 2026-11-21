@@ -6,7 +6,9 @@ const STAGES=['Order placed','Order confirmed','Shipped by retailer/outlet','Rec
 const root=document.getElementById('admin-root');
 const inr=n=>'₹'+new Intl.NumberFormat('en-IN').format(Number(n)||0);
 const base=p=>new URL(p,document.baseURI).href;
-let clients=[],counts={},sel=null,toastT;
+let clients=[],counts={},sel=null,toastT,logins=[];
+/* one login linked to more than one client → quiet owner warning (read-only, no unlink) */
+const sharedFor=(cid,em)=>{const mine=logins.filter(l=>l.c===cid&&(!em||l.e===em)).map(l=>l.e);const out=[];mine.forEach(e=>{logins.forEach(l=>{if(l.e===e&&l.c!==cid){const o=clients.find(x=>x.id===l.c);const n=o?o.name:'another client';if(out.indexOf(n)<0)out.push(n);}});});return out;};
 
 const css=document.createElement('style');css.textContent=`
 #admin-root{min-height:100vh;background:#0A0A0A;color:#F3EEE6;font:300 14px 'Jost',system-ui,sans-serif}
@@ -61,6 +63,7 @@ const css=document.createElement('style');css.textContent=`
 .dz-act-row{font-size:12.5px;color:#A39C90;padding:6px 0;border-top:1px solid #1A1917}
 @media(max-width:760px){.dz-tr{grid-template-columns:1.6fr .6fr 1fr 1fr auto}.dz-tr>span:nth-child(3),.dz-tr>span:nth-child(5),.dz-tr>span:nth-child(6),.dz-tr>span:nth-child(7){display:none}.dz-stk{grid-template-columns:48px 1fr}.dz-stk .dz-pr,.dz-stk .dz-act{grid-column:2}.dz-bar{grid-template-columns:9rem 1fr 1.5rem}}
 .dz-cl label,.dz-form label{display:flex!important;align-items:center;gap:6px;text-transform:none!important;letter-spacing:0!important;margin:0!important;font-size:13px!important;color:#F3EEE6!important}.dz-cl input,.dz-form label input{width:auto!important;margin:0!important}
+.ad-warn{display:block;color:#E0A66B!important;font-size:12px}.ad-u .ad-warn{flex-basis:100%;order:9}
 .ad-nc{margin-top:18px;border-top:1px solid #232120;padding-top:14px}.ad-nc>summary{cursor:pointer;list-style:none;font:500 11px 'Jost',sans-serif;letter-spacing:.24em;text-transform:uppercase;color:#E3C565;margin-bottom:10px}.ad-nc>summary::-webkit-details-marker{display:none}
 @media(max-width:760px){.ad-wrap{grid-template-columns:1fr}.ad-side{border-right:0;border-bottom:1px solid #232120}.ad-o{grid-template-columns:1fr}}
 `;document.head.appendChild(css);
@@ -72,7 +75,7 @@ async function loadClients(){
   const [c,o,u,v]=await Promise.all([
     sb.from('lx_clients').select('id,slug,name,biz').order('name'),
     sb.from('lx_orders').select('client_id'),
-    sb.from('lx_client_users').select('client_id'),
+    sb.from('lx_client_users').select('client_id,email'),
     sb.from('lx_docs').select('client_id,doc_id,data').eq('collection','visits')]);
   if(c.error)throw new Error(c.error.message);
   clients=c.data||[];counts={};
@@ -81,6 +84,7 @@ async function loadClients(){
   (v.data||[]).forEach(r=>{const k=counts[r.client_id];if(!k)return;const d=r.data||{};const n=Number(d.n)||0;k.v+=n;if(r.doc_id>=wk)k.v7+=n;if(r.doc_id===td)k.vt+=n;if(d.last_at>k.last){k.last=d.last_at;k.ua=d.ua||'';}});
   (o.data||[]).forEach(r=>{if(counts[r.client_id])counts[r.client_id].o++;});
   (u.data||[]).forEach(r=>{if(counts[r.client_id])counts[r.client_id].u++;});
+  logins=(u.data||[]).map(r=>({c:r.client_id,e:String(r.email||'').trim().toLowerCase()}));
 }
 
 function shell(){
@@ -99,6 +103,7 @@ function renderList(){
     b.appendChild(el('b',null,c.name));
     const n=counts[c.id]||{o:0,u:0};
     b.appendChild(el('small',null,(c.biz?c.biz+' · ':'')+n.o+' orders · '+n.u+' login'+(n.u===1?'':'s')));
+    const sh=sharedFor(c.id);if(sh.length)b.appendChild(el('small','ad-warn','Login shared with '+sh.join(', ')));
     b.appendChild(el('small',null,n.v?'👁 '+n.v+'× opened · '+n.v7+' this week · last '+agoA(n.last)+(n.ua?' · '+n.ua:''):'👁 not opened yet'));
     b.onclick=()=>{sel=c;history.replaceState(null,'','#'+c.slug);renderList();renderClient();};
     w.appendChild(b);
@@ -153,13 +158,14 @@ async function renderClient(){
     if(r.error){ul.appendChild(el('p','ad-mut',r.error.message));return;}
     if(!(r.data||[]).length){ul.appendChild(el('p','ad-mut','No login yet.'));return;}
     r.data.forEach(u=>{const row=el('div','ad-u');row.appendChild(el('b',null,u.email));
+      const sh=sharedFor(c.id,String(u.email||'').trim().toLowerCase());if(sh.length)row.appendChild(el('small','ad-warn','Also linked to '+sh.join(', ')+' — this login sees both'));
       const pw=document.createElement('input');pw.placeholder='New password';row.appendChild(pw);
       const set=el('button','ad-b g','Set password');set.type='button';set.onclick=async()=>{if(pw.value.length<8){toast('Min 8 characters');return;}set.disabled=true;try{await adminCall({action:'set_password',email:u.email,password:pw.value});toast('Password set');pw.value='';}catch(e){toast(e.message);}set.disabled=false;};row.appendChild(set);
-      const rm=el('button','ad-b d','Remove');rm.type='button';rm.onclick=async()=>{if(!confirm('Remove '+u.email+'? They will not be able to sign in.'))return;const x=await sb.from('lx_client_users').delete().match({client_id:c.id,email:u.email});if(x.error){toast(x.error.message);return;}try{await adminCall({action:'delete_user',email:u.email});}catch(e){}counts[c.id].u=Math.max(0,counts[c.id].u-1);renderList();users();toast('Removed');};row.appendChild(rm);
+      const rm=el('button','ad-b d','Remove');rm.type='button';rm.onclick=async()=>{if(!confirm('Remove '+u.email+'? They will not be able to sign in.'))return;const x=await sb.from('lx_client_users').delete().match({client_id:c.id,email:u.email});if(x.error){toast(x.error.message);return;}try{await adminCall({action:'delete_user',email:u.email});}catch(e){}logins=logins.filter(l=>!(l.c===c.id&&l.e===String(u.email).toLowerCase()));counts[c.id].u=Math.max(0,counts[c.id].u-1);renderList();users();toast('Removed');};row.appendChild(rm);
       ul.appendChild(row);});}
   gen.onclick=()=>{const w=['Luxella','Rare','Gold','Prime','Atelier','Maison'];lg.querySelector('#lu-pass').value=w[Math.floor(Math.random()*w.length)]+'@'+(1000+Math.floor(Math.random()*9000));};
   add.onclick=async()=>{const em=lg.querySelector('#lu-email').value.trim().toLowerCase(),pw=lg.querySelector('#lu-pass').value;if(!em){toast('Enter an email');return;}if(pw&&pw.length<8){toast('Password min 8 characters');return;}add.disabled=true;
-    try{const r=await sb.from('lx_client_users').insert({client_id:c.id,email:em});if(r.error)throw new Error(r.error.message);if(pw)await adminCall({action:'set_password',email:em,password:pw});counts[c.id].u++;renderList();lg.querySelector('#lu-email').value='';lg.querySelector('#lu-pass').value='';users();toast(pw?'Login added — share email + password':'Login added');}catch(e){toast(e.message);}add.disabled=false;};
+    try{const r=await sb.from('lx_client_users').insert({client_id:c.id,email:em});if(r.error)throw new Error(r.error.message);if(pw)await adminCall({action:'set_password',email:em,password:pw});logins.push({c:c.id,e:em});counts[c.id].u++;renderList();lg.querySelector('#lu-email').value='';lg.querySelector('#lu-pass').value='';users();toast(pw?'Login added — share email + password':'Login added');}catch(e){toast(e.message);}add.disabled=false;};
   users();
 
   /* orders */
