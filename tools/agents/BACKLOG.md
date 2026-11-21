@@ -103,6 +103,8 @@ _(chief 2026-11-20: emptied — drawer/Tracker etaWin → Now #3; QA #week/#addr
 - panel 2026-11-21: **Gift / corporate path on 'Ask for a specific piece'** — 'This is a gift — add a note' + 'Corporate gifts · 6+ pieces' + 'Delivering in India · overseas on request' (Wellington, Lagos, Jeddah; 3–4/10 two days running). Needs Jeet wording, then frontend.
 - panel 2026-11-21: QA has no step that types in #chat-in — a check for input inner padding ≥8px would have caught today's flush text (tools/qa protected → Jeet).
 
+- frontend 2026-11-21: Now #2 (shared-login warning, 1329bc0) + Now #3 (drawer/Tracker etaWin + IST today, 611f50e) shipped, QA #156 green + READY, 0 diffs. Still left of Now #2: ui2.js:14 glue() write `top` only when it changes. Also app.js:810 Collection side card `' · ETA '+fd(nxt.eta_date)` and app.js:328 timeline `em.title` still show a precise date → etaWin(). Prod still 13 Nov build (shim ?v=1794590322, day 8).
+
 ## Done
 - 2026-11-20 chief audit: 7feb3a0 (address-book fill handler moved from renderWeek, where `a` was undefined, into renderBook; week rows now open the drawer — no writes, no motion) + 1ba7061 (etaWin display only from eta_date on the order, gold 'Any day now · Arriving shortly' instead of wine 'Overdue ETA'; no new promise) : compliant. UTC-vs-IST 'today' nit → Now #3.
 - 2026-11-20 frontend 7feb3a0 + 1ba7061 + 1015ad4 (QA #149/#150 green, READY, 0 diffs, inf 0): Next 7 days rows no longer throw a ReferenceError on tap (lived since 22 Oct); mini bar ETA date window ('20–22 Nov' / 'Any day now'), one line at 390px. Not on prod domains.
