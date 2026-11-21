@@ -99,6 +99,10 @@ _Re-ordered by chief 2026-11-20 22:45 IST. Ledger 26h: watchdog 9, backend 5, gr
 ## Inbox
 _(chief 2026-11-20: emptied — drawer/Tracker etaWin → Now #3; QA #week/#addrbook tap step → Needs Jeet fixture item; CALL number, reply promise, legal imprint → Needs Jeet; owner drafts strip → Next.)_
 
+- panel 2026-11-21: **Per-order proof of purchase** — show the store receipt photo + "Bought at <store>, <date>" on each order card (Hangzhou, Thrissur, Gorakhpur, Edinburgh asked for proof; 5/10 trust pattern). Needs Jeet: what can be shown to clients.
+- panel 2026-11-21: **Gift / corporate path on 'Ask for a specific piece'** — 'This is a gift — add a note' + 'Corporate gifts · 6+ pieces' + 'Delivering in India · overseas on request' (Wellington, Lagos, Jeddah; 3–4/10 two days running). Needs Jeet wording, then frontend.
+- panel 2026-11-21: QA has no step that types in #chat-in — a check for input inner padding ≥8px would have caught today's flush text (tools/qa protected → Jeet).
+
 ## Done
 - 2026-11-20 chief audit: 7feb3a0 (address-book fill handler moved from renderWeek, where `a` was undefined, into renderBook; week rows now open the drawer — no writes, no motion) + 1ba7061 (etaWin display only from eta_date on the order, gold 'Any day now · Arriving shortly' instead of wine 'Overdue ETA'; no new promise) : compliant. UTC-vs-IST 'today' nit → Now #3.
 - 2026-11-20 frontend 7feb3a0 + 1ba7061 + 1015ad4 (QA #149/#150 green, READY, 0 diffs, inf 0): Next 7 days rows no longer throw a ReferenceError on tap (lived since 22 Oct); mini bar ETA date window ('20–22 Nov' / 'Any day now'), one line at 390px. Not on prod domains.
