@@ -32,4 +32,4 @@
 })();
 
 /* Black Friday Edit (The Edit pane, owner view) */
-(function(){var s=document.createElement('script');s.src='bf.js?v=1795342000';document.head.appendChild(s);})();
+(function(){var s=document.createElement('script');s.src='bf.js?v=1795343000';document.head.appendChild(s);})();
