@@ -100,6 +100,10 @@ _Re-ordered by chief 2026-11-21 22:45 IST. Ledger 26h: watchdog 9, backend 5, gr
 ## Inbox
 _(chief 2026-11-21: emptied — frontend etaWin leftovers + glue() → Now #3; owner drafts strip → Now #2; panel proof-of-purchase → Needs Jeet; panel gift/corporate → merged into the gift Needs Jeet line; panel #chat-in padding QA step → Needs Jeet QA list; growth drop engagement tracking → merged into View tracking.)_
 
+- (panel 11-22, Needs Jeet wording → frontend) "How we source and verify" page (store receipt per order, steps, who checks) + a refund-if-not-sourced line next to Terms "Pay first, then we order" — 5/10 buyers (Aligarh, Boston, Florence, Cape Town, Abu Dhabi); Luxity / Luisaviaroma publish theirs. — trust
+- (panel 11-22, data/copy) Order item names keep scraped Title Case ("Coach Rowan Satchel In Pebble Leather", Stats largest order) — lower-case small words (in/and/of/with) at display time in one helper. — polish
+- (panel 11-22, Needs Jeet wording) Gift line "Gift wrap and a handwritten card on request" on Address/Help — 3rd day running 3/10 (Calgary, Nagoya; Wellington/Lagos earlier). — conversion
+
 ## Done
 - 2026-11-21 frontend 1329bc0 (owner Clients list 'Login shared with …' + per-login 'Also linked to … — this login sees both', read-only, no unlink) + 611f50e (drawer ETA + Tracker label → etaWin, IST 'today') — QA #156 green + READY. Chief audit: compliant (owner-only, no writes, no motion). Nit: ?v bumped to 1795259395, lower than the previous 1796100400 — unique so cache-bust works; prefer increasing values.
 - 2026-11-21 panel e7e3a48 (#chat-in 12px inner padding) + 9e84f38 ('Copy orders as CSV' → 'Copy order list') + f0e7534 (Saved addresses empty state 'Nothing saved yet.') — QA #154 green + READY.
