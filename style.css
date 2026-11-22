@@ -4447,7 +4447,7 @@ body.dl-locked #pane-deals #deals-key,body.dl-locked #pane-deals #deals-margin,b
 .dl-lock{margin:40px 4px;padding:44px 24px;text-align:center;border:1px solid rgba(201,163,94,.45);background:radial-gradient(120% 80% at 50% 0%,rgba(201,163,94,.10),transparent 60%),#0d0c0a;display:flex;flex-direction:column;align-items:center;gap:12px}
 .dl-lock small{font:400 10px 'Lux Wide',sans-serif;letter-spacing:.3em;text-transform:uppercase;color:#C9A35E}
 .dl-lock h3{margin:0;font:italic 400 34px/1.1 'Playfair Display',Georgia,serif;color:#F3ECDD}
-.dl-lock p{margin:0 0 8px;max-width:30ch;color:#b9b0a2;font-size:14px;line-height:1.6}
+.dl-lock p{margin:0 0 8px;max-width:30ch;color:#b9b0a2;font-size:14px;line-height:1.6;text-wrap:balance}
 .dl-lock .btn{text-decoration:none;display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 22px}
 body.dl-locked .dl-imm-h button:not(.dl-imm-bk),body.dl-locked .cl-teaser,body.dl-locked .lx-ovh{display:none!important}
 .pcur,.sc-cur{display:none!important}
