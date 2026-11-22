@@ -30,3 +30,6 @@
  document.addEventListener('pointermove',tilt,{passive:true});document.addEventListener('pointerdown',tilt,{passive:true});
  ['pointerup','pointercancel','pointerleave','scroll'].forEach(function(t){document.addEventListener(t,function(){setTimeout(untilt,t==='pointerup'?180:0);},{passive:true,capture:true});});
 })();
+
+/* Black Friday Edit (The Edit pane, owner view) */
+(function(){var s=document.createElement('script');s.src='bf.js?v=1795340000';document.head.appendChild(s);})();
