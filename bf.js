@@ -16,19 +16,17 @@
      return crypto.subtle.importKey('raw',hex(kh),'AES-GCM',false,['decrypt']).then(function(key){
       return crypto.subtle.decrypt({name:'AES-GCM',iv:u.slice(0,12)},key,u.slice(12));}).then(function(pt){
       return new Response(new Blob([pt]).stream().pipeThrough(new DecompressionStream('gzip'))).json();});});});});}
- function mount(){
-  var pane=document.getElementById('pane-deals');if(!pane||document.getElementById('bf'))return;
-  var s=document.createElement('style');s.textContent=CSS;document.head.appendChild(s);
+ var active=false,failed=false,loading=false;
+ function css(){if(document.getElementById('bf-css'))return;var s=document.createElement('style');s.id='bf-css';s.textContent=CSS+'.dl-vs.bf4{grid-template-columns:repeat(4,1fr)!important}.dl-vs.bf4 .dl-vs-b{padding-left:2px!important;padding-right:2px!important;letter-spacing:.08em!important}';document.head.appendChild(s);}
+ function build(){
   var sec=el('section','card');sec.id='bf';
   sec.appendChild(el('h2',null,'Black Friday Edit'));
   sec.appendChild(el('p','note','Curated Black Friday pieces. Prices in Indian Rupees, valid until 30 November 2026. Tap a piece to enquire.'));
-  var br=el('div','bf-row'),gr=el('div','bf-row'),cr=el('div','bf-row'),qi=el('input','bf-q');qi.placeholder='Search pieces';qi.type='search';
+  var br=el('div','bf-row'),gr=el('div','bf-row'),cr=el('div','bf-row'),qi=el('input','bf-q');qi.placeholder='Search pieces';qi.type='search';qi.value=st.q;
   var cnt=el('div','bf-cnt'),grid=el('div','bf-g'),more=el('button','bf-chip bf-m','Show more');
   sec.appendChild(br);sec.appendChild(gr);sec.appendChild(qi);sec.appendChild(cr);sec.appendChild(cnt);sec.appendChild(grid);sec.appendChild(more);
-  pane.insertBefore(sec,pane.firstChild);
-  D.forEach(function(r){CATS[r[0]+r[1]+r[2]]=r[3];});
-  function chip(p,t,on,f){var b=el('button','bf-chip'+(on?' on':''),t);b.onclick=f;p.appendChild(b);}
-  function render(full){
+  function chip(p,t,on,f){var b=el('button','bf-chip'+(on?' on':''),t);b.type='button';b.onclick=f;p.appendChild(b);}
+  function render(){
    br.innerHTML='';gr.innerHTML='';cr.innerHTML='';
    chip(br,'Coach',st.b=='c',function(){st.b='c';st.c=0;st.n=PAGE;render();});chip(br,'Michael Kors',st.b=='m',function(){st.b='m';st.c=0;st.n=PAGE;render();});
    chip(gr,'Women',st.g=='w',function(){st.g='w';st.c=0;st.n=PAGE;render();});chip(gr,'Men',st.g=='m',function(){st.g='m';st.c=0;st.n=PAGE;render();});
@@ -38,7 +36,6 @@
    cnt.textContent=list.length+' pieces';grid.innerHTML='';
    list.slice(0,st.n).forEach(function(r){
     var a=el('a','bf-c');a.target='_blank';a.rel='noopener';
-    var pr=r[7]?r[7].map(function(t){return t[0]+' '+t[1];}).join(' | '):inr(r[6]);
     a.href='https://wa.me/'+WA+'?text='+encodeURIComponent('Hi Luxella, I would like to enquire about '+r[5]+' ('+r[4]+') from the Black Friday Edit.');
     var im=el('div','bf-im'),i=document.createElement('img');i.loading='lazy';i.referrerPolicy='no-referrer';i.alt=r[5];i.src=img(r[8]);im.appendChild(i);a.appendChild(im);
     var b=el('div','bf-b');b.appendChild(el('div','bf-n',r[5]));
@@ -49,10 +46,36 @@
   }
   more.onclick=function(){st.n+=PAGE;render();};
   var t;qi.oninput=function(){clearTimeout(t);t=setTimeout(function(){st.q=qi.value;st.n=PAGE;render();},200);};
-  render();
+  render();return sec;
  }
- var tries=0;(function tick(){
-  if(own()){if(!D){try{decode().then(function(d){D=d;mount();}).catch(function(){});}catch(e){}D=D||null;}return;}
-  if(++tries<240)setTimeout(tick,1000);
+ function sync(){
+  var l=document.getElementById('deals-list');if(!l)return;
+  var vs=l.querySelector('.dl-vs');if(!vs)return;
+  if(!D){if(!failed&&!loading){loading=true;decode().then(function(d){D=d;loading=false;sync();}).catch(function(){failed=true;loading=false;});}return;}
+  css();
+  var b=vs.querySelector('.dl-vs-bf');
+  if(!b){
+   b=el('button','dl-vs-b dl-vs-bf');b.type='button';b.appendChild(el('span',null,'Black Friday'));b.appendChild(el('small',null,D.length));vs.appendChild(b);vs.classList.add('bf4');
+   vs.addEventListener('click',function(e){
+    var t=e.target.closest&&e.target.closest('.dl-vs-b');if(!t)return;
+    if(t.classList.contains('dl-vs-bf')){e.stopPropagation();e.preventDefault();active=true;sync();try{vs.scrollIntoView({behavior:'smooth',block:'start'});}catch(x){}}
+    else if(active){active=false;sync();}
+   },true);
+  }
+  b.classList.toggle('on',active);b.setAttribute('aria-pressed',active);
+  var sec=document.getElementById('bf');
+  if(active){
+   vs.querySelectorAll('.dl-vs-b:not(.dl-vs-bf)').forEach(function(x){x.classList.remove('on');x.setAttribute('aria-pressed','false');});
+   Array.prototype.forEach.call(l.children,function(c){if(c!==vs&&c!==sec)c.style.display='none';});
+   if(!sec){sec=build();vs.insertAdjacentElement('afterend',sec);}
+  }else{
+   Array.prototype.forEach.call(l.children,function(c){if(c!==vs&&c!==sec)c.style.display='';});
+   if(sec)sec.remove();
+  }
+ }
+ var obs=null,tries=0;(function tick(){
+  var l=document.getElementById('deals-list');
+  if(l){if(!obs){obs=new MutationObserver(function(){sync();});obs.observe(l,{childList:true});}sync();}
+  if(++tries<3600)setTimeout(tick,l?3000:1000);
  })();
 })();
