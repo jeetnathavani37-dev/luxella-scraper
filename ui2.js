@@ -10,8 +10,11 @@ const fdate=s=>{if(!s)return '';const d=new Date(String(s).slice(0,10)+'T00:00:0
 const setH=()=>{const t=$('.sw .tabs');if(t)document.documentElement.style.setProperty('--tabsH',Math.round(t.getBoundingClientRect().height)+'px');};
 setH();window.addEventListener('resize',setH);try{const ro=new ResizeObserver(setH);const t=$('.sw .tabs');if(t)ro.observe(t);}catch(e){}
 {let k=0;const hk=()=>{if(window.__lxTick)return window.__lxTick(setH);if(++k<60)setTimeout(hk,250);};hk();} /* was a forever 2 s interval; ResizeObserver + shared tick cover it */
-const glue=()=>{const t=$('.sw .tabs'),m=$('.sw .mini');if(!t||!m)return;const r=t.getBoundingClientRect();const tt=parseFloat(getComputedStyle(t).top)||0;if(r.top<=tt+80){m.style.setProperty('top',Math.round(r.bottom-1)+'px','important');}};
-window.addEventListener('scroll',glue,{passive:true});window.addEventListener('resize',glue);setTimeout(glue,500);
+/* one read per frame (rAF), sticky top read once per element/resize, style written only when the value changes */
+let gq=0,gT=null,gM=null,gTT=0,gV=-1;
+const glue=()=>{gq=0;const t=$('.sw .tabs'),m=$('.sw .mini');if(!t||!m)return;if(t!==gT){gT=t;gTT=parseFloat(getComputedStyle(t).top)||0;}if(m!==gM){gM=m;gV=-1;}const r=t.getBoundingClientRect();if(r.top<=gTT+80){const v=Math.round(r.bottom-1);if(v!==gV){gV=v;m.style.setProperty('top',v+'px','important');}}};
+const glueQ=()=>{if(!gq)gq=requestAnimationFrame(glue);};
+window.addEventListener('scroll',glueQ,{passive:true});window.addEventListener('resize',()=>{gT=null;gV=-1;glueQ();});setTimeout(glue,500);
 
 /* 2 · Payments as cards (Paid = green, Due = red, Part = amber); tap → full order with photos */
 const ORD=()=>{try{const o=dash.data('orders');return o&&o.status==='ok'?o.data:[];}catch(e){return [];}};
