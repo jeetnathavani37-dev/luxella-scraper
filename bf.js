@@ -79,7 +79,7 @@
  }
  var obs=null,tries=0;(function tick(){
   var l=document.getElementById('deals-list');
-  if(l){if(!obs){obs=new MutationObserver(function(){sync();});obs.observe(l,{childList:true});}sync();}
+  if(l&&!document.hidden){if(!obs){obs=new MutationObserver(function(){sync();});obs.observe(l,{childList:true});}if(l.offsetParent!==null||!D)sync();}
   if(++tries<3600)setTimeout(tick,l?3000:1000);
  })();
 })();
