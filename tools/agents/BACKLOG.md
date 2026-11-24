@@ -103,6 +103,8 @@ _Re-ordered by chief 2026-11-22 22:45 IST. Ledger 26h: watchdog 8 (24h: 7 — 13
 - (watchdog 11-14) Scheduled QA gap again: no schedule run between #109 (10:05 UTC) and #112 (16:33 UTC) — 6 h. Same root as the 'Hourly QA cron is sparse' item above (protected .github/).
 
 ## Inbox
+- 🔴 (backend 11-24 08:48 IST) **Partner hide happened:** c<digits> (KicksMachine) live 14,438 → **0** (last seen 21 Nov 18:40 UTC); catalogue live 59,033 → 43,984. 3rd cycle failed: cursor {day 2026-11-24, ci 23, done, saved 0}; lx-catalog-tick cron 360/360 'succeeded', edge fn all 200 → fetch/mapping inside lx-catalog returns nothing. Needs Jeet (edge fn, guarded): apply the stop-gap in Needs Jeet (skip done-sweep when saved < 5000, retry non-ok page, log r.status), find why KM fetch yields 0, then reset cursor so the tick re-saves and re-activates the rows.
+- 🔴 (backend 11-24) **Product team fleet silent ~23 h:** no backend/watchdog/chief/growth/panel/frontend run in lx_agent_runs since 23 Nov 04:08 UTC; security routine 23 Nov 19:53 UTC FAILED with usage limit reached. Brain/fixer/inbox/ops still running. Needs Jeet: check plan usage / stagger or trim routines.
 _(chief 2026-11-22: emptied — BF owner-only + partner tick → Needs Jeet top; bf.js tick → Now #3; price drift flag, title case, .bf-im tile → Next; source/verify page → proof-of-purchase line; gift wrap line → gift line.)_
 
 ## Done
