@@ -4720,3 +4720,21 @@ html body .sw .tabs::before{flex-basis:30px;margin-right:-30px;background:linear
 html body .sw .tabs.lx-tl::before{opacity:1}
 /* panel 2026-11-21: chat 'Ask here' text sat on the left edge of its gold focus frame (webkit/chromium-client-chat-open; computed padding-left 0 from .sw input{padding:10px 0}) — give the field its own inner space */
 html body .sw .chat .ci #chat-in{padding:10px 12px}
+/* design 2026-11-24: calm welcome sheet (Backlog Now #1a). Run #174 webkit-client-home caught the sheet mid-fade:
+   the whole layer faded (opacity on .lx-sheet-back) so 'Dear QA', 'PRIVATE EDIT', 'INSTAGRAM' ghosted through the sheet,
+   and with 'Got it' on its own row the sheet took ~47% of a 390x664 screen.
+   Now: the sheet is always opaque and slides up (no overshoot), only the dim layer fades; 'Got it' / 'Not now' becomes a quiet
+   close link top-right (one action row); tighter type on phones. */
+body:not(:has(.dl-vault)) .lx-sheet-back{opacity:1;background:rgba(0,0,0,0);transition:background-color .3s ease}
+body:not(:has(.dl-vault)) .lx-sheet-back.on{background:rgba(0,0,0,.62)}
+.lx-sheet-back:not(.on) .lx-sheet{transform:translateY(100%)}
+html body .lx-sheet{position:relative;background:#0E0D0C;border-top:1px solid rgba(201,163,94,.28);box-shadow:0 -18px 40px rgba(0,0,0,.45)}
+html body .lx-sheet .eyebrow{display:block;padding-right:76px}
+html body .lx-sheet .lxrow>.btn2:last-child:not(:first-child){position:absolute;top:10px;right:8px;min-height:40px;padding:0 12px!important;background:none!important;border:0!important;color:#8f8778!important;font-size:10px!important;letter-spacing:.16em!important}
+@media (max-width:480px){
+ html body .lx-sheet{padding:18px 20px max(18px,env(safe-area-inset-bottom,0px))}
+ html body .lx-sheet h3{font-size:27px!important;margin:8px 0 6px!important}
+ html body .lx-sheet .lxp{font-size:12.5px!important;line-height:1.6!important;margin:0 0 14px!important}
+ html body .lx-sheet .lxrow{gap:8px!important;margin-top:2px}
+ html body .lx-sheet .lxrow .btn,html body .lx-sheet .lxrow>.btn2:not(:last-child){flex:1 1 auto;justify-content:center;text-align:center;padding:0 14px!important}
+}
