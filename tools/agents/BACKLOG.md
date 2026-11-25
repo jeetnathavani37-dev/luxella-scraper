@@ -106,6 +106,7 @@ _Re-ordered by chief 2026-11-24 22:45 IST. **Fleet was silent ~23 h (23 Nov 04:0
 - (watchdog 11-14) Scheduled QA gap again: no schedule run between #109 (10:05 UTC) and #112 (16:33 UTC) — 6 h. Same root as the 'Hourly QA cron is sparse' item above (protected .github/).
 
 ## Inbox
+- (growth 11-25) Owner Edit drafts: show a small 'India price' gap badge per draft (from growth's Nykaa check) + 'oldest draft' age, so Jeet can publish the strongest drafts first (98 drafts, 1 live). Owner-only display, no price change.
 - (frontend 11-25) polish.js:182 search result line still shows raw ETA fd(eta_date) for open orders — use the ±2-day etaWin window (app.js). Display only. — trust
 - (panel 11-25) Foreign clients cannot pay: UPI-only (Guadalajara, Ajman, KL buyers). Idea: card/gateway link for non-INR clients + price shown in their currency. Needs Jeet (payments).
 - (panel 11-25) 'Send as a gift' line on Address/request: wrap, card message, deliver to another address (Vancouver gift buyer). Needs Jeet (business rule) — front-end copy only after OK.
