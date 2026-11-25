@@ -187,7 +187,7 @@ new MutationObserver(()=>scheduleLinkify()).observe(document.getElementById('pan
  let back=null,sel=0,list=[];
  const close=()=>{if(back){back.remove();back=null;}};
  const draw=(q)=>{const all=build();list=all.map(it=>({it,sc:score(it,q.trim().toLowerCase())})).filter(x=>x.sc>0).sort((a,b)=>b.sc-a.sc).slice(0,q?9:8).map(x=>x.it);sel=0;const ul=back.querySelector('.cm-list');ul.textContent='';
-  if(!list.length){ul.appendChild(el('div','cm-empty','Nothing matches. Try the chat bubble, or WhatsApp Luxella.'));return;}
+  if(!list.length){ul.appendChild(el('div','cm-empty','Nothing matches. Ask Luxella, or message us on WhatsApp.'));return;}
   let lastG='';list.forEach((it,i)=>{if(it.g!==lastG){lastG=it.g;ul.appendChild(el('div','cm-g',it.g));}const r=el('button','cm-i');r.type='button';r.dataset.i=i;r.appendChild(el('span','cm-t',it.t));r.appendChild(el('span','cm-s',it.s));r.addEventListener('click',()=>run(i));r.addEventListener('mousemove',()=>{sel=i;mark();});ul.appendChild(r);});mark();};
  const mark=()=>{back.querySelectorAll('.cm-i').forEach(b=>b.classList.toggle('on',Number(b.dataset.i)===sel));const a=back.querySelector('.cm-i.on');if(a&&a.scrollIntoView)a.scrollIntoView({block:'nearest'});};
  const run=i=>{const it=list[i];close();if(it)setTimeout(it.go,60);};
