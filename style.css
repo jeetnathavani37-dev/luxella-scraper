@@ -4738,3 +4738,8 @@ html body .lx-sheet .lxrow>.btn2:last-child:not(:first-child){position:absolute;
  html body .lx-sheet .lxrow{gap:8px!important;margin-top:2px}
  html body .lx-sheet .lxrow .btn,html body .lx-sheet .lxrow>.btn2:not(:last-child){flex:1 1 auto;justify-content:center;text-align:center;padding:0 14px!important}
 }
+
+/* panel 2026-11-25: webkit-client-tab-pol — with no full policy on file, 'Tap any to read the full clause' and the › arrows promised clauses that do not exist (app.js:473 says ask on WhatsApp). Show them only when #terms holds clauses. */
+#pane-pol:not(:has(#terms details.tsec)) #terms-quick .tq-tap,#pane-pol:not(:has(#terms details.tsec)) #terms-quick .tqa{display:none}
+#pane-pol:not(:has(#terms details.tsec)) #terms-quick .tqp{cursor:default}
+#pane-pol:not(:has(#terms details.tsec)) #terms-quick .tqp:hover{background:transparent;padding-left:2px}
