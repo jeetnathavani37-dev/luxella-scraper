@@ -3,7 +3,7 @@ _Re-ordered by chief 2026-11-24 22:45 IST. **Fleet was silent ~23 h (23 Nov 04:0
 ## Now (max 3)
 1. (frontend — owner UI only; growth 11-24, **95 drafts, MK/Coach 0 live in Collection**) **Do FIRST.** Owner Collection 'Waiting to go live' strip: 'N priced drafts · oldest X d · last live drop <date>' + tick-to-select + one 'Publish selected' button that **Jeet** taps (no auto-publish, §4; extends the f98a129 pulse) **+ owner Ops alert when a brand with orders/asks has 0 live pieces** (today MK + Coach → 0, unseen ~3 days). Read-only alert, no catalogue writes. — conversion
 2. (design/panel) Calm first screen leftovers: (e) Address bar ✅ 9743a32 + dock ✅ 7c36a24, (f) Home grey strip ✅ fd87fd7, welcome ✅ 5cdc646; left: (d) section headings clipped under the sticky mini bar ('Activity log', panel 11-17 HK) → `scroll-margin-top`; (g) panel 11-24 Haldwani: footer colophon 'LUXELLA · PRIVATE CLIENT SERVICE · MMXXVI' too thin/pale on webkit 3x → contrast only; (h) frontend 11-24: webkit `*-bottom` shots now ~54 px more blank under footer after 5bc1493 — say if it looks empty on iPhone. — trust
-3. (frontend, small) etaWin leftovers app.js:810 Collection side card + app.js:328 timeline `em.title` → `etaWin()` (display only, §4); then deals.js:1096 stickTop early-return when #pane-deals is hidden (4× getComputedStyle per frame on every tab, frontend 11-24). — trust + perf
+3. ✅ frontend 8c92658 (QA 45602003841 READY) — (frontend, small) etaWin leftovers app.js:810 Collection side card + app.js:328 timeline `em.title` → `etaWin()` (display only, §4); then deals.js:1096 stickTop early-return when #pane-deals is hidden (4× getComputedStyle per frame on every tab, frontend 11-24). — trust + perf
 
 ## Next
 - (panel 11-24 Dammam, design/copy) Address card 'Received at international hub · ETA 18–22 Dec' reads as a month to Gulf buyers — for overseas clients add 'Ships from India' context or show the window only (no new promise).
@@ -106,6 +106,7 @@ _Re-ordered by chief 2026-11-24 22:45 IST. **Fleet was silent ~23 h (23 Nov 04:0
 - (watchdog 11-14) Scheduled QA gap again: no schedule run between #109 (10:05 UTC) and #112 (16:33 UTC) — 6 h. Same root as the 'Hourly QA cron is sparse' item above (protected .github/).
 
 ## Inbox
+- (frontend 11-25) polish.js:182 search result line still shows raw ETA fd(eta_date) for open orders — use the ±2-day etaWin window (app.js). Display only. — trust
 - (panel 11-25) Foreign clients cannot pay: UPI-only (Guadalajara, Ajman, KL buyers). Idea: card/gateway link for non-INR clients + price shown in their currency. Needs Jeet (payments).
 - (panel 11-25) 'Send as a gift' line on Address/request: wrap, card message, deliver to another address (Vancouver gift buyer). Needs Jeet (business rule) — front-end copy only after OK.
 - (panel 11-25) Each order card: courier name + delivery window once dispatched (Fukuoka buyer; Address card shows only 'ETA 18–22 Dec').
