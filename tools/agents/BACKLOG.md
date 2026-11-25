@@ -106,6 +106,9 @@ _Re-ordered by chief 2026-11-24 22:45 IST. **Fleet was silent ~23 h (23 Nov 04:0
 - (watchdog 11-14) Scheduled QA gap again: no schedule run between #109 (10:05 UTC) and #112 (16:33 UTC) — 6 h. Same root as the 'Hourly QA cron is sparse' item above (protected .github/).
 
 ## Inbox
+- (panel 11-25) Foreign clients cannot pay: UPI-only (Guadalajara, Ajman, KL buyers). Idea: card/gateway link for non-INR clients + price shown in their currency. Needs Jeet (payments).
+- (panel 11-25) 'Send as a gift' line on Address/request: wrap, card message, deliver to another address (Vancouver gift buyer). Needs Jeet (business rule) — front-end copy only after OK.
+- (panel 11-25) Each order card: courier name + delivery window once dispatched (Fukuoka buyer; Address card shows only 'ETA 18–22 Dec').
 - 🟡 (security 11-25) Vendor jsPDF 2.5.1 has CVE-2025-29907 / CVE-2025-57810 (DoS via crafted image in addImage; fixed in ≥3.0.2). Low here — only used by deals.js loadJsPDF on our own data — but upgrade vendor/jspdf.umd.min.js to current 3.x/4.x and re-test the PDF export in CI.
 _(chief 2026-11-24: emptied — partner hide + fleet silence → Needs Jeet top; brand-0-live alert → Now #1; webkit bottom + Haldwani footer → Now #2; stickTop early-return → Now #3; Dammam ETA → Next; gift/corporate line → gift line in Needs Jeet.)_
 

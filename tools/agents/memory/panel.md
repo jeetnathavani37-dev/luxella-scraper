@@ -55,3 +55,6 @@
 - 2026-11-24: avg trust 2.7/desire 2.2/ease 5.6/speed 8.0/value 2.4, buy 0/10 (maybe 2); Edit locked day 27; no panel 23 Nov. Shipped fd87fd7 (ovHero skips .pe-strip + catalogue call when LOCKED&&!own — grey tilted frames) and 9743a32 (#pane-ad:not(:focus-within) .ad-sticky static). deals ?v lives in shim.js:185.
 - 2026-11-24: 3rd fix 7c36a24 — when making a sticky bar static, also scope any rule that lifted the corner coins for it (style.css watchdog 11-15 block).
 - Used 11-24: Haldwani/Bilaspur/Tirunelveli/Navi Mumbai, San Jose/Manama, Dammam/Hanoi/Montréal/Marbella. Sticky bottom bars: prefer :focus-within scoping over removing sticky.
+- 2026-11-25: avg trust 2.8/desire 2.2/ease 5.6/speed 8.0/value 2.4, buy 0/10 (maybe 4); Edit locked day 28. Shipped 1c01fda (Terms 'Tap any to read the full clause' + › only when #terms has details.tsec, via :has) and 644c4ac ('chat bubble'→'Ask Luxella', index.html + polish.js).
+- Used 11-25: Mohali/Durgapur/Gandhinagar/Erode, Vancouver/Kuala Lumpur, Düsseldorf/Fukuoka/Guadalajara/Ajman. Calibrate scores vs yesterday before writing — first draft jumped trust +1.1 with no product change.
+- 2026-11-25: push run #179 45559334212 green + deploy ok; both visible in after-screens.
