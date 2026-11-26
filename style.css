@@ -4600,7 +4600,7 @@ html body #chat.chat .ch #chat-mode-t{margin-left:auto}
    away with the coins (scroll down, chat open, product overlay). Coins become fully opaque so no
    letters show through them. No new motion — one opacity transition that already matches the coins. */
 @media (max-width:900px){
-html body .sw::after{content:"";position:fixed;left:0;right:0;bottom:0;height:calc(92px + env(safe-area-inset-bottom,0px));z-index:29;pointer-events:none;background:linear-gradient(180deg,rgba(10,10,10,0) 0%,rgba(10,10,10,.72) 45%,rgba(10,10,10,.95) 100%);opacity:1;transition:opacity .4s ease}
+html body .sw::after{content:"";position:fixed;left:0;right:0;bottom:0;height:calc(92px + env(safe-area-inset-bottom,0px));z-index:29;pointer-events:none;background:linear-gradient(180deg,rgba(10,10,10,0) 0%,rgba(10,10,10,.42) 50%,rgba(10,10,10,.8) 100%);opacity:1;transition:opacity .4s ease}
 html body.lxm-down .sw::after,html body.dl-imm .sw::after,html body:has(#chat:not([hidden])) .sw::after,html body:not(:has(#qc-main)) .sw::after{opacity:0}
 html body .hv-fab#hv-fab,html body .qcm#qc-main,html body #totop{background:#0E0C09!important}
 }
