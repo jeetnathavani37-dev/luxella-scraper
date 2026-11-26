@@ -1770,7 +1770,7 @@
   const ru=el('div','pe-rule');ru.appendChild(el('i'));ru.appendChild(el('b',null,'✦'));ru.appendChild(el('i'));tx.appendChild(ru);
   tx.appendChild(el('p','pe-s',LOCKED&&!own()?'Opening soon. Your concierge will tell you first.':n?(n+' new '+(n>1?'pieces':'piece')+', chosen for you tonight.'):'New pieces are presented every evening.'));tx.appendChild(el('span','pe-d',longDate()));h.appendChild(tx);
   const env=el('div','pe-strip');const cards=env;h.appendChild(env);
-  const cta=el('button','pe-cta','Open your edit');cta.type='button';h.appendChild(cta);
+  const cta=el('button','pe-cta',LOCKED&&!own()?'Ask for a specific piece':'Open your edit');cta.type='button';h.appendChild(cta);
   const go=()=>{if(h.classList.contains('open'))return;h.classList.add('open');setTimeout(()=>{const tb=$('tab-deals');if(tb)tb.click();setTimeout(()=>h.classList.remove('open'),800);},900);};h.addEventListener('click',go);
   if(LOCKED&&!own())env.style.display='none';else try{window.lx.deals.catalog({sort:'trend',cat:'Bags',segment:'luxury',limit:40,nocount:true}).then(r=>{const seen=new Set();const pk=(r.rows||[]).filter(x=>x.images&&x.images[0]&&!seen.has(x.brand)&&seen.add(x.brand)).slice(0,3);const F=[],ok=[];let bad=0;const fin=()=>{if(!ok.some(Boolean)&&bad>=F.length)env.style.display='none';};pk.forEach((it,i)=>{const f=el('figure');f.style.setProperty('--i',i);const im=el('img');im.alt='';im.decoding='async';F[i]=f;im.onload=()=>{ok[i]=1;F.forEach((x,j)=>{if(ok[j])cards.appendChild(x);});};im.onerror=()=>{bad++;fin();};im.src=cimg(it.images[0],500);f.appendChild(im);});fin();}).catch(()=>{env.style.display='none';});}catch(e){}
   pn.insertBefore(h,pn.firstChild);}
