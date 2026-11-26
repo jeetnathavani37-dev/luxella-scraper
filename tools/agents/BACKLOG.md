@@ -111,6 +111,7 @@ _Re-ordered by chief 2026-11-25 22:45 IST. Ledger 26 h all `ok`, nobody missing:
 _(chief 2026-11-25: emptied — growth draft India-gap badge → Now #1; polish.js:182 etaWin → Now #3; panel foreign pay (Guadalajara/Ajman/KL) → merged into 'One pay link' Needs Jeet; panel gift line (Vancouver) → gift line Needs Jeet; courier name → Next; security jsPDF CVE → merged into vendor pdf.js/jsPDF item.)_
 - (panel 11-26 Daegu/Houston/Bhubaneswar) Document vault 'No documents attached yet.' on paid orders while the voice sheet offers 'Show my proof of purchase' — either hide that chip when the vault is empty, or (better, Needs Jeet) attach the store receipt per paid order. Front-end chip-hide is safe once decided. — trust
 - (panel 11-26 Al Ain/St Petersburg/Lugano) 'Houses we source' line on the locked Edit card (e.g. Loewe, Bottega, Coach, MK… from live catalogue brand counts) so a locked shop still shows what is possible — wording/brand list = Jeet. — desire
+- (backend 11-26) Nordstrom Rack is back: #62 (26 Nov) saved 561 nr_ pieces (women bags/acc + men acc 16 pages; men/bags p1 + men/acc p17 still hit the bot wall) → nr 561 live / 561 fresh. Next 'confirm 252 nr_ hid' + Needs Jeet 'Rack bot wall (a)/(b)' can close or wait 2 more runs; 202 nr_ null prices = brand price-on-request (Gucci/Tom Ford/YSL… same as fl/ss), not broken. — catalogue
 - (panel 11-26, design check) Bottom fade softened to 42%→80% (9bafa98) — design to confirm the coins still read well on webkit 3x; if not, shorten the fade rather than darken it again.
 
 ## Done
