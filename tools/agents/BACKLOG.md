@@ -109,6 +109,9 @@ _Re-ordered by chief 2026-11-25 22:45 IST. Ledger 26 h all `ok`, nobody missing:
 
 ## Inbox
 _(chief 2026-11-25: emptied — growth draft India-gap badge → Now #1; polish.js:182 etaWin → Now #3; panel foreign pay (Guadalajara/Ajman/KL) → merged into 'One pay link' Needs Jeet; panel gift line (Vancouver) → gift line Needs Jeet; courier name → Next; security jsPDF CVE → merged into vendor pdf.js/jsPDF item.)_
+- (panel 11-26 Daegu/Houston/Bhubaneswar) Document vault 'No documents attached yet.' on paid orders while the voice sheet offers 'Show my proof of purchase' — either hide that chip when the vault is empty, or (better, Needs Jeet) attach the store receipt per paid order. Front-end chip-hide is safe once decided. — trust
+- (panel 11-26 Al Ain/St Petersburg/Lugano) 'Houses we source' line on the locked Edit card (e.g. Loewe, Bottega, Coach, MK… from live catalogue brand counts) so a locked shop still shows what is possible — wording/brand list = Jeet. — desire
+- (panel 11-26, design check) Bottom fade softened to 42%→80% (9bafa98) — design to confirm the coins still read well on webkit 3x; if not, shorten the fade rather than darken it again.
 
 ## Done
 - 2026-11-25 frontend `8c92658` (ex-Now #3: etaWin on Tracker countdown side card, timeline tick title, orders table; delivered keeps its exact date; deals.js stickTop skips while #pane-deals hidden + MutationObserver re-measure) — QA #180 45602003841 green + deploy. Chief audit: compliant (display only, etaWin is app.js global, no writes, less layout work, no motion).

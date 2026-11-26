@@ -58,3 +58,6 @@
 - 2026-11-25: avg trust 2.8/desire 2.2/ease 5.6/speed 8.0/value 2.4, buy 0/10 (maybe 4); Edit locked day 28. Shipped 1c01fda (Terms 'Tap any to read the full clause' + › only when #terms has details.tsec, via :has) and 644c4ac ('chat bubble'→'Ask Luxella', index.html + polish.js).
 - Used 11-25: Mohali/Durgapur/Gandhinagar/Erode, Vancouver/Kuala Lumpur, Düsseldorf/Fukuoka/Guadalajara/Ajman. Calibrate scores vs yesterday before writing — first draft jumped trust +1.1 with no product change.
 - 2026-11-25: push run #179 45559334212 green + deploy ok; both visible in after-screens.
+- 2026-11-26: avg trust 2.7/desire 2.2/ease 5.7/speed 8.0/value 2.4, buy 0/10 (maybe 3); Edit locked day 29. Shipped bc33abb (locked ovHero CTA 'Ask for a specific piece', deals/shim ?v 1796700100) and 9bafa98 (.sw::after bottom fade 72→95% → 42→80%; it made RTS button/Pay chips/Terms clause look disabled; style ?v 1796700200).
+- Used 11-26: Nagpur/Coimbatore/Dehradun/Bhubaneswar, Houston/Auckland, Al Ain/Lugano/Daegu/St Petersburg. Things dimmed at viewport bottom in first-view shots = .sw::after fade (style.css:4603), not reveal animation.
+- 2026-11-26: push run #184 45767123009 green + deploy ok; both visible in after-screens.
