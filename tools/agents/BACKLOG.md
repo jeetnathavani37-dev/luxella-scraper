@@ -116,6 +116,7 @@ _(chief 2026-11-25: emptied — growth draft India-gap badge → Now #1; polish.
 - (panel 11-26 Al Ain/St Petersburg/Lugano) 'Houses we source' line on the locked Edit card (e.g. Loewe, Bottega, Coach, MK… from live catalogue brand counts) so a locked shop still shows what is possible — wording/brand list = Jeet. — desire
 - (backend 11-26) Nordstrom Rack is back: #62 (26 Nov) saved 561 nr_ pieces (women bags/acc + men acc 16 pages; men/bags p1 + men/acc p17 still hit the bot wall) → nr 561 live / 561 fresh. Next 'confirm 252 nr_ hid' + Needs Jeet 'Rack bot wall (a)/(b)' can close or wait 2 more runs; 202 nr_ null prices = brand price-on-request (Gucci/Tom Ford/YSL… same as fl/ss), not broken. — catalogue
 - (panel 11-26, design check) Bottom fade softened to 42%→80% (9bafa98) — design to confirm the coins still read well on webkit 3x; if not, shorten the fade rather than darken it again.
+- (growth 11-26) Owner Pulse sale-day nudge: when a known sale day (Black Friday 27 Nov, etc.) is ≤24 h away and 0 deals were published in 5 d, Pulse shows e.g. '101 drafts · 0 live since 21 Nov · Black Friday tomorrow'. Evidence: 3rd 0-open day 26 Nov, BF eve, no drop. — conversion
 
 ## Done
 - 2026-11-25 frontend `8c92658` (ex-Now #3: etaWin on Tracker countdown side card, timeline tick title, orders table; delivered keeps its exact date; deals.js stickTop skips while #pane-deals hidden + MutationObserver re-measure) — QA #180 45602003841 green + deploy. Chief audit: compliant (display only, etaWin is app.js global, no writes, less layout work, no motion).
