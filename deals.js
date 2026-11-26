@@ -982,17 +982,20 @@
   if(PULSE==null&&!window.__pulse&&window.lx.deals.pendingReqs){window.__pulse=1;window.lx.deals.pendingReqs().then(L=>{PULSE=L||[];render();}).catch(()=>{});}
   const now=Date.now(),T=v=>{const t=Date.parse(v||'');return isFinite(t)?t:NaN;},age=ms=>ms<864e5?Math.max(1,Math.floor(ms/36e5))+'h':Math.floor(ms/864e5)+'d';
   const live=rows.filter(r=>!(r.data||{}).draft).reduce((m,r)=>r.created_at>m?r.created_at:m,'');const lt=T(live);
-  const drafts=rows.filter(r=>(r.data||{}).draft).length;
+  const dr=rows.filter(r=>(r.data||{}).draft),drafts=dr.length,od=dr.reduce((m,r)=>{const t=T(r.created_at);return isFinite(t)&&t<m?t:m;},now);
+  /* houses with drafts waiting but nothing live anywhere (Collection facets + live Edit deals) — read-only nudge, never publishes */
+  let dark=[];if(COLF&&Array.isArray(COLF.brands)&&COLF.brands.length){const lv=new Set(COLF.brands.map(x=>String(Array.isArray(x)?x[0]:(x&&x.brand)||'').trim().toLowerCase()));rows.filter(r=>r.kind==='deal'&&!(r.data||{}).draft).forEach(r=>lv.add(String((r.data||{}).brand||'').trim().toLowerCase()));const cnt={};dr.forEach(r=>{const bn=String((r.data||{}).brand||'').trim();if(bn&&!lv.has(bn.toLowerCase()))cnt[bn]=(cnt[bn]||0)+1;});dark=Object.keys(cnt).sort((a,c)=>cnt[c]-cnt[a]);}
   const P=PULSE||[],dtx=d=>d&&typeof d==='object'?String(d.text||''):typeof d==='string'?d:'';
   const stale=P.filter(x=>{const d=x.data||{};if(!dtx(d.draft))return false;const t=T((d.draft&&d.draft.at)||d.at);return isFinite(t)&&now-t>12*36e5;});
   const oldest=stale.reduce((m,x)=>{const t=T((x.data||{}).at);return isFinite(t)&&t<m?t:m;},now);
   const parts=[];const quiet=isFinite(lt)&&now-lt>=864e5;
   parts.push(!isFinite(lt)?'No live drop yet':quiet?'No live drop in '+age(now-lt):'Last drop '+age(now-lt)+' ago');
-  if(drafts)parts.push(drafts+' draft'+(drafts===1?'':'s')+' ready');
+  if(drafts)parts.push(drafts+' draft'+(drafts===1?'':'s')+' ready'+(now-od>=864e5?' · oldest '+age(now-od):''));
+  if(dark.length)parts.push('0 live in Collection: '+dark.slice(0,3).join(', ')+(dark.length>3?' +'+(dark.length-3):''));
   if(PULSE!=null&&P.length)parts.push(P.length+' ask'+(P.length===1?'':'s')+' waiting');
   if(stale.length)parts.push(stale.length+' repl'+(stale.length===1?'y':'ies')+' drafted, not sent'+(oldest<now?' · oldest '+age(now-oldest):''));
-  const b=el('button','dl-pulse'+(stale.length||quiet?' warn':''));b.type='button';b.setAttribute('aria-label','Owner pulse: '+parts.join(', ')+'. Open enquiries');
-  b.appendChild(el('small',null,'Today'));b.appendChild(el('span',null,parts.join(' · ')));
+  const b=el('button','dl-pulse'+(stale.length||quiet||dark.length?' warn':''));b.type='button';b.setAttribute('aria-label','Owner pulse: '+parts.join(', ')+'. Open enquiries');
+  b.appendChild(el('small',null,'Pulse'));b.appendChild(el('span',null,parts.join(' · ')));
   b.addEventListener('click',()=>{if(VIEW==='reqs')return;VIEW='reqs';LS.set('view','reqs');PAGE=24;render();});return b;}
  function viewSwitch(nD,nS){const w=el('div','dl-vs');const mk=(k,t,n)=>{const b=el('button','dl-vs-b'+(VIEW===k?' on':''));b.type='button';b.setAttribute('aria-pressed',VIEW===k);b.appendChild(el('span',null,t));b.appendChild(el('small',null,String(n)));b.addEventListener('click',()=>{if(VIEW===k)return;VIEW=k;LS.set('view',k);PAGE=24;render();try{$('deals').scrollIntoView({behavior:'smooth',block:'start'});}catch(e){}});w.appendChild(b);};mk('deals','Arrivals',nD);mk('shop','Boutique',nS);mk('reqs',own()?'Enquiries':'My enquiries',RQN==null?'·':RQN);if(RQN==null&&!window.__rqn){window.__rqn=1;window.lx.deals.myReqs().then(L=>{RQN=L.filter(x=>!(x.data||{}).reply).length;render();}).catch(()=>{});}return w;}
  function fromPrice(L){const p=L.map(r=>r.r?num(r.cp.price):num((r.data||{}).price)).filter(x=>x!=null);return p.length?Math.min(...p):null;}
