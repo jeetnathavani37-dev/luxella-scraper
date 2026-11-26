@@ -179,7 +179,7 @@ new MutationObserver(()=>scheduleLinkify()).observe(document.getElementById('pan
   items.push({g:'Actions',t:'WhatsApp Luxella',s:'+91 87240 79056',k:'whatsapp chat message contact',go:()=>window.open('https://wa.me/918724079056','_blank')});
   items.push({g:'Actions',t:'Instagram @luxella.in',s:'Opens Instagram',k:'instagram insta social',go:()=>window.open('https://www.instagram.com/luxella.in/','_blank')});
   items.push({g:'Actions',t:'Email Luxella',s:'luxella.in@gmail.com',k:'email mail gmail',go:()=>{location.href='mailto:luxella.in@gmail.com';}});
-  rows.forEach(r=>{const st=Number(r.stage||1);items.push({g:'Orders',t:r.item,s:(r.order_no||'')+' · '+(STAGES[st-1]||r.status)+(r.eta_date&&st<9?' · ETA '+fd(r.eta_date):''),k:(r.order_no||'')+' '+(r.brand||'')+' '+(r.status||''),go:()=>openDrawer(r)});});
+  rows.forEach(r=>{const st=Number(r.stage||1);items.push({g:'Orders',t:r.item,s:(r.order_no||'')+' · '+(STAGES[st-1]||r.status)+(r.eta_date&&st<9&&r.status!=='Delivered'?' · ETA '+(typeof etaWin==='function'?etaWin(r.eta_date):fd(r.eta_date)):''),k:(r.order_no||'')+' '+(r.brand||'')+' '+(r.status||''),go:()=>openDrawer(r)});});
   TABS.forEach(([id,n])=>items.push({g:'Go to',t:n,s:'Tab',k:'',go:()=>document.getElementById('tab-'+id).click()}));
   if(typeof polSections==='function')polSections().forEach(s=>{if(s.n==='00')return;items.push({g:'Terms',t:s.title,s:'Section '+s.n+' · '+(s.lead||s.body[0]||'').slice(0,70),k:(s.lead||'')+' '+s.body.join(' '),go:()=>openPolicy(s.n)});});
   return items;};
