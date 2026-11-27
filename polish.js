@@ -211,9 +211,11 @@ new MutationObserver(()=>scheduleLinkify()).observe(document.getElementById('pan
    LIVE orb + contact coin covered 'Filters & search' (All orders) and the Address heading/bar
    (webkit-client-tab-al.png, -tab-ad.png, QA #128; Backlog Now #2b). When any visible field in the
    open pane reaches the bottom 150px of the screen, body gets .lx-fld and the two coins fade out
-   (same .4s opacity they already use; no new motion). Back-to-top stays. Read-only, no writes. */
+   (same .4s opacity they already use; no new motion). Back-to-top stays. Read-only, no writes.
+   design 2026-11-27: + .a-ordcard — Address tab order card ('#QA01 · Coach R…') sat under the coins
+   (webkit-client-tab-ad.png, QA #190; Backlog Now #2i). Position only. */
 (function(){
- const SEL='.sw [id^="pane-"]:not([hidden]) :is(input:not([type=hidden]),textarea,select,details.flt>summary,.ad-sticky)';
+ const SEL='.sw [id^="pane-"]:not([hidden]) :is(input:not([type=hidden]),textarea,select,details.flt>summary,.ad-sticky,.a-ordcard)';
  let q=false;
  const run=()=>{q=false;const h=window.innerHeight||0,band=h-150;let on=false;
   if(window.innerWidth<=900){const els=document.querySelectorAll(SEL);
