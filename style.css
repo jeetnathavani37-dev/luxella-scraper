@@ -3534,7 +3534,7 @@ body.cl-on{overflow:hidden}
 .pe{padding:34px 22px 28px!important;text-align:center}
 .pe-dear{font-size:34px!important}
 .pe-t span{letter-spacing:.04em!important}
-.pe-s{font:italic 400 17px/1.4 'Lx Playfair','Lux Display',Georgia,serif!important;letter-spacing:0!important;text-transform:none!important;color:#EAD9BC!important;margin-top:4px!important}
+.pe-s{font:italic 400 17px/1.4 'Lx Playfair','Lux Display',Georgia,serif!important;letter-spacing:0!important;text-transform:none!important;color:#EAD9BC!important;margin-top:4px!important;text-wrap:balance}
 .pe-d{font:300 7.5px 'Lux Wide',sans-serif!important;font-style:normal!important;letter-spacing:.3em!important;text-transform:uppercase!important;color:#C9A35E!important;margin-top:10px!important}
 .pe-strip{position:relative;z-index:2;display:flex;justify-content:center;align-items:flex-end;gap:0;margin:26px auto 6px;height:200px}
 .pe-strip figure{position:relative;width:31%;max-width:132px;aspect-ratio:4/5;margin:0 -4px;background:#f6f2ec;border:1px solid rgba(201,163,94,.65);outline:4px solid rgba(20,6,10,.6);box-shadow:0 18px 30px rgba(0,0,0,.45);transform:rotate(calc((var(--i) - 1)*5deg)) translateY(calc((var(--i) - 1)*(var(--i) - 1)*10px));opacity:0;animation:peUp .9s cubic-bezier(.22,1,.36,1) forwards;animation-delay:calc(.25s + var(--i)*.12s)}

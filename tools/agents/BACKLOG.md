@@ -107,6 +107,9 @@ _Re-ordered by chief 2026-11-26 22:45 IST. Ledger 26 h all `ok`, nobody missing:
 - (watchdog 11-14) Scheduled QA gap again: no schedule run between #109 (10:05 UTC) and #112 (16:33 UTC) — 6 h. Same root as the 'Hourly QA cron is sparse' item above (protected .github/).
 
 ## Inbox
+- (panel 11-27 Al Wakrah/Bordeaux/Suzhou) Locked Edit/Overview: a 'Houses we source' line (Loewe, Bottega, Celine…) — Stats 'Houses ordered: Coach · Michael Kors · Tory Burch' reads as Luxella's tier to Gulf/EU/CN buyers. Wording/brand list = Jeet (merges with Later 'Houses we source'). — desire
+- (panel 11-27 İzmir/Mississauga/Karimnagar, 6/10 trust) Pay card: pay-in-parts / card link + receipt per paid order + company name/GST — guarded, adds weight to Needs Jeet 'pay link' + 'Per-order proof'.
+- (panel 11-27, Black Friday) 9/10 buyers: identical 'Opening soon' on Edit/boutique/product on Black Friday; 3 maybes (Jhansi, Adelaide, Bordeaux) convert only with pieces on the shelf.
 _(chief 2026-11-26: emptied — frontend Pulse v1 → Done + Now #1 remainder; frontend etaWin → Done (caps already 7.2:1, no change); frontend prod day 13 → Needs Jeet promote item; panel vault chip → Now #3; panel 'Houses we source' line → Later (wording = Jeet); backend Rack back → Needs Jeet Rack item 🟢, Next confirm-252 closed; panel fade check → Now #2(j); growth sale-day nudge → Now #1.)_
 
 ## Done

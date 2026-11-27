@@ -61,3 +61,6 @@
 - 2026-11-26: avg trust 2.7/desire 2.2/ease 5.7/speed 8.0/value 2.4, buy 0/10 (maybe 3); Edit locked day 29. Shipped bc33abb (locked ovHero CTA 'Ask for a specific piece', deals/shim ?v 1796700100) and 9bafa98 (.sw::after bottom fade 72→95% → 42→80%; it made RTS button/Pay chips/Terms clause look disabled; style ?v 1796700200).
 - Used 11-26: Nagpur/Coimbatore/Dehradun/Bhubaneswar, Houston/Auckland, Al Ain/Lugano/Daegu/St Petersburg. Things dimmed at viewport bottom in first-view shots = .sw::after fade (style.css:4603), not reveal animation.
 - 2026-11-26: push run #184 45767123009 green + deploy ok; both visible in after-screens.
+- 2026-11-27: avg trust 2.7/desire 2.2/ease 5.7/speed 8.0/value 2.4, buy 0/10 (maybe 3) — flat, Black Friday, Edit locked day 30. Shipped d0ac904 (voice 'Show my proof of purchase' chip only when photos.pop has files; app/shim ?v 1796900100) + 3e30834 (locked ovHero drops .pe-d date — read as opening date; deals/shim ?v 1796900200).
+- Used 11-27: Jhansi/Karimnagar/Margao/Rourkela, Mississauga/Adelaide, Al Wakrah/Bordeaux/İzmir/Suzhou. QA runs at ~23:45 UTC → dates/greetings in shots are UTC ('Thursday 26', 'Good evening'), not bugs.
+
