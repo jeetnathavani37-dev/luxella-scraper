@@ -143,7 +143,7 @@
   tr.addEventListener('click',e=>e.stopPropagation(),true);
   tr.addEventListener('scroll',()=>{const i=Math.round(tr.scrollLeft/Math.max(1,tr.clientWidth));[...dots.children].forEach((b,j)=>b.className=j===i?'on':'');n.textContent=(i+1)+'/'+L.length;},{passive:true});}
  /* card */
- function card(r){const d=r.data||{};const c=el('article','dl-c'+(d.sold?' sold':'')+(F.view==='list'?' row':''));const t=today();if(own()&&d.draft){const dr=el('div','dl-draft');dr.appendChild(el('span',null,'Draft'+(d.source==='scout'?' · Deal Scout':'')));const pb=el('button','btn dl-ask','Publish');pb.type='button';pb.addEventListener('click',async e=>{e.stopPropagation();pb.disabled=true;try{const nd=Object.assign({},d);delete nd.draft;await window.lx.deals.update(r.id,nd);load();}catch(er){pb.disabled=false;alert('Could not publish.');}});dr.appendChild(pb);c.appendChild(dr);}
+ function card(r){const d=r.data||{};const c=el('article','dl-c'+(d.sold?' sold':'')+(F.view==='list'?' row':''));const t=today();if(own()&&d.draft){const dr=el('div','dl-draft');const lb=el('label','dl-pick');const ck=el('input');ck.type='checkbox';ck.checked=SELD.has(r.id);ck.setAttribute('aria-label','Select '+[d.brand,d.title].filter(Boolean).join(' ')+' to publish');ck.addEventListener('change',()=>{if(ck.checked)SELD.add(r.id);else SELD.delete(r.id);pubBar();});lb.addEventListener('click',e=>e.stopPropagation());lb.appendChild(ck);lb.appendChild(el('span',null,'Draft'+(d.source==='scout'?' · Deal Scout':'')));dr.appendChild(lb);const pb=el('button','btn dl-ask','Publish');pb.type='button';pb.addEventListener('click',async e=>{e.stopPropagation();pb.disabled=true;try{const nd=Object.assign({},d);delete nd.draft;await window.lx.deals.update(r.id,nd);load();}catch(er){pb.disabled=false;alert('Could not publish.');}});dr.appendChild(pb);c.appendChild(dr);}
   const ph=el('div','dl-ph');gallery(ph,d,true);
   const tags=el('div','dl-tags');if(isNew(r)&&!SEEN.has(r.id))tags.appendChild(el('span','dl-tag new','New'));
   if(d.sold)tags.appendChild(el('span','dl-tag sold','Sold out'));else{if(disc(d))tags.appendChild(el('span','dl-tag off',disc(d)+'% off'));if(d.ends&&d.ends===t)tags.appendChild(el('span','dl-tag hot','Ends today'));if(num(d.stock)!=null&&Number(d.stock)<=3)tags.appendChild(el('span','dl-tag hot','Only '+d.stock+' left'));}
@@ -977,6 +977,19 @@
   b.appendChild(ac);if(REQ[r.id+':'+(p.i+1)])b.appendChild(el('small','dl-pc-q','✓ You asked about this'));{const hb=holdBadge(r.id+':'+(p.i+1));if(hb)b.appendChild(hb);}c.appendChild(b);return c;}
  /* ---------- Shop: brand storefronts + comments ---------- */
  /* owner-only, read-only (Backlog Now #1): one line — hours since the last live drop, drafts ready, asks waiting, replies drafted but unsent >12 h. Never sends, never publishes (§4). */
+ /* owner-only (Backlog Now #1): tick drafts → one 'Publish selected' bar that Jeet taps; confirms first, publishes only the ticked ids, sends nothing (§4) */
+ const SELD=new Set();let PUBBAR=null,PUBGO=false;
+ function pubBar(){const dr=new Set(rows.filter(r=>(r.data||{}).draft).map(r=>r.id));[...SELD].forEach(id=>{if(!dr.has(id))SELD.delete(id);});
+  if(!PUBBAR){if(!own()||!SELD.size)return;PUBBAR=el('div','dl-pubsel');PUBBAR.setAttribute('role','region');PUBBAR.setAttribute('aria-label','Selected drafts');const n=el('span','dl-pubsel-n');const cl=el('button','btn2','Clear');cl.type='button';cl.addEventListener('click',()=>{SELD.clear();document.querySelectorAll('.dl-pick input').forEach(x=>{x.checked=false;});pubBar();});const go=el('button','btn dl-ask','Publish selected');go.type='button';
+   go.addEventListener('click',async()=>{const ids=[...SELD];if(!ids.length||PUBGO)return;if(!confirm('Publish '+ids.length+' draft'+(ids.length===1?'':'s')+' to clients?'))return;PUBGO=true;go.disabled=cl.disabled=true;let ok=0,bad=0;
+    for(const id of ids){const r=rows.find(x=>x.id===id);if(!r||!(r.data||{}).draft){SELD.delete(id);continue;}n.textContent='Publishing '+(ok+bad+1)+' of '+ids.length+'…';try{const nd=Object.assign({},r.data);delete nd.draft;await window.lx.deals.update(r.id,nd);ok++;SELD.delete(id);}catch(e){bad++;}}
+    PUBGO=false;go.disabled=cl.disabled=false;say('Published '+ok+(bad?' · '+bad+' could not publish, still selected':''));await load();pubBar();});
+   PUBBAR.appendChild(n);PUBBAR.appendChild(cl);PUBBAR.appendChild(go);document.body.appendChild(PUBBAR);
+   const pd=$('pane-deals');if(pd&&!pd._pubMo){pd._pubMo=new MutationObserver(()=>pubBar());pd._pubMo.observe(pd,{attributes:true,attributeFilter:['hidden']});}}
+  const pd=$('pane-deals');PUBBAR.hidden=!own()||!SELD.size||!!(pd&&pd.hidden);if(!PUBGO)PUBBAR.querySelector('.dl-pubsel-n').textContent=SELD.size+' selected';}
+ /* known sale days (IST date strings) for the owner Pulse nudge — display only */
+ function saleSoon(t){const Y=+t.slice(0,4);const w=new Date(Date.UTC(Y,10,1)).getUTCDay();const bf=Y+'-11-'+String(1+((5-w+7)%7)+21).padStart(2,'0');const L=[['Black Friday',bf],['Cyber Monday',addD(bf,3)],['Boxing Day',Y+'-12-26']];
+  for(const [n,d] of L){if(d===t)return n+' today';if(d===addD(t,1))return n+' tomorrow';}return '';}
  let PULSE=null;
  function ownerPulse(){if(!own()||!window.lx||!window.lx.deals)return null;
   if(PULSE==null&&!window.__pulse&&window.lx.deals.pendingReqs){window.__pulse=1;window.lx.deals.pendingReqs().then(L=>{PULSE=L||[];render();}).catch(()=>{});}
@@ -989,12 +1002,13 @@
   const stale=P.filter(x=>{const d=x.data||{};if(!dtx(d.draft))return false;const t=T((d.draft&&d.draft.at)||d.at);return isFinite(t)&&now-t>12*36e5;});
   const oldest=stale.reduce((m,x)=>{const t=T((x.data||{}).at);return isFinite(t)&&t<m?t:m;},now);
   const parts=[];const quiet=isFinite(lt)&&now-lt>=864e5;
+  const sale=(!isFinite(lt)||now-lt>=5*864e5)?saleSoon(today()):'';if(sale)parts.push(sale);
   parts.push(!isFinite(lt)?'No live drop yet':quiet?'No live drop in '+age(now-lt):'Last drop '+age(now-lt)+' ago');
   if(drafts)parts.push(drafts+' draft'+(drafts===1?'':'s')+' ready'+(now-od>=864e5?' · oldest '+age(now-od):''));
   if(dark.length)parts.push('0 live in Collection: '+dark.slice(0,3).join(', ')+(dark.length>3?' +'+(dark.length-3):''));
   if(PULSE!=null&&P.length)parts.push(P.length+' ask'+(P.length===1?'':'s')+' waiting');
   if(stale.length)parts.push(stale.length+' repl'+(stale.length===1?'y':'ies')+' drafted, not sent'+(oldest<now?' · oldest '+age(now-oldest):''));
-  const b=el('button','dl-pulse'+(stale.length||quiet||dark.length?' warn':''));b.type='button';b.setAttribute('aria-label','Owner pulse: '+parts.join(', ')+'. Open enquiries');
+  const b=el('button','dl-pulse'+(stale.length||quiet||dark.length||sale?' warn':''));b.type='button';b.setAttribute('aria-label','Owner pulse: '+parts.join(', ')+'. Open enquiries');
   b.appendChild(el('small',null,'Pulse'));b.appendChild(el('span',null,parts.join(' · ')));
   b.addEventListener('click',()=>{if(VIEW==='reqs')return;VIEW='reqs';LS.set('view','reqs');PAGE=24;render();});return b;}
  function viewSwitch(nD,nS){const w=el('div','dl-vs');const mk=(k,t,n)=>{const b=el('button','dl-vs-b'+(VIEW===k?' on':''));b.type='button';b.setAttribute('aria-pressed',VIEW===k);b.appendChild(el('span',null,t));b.appendChild(el('small',null,String(n)));b.addEventListener('click',()=>{if(VIEW===k)return;VIEW=k;LS.set('view',k);PAGE=24;render();try{$('deals').scrollIntoView({behavior:'smooth',block:'start'});}catch(e){}});w.appendChild(b);};mk('deals','Arrivals',nD);mk('shop','Boutique',nS);mk('reqs',own()?'Enquiries':'My enquiries',RQN==null?'·':RQN);if(RQN==null&&!window.__rqn){window.__rqn=1;window.lx.deals.myReqs().then(L=>{RQN=L.filter(x=>!(x.data||{}).reply).length;render();}).catch(()=>{});}return w;}
@@ -1103,6 +1117,7 @@
   if(!COLF&&!window.__colf){window.__colf=1;window.lx.deals.catalogFacets().then(f=>{COLF=f;render();}).catch(()=>{});}
   {const nS=all.length+dropPieces().length+((COLF&&COLF.total)||0);l.appendChild(viewSwitch(pdfs.length,nS>=10000?(Math.floor(nS/100)/10)+'k':nS));}
   {const pu=ownerPulse();if(pu)l.appendChild(pu);}
+  if(own()||PUBBAR)pubBar();
   if(!own())autoReady(l);
   if(VIEW==='shop'){shopView(l,all);return;}
   if(VIEW==='reqs'){requestsView(l);return;}

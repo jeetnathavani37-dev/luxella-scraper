@@ -4743,3 +4743,14 @@ html body .lx-sheet .lxrow>.btn2:last-child:not(:first-child){position:absolute;
 #pane-pol:not(:has(#terms details.tsec)) #terms-quick .tq-tap,#pane-pol:not(:has(#terms details.tsec)) #terms-quick .tqa{display:none}
 #pane-pol:not(:has(#terms details.tsec)) #terms-quick .tqp{cursor:default}
 #pane-pol:not(:has(#terms details.tsec)) #terms-quick .tqp:hover{background:transparent;padding-left:2px}
+
+/* frontend 2026-11-27 (Backlog Now #1): owner tick-to-select on draft cards + 'Publish selected' bar. Owner-only, no motion. */
+.dl-pick{display:inline-flex;align-items:center;gap:10px;min-height:40px;cursor:pointer}
+.dl-pick input{width:22px;height:22px;margin:0;flex:none;accent-color:#C9A96A;cursor:pointer}
+.dl-pubsel{position:fixed;left:16px;right:16px;bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:9000;display:flex;align-items:center;gap:10px;max-width:520px;margin:0 auto;padding:10px 12px;background:#14110c;border:1px solid #C9A96A;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.5)}
+.dl-pubsel[hidden]{display:none}
+.dl-pubsel-n{flex:1;min-width:0;font:400 12px 'Lux Text',sans-serif;letter-spacing:.06em;color:#EDE6DA;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dl-pubsel button{min-height:40px;padding:0 14px;font:400 10px 'Lux Wide',sans-serif;letter-spacing:.14em;text-transform:uppercase;white-space:nowrap;cursor:pointer;border-radius:3px}
+.dl-pubsel .btn2{background:transparent;border:1px solid rgba(201,169,106,.45);color:#E9D3A0}
+.dl-pubsel .btn{background:#C9A96A;border:1px solid #C9A96A;color:#0a0907}
+.dl-pubsel button:disabled{opacity:.5;cursor:default}
