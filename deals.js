@@ -988,8 +988,10 @@
    const pd=$('pane-deals');if(pd&&!pd._pubMo){pd._pubMo=new MutationObserver(()=>pubBar());pd._pubMo.observe(pd,{attributes:true,attributeFilter:['hidden']});}}
   const pd=$('pane-deals');PUBBAR.hidden=!own()||!SELD.size||!!(pd&&pd.hidden);if(!PUBGO)PUBBAR.querySelector('.dl-pubsel-n').textContent=SELD.size+' selected';}
  /* known sale days (IST date strings) for the owner Pulse nudge — display only */
- function saleSoon(t){const Y=+t.slice(0,4);const w=new Date(Date.UTC(Y,10,1)).getUTCDay();const bf=Y+'-11-'+String(1+((5-w+7)%7)+21).padStart(2,'0');const L=[['Black Friday',bf],['Cyber Monday',addD(bf,3)],['Boxing Day',Y+'-12-26']];
-  for(const [n,d] of L){if(d===t)return n+' today';if(d===addD(t,1))return n+' tomorrow';}return '';}
+ function saleSoon(t){const Y=+t.slice(0,4);const w=new Date(Date.UTC(Y,10,1)).getUTCDay();const bf=Y+'-11-'+String(1+((4-w+7)%7)+22).padStart(2,'0');const L=[['Black Friday',bf],['Cyber Monday',addD(bf,3)],['Boxing Day',Y+'-12-26']];
+  /* bf = day after the 4th Thursday of November */
+  for(const [n,d] of L){if(d===t)return n+' today';if(d===addD(t,1))return n+' tomorrow';}
+  for(let i=0;i<L.length;i++){if(addD(L[i][1],1)===t){const nx=L.find(x=>x[1]>t);return L[i][0]+' passed'+(nx?' · next: '+nx[0]+' '+(+nx[1].slice(8))+' '+(nx[1].slice(5,7)==='11'?'Nov':'Dec'):'');}}return '';}
  let PULSE=null;
  function ownerPulse(){if(!own()||!window.lx||!window.lx.deals)return null;
   if(PULSE==null&&!window.__pulse&&window.lx.deals.pendingReqs){window.__pulse=1;window.lx.deals.pendingReqs().then(L=>{PULSE=L||[];render();}).catch(()=>{});}
