@@ -107,6 +107,9 @@ _Re-ordered by chief 2026-11-27 22:45 IST. Ledger 26 h all `ok`, nobody missing:
 
 ## Inbox
 _(chief 2026-11-27: emptied — growth missed-sale-day line → Now #3; frontend Now #1 v2 → Done; frontend a11y 1f6e793 → Done; frontend st-month bug → Now #1; panel 'Houses we source' → merged into Later item; panel pay-in-parts/receipt/GST → adds weight to Needs Jeet 'Per-order proof' + pay link; panel BF 'Opening soon' 9/10 → evidence in Needs Jeet BF item.)_
+- (panel 11-28 Rotterdam, design call) Section headings switch style by tab — italic serif on Overview/RTS/Tracker/Orders, tall gold caps on Payments/Address/Stats/Terms/Help (style.css:1941-1943, deliberate in 48b8e22). Old-money buyer read it as two houses; design to decide one system. — polish
+- (panel 11-28 Patiala senior) Mini bar 'OPEN 2 · DUE · ETA TODAY' (.mini) is the smallest text on every tab top — consider 12px+ for the numbers only. — a11y
+- (panel 11-28 Patiala, business) 'Call me back' one-tap request on Help (sends a WhatsApp/enquiry, no auto-call) — needs Jeet's OK on the promise. — trust
 
 ## Done
 - 2026-11-27 frontend `3315db5` (ex-Now #1 v2: owner tick-to-select drafts + fixed 'Publish selected' bar, confirm() first, sends nothing; Pulse sale-day nudge) + `1f6e793` (13 aria-labels) — QA #192 45988286855 green + READY. Chief audit 3315db5: compliant (own()-gated, Jeet taps, no motion); nit saleSoon formula → Now #3.

@@ -64,3 +64,6 @@
 - 2026-11-27: avg trust 2.7/desire 2.2/ease 5.7/speed 8.0/value 2.4, buy 0/10 (maybe 3) — flat, Black Friday, Edit locked day 30. Shipped d0ac904 (voice 'Show my proof of purchase' chip only when photos.pop has files; app/shim ?v 1796900100) + 3e30834 (locked ovHero drops .pe-d date — read as opening date; deals/shim ?v 1796900200).
 - Used 11-27: Jhansi/Karimnagar/Margao/Rourkela, Mississauga/Adelaide, Al Wakrah/Bordeaux/İzmir/Suzhou. QA runs at ~23:45 UTC → dates/greetings in shots are UTC ('Thursday 26', 'Good evening'), not bugs.
 
+- 2026-11-28: avg trust 2.5/desire 2.1/ease 5.6/speed 8.0/value 2.2, buy 0/10 (maybe 2); Edit locked day 31, day after BF. Shipped b19f5d7 (Help h2 'Ask for a quote'→'Ask for a specific piece' to match every CTA; app/shim ?v 1797200100) + 79d26dc (Help note + 'Luxella replies within 24 hours', reused from deals.js enquiry sheet).
+- Used 11-28: Patiala/Vellore/Kakinada/Silchar, Jersey City/Coventry, Al Madinah/Rotterdam/Denpasar/Port Harcourt. Heading caps-vs-italic split is deliberate (style.css:1941, 48b8e22) — don't "fix" it, it's in Inbox for design.
+- 2026-11-28: push run #195 46115835033 green + deploy ok; both visible in after-screens.
